@@ -1,0 +1,988 @@
+/*
+* Argus Open Source
+* Software to apply Statistical Disclosure Control techniques
+* 
+* Copyright 2014 Statistics Netherlands
+* 
+* This program is free software; you can redistribute it and/or 
+* modify it under the terms of the European Union Public Licence 
+* (EUPL) version 1.1, as published by the European Commission.
+* 
+* You can find the text of the EUPL v1.1 on
+* https://joinup.ec.europa.eu/software/page/eupl/licence-eupl
+* 
+* This software is distributed on an "AS IS" basis without 
+* warranties or conditions of any kind, either express or implied.
+*/
+
+package tauargus.gui;
+
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.JTree;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
+import org.apache.commons.lang3.StringUtils;
+import tauargus.extern.dataengine.TauArgus;
+import tauargus.model.Application;
+import tauargus.model.ArgusException;
+import tauargus.model.RecodeInfo;
+import tauargus.model.TableSet;
+import tauargus.model.VarCodeProperties;
+import tauargus.model.Variable;
+import tauargus.utils.SingleListSelectionModel;
+//import tauargus.utils.ExecUtils;
+import argus.utils.SystemUtils;
+import tauargus.service.TableService;
+import tauargus.utils.TableColumnResizer;
+import tauargus.utils.TauArgusUtils;
+import tauargus.utils.TreeUtils;
+
+public class DialogGlobalRecode extends DialogBase {
+
+    private static class CodeInfo {
+        private final int codeIndex;
+        private final String label;
+        private final boolean active;
+        private final boolean missing;
+
+        public CodeInfo(int codeIndex, String label, boolean missing, boolean active) {
+            this.codeIndex = codeIndex;
+            this.label = label;
+            this.missing = missing;
+            this.active = active;
+        }
+
+        public int getCodeIndex() {
+            return codeIndex;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public boolean isActive() {
+            return active;
+        }
+
+        public boolean isMissing() {
+            return missing;
+        }
+
+        @Override
+        public String toString() {
+            return label;
+        }
+    }
+    
+    private static class VariableTableModel extends AbstractTableModel {
+        private List<Variable> variables;
+
+        VariableTableModel(List<Variable> variables) {
+            this.variables = variables;
+        }
+
+        public void setData(List<Variable> variables) {
+            this.variables = variables;
+            fireTableDataChanged();
+        }
+
+        @Override
+        public int getRowCount() {
+            return variables.size();
+        }
+
+        static String[] columnNames = { "R", "Variable", "Extended variable" };
+
+        @Override
+        public int getColumnCount() {
+            return columnNames.length;
+        }
+
+        @Override
+        public String getColumnName(int column) {
+            return columnNames[column];
+        }
+
+        @Override
+        public Object getValueAt(int rowIndex, int columnIndex) {
+            return variables.get(rowIndex);
+        }
+
+        @Override
+        public Class<?> getColumnClass(int columnIndex) {
+            return Variable.class;
+        }
+    }
+    
+    /**
+     * Will be used for listening to changes in missing1, missing2, codelist and recode data
+     */
+    private static class MyDocumentListener implements DocumentListener {
+        private boolean changed = false;
+
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            changed = true;
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            changed = true;
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            changed = true;
+        }
+
+        public void setChanged(boolean changed) {
+            this.changed = changed;
+        }
+
+        public boolean isChanged() {
+            return changed;
+        }
+    }
+        
+    private static final Logger logger = Logger.getLogger(DialogGlobalRecode.class.getName());
+
+    private TauArgus tauArgus = Application.getTauArgusDll();
+    private TableSet tableSet;
+    private Variable variable;
+    private boolean fromTree;
+    private MyDocumentListener documentListener;
+
+    /**
+     * Creates new form DialogGlobalRecode
+     */
+    public DialogGlobalRecode(java.awt.Frame parent, boolean modal) {
+        super(parent, modal);
+        initComponents();
+
+        tableVariables.setDefaultRenderer(Variable.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Variable variable = (Variable) value;
+                if (column == 0) {
+                    if (variable.recoded)
+                        value = "R";
+                    else if (variable.truncLevels > 0)
+                        value = "T";
+                    else
+                        value = "";
+                }
+                if (column == 1) {
+                    value = variable.name; // VarName(i)
+                }
+                if (column == 2) {
+                    value = variable.name; // metadata.Varlist(i).Name
+                }
+                Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                if ((variable.recoded || variable.truncLevels > 0) && !isSelected) {
+                    component.setForeground(Color.red);
+                } else {
+                    component.setForeground(Color.black);
+                }
+                return component;
+            }
+        });
+
+        panelRecodeData.setVisible(false);
+        panelTree.setVisible(false);
+        treeCode.setVisible(false);
+        
+        ListSelectionModel selectionModel = new SingleListSelectionModel();
+        selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        selectionModel.addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                if (documentListener.isChanged()) {
+                    documentListener.setChanged(false);
+                    saveRecodeInfo();
+                }
+                int selectedRow = tableVariables.getSelectedRow();
+                if (selectedRow != -1) {
+                    variable = tableSet.expVar.get(selectedRow);
+                    fromTree = variable.hierarchical != Variable.HIER_NONE;
+                    panelRecodeData.setVisible(!fromTree);
+                    panelMissing.setVisible(!fromTree);
+                    panelTree.setVisible(fromTree);
+                    treeCode.setVisible(fromTree);
+                    buttonUndo.setEnabled(variable.recoded);
+                    buttonApply.setEnabled(!variable.recoded);
+                    buttonRead.setEnabled(!fromTree);
+                    if (fromTree) {
+                        buildTree();
+                        labelTreeResult.setText("");
+                    } else {
+                        labelRecodeData.setText("Edit box for global recode");
+                        textAreaRecodeData.setText("");
+                        textFieldMissing1.setText("");
+                        textFieldMissing2.setText("");
+                        textFieldCodelist.setText("");
+                        if (variable.recoded) {
+                            try {
+                                RecodeInfo recodeInfo = variable.readRecodeFile(variable.currentRecodeFile);
+                                textFieldCodelist.setText(variable.currentRecodeCodeListFile);
+                                if (recodeInfo != null) {
+                                    labelRecodeData.setText(variable.currentRecodeFile);
+                                    textAreaRecodeData.setText(recodeInfo.getRecodeData());
+                                    textFieldMissing1.setText(recodeInfo.getMissing1());
+                                    textFieldMissing2.setText(recodeInfo.getMissing2());
+                                    textFieldCodelist.setText(recodeInfo.getCodeList());
+                                }
+// Anco 1.6
+                                //                            } catch (ArgusException | IOException ex) {
+                               } catch (ArgusException  ex) {
+                                JOptionPane.showMessageDialog(DialogGlobalRecode.this, ex.getMessage());}
+                                catch (IOException ex) {
+                                JOptionPane.showMessageDialog(DialogGlobalRecode.this, ex.getMessage());
+                            }
+                        }
+                        textAreaWarning.setText("");
+                    }
+                }
+                documentListener.setChanged(false);
+            }
+        });
+
+        documentListener = new MyDocumentListener();
+        textAreaRecodeData.getDocument().addDocumentListener(documentListener);
+        textFieldMissing1.getDocument().addDocumentListener(documentListener);
+        textFieldMissing2.getDocument().addDocumentListener(documentListener);
+        textFieldCodelist.getDocument().addDocumentListener(documentListener);
+        
+        tableVariables.setSelectionModel(selectionModel);
+    
+        treeCode.setCellRenderer(new DefaultTreeCellRenderer() {
+            @Override
+            public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+                Component component = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+                Object userObject = ((DefaultMutableTreeNode) value).getUserObject();
+                if (userObject instanceof CodeInfo) {
+                    CodeInfo codeInfo = (CodeInfo) userObject;
+                    if (!codeInfo.isActive()) {
+                        component.setForeground(Color.gray);
+                    } else if (codeInfo.isMissing()) {
+                        component.setForeground(Color.red);
+                    }
+                }
+                return component;
+            }
+        });
+        
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                if (documentListener.isChanged()) {
+                    documentListener.setChanged(false);
+                    saveRecodeInfo();
+                }
+
+                tauArgus.ApplyRecode();
+            }
+        });
+
+        setLocationRelativeTo(parent);
+    }
+
+    public void showDialog(TableSet tableSet) {
+        this.tableSet = tableSet;
+
+        tableVariables.setModel(new VariableTableModel(tableSet.expVar));
+        TableColumnResizer.adjustColumnPreferredWidths(tableVariables, false);
+        
+        if (tableSet.expVar.size() != 0) {
+            tableVariables.setRowSelectionInterval(0, 0);
+        }
+        
+        labelRecodeData.setText("Edit box for global recode");
+        pack();
+        setVisible(true);
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        fileChooser = new javax.swing.JFileChooser();
+        scrollPaneVariables = new javax.swing.JScrollPane();
+        tableVariables = new javax.swing.JTable();
+        panelRecode = new javax.swing.JPanel();
+        buttonRead = new javax.swing.JButton();
+        buttonApply = new javax.swing.JButton();
+        buttonUndo = new javax.swing.JButton();
+        panelClose = new javax.swing.JPanel();
+        buttonClose = new javax.swing.JButton();
+        panelMissing = new javax.swing.JPanel();
+        labelMissing1 = new javax.swing.JLabel();
+        textFieldMissing1 = new javax.swing.JTextField();
+        labelMissing2 = new javax.swing.JLabel();
+        textFieldMissing2 = new javax.swing.JTextField();
+        panelRecodeData = new javax.swing.JPanel();
+        labelRecodeData = new javax.swing.JLabel();
+        scrollPaneRecodeData = new javax.swing.JScrollPane();
+        textAreaRecodeData = new javax.swing.JTextArea();
+        labelCodelist = new javax.swing.JLabel();
+        textFieldCodelist = new javax.swing.JTextField();
+        buttonCodelist = new javax.swing.JButton();
+        labelWarning = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        textAreaWarning = new javax.swing.JTextArea();
+        panelTree = new javax.swing.JPanel();
+        labelMaxLevel = new javax.swing.JLabel();
+        comboBoxMaxLevel = new javax.swing.JComboBox();
+        scrollPaneCodeTree = new javax.swing.JScrollPane();
+        treeCode = new javax.swing.JTree();
+        labelTreeResult = new javax.swing.JLabel();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+
+        tableVariables.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "R", "Variable", "Extended variable"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        tableVariables.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        tableVariables.getTableHeader().setReorderingAllowed(false);
+        scrollPaneVariables.setViewportView(tableVariables);
+
+        panelRecode.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        buttonRead.setText("Read");
+        buttonRead.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonReadActionPerformed(evt);
+            }
+        });
+
+        buttonApply.setText("Apply");
+        buttonApply.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonApplyActionPerformed(evt);
+            }
+        });
+
+        buttonUndo.setText("Undo");
+        buttonUndo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonUndoActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout panelRecodeLayout = new javax.swing.GroupLayout(panelRecode);
+        panelRecode.setLayout(panelRecodeLayout);
+        panelRecodeLayout.setHorizontalGroup(
+            panelRecodeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelRecodeLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panelRecodeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(buttonRead, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(buttonApply, javax.swing.GroupLayout.DEFAULT_SIZE, 98, Short.MAX_VALUE)
+                    .addComponent(buttonUndo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        panelRecodeLayout.setVerticalGroup(
+            panelRecodeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelRecodeLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(buttonRead)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(buttonApply)
+                .addGap(18, 18, 18)
+                .addComponent(buttonUndo)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        panelClose.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        buttonClose.setText("Close");
+        buttonClose.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonCloseActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout panelCloseLayout = new javax.swing.GroupLayout(panelClose);
+        panelClose.setLayout(panelCloseLayout);
+        panelCloseLayout.setHorizontalGroup(
+            panelCloseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelCloseLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(buttonClose, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        panelCloseLayout.setVerticalGroup(
+            panelCloseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelCloseLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(buttonClose)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        panelMissing.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Missing values"));
+
+        labelMissing1.setText("1");
+
+        labelMissing2.setText("2");
+
+        javax.swing.GroupLayout panelMissingLayout = new javax.swing.GroupLayout(panelMissing);
+        panelMissing.setLayout(panelMissingLayout);
+        panelMissingLayout.setHorizontalGroup(
+            panelMissingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelMissingLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panelMissingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(labelMissing1)
+                    .addComponent(labelMissing2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panelMissingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(textFieldMissing1)
+                    .addComponent(textFieldMissing2))
+                .addContainerGap())
+        );
+        panelMissingLayout.setVerticalGroup(
+            panelMissingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelMissingLayout.createSequentialGroup()
+                .addGroup(panelMissingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(labelMissing1)
+                    .addComponent(textFieldMissing1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panelMissingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(labelMissing2)
+                    .addComponent(textFieldMissing2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+        );
+
+        panelRecodeData.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        labelRecodeData.setText("<FileName>");
+
+        textAreaRecodeData.setColumns(20);
+        textAreaRecodeData.setRows(5);
+        scrollPaneRecodeData.setViewportView(textAreaRecodeData);
+
+        labelCodelist.setText("Codelist for recode:");
+
+        buttonCodelist.setText("...");
+        buttonCodelist.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonCodelistActionPerformed(evt);
+            }
+        });
+
+        labelWarning.setText("Warning:");
+
+        jScrollPane1.setToolTipText("");
+        jScrollPane1.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+
+        textAreaWarning.setColumns(20);
+        textAreaWarning.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
+        textAreaWarning.setRows(5);
+        jScrollPane1.setViewportView(textAreaWarning);
+
+        javax.swing.GroupLayout panelRecodeDataLayout = new javax.swing.GroupLayout(panelRecodeData);
+        panelRecodeData.setLayout(panelRecodeDataLayout);
+        panelRecodeDataLayout.setHorizontalGroup(
+            panelRecodeDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelRecodeDataLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panelRecodeDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(scrollPaneRecodeData, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE)
+                    .addComponent(labelRecodeData, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(labelCodelist, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(panelRecodeDataLayout.createSequentialGroup()
+                        .addComponent(textFieldCodelist)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(buttonCodelist))
+                    .addComponent(labelWarning, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1))
+                .addContainerGap())
+        );
+        panelRecodeDataLayout.setVerticalGroup(
+            panelRecodeDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelRecodeDataLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(labelRecodeData)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(scrollPaneRecodeData)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(labelCodelist)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panelRecodeDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(textFieldCodelist, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(buttonCodelist))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(labelWarning)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+
+        panelTree.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        labelMaxLevel.setText("Maximum level:");
+
+        comboBoxMaxLevel.setMaximumRowCount(9);
+        comboBoxMaxLevel.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }));
+        comboBoxMaxLevel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboBoxMaxLevelActionPerformed(evt);
+            }
+        });
+
+        scrollPaneCodeTree.setViewportView(treeCode);
+
+        javax.swing.GroupLayout panelTreeLayout = new javax.swing.GroupLayout(panelTree);
+        panelTree.setLayout(panelTreeLayout);
+        panelTreeLayout.setHorizontalGroup(
+            panelTreeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelTreeLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panelTreeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(scrollPaneCodeTree, javax.swing.GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE)
+                    .addGroup(panelTreeLayout.createSequentialGroup()
+                        .addComponent(labelMaxLevel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(comboBoxMaxLevel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(labelTreeResult, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        panelTreeLayout.setVerticalGroup(
+            panelTreeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelTreeLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panelTreeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(labelMaxLevel, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(comboBoxMaxLevel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(scrollPaneCodeTree)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(labelTreeResult, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(scrollPaneVariables, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(panelRecode, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(panelClose, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(panelMissing, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(panelRecodeData, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(panelTree, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {panelRecodeData, panelTree});
+
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(panelTree, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(scrollPaneVariables, javax.swing.GroupLayout.DEFAULT_SIZE, 497, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(panelRecode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(panelClose, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(panelMissing, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(panelRecodeData, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void buttonUndoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonUndoActionPerformed
+        if (!tauArgus.UndoRecode(variable.index)) {
+            JOptionPane.showMessageDialog(this, "Unknown error when undoing recode");
+        } else {
+            variable.recoded = false;
+            variable.truncLevels = 0;
+            ((AbstractTableModel)tableVariables.getModel()).fireTableDataChanged();
+            buttonUndo.setEnabled(false);
+            if (fromTree) {
+                buildTree();
+            }
+            labelTreeResult.setText("");
+            labelTreeResult.setForeground(Color.black);
+            labelWarning.setText("");
+            labelWarning.setForeground(Color.black);
+            logger.info("Recode for var: " + variable.name + " has been reversed\n"); // VarName(CurrentVar)
+            SystemUtils.writeLogbook("Recode for var: " + variable.name + " has been reversed");
+            buttonApply.setEnabled(true); 
+            buttonUndo.setEnabled(false);
+            buttonRead.setEnabled(!fromTree);
+            textAreaWarning.setText("");
+        }
+    }//GEN-LAST:event_buttonUndoActionPerformed
+
+    private void buttonCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCloseActionPerformed
+        setVisible(false);
+        if (documentListener.isChanged()) {
+            documentListener.setChanged(false);
+            saveRecodeInfo();
+        }
+
+        tauArgus.ApplyRecode();
+        for (int i=0;i<TableService.numberOfTables();i++){
+            TableSet tableSet = TableService.getTable(i);
+            tableSet.clearHistory();
+        }
+        dispose();
+    }//GEN-LAST:event_buttonCloseActionPerformed
+
+    private void comboBoxMaxLevelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxMaxLevelActionPerformed
+        int selectedIndex = comboBoxMaxLevel.getSelectedIndex(); int maxDepth = 0;
+        if (selectedIndex != -1) {
+            maxDepth = expand(selectedIndex + 1);
+        }
+    }//GEN-LAST:event_comboBoxMaxLevelActionPerformed
+
+    private void buttonApplyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonApplyActionPerformed
+        if (fromTree) {
+            tauArgus.UndoRecode(variable.index);
+            for (int row = 0; row < treeCode.getRowCount(); row++) {
+                if (treeCode.isCollapsed(row)) {
+                    TreePath treePath = treeCode.getPathForRow(row);
+                    DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) treePath.getLastPathComponent();
+                    if (!treeCode.getModel().isLeaf(treeNode)) {
+                        CodeInfo codeInfo = (CodeInfo)treeNode.getUserObject();
+                        if (!tauArgus.SetVarCodeActive(variable.index, codeInfo.getCodeIndex(), false)) {
+                            JOptionPane.showMessageDialog(this, "Iets fout in de tree");
+                        }
+                   }
+                }
+            }
+            if (tauArgus.DoActiveRecode(variable.index)) {
+                variable.recoded = true;
+                buttonUndo.setEnabled(true);
+                buttonApply.setEnabled(false);
+                labelTreeResult.setText("Tree recode has been applied successfully");
+                labelTreeResult.setForeground(Color.black);
+                ((AbstractTableModel)tableVariables.getModel()).fireTableDataChanged();
+                logger.info("Var: " + variable.name + " has been recoded\n"); // VarName(CurrentVar) 
+                SystemUtils.writeLogbook("Var: " + variable.name + " has been recoded");
+                buildTree();
+            } else {
+                JOptionPane.showMessageDialog(this, "This hierarchical recoding could not be applied");
+                labelTreeResult.setText("Tree recode could not be applied");
+                labelTreeResult.setForeground(Color.red);
+            }
+        } else {
+            RecodeInfo recodeInfo = new RecodeInfo(
+                    textAreaRecodeData.getText(), 
+                    textFieldMissing1.getText(), 
+                    textFieldMissing2.getText(), 
+                    textFieldCodelist.getText());
+            try {
+                variable.recode(recodeInfo);
+                buttonApply.setEnabled(false);
+                buttonUndo.setEnabled(true);
+                buttonRead.setEnabled(false);
+                textAreaWarning.setText(Variable.RecodeWarning);
+                logger.log(Level.INFO, "Var: {0} has been recoded", variable.name);
+                ((AbstractTableModel)tableVariables.getModel()).fireTableDataChanged();
+//                textAreaRecodeData.requestFocusInWindow();
+//                textAreaRecodeData.setCaretPosition(StrUtils.startingPosition(textAreaRecodeData.getText(), errorLine[0], errorPos[0]));
+            } catch (ArgusException ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage());
+            }
+        }
+    }//GEN-LAST:event_buttonApplyActionPerformed
+
+    private void buttonCodelistActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCodelistActionPerformed
+        fileChooser.setDialogTitle("Select CodeList files");
+        fileChooser.setSelectedFile(new File(""));
+        fileChooser.resetChoosableFileFilters();
+        fileChooser.setFileFilter(new FileNameExtensionFilter("CodeList files (*.cdl)", "cdl"));
+        if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
+            String codeListFile = fileChooser.getSelectedFile().toString();
+            textFieldCodelist.setText(codeListFile);
+            variable.currentRecodeCodeListFile = codeListFile;
+        }
+    }//GEN-LAST:event_buttonCodelistActionPerformed
+
+    private void buttonReadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonReadActionPerformed
+        String hs = SystemUtils.getRegString("general", "datadir", "");
+        if (!hs.equals("")){
+            File file = new File(hs); 
+            fileChooser.setCurrentDirectory(file);
+        }
+        fileChooser.setDialogTitle("Recode files");
+        fileChooser.setSelectedFile(new File(""));
+        fileChooser.resetChoosableFileFilters();
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Recode files (*.grc)", "grc"));
+        
+        if (fromTree) {
+            if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
+                String recodeListFile = fileChooser.getSelectedFile().toString();
+                try {
+                    variable.applyRecodeTree(recodeListFile);
+                    variable.recoded = true;
+                    buildTree();
+                    ((AbstractTableModel)tableVariables.getModel()).fireTableDataChanged();
+                    buttonUndo.setEnabled(true);
+                    // buttonApply.setEnabled(false);
+                    labelTreeResult.setText("Tree recode has been applied successfully");
+                    labelTreeResult.setForeground(Color.black);
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, ex.getMessage());
+                }
+            }
+        } else {
+            if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
+                String fileName = fileChooser.getSelectedFile().toString();
+                if (StringUtils.isNotBlank(fileName)) {
+                    try {
+                    if (!TauArgusUtils.ExistFile(fileName)){ throw new ArgusException ("Recode file ("+fileName+ ") does not exist");}
+                        RecodeInfo recodeInfo = variable.readRecodeFile(fileName);
+                        if (recodeInfo != null) {
+                            labelRecodeData.setText(fileName);
+                            textAreaRecodeData.setText(recodeInfo.getRecodeData());
+                            textFieldMissing1.setText(recodeInfo.getMissing1());
+                            textFieldMissing2.setText(recodeInfo.getMissing2());
+                            textFieldCodelist.setText(recodeInfo.getCodeList());
+                            variable.currentRecodeFile = fileName;
+                        }
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(this, ex.getMessage());
+                    }
+                } 
+            }
+        }
+    }//GEN-LAST:event_buttonReadActionPerformed
+
+    private void saveRecodeInfo() {
+        RecodeInfo recodeInfo = new RecodeInfo(textAreaRecodeData.getText(), textFieldMissing1.getText(), textFieldMissing2.getText(), textFieldCodelist.getText());
+        int i = JOptionPane.showConfirmDialog(this, "Recode information has been changed.\nSave recodefile?", "ARGUS-recodefiles", JOptionPane.YES_NO_OPTION);
+        if (i == JOptionPane.YES_OPTION) {
+        String hs = SystemUtils.getRegString("general", "datadir", "");
+        if (!hs.equals("")){
+            File file = new File(hs); 
+            fileChooser.setCurrentDirectory(file);
+        }
+            fileChooser.setDialogTitle("Save global recode file");
+            fileChooser.setSelectedFile(new File(variable.currentRecodeFile));
+            fileChooser.setFileFilter(new FileNameExtensionFilter("Recode files (*.grc)", "grc"));
+            if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
+                variable.currentRecodeFile = fileChooser.getSelectedFile().toString();
+                try {
+                    variable.writeRecodeFile(variable.currentRecodeFile, recodeInfo);
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(DialogGlobalRecode.this, ex.getMessage());
+                }
+                return;
+            }
+        }
+        String tempDir = Application.getTempDir();
+        File f = new File(tempDir, "Argus" + variable.index + ".grc");
+        variable.currentRecodeFile = f.getAbsolutePath();
+        try {
+            variable.writeRecodeFile(variable.currentRecodeFile, recodeInfo);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(DialogGlobalRecode.this, ex.getMessage());
+        }
+    }
+
+    private int addChildren(DefaultMutableTreeNode parentNode, VarCodeProperties parentProperties, int codeIndex) {
+        int nChildren = parentProperties.getnChildren();
+        VarCodeProperties properties = new VarCodeProperties();
+        for (int i = 0; i < nChildren; i++) {
+            codeIndex++;
+            properties.setCode(variable.index, codeIndex); 
+            CodeInfo codeInfo = new CodeInfo(codeIndex, properties.getCode(), properties.isMissing(), properties.isActive());
+            DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(codeInfo, properties.isParent());
+            parentNode.add(childNode);
+            codeIndex = addChildren(childNode, properties, codeIndex);
+        }
+        return codeIndex;
+    }
+    
+    private void addMissing(DefaultMutableTreeNode topNode, int codeIndex) {
+        VarCodeProperties properties = new VarCodeProperties();
+        for (;;) {
+            codeIndex++;
+            if (!properties.setCode(variable.index, codeIndex)) {
+                break;
+            }
+            CodeInfo codeInfo = new CodeInfo(codeIndex, properties.getCode(), properties.isMissing(), properties.isActive());
+            DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(codeInfo, properties.isParent());
+            topNode.add(childNode);
+        }
+    }
+    
+    private void buildTree() {
+        int codeIndex = 0; int maxDepth = 0; int VarDepth = 0; int MaxLevelChoice = 0;
+        VarCodeProperties properties = new VarCodeProperties(variable.index, codeIndex);
+        CodeInfo codeInfo = new CodeInfo(codeIndex, properties.getCode(), properties.isMissing(), properties.isActive());
+        DefaultMutableTreeNode topNode = new DefaultMutableTreeNode(codeInfo, properties.isParent());
+        codeIndex = addChildren(topNode, properties, codeIndex);
+        addMissing(topNode, codeIndex);
+
+        DefaultTreeModel treeModel = new DefaultTreeModel(topNode);
+        treeCode.setModel(treeModel);
+        maxDepth = expand(Integer.MAX_VALUE);
+        //maxDepth = expand(variable.GetDepthOfHierarchicalBoom());
+        VarDepth = variable.GetDepthOfHierarchicalBoom(variable.recoded)-1; // here levels are numbered 0, 1, 2, 3, ...
+        MaxLevelChoice = comboBoxMaxLevel.getItemCount()-1;
+        if (VarDepth - MaxLevelChoice < 0)
+        {            
+            for (int j=VarDepth;j<MaxLevelChoice;j++)
+            {
+                comboBoxMaxLevel.removeItemAt(VarDepth+1);
+            }
+        }
+        else
+        {
+            for (int j=MaxLevelChoice+1;j<=VarDepth;j++)
+            {
+                comboBoxMaxLevel.addItem(Integer.toString(j+1));
+            }
+            
+        }
+        comboBoxMaxLevel.setSelectedIndex(maxDepth);
+    }
+    
+    private int expand(int depth) {
+        TreeModel treeModel = treeCode.getModel(); int j;
+        TreeUtils.collapse(treeCode, 0);
+        int maxDepth = 0;
+        for (int row = 0; row < treeCode.getRowCount(); row++) {
+            TreePath treePath = treeCode.getPathForRow(row);
+            DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode)treePath.getLastPathComponent();
+            j = treeNode.getLevel();
+            if (treeNode.getLevel() < depth && treeModel.getChildCount(treeNode) != 0) {
+                DefaultMutableTreeNode firstChild = (DefaultMutableTreeNode)treeModel.getChild(treeNode, 0);
+                CodeInfo codeInfo = (CodeInfo)firstChild.getUserObject();
+                if (codeInfo.isActive()) {
+                    treeCode.expandRow(row);
+                    if (treeNode.getLevel() > maxDepth){maxDepth=treeNode.getLevel(); }
+                }
+            }
+        }   
+        return maxDepth;
+    }
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(DialogGlobalRecode.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(DialogGlobalRecode.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(DialogGlobalRecode.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(DialogGlobalRecode.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the dialog */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                DialogGlobalRecode dialog = new DialogGlobalRecode(new javax.swing.JFrame(), true);
+                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
+                    public void windowClosing(java.awt.event.WindowEvent e) {
+                        System.exit(0);
+                    }
+                });
+                dialog.setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton buttonApply;
+    private javax.swing.JButton buttonClose;
+    private javax.swing.JButton buttonCodelist;
+    private javax.swing.JButton buttonRead;
+    private javax.swing.JButton buttonUndo;
+    private javax.swing.JComboBox comboBoxMaxLevel;
+    private javax.swing.JFileChooser fileChooser;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel labelCodelist;
+    private javax.swing.JLabel labelMaxLevel;
+    private javax.swing.JLabel labelMissing1;
+    private javax.swing.JLabel labelMissing2;
+    private javax.swing.JLabel labelRecodeData;
+    private javax.swing.JLabel labelTreeResult;
+    private javax.swing.JLabel labelWarning;
+    private javax.swing.JPanel panelClose;
+    private javax.swing.JPanel panelMissing;
+    private javax.swing.JPanel panelRecode;
+    private javax.swing.JPanel panelRecodeData;
+    private javax.swing.JPanel panelTree;
+    private javax.swing.JScrollPane scrollPaneCodeTree;
+    private javax.swing.JScrollPane scrollPaneRecodeData;
+    private javax.swing.JScrollPane scrollPaneVariables;
+    private javax.swing.JTable tableVariables;
+    private javax.swing.JTextArea textAreaRecodeData;
+    private javax.swing.JTextArea textAreaWarning;
+    private javax.swing.JTextField textFieldCodelist;
+    private javax.swing.JTextField textFieldMissing1;
+    private javax.swing.JTextField textFieldMissing2;
+    private javax.swing.JTree treeCode;
+    // End of variables declaration//GEN-END:variables
+}
