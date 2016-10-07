@@ -277,7 +277,7 @@ public class DialogSpecifyTablesMicro extends DialogBase {
             textFieldReqRange[i].setText(Integer.toString(tableSet.piepMarge[i]));
             textFieldReqFreq[i].setText(Integer.toString(tableSet.piepMinFreq[i]));
             textFieldRange[i].setText(Integer.toString(tableSet.frequencyMarge[i]));
-            textFieldMinFreq[i].setText(Integer.toString(tableSet.minFreq[i]));
+            if (tableSet.frequencyRule) textFieldMinFreq[i].setText(Integer.toString(tableSet.minFreq[i]));
         }
 
         //loadDefaultsFromRegistry();
@@ -473,11 +473,12 @@ public class DialogSpecifyTablesMicro extends DialogBase {
             tableSet.piepMarge[i] = Integer.parseInt(textFieldReqRange[i].getText());
             tableSet.piepMinFreq[i] = Integer.parseInt(textFieldReqFreq[i].getText());
 
-            //if (tableSet.frequencyRule) {
+            // This if-statement is needed (is not controlled by boolean when calling SetTableSafety-routine) 
+            if (tableSet.frequencyRule) {
                 tableSet.minFreq[i] = Integer.parseInt(textFieldMinFreq[i].getText());
-            //} else {
-            //    tableSet.minFreq[i] = 0;
-            //}
+            } else {
+                tableSet.minFreq[i] = 0;
+            }
             tableSet.frequencyMarge[i] = Integer.parseInt(textFieldRange[i].getText());
         }
         if (!tableSet.holding) {
