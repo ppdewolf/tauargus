@@ -115,7 +115,7 @@ public class TauArgus {
     return TauArgusJavaJNI.TauArgus_UndoSecondarySuppress(swigCPtr, this, TableIndex, SortSuppress);
   }
 
-  public boolean SetTableSafetyInfo(int TabIndex, boolean HasMaxScore, boolean DominanceRule, int[] DominanceNumber, int[] DominancePerc, boolean PQRule, int[] PriorPosteriorP, int[] PriorPosteriorQ, int[] PriorPosteriorN, boolean HasFreq, int CellFreqSafetyPerc, int SafeMinRec, boolean HasStatus, int ManualSafetyPerc, boolean ApplyZeroRule, int ZeroSafetyRange, boolean EmptyCellAsNonStructural, int NSEmptySafetyRange, int[] ErrorCode) {
+  public boolean SetTableSafetyInfo(int TabIndex, boolean HasMaxScore, boolean DominanceRule, int[] DominanceNumber, int[] DominancePerc, boolean PQRule, int[] PriorPosteriorP, int[] PriorPosteriorQ, int[] PriorPosteriorN, boolean HasFreq, int CellFreqSafetyPerc, int SafeMinRec, boolean HasStatus, int ManualSafetyPerc, boolean ApplyZeroRule, double ZeroSafetyRange, boolean EmptyCellAsNonStructural, int NSEmptySafetyRange, int[] ErrorCode) {
     return TauArgusJavaJNI.TauArgus_SetTableSafetyInfo(swigCPtr, this, TabIndex, HasMaxScore, DominanceRule, DominanceNumber, DominancePerc, PQRule, PriorPosteriorP, PriorPosteriorQ, PriorPosteriorN, HasFreq, CellFreqSafetyPerc, SafeMinRec, HasStatus, ManualSafetyPerc, ApplyZeroRule, ZeroSafetyRange, EmptyCellAsNonStructural, NSEmptySafetyRange, ErrorCode);
   }
 
@@ -215,7 +215,7 @@ public class TauArgus {
     return TauArgusJavaJNI.TauArgus_PrepareHITAS(swigCPtr, this, TableIndex, NameParameterFile, NameFilesFile, TauTemp);
   }
 
-  public boolean SetTableSafety(int Index, boolean DominanceRule, int[] DominanceNumber, int[] DominancePerc, boolean PQRule, int[] PriorPosteriorP, int[] PriorPosteriorQ, int[] PriorPosteriorN, int[] SafeMinRecAndHoldings, int[] PeepPerc, int[] PeepSafetyRange, int[] PeepMinFreqCellAndHolding, boolean ApplyPeep, boolean ApplyWeight, boolean ApplyWeightOnSafetyRule, boolean ApplyHolding, boolean ApplyZeroRule, boolean EmptyCellAsNonStructural, int NSEmptySafetyRange, int ZeroSafetyRange, int ManualSafetyPerc, int[] CellAndHoldingFreqSafetyPerc) {
+  public boolean SetTableSafety(int Index, boolean DominanceRule, int[] DominanceNumber, int[] DominancePerc, boolean PQRule, int[] PriorPosteriorP, int[] PriorPosteriorQ, int[] PriorPosteriorN, int[] SafeMinRecAndHoldings, int[] PeepPerc, int[] PeepSafetyRange, int[] PeepMinFreqCellAndHolding, boolean ApplyPeep, boolean ApplyWeight, boolean ApplyWeightOnSafetyRule, boolean ApplyHolding, boolean ApplyZeroRule, boolean EmptyCellAsNonStructural, int NSEmptySafetyRange, double ZeroSafetyRange, int ManualSafetyPerc, int[] CellAndHoldingFreqSafetyPerc) {
     return TauArgusJavaJNI.TauArgus_SetTableSafety(swigCPtr, this, Index, DominanceRule, DominanceNumber, DominancePerc, PQRule, PriorPosteriorP, PriorPosteriorQ, PriorPosteriorN, SafeMinRecAndHoldings, PeepPerc, PeepSafetyRange, PeepMinFreqCellAndHolding, ApplyPeep, ApplyWeight, ApplyWeightOnSafetyRule, ApplyHolding, ApplyZeroRule, EmptyCellAsNonStructural, NSEmptySafetyRange, ZeroSafetyRange, ManualSafetyPerc, CellAndHoldingFreqSafetyPerc);
   }
 
