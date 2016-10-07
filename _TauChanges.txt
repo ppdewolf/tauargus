@@ -31,3 +31,6 @@ summary    : Apriori file adapted. If only the cost is used (with "omit"), this 
 date       : Oct 7, 2016 11:42:07 AM
 summary    : MinFreq rule correctly passed with save(tableSet)
              See UserSupport issue #3
+
+date       : Oct 7, 2016 
+summary    : Zero unsafe correctly passed with save(tableSet) and correctly used in Calculate Table
