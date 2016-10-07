@@ -34,3 +34,6 @@ summary    : MinFreq rule correctly passed with save(tableSet)
 
 date       : Oct 7, 2016 
 summary    : Zero unsafe correctly passed with save(tableSet) and correctly used in Calculate Table
+
+date       : Oct 7, 2016 3:41:44 PM
+summary    : Spureous commas in csv output format removed
