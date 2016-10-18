@@ -106,9 +106,9 @@ public class GHMiter {
         testProto003(tableSet);
 
         int OkeCode = tauArgus.SetSecondaryGHMITER(Application.getTempFile(ausgabe), tableSet.index, NSec, false);
-        OkeCode = 4007;
+        //OkeCode = 4007;
         if (OkeCode == 4007){
-            tableSet.ghMiterMessage = "Some frozen/protected cells needed to be suppressed\n"; 
+            if (Application.isAnco()) tableSet.ghMiterMessage = "Some frozen/protected cells needed to be suppressed\n"; 
             writeFrozen(tableSet.expVar.size());
             OkeCode = 1;
         }
@@ -172,7 +172,7 @@ public class GHMiter {
             nt = nt + tableSet.ghMiterRatio[i];
         }
       if (nt !=0 ) {tableSet.ghMiterMessage = tableSet.ghMiterMessage + "Some (" + 
-               nt + ") cells could not be fully protected\n";}  
+               nt + ") cells could not be fully protected\nSave table and see report file for more info.";}  
      }
      catch(Exception ex){}
         

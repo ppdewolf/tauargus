@@ -37,3 +37,9 @@ summary    : Zero unsafe correctly passed with save(tableSet) and correctly used
 
 date       : Oct 7, 2016 3:41:44 PM
 summary    : Spureous commas in csv output format removed
+
+date       : Oct 18, 2016 3:45:15 PM
+summary    : Length code-names spanning variables for hypercube dynamic
+
+date       : Oct 18, 2016
+summary    : Correctly resetting file-format (free/fixed) when changing in one session

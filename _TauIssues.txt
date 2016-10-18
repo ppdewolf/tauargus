@@ -1,15 +1,11 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!  This file is no longer in use: now using the issue tracking system of GitHub
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
 ===================================
 2016001 
 Level nummer bij table-view en bij recode-tree is verschillend. Max 1 level in recode tree = max 2 level bij view table.
-
-===================================
-2016002 
-Minimum frequency rule wordt meegenomen, ook als niet aangevinkt!
-
-===================================
-2016003 
-"Zero unsafe" wordt niet meegenomen!
-PWOF: Wordt getest via Integer.parsInt() terwijl het een double mag zijn (default zelfs 0.0). Exception niet opgevangen.
 
 ===================================
 2016004 In een tab-file worden "lege" cellen gevuld met een 1 ??????
