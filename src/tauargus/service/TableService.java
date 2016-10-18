@@ -229,6 +229,10 @@ public class TableService {
         if (metadata.dataFileType == Metadata.DATA_FILE_TYPE_FREE) {
             tauArgus.SetInFileInfo(false, metadata.fieldSeparator);
         }
+        else{ // Is this indeed in all other cases ????? PWOF 18-10-2016
+            tauArgus.SetInFileInfo(true, metadata.fieldSeparator);
+        }
+            
         TauArgusUtils.setVariables();
         pcs.firePropertyChange("activityMain", null, "Exploring datafile...");
         pcs.firePropertyChange("progressMain", null, 0);
