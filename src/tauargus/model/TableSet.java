@@ -835,7 +835,8 @@ public class TableSet {
                   pqRule, pqP, pqQ, pqN,
                   frequencyRule, frequencyMarge[0], minFreq[0],
                   useStatusOnly, manualMarge,
-                  zeroUnsafe, (int)Math.round(zeroRange), false, 10, errorCodeArr)) {
+                  //zeroUnsafe, (int)Math.round(zeroRange), false, 10, errorCodeArr)) {
+                  zeroUnsafe, zeroRange, false, 10, errorCodeArr)) {
             int errorCode = errorCodeArr[0];
             throw new ArgusException("Error in specifying table " + index + "\n" + tauArgus.GetErrorString(errorCode));
         }

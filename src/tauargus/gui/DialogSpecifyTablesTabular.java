@@ -66,7 +66,7 @@ public class DialogSpecifyTablesTabular extends DialogBase {
         textFieldN.setInputVerifier(integerInputVerifier);
         textFieldFrequency.setInputVerifier(integerInputVerifier);
         textFieldRange.setInputVerifier(integerInputVerifier);
-        textFieldZeroMargin.setInputVerifier(integerInputVerifier);
+        textFieldZeroMargin.setInputVerifier(doubleInputVerifier);
         textFieldManualSafetyRange.setInputVerifier(integerInputVerifier);
 
         setLocationRelativeTo(parent);
@@ -881,7 +881,7 @@ public class DialogSpecifyTablesTabular extends DialogBase {
             table.minFreq[0] = 0;
         }
         if (table.zeroUnsafe) {
-            table.zeroRange = Integer.parseInt(textFieldZeroMargin.getText());
+            table.zeroRange = Double.parseDouble(textFieldZeroMargin.getText());
         }
 
         table.manualMarge = Integer.parseInt(textFieldManualSafetyRange.getText());
