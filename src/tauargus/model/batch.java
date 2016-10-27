@@ -873,7 +873,7 @@ public static int runBatchProcess(String batchFile){
           case "ZERO":{ //ZERO: (ZeroSafetyRange)
              if (tableset.isFrequencyTable()){throw new ArgusException ("Zero rule cannot be applied to a frequency table");} 
               tableset.zeroUnsafe = true;
-              tableset.zeroRange = Integer.parseInt(token);
+              tableset.zeroRange = Double.parseDouble(token);
               token = nextChar(tail);
               break;
           } 
