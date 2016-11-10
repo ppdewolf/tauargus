@@ -74,28 +74,38 @@ public class SaveTable {
     static public void writeTable(final TableSet tableSet, int selectedFormat)throws ArgusException{
         int respType = 0; 
         String hs;
+        Boolean oke= true;
         int[] dimSequence = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
         if (tableSet.rounded ){respType = 1;}
         if (tableSet.ctaProtect) {respType = 2;}
         switch (selectedFormat) {
             case TableSet.FILE_FORMAT_CSV:
                 if (!tauArgus.WriteCSV(tableSet.index, tableSet.safeFileName, dimSequence, respType)){
-                    throw new ArgusException ("An unexpected error occurred when writing the CVS file to"+
+                    throw new ArgusException ("An unexpected error occurred when writing the CVS file to "+
                             tableSet.safeFileName);
                     }
                 break;
             case TableSet.FILE_FORMAT_PIVOT_TABLE:
                 hs = makeFirstLine(tableSet, respType);
-                tauArgus.WriteCellRecords(tableSet.index, tableSet.safeFileName, 0,
-                        false, writeSupppressEmpty, hs, writeAddStatus, respType);
+                if (!tauArgus.WriteCellRecords(tableSet.index, tableSet.safeFileName, 0,
+                        false, writeSupppressEmpty, hs, writeAddStatus, respType)){
+                    throw new ArgusException ("An unexpected error occurred when writing the CVS file to "+
+                            tableSet.safeFileName);
+                    }
                 break;
             case TableSet.FILE_FORMAT_CODE_VALUE:
-                tauArgus.WriteCellRecords(tableSet.index, tableSet.safeFileName, 0,
-                        false, writeSupppressEmpty, "", writeAddStatus, respType);
+                if (!tauArgus.WriteCellRecords(tableSet.index, tableSet.safeFileName, 0,
+                        false, writeSupppressEmpty, "", writeAddStatus, respType)){
+                    throw new ArgusException ("An unexpected error occurred when writing the Code-value file to "+
+                            tableSet.safeFileName);
+                    }
                 break;
             case TableSet.FILE_FORMAT_SBS:
-                tauArgus.WriteCellRecords(tableSet.index, tableSet.safeFileName, 1,
-                        writeSBSHierarchicalLevels, true, "", true, respType);
+                if (!tauArgus.WriteCellRecords(tableSet.index, tableSet.safeFileName, 1,
+                        writeSBSHierarchicalLevels, true, "", true, respType)){
+                    throw new ArgusException ("An unexpected error occurred when writing the SBSS file to "+
+                            tableSet.safeFileName);
+                    }
                 break;
             case TableSet.FILE_FORMAT_INTERMEDIATE:
                 // The GUI thread (EDT) should not be used for long running tasks, 

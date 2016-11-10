@@ -41,6 +41,7 @@ import argus.utils.StrUtils;
 import argus.utils.SystemUtils;
 //import tauargus.utils.Tokenizer;
 import argus.utils.Tokenizer;
+import static tauargus.utils.TauArgusUtils.ShowWarningMessage;
 
 public class Metadata implements Cloneable {
     public static final int DATA_ORIGIN_MICRO = 1;
@@ -713,7 +714,8 @@ public class Metadata implements Cloneable {
     }
 
     public void verify() throws ArgusException {
-        if (variables.isEmpty()) {
+        boolean overlapFound = false; String overlapString = "";  
+          if (variables.isEmpty()) {
              throw new ArgusException("No variables have been specified.");
         }
 
@@ -755,8 +757,11 @@ public class Metadata implements Cloneable {
                     int b2 = variable2.bPos;
                     int e2 = b2 + variable2.varLen;
                     if (b2 < e1 && e2 > b1) {
-                        throw new ArgusException("Variable " + variable.name + " and variable " + variable2.name + " overlap.");
-                    }
+//                        throw new ArgusException("Variable " + variable.name + " and variable " + variable2.name + " overlap.");
+                    if (overlapFound) {overlapString = overlapString + "\n";} 
+                    overlapFound = true; 
+                    overlapString = overlapString + "Variable " + variable.name + " and variable " + variable2.name + " overlap.";                      
+                   }
                     if (StringUtils.equalsIgnoreCase(variable.name, variable2.name)) {
                         throw new ArgusException("Variable" + i + " and variable" + j + " have the same name.");
                     }
@@ -802,6 +807,11 @@ public class Metadata implements Cloneable {
                     throw new ArgusException("There is no request code specified for variable" + variable.name + ".");
                 }
             }
+        }            
+        if (overlapFound){int i = ShowWarningMessage(overlapString);
+           if (i == 0 ) {
+              throw new ArgusException(""); //overlapString);
+          }
         }
     }
     

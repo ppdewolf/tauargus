@@ -315,7 +315,7 @@ public class DialogSpecifyMetadata extends DialogBase {
                 metadata.verify(); 
             } 
             catch (ArgusException ex) {
-                JOptionPane.showMessageDialog(this, ex.getMessage());
+                if (!ex.getMessage().isEmpty()){JOptionPane.showMessageDialog(this, ex.getMessage());}
                 return;
             }
             //It looks a bit weird, but the PanelEditVariable stores the new statusses in oldmetadata.

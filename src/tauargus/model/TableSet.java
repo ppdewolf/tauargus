@@ -1542,7 +1542,7 @@ if (Application.isProtectCoverTable()){
     
     public void clearHistory(){
     if (!Application.isProtectCoverTable()){
-      TauArgusUtils.DeleteFile(Application.getTempFile("Apriori" + index + "C"));
+      TauArgusUtils.DeleteFile(Application.getTempFile("Apriori" + index + ".htm"));
       TauArgusUtils.DeleteFile(Application.getTempFile("HistStat" + index + ".htm"));
       TauArgusUtils.DeleteFile(Application.getTempFile("HistCost" + index + ".htm"));
       TauArgusUtils.DeleteFile(Application.getTempFile("HistPL" + index + ".htm"));

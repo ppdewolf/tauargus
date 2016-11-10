@@ -32,6 +32,7 @@ import tauargus.model.Metadata;
 import tauargus.model.Variable;
 import argus.utils.SystemUtils;
 import java.util.List;
+import javax.swing.JOptionPane;
 
 public class TauArgusUtils {
     private static TauArgus tauArgus = Application.getTauArgusDll();
@@ -246,7 +247,23 @@ public class TauArgusUtils {
       }   
     }
     
-    
+        public static int ShowWarningMessage(String WarningString){
+        /* If interactive show a message
+              if teh message is ignore: do nothing es raise an exception
+           If Batch (both versions) write a message to the logfile*/
+        int i;
+        if (Application.isBatch()){
+          SystemUtils.writeLogbook("WARNING: "+WarningString); 
+          return 1;
+                }
+        else{ /* interactive*/
+           i = JOptionPane.showConfirmDialog(null, WarningString+ "\nDo you want to continue?", 
+                                             "Warning", JOptionPane.YES_NO_OPTION);
+           if (i == JOptionPane.YES_OPTION) { return 1;}
+           else                             { return 0;}
+        }
+    }
+
      public static String GetSimpleSepToken(String[] st, String sep) {
         Integer p;
         String token, hs;

@@ -74,8 +74,8 @@ public class Application {
     // for interfacing with C++ dll
     static {
         System.loadLibrary("tauhitas");   
-        System.loadLibrary("TauArgusJava");         
         System.loadLibrary("TauRounder");
+        System.loadLibrary("TauArgusJava");         
  //        System.loadLibrary("XXRoundCom");
 //        System.loadLibrary("libTauRounder");
 //        System.loadLibrary("TauArgusJava");
