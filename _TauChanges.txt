@@ -43,3 +43,12 @@ summary    : Length code-names spanning variables for hypercube dynamic
 
 date       : Oct 18, 2016
 summary    : Correctly resetting file-format (free/fixed) when changing in one session
+
+date	   : Nov 3, 2016
+summary	   : Overlapping variables in fixed format allowed
+
+date	   : Nov 7, 2016
+summary	   : Apriori filename bug repaired
+
+date	   : Nov 10, 2016
+summary	   : Display error message when using special characters (accents)

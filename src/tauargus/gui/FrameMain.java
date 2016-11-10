@@ -84,7 +84,7 @@ public class FrameMain extends javax.swing.JFrame {
 // Anco 1.6                        
 //                    } catch (ArgusException | FileNotFoundException ex) {
                     } catch (ArgusException  ex) {
-                        JOptionPane.showMessageDialog(FrameMain.this, ex.getMessage());}
+                        if (!ex.getMessage().isEmpty()){JOptionPane.showMessageDialog(FrameMain.this, ex.getMessage());}}
                       catch ( FileNotFoundException ex) {
                         JOptionPane.showMessageDialog(FrameMain.this, ex.getMessage());  
                     } 
