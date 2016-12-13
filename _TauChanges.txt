@@ -52,3 +52,8 @@ summary	   : Apriori filename bug repaired
 
 date	   : Nov 10, 2016
 summary	   : Display error message when using special characters (accents)
+
+date       : Dec 13,2016
+summary    : The <LOGBOOK> command in the batch file is now working correctly. The quotes around the logfile name were not removed.
+
+
