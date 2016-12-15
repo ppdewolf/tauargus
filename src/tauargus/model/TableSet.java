@@ -1180,7 +1180,7 @@ if (Application.isProtectCoverTable()){
         maxTabVal = XMax;
         minTabVal = XMin;
     }
-
+      
     public void write(String fileName, boolean suppressEmpty, boolean simple, boolean holdinglevel, boolean withAudit, PropertyChangeListener propertyChangeListener) throws IOException, ArgusException {
         PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
         propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);
