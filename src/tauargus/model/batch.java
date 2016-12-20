@@ -324,7 +324,8 @@ public static int runBatchProcess(String batchFile){
                   }    
 
                   case ("<LOGBOOK>"):   
-                    { SystemUtils.setLogbook(tokenizer.getLine());
+                    { hs = StrUtils.unQuote(tokenizer.getLine());
+                      SystemUtils.setLogbook(hs);
                       tokenizer.clearLine();
                     break;}    
                   default:{

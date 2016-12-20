@@ -41,6 +41,7 @@ import tauargus.utils.ExecUtils;
 import argus.utils.SystemUtils;
 import java.beans.PropertyChangeEvent;
 
+
   
 /**
  *
@@ -71,7 +72,8 @@ public class OptiSuppress {
     public static double JJZero, JJZero1, JJZero2, JJFeasTol, JJOptTol, JJMinViola, JJMaxSlack,CTATolerance;
     public static int JJInfinity, JJMaxColslp, JJMaxRowslp, JJMaxCutsPool, JJMaxCutsIter;
              
-    private static String solverName[]={"NO","XPRESS", "CPLEX", "SCIP" };    
+    private static String solverName[]={"NO","XPRESS", "CPLEX", "SCIP" }; 
+    private static String dots = "....................";
     private static final TauArgus tauArgus = Application.getTauArgusDll();    
     private static final HiTaSCtrl tauHitas = Application.getTauHitasDll();
     private static final RounderCtrl rounder = Application.getRounder();
@@ -609,12 +611,48 @@ public class OptiSuppress {
      * ReadSecondaries will finally give the results back to the engine.
      * 
      * @param tableSet
+     * @param VarNo
      * @param propertyChangeListener
      * @return
      * @throws ArgusException
      * @throws FileNotFoundException
      * @throws IOException 
      */
+    
+    public static boolean rewriteHitasv(int expVarNo, int VarNo ) throws ArgusException {
+      int i, n, l; 
+      String hs;
+      char dot = dots.charAt(0);
+      hs = "hitasv" + Integer.toString(VarNo+1);
+      File fileKlad = new File(Application.getTempFile(hs+".kld"));
+      File fileHitasVtxt = new File(Application.getTempFile(hs+".txt"));
+      if (fileKlad.exists()) { fileKlad.delete();}
+      fileHitasVtxt.renameTo(new File(Application.getTempFile(hs+".kld")));  
+
+      try{
+
+       BufferedWriter out = new BufferedWriter(new FileWriter(Application.getTempFile(hs+".txt")));
+       BufferedReader in =  new BufferedReader(new FileReader(Application.getTempFile(hs+".kld")));
+       while (in.ready()){
+         hs = in.readLine();
+         l = hs.length();
+         i=0;
+         while ( (i<l) && (hs.charAt(i) == dot)) {i++;}
+         hs = hs.substring(i);
+         hs = hs.replace (".", "_");
+         hs = dots.substring(0, i) + hs;
+         out.write(hs + "\n");
+         }
+         out.close();
+         in.close();
+         if (fileKlad.exists() && !Application.isAnco()) { fileKlad.delete();}
+        }
+      catch (IOException ex){
+         throw new ArgusException("A problem was encountered when rewriting the file hitasv");}  
+
+     return true;
+    }
+    
     public static boolean runModular(TableSet tableSet, final PropertyChangeListener propertyChangeListener) throws ArgusException, FileNotFoundException, IOException{
         boolean Oke; int i; String hs; Variable variable; BufferedWriter out ;
         final PropertyChangeSupport pcs = new PropertyChangeSupport(TableService.class);
@@ -639,7 +677,13 @@ public class OptiSuppress {
         SystemUtils.writeLogbook("Start of the modular protection for table " + TableService.getTableDescription(tableSet));
         Oke = tauArgus.PrepareHITAS(tableSet.index, Application.getTempFile("NPF.txt"), Application.getTempFile("NFS.txt"), Application.getTempDir()+"/");
         if (!Oke){throw new ArgusException("An unknown error occurred when preparing the files for Modular");} 
-        //TestHitasFiles; check for a bogus at the top level
+        // TestHitasFiles; check for a bogus at the top level
+        // rewrite hitasv?.txt here again without dots in the codes
+        // Note that this procedure will faill if the code starts with a dot!!!!
+        // Ideally this is coorrected in the TauArgus dll itself
+        for(i=0;i<tableSet.expVar.size();i++){
+          rewriteHitasv(tableSet.expVar.get(i).index, i); 
+        }
         int n= tableSet.respVar.nDecimals;
         try{
          out = new BufferedWriter(new FileWriter(Application.getTempFile("NPF.txt"), true));
