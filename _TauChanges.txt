@@ -59,3 +59,7 @@ summary    : The <LOGBOOK> command in the batch file is now working correctly. T
 date       : Dec 15, 2016
 summary    : The problem with dots in a code, when applying modular has been solved, unless a code starta with a dot.
              A workaround (rewriteHitasv) has been added to OptiSuppress. Ideally this should be solved in the TauArgus Dll.
+
+above is RELEASED IN 4.1.4
+--------------------------------------------------------------
+             
