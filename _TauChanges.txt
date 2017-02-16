@@ -63,6 +63,8 @@ summary    : The problem with dots in a code, when applying modular has been sol
 above is RELEASED IN 4.1.4
 --------------------------------------------------------------
 date       : Jan 30, 2017
-summary    : string handling in TauArgusJava.dll adjusted (could cause crash when using weights).
+summary    : String handling in TauArgusJava.dll adjusted (could cause crash when using weights).
 
-
+date       : Feb 16,2017
+summary    : Comparing doubles made consistent in java-sources with new, corrected version in TauArgusJava.dll
+             Intermediate output now uses number of decimals of response variable
