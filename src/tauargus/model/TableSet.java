@@ -1216,6 +1216,11 @@ if (Application.isProtectCoverTable()){
 
             VarCode varCode = new VarCode();
             int cellIndex = 0;
+            int nDec = respVar.nDecimals;
+            DecimalFormat mdecimalFormat = new DecimalFormat();
+            mdecimalFormat.setMinimumFractionDigits(nDec);
+            mdecimalFormat.setMaximumFractionDigits(nDec);
+            mdecimalFormat.setGroupingUsed(false);
             for (;;) {
                 Cell cell = getCell(dimArray);
                 if (cell.status != CellStatus.EMPTY || !suppressEmpty) {
@@ -1228,7 +1233,7 @@ if (Application.isProtectCoverTable()){
                         }
                         writer.print(StrUtils.quote(codeString) + ";");
                     }
-                    writer.print(cell.response + ";");
+                    writer.print(mdecimalFormat.format(cell.response) + ";");
                     // for freq tables no double column resp and freq nor shadow variable
                     if (!isFrequencyTable()){
                      if (!holdinglevel) {
@@ -1237,24 +1242,24 @@ if (Application.isProtectCoverTable()){
                          writer.print(cell.holdingFreq + ";");
                      }
                      if (!simple) {
-                         writer.print(cell.shadow + ";");
+                         writer.print(mdecimalFormat.format(cell.shadow) + ";");
                      }
                     } 
-                    writer.print(cell.cost + ";");
+                    writer.print(mdecimalFormat.format(cell.cost) + ";");
                     if (!simple) {
                         if (holdinglevel) {
                             for (int j = cell.holdingFreq; j < numberOfTopNNeeded; j++) {
                                 cell.holdingMaxScore[j] = 0;
                             }
                             for (int j = 0; j < numberOfTopNNeeded; j++) {
-                                writer.print(cell.holdingMaxScore[j] + ";");
+                                writer.print(mdecimalFormat.format(cell.holdingMaxScore[j]) + ";");
                             }
                         } else {
                             for (int j = cell.freq; j < numberOfTopNNeeded; j++) {
                                 cell.maxScore[j] = 0;
                             }
                             for (int j = 0; j < numberOfTopNNeeded; j++) {
-                                writer.print(cell.maxScore[j] + ";");
+                                writer.print(mdecimalFormat.format(cell.maxScore[j]) + ";");
                             }
                         }
                     }
@@ -1263,20 +1268,22 @@ if (Application.isProtectCoverTable()){
                     } else {
                         writer.print(cell.status.getCategory().getSymbol());
                     }
-                    writer.print(";" + cell.lower + ";" + cell.upper);
-
+                    writer.print(";" + mdecimalFormat.format(cell.lower) + ";" + mdecimalFormat.format(cell.upper));
                     if (withAudit) {
-                        writer.print(";" + cell.realizedLower + ";" + cell.realizedUpper + ";" + (cell.realizedUpper - cell.realizedLower));
+                        writer.print(";" + mdecimalFormat.format(cell.realizedLower) + ";" + mdecimalFormat.format(cell.realizedUpper) + ";" + mdecimalFormat.format(cell.realizedUpper - cell.realizedLower));
                         if (cell.response == 0 || cell.status.isSafeNotProtected()) {
                             writer.print(";0;0;0");
                         } else {
-                            DecimalFormat decimalFormat = new DecimalFormat();
-                            decimalFormat.setMinimumFractionDigits(2);
-                            decimalFormat.setMaximumFractionDigits(2);
+                            //DecimalFormat decimalFormat = new DecimalFormat();
+                            mdecimalFormat.setMinimumFractionDigits(2);
+                            mdecimalFormat.setMaximumFractionDigits(2);
+                            //decimalFormat.setGroupingUsed(false);
                             writer.print(";"
-                                    + decimalFormat.format(100 * (cell.response - cell.realizedLower) / cell.response) + ";"
-                                    + decimalFormat.format(100 * (cell.realizedUpper - cell.response) / cell.response) + ";"
-                                    + decimalFormat.format(100 * (cell.realizedUpper - cell.realizedLower) / cell.response));
+                                    + mdecimalFormat.format(100 * (cell.response - cell.realizedLower) / cell.response) + ";"
+                                    + mdecimalFormat.format(100 * (cell.realizedUpper - cell.response) / cell.response) + ";"
+                                    + mdecimalFormat.format(100 * (cell.realizedUpper - cell.realizedLower) / cell.response));
+                            mdecimalFormat.setMinimumFractionDigits(nDec);
+                            mdecimalFormat.setMaximumFractionDigits(nDec);
                         }
                     }
                     writer.println();
@@ -2073,7 +2080,11 @@ if (Application.isProtectCoverTable()){
               tauArgus.GetTableCellValue(tableIndex, cn, x);
               xTot = xTot - x[0];
             }
-            oke = (Math.abs(xTot) <= 0.00001);
+            // Differs from test in TauArgusJava.dll !!!!!!
+            // oke = (Math.abs(xTot) <= 0.00001);
+            // Math.ulp(1d) is machine precision in Java for double
+            oke = (Math.abs(xTot) < Math.ulp(1d)*Math.abs(xTot)*2);
+            
             if (!oke){ //write an entry
               p = hs.indexOf("(");
               try{cn = StrUtils.toInteger(hs.substring(0,p));} catch(Exception ex){}

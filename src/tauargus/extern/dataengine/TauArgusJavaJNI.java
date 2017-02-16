@@ -54,8 +54,8 @@ public class TauArgusJavaJNI {
   public final static native int TauArgus_WriteGHMITERDataCell(long jarg1, TauArgus jarg1_, String jarg2, int jarg3, boolean jarg4);
   public final static native int TauArgus_WriteGHMITERSteuer(long jarg1, TauArgus jarg1_, String jarg2, String jarg3, String jarg4, int jarg5);
   public final static native boolean TauArgus_GetVarCodeProperties(long jarg1, TauArgus jarg1_, int jarg2, int jarg3, int[] jarg4, int[] jarg5, int[] jarg6, int[] jarg7, int[] jarg8, String[] jarg9);
-  public final static native boolean TauArgus_UnsafeVariableCodes(long jarg1, TauArgus jarg1_, int jarg2, int jarg3, int[] jarg4, int[] jarg5, String[] jarg6, int[] jarg7, int[] jarg8);
-  public final static native boolean TauArgus_GetVarCode(long jarg1, TauArgus jarg1_, int jarg2, int jarg3, int[] jarg4, String[] jarg5, int[] jarg6, int[] jarg7);
+  public final static native boolean TauArgus_UnsafeVariableCodes(long jarg1, TauArgus jarg1_, int jarg2, int jarg3, int[] jarg4, int[] jarg5, java.lang.String[] jarg6, int[] jarg7, int[] jarg8);
+  public final static native boolean TauArgus_GetVarCode(long jarg1, TauArgus jarg1_, int jarg2, int jarg3, int[] jarg4, java.lang.String[] jarg5, int[] jarg6, int[] jarg7);
   public final static native int TauArgus_GetVarHierarchyDepth(long jarg1, TauArgus jarg1_, int jarg2, boolean jarg3);
   public final static native int TauArgus_SetHierarchicalCodelist(long jarg1, TauArgus jarg1_, int jarg2, String jarg3, String jarg4);
   public final static native boolean TauArgus_SetSecondaryHITAS(long jarg1, TauArgus jarg1_, int jarg2, int[] jarg3);

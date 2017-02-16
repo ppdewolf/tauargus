@@ -191,11 +191,11 @@ public class TauArgus {
     return TauArgusJavaJNI.TauArgus_GetVarCodeProperties(swigCPtr, this, VarIndex, CodeIndex, IsParent, IsActive, IsMissing, Level, nChildren, Code);
   }
 
-  public boolean UnsafeVariableCodes(int VarIndex, int CodeIndex, int[] IsMissing, int[] Freq, String[] Code, int[] Count, int[] UCArray) {
+  public boolean UnsafeVariableCodes(int VarIndex, int CodeIndex, int[] IsMissing, int[] Freq, java.lang.String[] Code, int[] Count, int[] UCArray) {
     return TauArgusJavaJNI.TauArgus_UnsafeVariableCodes(swigCPtr, this, VarIndex, CodeIndex, IsMissing, Freq, Code, Count, UCArray);
   }
 
-  public boolean GetVarCode(int VarIndex, int CodeIndex, int[] CodeType, String[] CodeString, int[] IsMissing, int[] Level) {
+  public boolean GetVarCode(int VarIndex, int CodeIndex, int[] CodeType, java.lang.String[] CodeString, int[] IsMissing, int[] Level) {
     return TauArgusJavaJNI.TauArgus_GetVarCode(swigCPtr, this, VarIndex, CodeIndex, CodeType, CodeString, IsMissing, Level);
   }
 
