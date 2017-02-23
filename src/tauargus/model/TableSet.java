@@ -2029,9 +2029,10 @@ if (Application.isProtectCoverTable()){
     }
 
     public static void MakeAdditErrorList(int tableIndex){
-       int deci; String hs, hs1, regel; double xTot;
+       int deci; String hs, hs1, regel; double xTot,xSub, epsilon, upl;
        double[] x = new double[1]; String spaces = "                            ";
        int i, n, cn, p, nRel; Boolean oke;
+       epsilon = 1.0E-8; upl = 2;
        //There is something open for incomplete/linked tables
        String Streep = "--------------------------------------------------";
        TableSet tableSet = TableService.getTable(tableIndex);
@@ -2072,19 +2073,21 @@ if (Application.isProtectCoverTable()){
             cn = 0;
             try{cn = StrUtils.toInteger(hs.substring(0,p));} catch(Exception ex){}
             tauArgus.GetTableCellValue(tableIndex, cn, x);
-            xTot = x[0];
+            xTot = x[0]; xSub = 0;
             for (i=1;i<n;i++){
               hs1 = hs1.substring(p+4);
               p = hs1.indexOf("(");
               try{cn = StrUtils.toInteger(hs1.substring(0,p));} catch(Exception ex){}
               tauArgus.GetTableCellValue(tableIndex, cn, x);
-              xTot = xTot - x[0];
+              xSub = xSub + x[0];
             }
             // Differs from test in TauArgusJava.dll !!!!!!
             // oke = (Math.abs(xTot) <= 0.00001);
             // Math.ulp(1d) is machine precision in Java for double
-            oke = (Math.abs(xTot) < Math.ulp(1d)*Math.abs(xTot)*2);
-            
+ //           oke = (Math.abs(xTot) < Math.ulp(1d)*Math.abs(xTot)*2);
+//            std::abs(x - y) < std::numeric_limits<double>::epsilon() * std::abs(x + y) * ulp 
+
+            oke = (Math.abs(xTot - xSub) < epsilon * Math.abs(xTot + xSub) * upl);          
             if (!oke){ //write an entry
               p = hs.indexOf("(");
               try{cn = StrUtils.toInteger(hs.substring(0,p));} catch(Exception ex){}
@@ -2104,7 +2107,7 @@ if (Application.isProtectCoverTable()){
                 out.write(regel); out.newLine();
               }
             out.newLine();
-            regel =  String.format(Locale.US, "%."+deci+"f", xTot);
+            regel =  String.format(Locale.US, "%."+deci+"f", xTot-xSub);
             regel = spaces.substring(0,19-regel.length())+ regel;
             out.write(regel + "  Difference"); out.newLine();
             out.write(Streep);  out.newLine();
