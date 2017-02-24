@@ -2032,7 +2032,7 @@ if (Application.isProtectCoverTable()){
        int deci; String hs, hs1, regel; double xTot,xSub, epsilon, upl;
        double[] x = new double[1]; String spaces = "                            ";
        int i, n, cn, p, nRel; Boolean oke;
-       epsilon = 1.0E-8; upl = 2;
+       epsilon = 1.0E-14; upl = 2;
        //There is something open for incomplete/linked tables
        String Streep = "--------------------------------------------------";
        TableSet tableSet = TableService.getTable(tableIndex);
