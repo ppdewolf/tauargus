@@ -426,6 +426,8 @@ public class DialogSpecifyMetadata extends DialogBase {
               panelEditVariable.setDataType(Metadata.DATA_FILE_TYPE_SPSS); 
         }
        jButtonGetSPSSMeta.setEnabled(comboBoxFormat.getSelectedIndex() == 2);
+//       if (Metadata.dataOrigin = Metadata.DATA_ORIGIN_TABULAR)
+// Hier controle op data origin en free format       
        calculateButtonStates();       
     }//GEN-LAST:event_comboBoxFormatActionPerformed
 
