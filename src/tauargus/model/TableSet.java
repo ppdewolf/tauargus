@@ -550,7 +550,7 @@ public class TableSet {
                     try{ cell.cost = StrUtils.toDouble(value);} catch(Exception ex){}
                     break;
                 case FREQUENCY:
-                    if (value.equals("")){ cell.status = CellStatus.EMPTY;}
+                    if (value.equals("")){ cell.status = CellStatus.EMPTY; cell.freq=0;}
                     try{cell.freq = StrUtils.toInteger(value);} catch(Exception ex){}
                     break;
                 case TOP_N:
@@ -613,6 +613,7 @@ public class TableSet {
         if (readFreqOnlyTable) {
             cell.response = cell.freq;
         }
+        //????? WHAT'S HAPPENIGN HERE ????? response = freq ????? PWOF 20170227 
         if (cell.response == Cell.UNKNOWN && cell.freq != Cell.UNKNOWN) {
             cell.response = cell.freq;
         }
@@ -2086,8 +2087,9 @@ if (Application.isProtectCoverTable()){
             // Math.ulp(1d) is machine precision in Java for double
  //           oke = (Math.abs(xTot) < Math.ulp(1d)*Math.abs(xTot)*2);
 //            std::abs(x - y) < std::numeric_limits<double>::epsilon() * std::abs(x + y) * ulp 
-
-            oke = (Math.abs(xTot - xSub) < epsilon * Math.abs(xTot + xSub) * upl);          
+//                              || std::abs(x - y) < epsilon            // in case x = y = 0
+            oke = ((Math.abs(xTot - xSub) < epsilon * Math.abs(xTot + xSub) * upl) || (Math.abs(xTot - xSub) < epsilon));
+            
             if (!oke){ //write an entry
               p = hs.indexOf("(");
               try{cn = StrUtils.toInteger(hs.substring(0,p));} catch(Exception ex){}
