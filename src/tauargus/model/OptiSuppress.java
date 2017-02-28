@@ -1076,10 +1076,10 @@ public class OptiSuppress {
                solutionType = rounder.DoRound(solverName, Application.getTempFile("JJ"+xs+".IN"), X, upperBound, lowerBound, 0,  
                                   Application.getTempFile("JJ"+xs+".OUT"), 
                                   Application.getTempFile("JJstat"+xs+".OUT"),
-                                  "access.ilm", 
+                                  TauArgusUtils.GetCplexLicenceFile(), 
                                   Application.getTempFile("JJRound"+xs+".log"),
                                   maxRoundTime, 0,
-                                  "Dir",
+                                  Application.getTempDir()+"/",
                                    maxJump, numberJump , usedTime, errorCode); //, activityListener );
                if (solutionType>2) {throw new ArgusException("Rounding error code = "+tauArgus.GetErrorString(errorCode[0]) + "\noccured in subtable "+j);}             
                tableSet.roundMaxJump = Math.max(tableSet.roundMaxJump, maxJump[0]);
@@ -1091,7 +1091,7 @@ public class OptiSuppress {
                  TauArgusUtils.renameFile(Application.getTempFile("JJRound"+xs+".OUT.RAPID"),Application.getTempFile("JJRound"+xs+".OUT"));
                 }
                }                
-               tableSet.roundSolType[solutionType-1]++;
+               tableSet.roundSolType[solutionType]++;
                hs =  "<tr><td align=\"Right\">" + xs + "</td><td align=\"Right\">";
                if (solutionType == 2){hs = hs + "Rapid";}
                if (solutionType == 1){hs = hs + "Feasible";}

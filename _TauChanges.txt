@@ -62,9 +62,17 @@ summary    : The problem with dots in a code, when applying modular has been sol
 
 above is RELEASED IN 4.1.4
 --------------------------------------------------------------
+date	   : Jan 20, 2017
+summary	   : Modular and Optimal now deal with scaling costs in the same way (issue #7, #34)
+
 date       : Jan 30, 2017
-summary    : String handling in TauArgusJava.dll adjusted (could cause crash when using weights).
+summary    : String handling in TauArgusJava.dll adjusted (could cause crash when using weights) (issue #40).
 
 date       : Feb 16,2017
 summary    : Comparing doubles made consistent in java-sources with new, corrected version in TauArgusJava.dll
-             Intermediate output now uses number of decimals of response variable
+             Intermediate output now uses number of decimals of response variable (issue #29, #46)
+			 
+date       : Feb 28, 2017 10:22:12 AM
+summary    : Partitioning in rounding adjusted: (issue #8)
+             license file and working-dir were hard-coded
+             SolutionType starts at 0, but used "-1" in array-location
