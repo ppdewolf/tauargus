@@ -94,8 +94,12 @@ public class SaveTable {
                     }
                 break;
             case TableSet.FILE_FORMAT_CODE_VALUE:
+                if (writeVarnamesOnFirstLine) {
+                    hs = makeFirstLine(tableSet, respType);
+                }
+                else {hs = "";}
                 if (!tauArgus.WriteCellRecords(tableSet.index, tableSet.safeFileName, 0,
-                        false, writeSupppressEmpty, "", writeAddStatus, respType)){
+                        false, writeSupppressEmpty, hs, writeAddStatus, respType)){
                     throw new ArgusException ("An unexpected error occurred when writing the Code-value file to "+
                             tableSet.safeFileName);
                     }
@@ -159,23 +163,26 @@ public class SaveTable {
      */
     private static String makeFirstLine (TableSet tableSet, int respType){
         String hs;
+        String quote = "";
+        if (writeEmbedQuotes) quote = "\"";
         hs = "";
         for (int i=0; i<tableSet.expVar.size();i++){
-            hs = hs + "\""+tableSet.expVar.get(i).name+"\",";
+            //hs = hs + "\""+tableSet.expVar.get(i).name+"\",";
+            hs = hs + quote + tableSet.expVar.get(i).name + quote +",";
         }
         hs = hs.substring(0, hs.length()-1);
-        if (tableSet.respVar  == Application.getFreqVar()){ hs = hs + ",\"Freq\",";}
-             else {hs = hs + ",\""+tableSet.respVar.name;
+        if (tableSet.respVar  == Application.getFreqVar()){ hs = hs + ","+ quote + "Freq" + quote + ",";}
+             else {hs = hs + "," + quote + tableSet.respVar.name;
              if (respType == 1){hs = hs + "_Round";}
              if (respType == 2){hs = hs + "_CTA";}
-             hs = hs + "\"";
+             hs = hs + quote; //"\"";
 //             hs = hs +"\","; 
         }
         //TODO CTA and rounded
         if (writeAddStatus){
-            if ( respType == 0 ){hs = hs + ",\"Status\"";}       
-            if ( (respType == 1) || (respType == 2) ){hs = hs + ",\"" + tableSet.respVar.name + "_Orig\"";}       
-            if ( respType == 2 ){hs = hs + ",\"Status\"";}       
+            if ( respType == 0 ){hs = hs + "," + quote + "Status" + quote;}       
+            if ( (respType == 1) || (respType == 2) ){hs = hs + "," + quote + tableSet.respVar.name + "_Orig" + quote;}       
+            if ( respType == 2 ){hs = hs + "," + quote + "Status" + quote;}       
         }
         return hs;
     }

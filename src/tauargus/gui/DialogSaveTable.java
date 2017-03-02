@@ -94,60 +94,50 @@ public class DialogSaveTable extends DialogBase {
 
         buttonGroupFormat.add(jRadioCSVFormat);
         jRadioCSVFormat.setText("CSV format");
-        jRadioCSVFormat.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                jRadioCSVFormatStateChanged(evt);
-            }
-        });
-        jRadioCSVFormat.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioCSVFormatActionPerformed(evt);
+        jRadioCSVFormat.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jRadioCSVFormatItemStateChanged(evt);
             }
         });
 
         buttonGroupFormat.add(jRadioCSVPivot);
         jRadioCSVPivot.setText("CSV for pivot table");
-        jRadioCSVPivot.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                jRadioCSVPivotStateChanged(evt);
+        jRadioCSVPivot.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jRadioCSVPivotItemStateChanged(evt);
             }
         });
 
         buttonGroupFormat.add(jRadioCodeValue);
         jRadioCodeValue.setSelected(true);
         jRadioCodeValue.setText("Code-value");
-        jRadioCodeValue.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                jRadioCodeValueStateChanged(evt);
+        jRadioCodeValue.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jRadioCodeValueItemStateChanged(evt);
             }
         });
 
         buttonGroupFormat.add(jRadioSBSFormat);
         jRadioSBSFormat.setText("SBS format");
-        jRadioSBSFormat.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                jRadioSBSFormatStateChanged(evt);
-            }
-        });
-        jRadioSBSFormat.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioSBSFormatActionPerformed(evt);
+        jRadioSBSFormat.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jRadioSBSFormatItemStateChanged(evt);
             }
         });
 
         buttonGroupFormat.add(jRadioIntermediate);
         jRadioIntermediate.setText("Intermediate format");
-        jRadioIntermediate.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                jRadioIntermediateStateChanged(evt);
+        jRadioIntermediate.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jRadioIntermediateItemStateChanged(evt);
             }
         });
 
         buttonGroupFormat.add(jRadioJJFormat);
         jRadioJJFormat.setText("JJ format");
-        jRadioJJFormat.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                jRadioJJFormatStateChanged(evt);
+        jRadioJJFormat.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jRadioJJFormatItemStateChanged(evt);
             }
         });
 
@@ -426,47 +416,48 @@ public class DialogSaveTable extends DialogBase {
         }
     }//GEN-LAST:event_jButtonChooseSafeFileActionPerformed
 
-    private void jRadioCSVFormatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioCSVFormatActionPerformed
+    private void jRadioCSVPivotItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jRadioCSVPivotItemStateChanged
         // TODO add your handling code here:
-    }//GEN-LAST:event_jRadioCSVFormatActionPerformed
-
-    private void jRadioSBSFormatStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jRadioSBSFormatStateChanged
-        jCheckBoxAddHierarchicalLevels.setEnabled(jRadioSBSFormat.isSelected());
+        jCheckBoxVarNamesOnFirstRow.setSelected(jRadioCSVPivot.isSelected());
+        jCheckBoxEmbedSpanningVarQuotes.setSelected(jRadioCSVPivot.isSelected());
         enableGeneralOptions();
-    }//GEN-LAST:event_jRadioSBSFormatStateChanged
+    }//GEN-LAST:event_jRadioCSVPivotItemStateChanged
 
-    private void jRadioSBSFormatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioSBSFormatActionPerformed
+    private void jRadioCodeValueItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jRadioCodeValueItemStateChanged
         // TODO add your handling code here:
-    }//GEN-LAST:event_jRadioSBSFormatActionPerformed
+        jCheckBoxEmbedSpanningVarQuotes.setSelected(jRadioCodeValue.isSelected());
+        enableGeneralOptions();
+    }//GEN-LAST:event_jRadioCodeValueItemStateChanged
 
-    private void jRadioIntermediateStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jRadioIntermediateStateChanged
+    private void jRadioCSVFormatItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jRadioCSVFormatItemStateChanged
+        // TODO add your handling code here:
+        jCheckBoxEmbedSpanningVarQuotes.setSelected(jRadioCSVFormat.isSelected());
+        enableGeneralOptions();
+    }//GEN-LAST:event_jRadioCSVFormatItemStateChanged
+
+    private void jRadioSBSFormatItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jRadioSBSFormatItemStateChanged
+        // TODO add your handling code here:
+        jCheckBoxAddHierarchicalLevels.setEnabled(jRadioSBSFormat.isSelected());
+        jCheckBoxEmbedSpanningVarQuotes.setSelected(jRadioSBSFormat.isSelected());
+        enableGeneralOptions();
+    }//GEN-LAST:event_jRadioSBSFormatItemStateChanged
+
+    private void jRadioIntermediateItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jRadioIntermediateItemStateChanged
         // TODO add your handling code here:
         checkBoxStatusOnly.setEnabled(jRadioIntermediate.isSelected());
         checkBoxAddAuditResults.setEnabled(jRadioIntermediate.isSelected());
         checkBoxUseHoldingInfo.setEnabled(jRadioIntermediate.isSelected());
+        jCheckBoxEmbedSpanningVarQuotes.setSelected(jRadioIntermediate.isSelected());
         enableGeneralOptions();
-    }//GEN-LAST:event_jRadioIntermediateStateChanged
+    }//GEN-LAST:event_jRadioIntermediateItemStateChanged
 
-    private void jRadioJJFormatStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jRadioJJFormatStateChanged
+    private void jRadioJJFormatItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jRadioJJFormatItemStateChanged
+        // TODO add your handling code here:
         jCheckBoxremoveTrivialLevels.setEnabled(jRadioJJFormat.isSelected());
+        jCheckBoxEmbedSpanningVarQuotes.setSelected(false);
         enableGeneralOptions();
-        
-    }//GEN-LAST:event_jRadioJJFormatStateChanged
-
-    private void jRadioCSVFormatStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jRadioCSVFormatStateChanged
-        // TODO add your handling code here:
-        enableGeneralOptions();
-    }//GEN-LAST:event_jRadioCSVFormatStateChanged
-
-    private void jRadioCSVPivotStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jRadioCSVPivotStateChanged
-        // TODO add your handling code here:
-        enableGeneralOptions();
-    }//GEN-LAST:event_jRadioCSVPivotStateChanged
-
-    private void jRadioCodeValueStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jRadioCodeValueStateChanged
-        // TODO add your handling code here:
-        enableGeneralOptions();
-    }//GEN-LAST:event_jRadioCodeValueStateChanged
+    }//GEN-LAST:event_jRadioJJFormatItemStateChanged
+    
     private  void enableGeneralOptions(){
         jCheckBoxAddStatus.setEnabled(jRadioCSVPivot.isSelected() ||
                                       jRadioCodeValue.isSelected()  );
@@ -479,12 +470,12 @@ public class DialogSaveTable extends DialogBase {
                                                 jRadioCodeValue.isSelected()||
                                                 jRadioIntermediate.isSelected() ||
                                                 jRadioSBSFormat.isSelected() );
-        jCheckBoxVarNamesOnFirstRow.setEnabled(jRadioCSVPivot.isSelected() ||
-                                                jRadioCodeValue.isSelected()||
-                                                jRadioIntermediate.isSelected() ||
-                                                jRadioSBSFormat.isSelected() );
-        jCheckBoxVarNamesOnFirstRow.setSelected(jRadioCSVPivot.isSelected());
-        
+        jCheckBoxVarNamesOnFirstRow.setEnabled(//jRadioCSVPivot.isSelected() ||
+                                                jRadioCodeValue.isSelected() //||
+                                                //jRadioIntermediate.isSelected() ||
+                                                //jRadioSBSFormat.isSelected()
+                                                );
+//jCheckBoxVarNamesOnFirstRow.setSelected(jRadioCSVPivot.isSelected());
     }
     /**
      * @param args the command line arguments

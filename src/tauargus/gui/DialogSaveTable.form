@@ -197,8 +197,7 @@
             <Property name="text" type="java.lang.String" value="CSV format"/>
           </Properties>
           <Events>
-            <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="jRadioCSVFormatStateChanged"/>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jRadioCSVFormatActionPerformed"/>
+            <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="jRadioCSVFormatItemStateChanged"/>
           </Events>
         </Component>
         <Component class="javax.swing.JRadioButton" name="jRadioCSVPivot">
@@ -209,7 +208,7 @@
             <Property name="text" type="java.lang.String" value="CSV for pivot table"/>
           </Properties>
           <Events>
-            <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="jRadioCSVPivotStateChanged"/>
+            <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="jRadioCSVPivotItemStateChanged"/>
           </Events>
         </Component>
         <Component class="javax.swing.JRadioButton" name="jRadioCodeValue">
@@ -221,7 +220,7 @@
             <Property name="text" type="java.lang.String" value="Code-value"/>
           </Properties>
           <Events>
-            <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="jRadioCodeValueStateChanged"/>
+            <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="jRadioCodeValueItemStateChanged"/>
           </Events>
         </Component>
         <Component class="javax.swing.JRadioButton" name="jRadioSBSFormat">
@@ -232,8 +231,7 @@
             <Property name="text" type="java.lang.String" value="SBS format"/>
           </Properties>
           <Events>
-            <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="jRadioSBSFormatStateChanged"/>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jRadioSBSFormatActionPerformed"/>
+            <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="jRadioSBSFormatItemStateChanged"/>
           </Events>
         </Component>
         <Component class="javax.swing.JRadioButton" name="jRadioIntermediate">
@@ -244,7 +242,7 @@
             <Property name="text" type="java.lang.String" value="Intermediate format"/>
           </Properties>
           <Events>
-            <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="jRadioIntermediateStateChanged"/>
+            <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="jRadioIntermediateItemStateChanged"/>
           </Events>
         </Component>
         <Component class="javax.swing.JRadioButton" name="jRadioJJFormat">
@@ -255,7 +253,7 @@
             <Property name="text" type="java.lang.String" value="JJ format"/>
           </Properties>
           <Events>
-            <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="jRadioJJFormatStateChanged"/>
+            <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="jRadioJJFormatItemStateChanged"/>
           </Events>
         </Component>
         <Component class="javax.swing.JButton" name="jButtonWrite">
