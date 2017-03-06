@@ -416,7 +416,7 @@ public class PanelTable extends javax.swing.JPanel {
     
     public void setRowColumnVariables(Variable rowVariable, Variable columnVariable) {
         int VarDepth=1;
-        int MaxLevelChoice = 6;
+        int MaxLevelChoice;
         isAdjusting = true;
         rowExpVarIndex = indexOfVariable(rowVariable);
         columnExpVarIndex = indexOfVariable(columnVariable);
@@ -435,7 +435,8 @@ public class PanelTable extends javax.swing.JPanel {
         {
             for (int j=MaxLevelChoice+1;j<=VarDepth;j++)
             {
-                comboBoxNrOfVertLevels.addItem(Integer.toString(j+1));
+                //comboBoxNrOfVertLevels.addItem(Integer.toString(j+1));
+                comboBoxNrOfVertLevels.addItem(Integer.toString(j));
             }
         }
         comboBoxNrOfVertLevels.setSelectedIndex(1);
@@ -458,7 +459,8 @@ public class PanelTable extends javax.swing.JPanel {
             {
                 for (int j=MaxLevelChoice+1;j<=VarDepth;j++)
                 {
-                    comboBoxNrOfHorLevels.addItem(Integer.toString(j+1));
+                    //comboBoxNrOfHorLevels.addItem(Integer.toString(j+1));
+                    comboBoxNrOfHorLevels.addItem(Integer.toString(j));
                 }
             }
             comboBoxNrOfHorLevels.setSelectedIndex(1);
@@ -1186,7 +1188,7 @@ public class PanelTable extends javax.swing.JPanel {
 
         LabelNrOfHorLevels.setText("Hor. levels:");
 
-        comboBoxNrOfHorLevels.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }));
+        comboBoxNrOfHorLevels.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }));
         comboBoxNrOfHorLevels.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comboBoxNrOfHorLevelsActionPerformed(evt);
@@ -1195,7 +1197,7 @@ public class PanelTable extends javax.swing.JPanel {
 
         LabelNrOfVertLevels.setText("Vert. levels:");
 
-        comboBoxNrOfVertLevels.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }));
+        comboBoxNrOfVertLevels.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }));
         comboBoxNrOfVertLevels.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comboBoxNrOfVertLevelsActionPerformed(evt);
@@ -1232,16 +1234,17 @@ public class PanelTable extends javax.swing.JPanel {
             panelBottomButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelBottomButtonsLayout.createSequentialGroup()
                 .addContainerGap()
+                .addGroup(panelBottomButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(buttonTableSummary, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(buttonSelectView, javax.swing.GroupLayout.DEFAULT_SIZE, 108, Short.MAX_VALUE))
                 .addGroup(panelBottomButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panelBottomButtonsLayout.createSequentialGroup()
-                        .addComponent(buttonSelectView, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(LabelNrOfHorLevels)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(comboBoxNrOfHorLevels, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(panelBottomButtonsLayout.createSequentialGroup()
-                        .addComponent(buttonTableSummary)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelBottomButtonsLayout.createSequentialGroup()
+                        .addGap(7, 7, 7)
                         .addComponent(LabelNrOfVertLevels)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(comboBoxNrOfVertLevels, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -1517,9 +1520,13 @@ public class PanelTable extends javax.swing.JPanel {
         dialog.showDialog(tableSet);
         int oldRowExpVarIndex = rowExpVarIndex;
         int oldColumnExpVarIndex = columnExpVarIndex;
+        Variable RowVar= null, ColVar = null;
         // SetTanle resets rowExpVarIndex and columnExpVarIndex to 0 and 1.
         setTable(tableSet);
-        setRowColumnVariables(tableSet.expVar.get(oldRowExpVarIndex), tableSet.expVar.get(oldColumnExpVarIndex));
+        if (oldRowExpVarIndex != -1) RowVar = tableSet.expVar.get(oldRowExpVarIndex);
+        if (oldColumnExpVarIndex != -1) ColVar = tableSet.expVar.get(oldColumnExpVarIndex);
+        //setRowColumnVariables(tableSet.expVar.get(oldRowExpVarIndex), tableSet.expVar.get(oldColumnExpVarIndex));
+        setRowColumnVariables(RowVar,ColVar);
     }//GEN-LAST:event_buttonRecodeActionPerformed
 
     private void checkBoxOutputViewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxOutputViewActionPerformed
@@ -1529,7 +1536,7 @@ public class PanelTable extends javax.swing.JPanel {
 
     private void comboBoxNrOfHorLevelsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxNrOfHorLevelsActionPerformed
         int maxLevel = Integer.parseInt((String)comboBoxNrOfHorLevels.getSelectedItem());
-        setLevel(codeList[columnExpVarIndex], maxLevel);
+        setLevel(codeList[columnExpVarIndex], maxLevel+1);
         createColumnIndices();
         ((AbstractTableModel)table.getModel()).fireTableStructureChanged();
         adjustColumnWidths();
@@ -1537,7 +1544,7 @@ public class PanelTable extends javax.swing.JPanel {
 
     private void comboBoxNrOfVertLevelsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxNrOfVertLevelsActionPerformed
         int maxLevel = Integer.parseInt((String)comboBoxNrOfVertLevels.getSelectedItem());
-        setLevel(codeList[rowExpVarIndex], maxLevel);
+        setLevel(codeList[rowExpVarIndex], maxLevel+1);
         createRowIndices();
         ((AbstractTableModel)table.getModel()).fireTableDataChanged();
         adjustColumnWidths();
