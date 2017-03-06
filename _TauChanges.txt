@@ -78,5 +78,5 @@ summary    : Partitioning in rounding adjusted: (issue #8)
              SolutionType starts at 0, but used "-1" in array-location
 
 date       : Mar 6, 2017 11:38:34 AM
-summary    : Use of quotes in writing tables to file is now optional + dialog "save file" adjusted which options allowed in each format
+summary    : Use of quotes in writing tables to file is now optional + dialog "save file" adjusted which options allowed in each format + corrected applying chosen options (issue #42)
 
