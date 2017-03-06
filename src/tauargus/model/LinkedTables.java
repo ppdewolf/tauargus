@@ -197,7 +197,7 @@ public class LinkedTables {
             tableSet = TableService.getTable(i);
             try{
             tableSet.write(Application.getTempFile("temp"+i+".tab"),
-                           false, false, false, false, null);}
+                           false, false, false, false, false, null);}
             catch (Exception ex){ throw new ArgusException (ex.getMessage()+ "\nError writing intermediate table "+(i+1) );
             }
         }
