@@ -1182,7 +1182,7 @@ if (Application.isProtectCoverTable()){
         minTabVal = XMin;
     }
       
-    public void write(String fileName, boolean suppressEmpty, boolean simple, boolean holdinglevel, boolean withAudit, PropertyChangeListener propertyChangeListener) throws IOException, ArgusException {
+    public void write(String fileName, boolean suppressEmpty, boolean simple, boolean holdinglevel, boolean withAudit, boolean EmbedQuotes, PropertyChangeListener propertyChangeListener) throws IOException, ArgusException {
         PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
         propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);
 
@@ -1232,7 +1232,12 @@ if (Application.isProtectCoverTable()){
                         if (codeString.equals("")) {
                             codeString = variable.getTotalCode();
                         }
-                        writer.print(StrUtils.quote(codeString) + ";");
+                        if (EmbedQuotes){
+                            writer.print(StrUtils.quote(codeString) + ";");
+                        }
+                        else{
+                            writer.print(codeString + ";");
+                        }
                     }
                     writer.print(mdecimalFormat.format(cell.response) + ";");
                     // for freq tables no double column resp and freq nor shadow variable

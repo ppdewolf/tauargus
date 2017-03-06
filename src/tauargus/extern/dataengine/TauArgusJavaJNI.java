@@ -42,12 +42,11 @@ public class TauArgusJavaJNI {
   public final static native void TauArgus_ThroughTable(long jarg1, TauArgus jarg1_);
   public final static native boolean TauArgus_SetTotalsInCodeList(long jarg1, TauArgus jarg1_, int jarg2, int[] jarg3, int[] jarg4, int[] jarg5);
   public final static native boolean TauArgus_SetInCodeList(long jarg1, TauArgus jarg1_, int jarg2, int[] jarg3, String[] jarg4, int[] jarg5, int[] jarg6);
-  public final static native boolean TauArgus_WriteCellRecords(long jarg1, TauArgus jarg1_, int jarg2, String jarg3, int jarg4, boolean jarg5, boolean jarg6, String jarg7, boolean jarg8, int jarg9);
+  public final static native boolean TauArgus_WriteCellRecords(long jarg1, TauArgus jarg1_, int jarg2, String jarg3, int jarg4, boolean jarg5, boolean jarg6, String jarg7, boolean jarg8, boolean jarg9, int jarg10);
   public final static native void TauArgus_GetTotalTabelSize(long jarg1, TauArgus jarg1_, int jarg2, int[] jarg3, int[] jarg4);
   public final static native int TauArgus_SetSecondaryJJFORMAT(long jarg1, TauArgus jarg1_, int jarg2, String jarg3, boolean jarg4, int[] jarg5);
   public final static native boolean TauArgus_WriteJJFormat(long jarg1, TauArgus jarg1_, int jarg2, String jarg3, double jarg4, double jarg5, boolean jarg6, boolean jarg7, boolean jarg8);
-  public final static native boolean TauArgus_WriteCSV(long jarg1, TauArgus jarg1_, int jarg2, String jarg3, int[] jarg4, int jarg5);
-  public final static native boolean TauArgus_WriteCSVBasic(long jarg1, TauArgus jarg1_, int jarg2, String jarg3, int[] jarg4, int jarg5);
+  public final static native boolean TauArgus_WriteCSV(long jarg1, TauArgus jarg1_, int jarg2, String jarg3, boolean jarg4, int[] jarg5, int jarg6);
   public final static native boolean TauArgus_GetCellDistance(long jarg1, TauArgus jarg1_, int jarg2, int[] jarg3, int[] jarg4);
   public final static native boolean TauArgus_PrepareCellDistance(long jarg1, TauArgus jarg1_, int jarg2);
   public final static native int TauArgus_SetSecondaryGHMITER(long jarg1, TauArgus jarg1_, String jarg2, int jarg3, int[] jarg4, boolean jarg5);

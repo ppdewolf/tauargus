@@ -80,7 +80,7 @@ public class SaveTable {
         if (tableSet.ctaProtect) {respType = 2;}
         switch (selectedFormat) {
             case TableSet.FILE_FORMAT_CSV:
-                if (!tauArgus.WriteCSV(tableSet.index, tableSet.safeFileName, dimSequence, respType)){
+                if (!tauArgus.WriteCSV(tableSet.index, tableSet.safeFileName, writeEmbedQuotes, dimSequence, respType)){
                     throw new ArgusException ("An unexpected error occurred when writing the CVS file to "+
                             tableSet.safeFileName);
                     }
@@ -88,7 +88,7 @@ public class SaveTable {
             case TableSet.FILE_FORMAT_PIVOT_TABLE:
                 hs = makeFirstLine(tableSet, respType);
                 if (!tauArgus.WriteCellRecords(tableSet.index, tableSet.safeFileName, 0,
-                        false, writeSupppressEmpty, hs, writeAddStatus, respType)){
+                        false, writeSupppressEmpty, hs, writeAddStatus, writeEmbedQuotes, respType)){
                     throw new ArgusException ("An unexpected error occurred when writing the CVS file to "+
                             tableSet.safeFileName);
                     }
@@ -99,14 +99,14 @@ public class SaveTable {
                 }
                 else {hs = "";}
                 if (!tauArgus.WriteCellRecords(tableSet.index, tableSet.safeFileName, 0,
-                        false, writeSupppressEmpty, hs, writeAddStatus, respType)){
+                        false, writeSupppressEmpty, hs, writeAddStatus, writeEmbedQuotes, respType)){
                     throw new ArgusException ("An unexpected error occurred when writing the Code-value file to "+
                             tableSet.safeFileName);
                     }
                 break;
             case TableSet.FILE_FORMAT_SBS:
                 if (!tauArgus.WriteCellRecords(tableSet.index, tableSet.safeFileName, 1,
-                        writeSBSHierarchicalLevels, true, "", true, respType)){
+                        writeSBSHierarchicalLevels, true, "", true, writeEmbedQuotes, respType)){
                     throw new ArgusException ("An unexpected error occurred when writing the SBSS file to "+
                             tableSet.safeFileName);
                     }
@@ -125,6 +125,7 @@ public class SaveTable {
                                 writeIntermediateStatusOnly,
                                 writeIntermediateUseHolding,
                                 writeIntermediateAddAudit,
+                                writeEmbedQuotes,
                                 getPropertyChangeListener());
                         return null;
                     }
