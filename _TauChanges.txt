@@ -80,3 +80,14 @@ summary    : Partitioning in rounding adjusted: (issue #8)
 date       : Mar 6, 2017 11:38:34 AM
 summary    : Use of quotes in writing tables to file is now optional + dialog "save file" adjusted which options allowed in each format + corrected applying chosen options (issue #42)
 
+date       : Mar 8, 2017
+summary    : The file AdditErr.txt is now removed from the temp-dir before reading a table.
+             This prevents an old error file to be shown unexpectedly.
+
+date       : Mar 9,2017
+summary    : The reading of tabular data has been improved. A lot of checks have been added.
+             especially the imputation of freq = 1 in frequency tables has been corrected (issue #5)
+             Also stange symbols in numeric fields are now detected. 
+             Apart from normal numerical input only "" and "-" are accepted and treated as empty fields.
+
+

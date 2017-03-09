@@ -513,13 +513,15 @@ public class TableSet {
 
     private boolean buildCell(Tokenizer tokenizer, String[] codes, Cell cell) throws ArgusException {
         final double EPSILON = 0.000000001;
+        boolean hasResp = false, hasFreq = false, hasStatus = false;
+        String hs;
 
         int iExp = 0;
         int iTop = 0;
         cell.response = Cell.UNKNOWN;
         cell.shadow = Cell.UNKNOWN;
         cell.cost = Cell.UNKNOWN;
-        cell.freq = 1; // - 1
+        cell.freq = Cell.UNKNOWN; //0; // - 1
         for (int i = 0; i < TableSet.MAX_TOP_N_VAR; i++) {
             cell.maxScore[i] = 0;
             cell.holdingMaxScore[i] = 0;
@@ -540,30 +542,47 @@ public class TableSet {
                     iExp++;
                     break;
                 case RESPONSE:
-                    if (value.equals("")){ cell.status = CellStatus.EMPTY;}
-                    try{cell.response = StrUtils.toDouble(value);} catch(Exception ex){}
+                    hasResp = true;
+                    if (value.equals("") || value.equals("-")){ cell.status = CellStatus.EMPTY;}
+                    else
+                    try{cell.response = StrUtils.toDouble(value);} catch(Exception ex)
+                      {throw new ArgusException (ex.getMessage());}
                     break;
                 case SHADOW:
-                    try{cell.shadow = StrUtils.toDouble(value);} catch(Exception ex){}
+                    if ((value.equals("") || value.equals("-"))){break;}
+                    try{cell.shadow = StrUtils.toDouble(value);} catch(Exception ex)
+                      {throw new ArgusException (ex.getMessage());}
                     break;
                 case COST:
-                    try{ cell.cost = StrUtils.toDouble(value);} catch(Exception ex){}
+                    if ((value.equals("") || value.equals("-"))){break;}
+                    try{ cell.cost = StrUtils.toDouble(value);} catch(Exception ex)
+                      {throw new ArgusException (ex.getMessage());}
                     break;
                 case FREQUENCY:
-                    if (value.equals("")){ cell.status = CellStatus.EMPTY; cell.freq=0;}
-                    try{cell.freq = StrUtils.toInteger(value);} catch(Exception ex){}
+                    hasFreq = true;
+                    if (value.equals("") || value.equals("-")){ cell.status = CellStatus.EMPTY;}// cell.freq=0;}
+                    else
+                    try{cell.freq = StrUtils.toInteger(value);} catch(Exception ex)
+                      {throw new ArgusException (ex.getMessage());}
                     break;
                 case TOP_N:
-                    try{cell.maxScore[iTop] = StrUtils.toDouble(value);} catch(Exception ex){}
+                    if ((value.equals("") || value.equals("-"))){iTop++;break;}
+                    try{cell.maxScore[iTop] = StrUtils.toDouble(value);} catch(Exception ex)
+                      {throw new ArgusException (ex.getMessage());}
                     iTop++;
                     break;
                 case LOWER_PROTECTION_LEVEL:
-                    try{cell.lower = StrUtils.toDouble(value);} catch(Exception ex){}
+                    if ((value.equals("") || value.equals("-"))){break;}
+                    try{cell.lower = StrUtils.toDouble(value);} catch(Exception ex)
+                      {throw new ArgusException (ex.getMessage());}
                     break;
                 case UPPER_PROTECTION_LEVEL:
-                    try{cell.upper = StrUtils.toDouble(value);} catch(Exception ex){}
+                    if ((value.equals("") || value.equals("-"))){break;}
+                    try{cell.upper = StrUtils.toDouble(value);} catch(Exception ex)
+                      {throw new ArgusException (ex.getMessage());}
                     break;
                 case STATUS:
+                    hasStatus = true;
                     value = value.toUpperCase();
                     if (value.equals("")) {cell.status = CellStatus.EMPTY;}
                     else if (value.equals("E")) {
@@ -590,7 +609,69 @@ public class TableSet {
                     }
             } // end of switch statement
         } // end loop over all variables;
+        
 
+        if (readFreqOnlyTable) {
+            cell.response = cell.freq;
+        }
+ //       if (hasResp  && !hasFreq) { cell.freq = 1;}
+        // Checking for consistency of empty cells etc
+        
+        //1
+        if (cell.response == Cell.UNKNOWN && cell.freq == Cell.UNKNOWN){
+            if (cell.status == CellStatus.SAFE ||cell.status == CellStatus.SAFE_MANUAL) {cell.status = CellStatus.EMPTY;}
+            if (cell.status != CellStatus.EMPTY){
+           throw new ArgusException("An empty cell cannot have a status different from empty");             
+            
+        } 
+        }
+        //2
+        if (cell.response == Cell.UNKNOWN && cell.freq != Cell.UNKNOWN){
+           throw new ArgusException("An empty cell cannot have a real frequency");                         
+        }
+       
+        //3
+        if (cell.response != Cell.UNKNOWN && cell.freq == 0){
+           throw new ArgusException("A real cell cannot have a frequency zero");                         
+        }
+
+        //4
+        if (cell.response != Cell.UNKNOWN && cell.freq == Cell.UNKNOWN){
+          cell.freq = 1;
+          hs = "";
+          for (int j=0;j<iExp;j++){
+            if (codes[j].equals("")) {hs =hs + "Total";}
+                                else {hs = hs + codes[j];}
+            if (j+1<iExp) {hs=hs+",";}
+                }
+          SystemUtils.writeLogbook("A real cell with no frequency is strange;"
+                  + " In cell ("+ hs+") freq = 1 has been imputed.");
+        }
+        //5
+        if (cell.response == Cell.UNKNOWN && cell.freq == Cell.UNKNOWN){
+            cell.status = CellStatus.EMPTY;
+        }
+        
+        //6
+        //If an empty cell has a status <>empty we will overrule this
+        if (cell.response == Cell.UNKNOWN && hasStatus){
+            if ( !cell.status.isEmpty()){
+            cell.status = CellStatus.EMPTY; 
+            }                
+        }
+        
+        //7
+        if (cell.response != Cell.UNKNOWN && cell.freq != Cell.UNKNOWN &&
+                cell.status == CellStatus.EMPTY){
+           throw new ArgusException("A non-empty cell cannotyhave a status empty");                                     
+        }
+        //????? WHAT'S HAPPENIGN HERE ????? response = freq ????? PWOF 20170227 
+//        if (cell.response == Cell.UNKNOWN && cell.freq != Cell.UNKNOWN) {
+//            cell.response = cell.freq;
+//        }
+//        if (cell.response == Cell.UNKNOWN) {
+//            throw new ArgusException("Response variable is unknown");
+//        }
         if (cell.status == CellStatus.UNSAFE_MANUAL) {
             if (cell.lower == Cell.UNKNOWN) {
                 cell.lower = Math.abs(cell.response * manualMarge / 100);
@@ -609,17 +690,7 @@ public class TableSet {
             cell.lower = 0;
             cell.upper = 0;
         }
-
-        if (readFreqOnlyTable) {
-            cell.response = cell.freq;
-        }
-        //????? WHAT'S HAPPENIGN HERE ????? response = freq ????? PWOF 20170227 
-        if (cell.response == Cell.UNKNOWN && cell.freq != Cell.UNKNOWN) {
-            cell.response = cell.freq;
-        }
-        if (cell.response == Cell.UNKNOWN) {
-            throw new ArgusException("Response variable is unknown");
-        }
+        
         if (cell.shadow == Cell.UNKNOWN) {
             cell.shadow = cell.response;
         }
@@ -724,12 +795,13 @@ public class TableSet {
         int[] dimIndex = new int[expVar.size()];
         computeTotals = (additivity == TableSet.ADDITIVITY_RECOMPUTE);
         hasRealFreq = metadata.containsFrequencyVariable();
-        boolean continueBogusCovertable;
+        boolean continueBogusCovertable, Oke;
         int[][] bogusRange = new int[expVar.size()][2];
         int[] bogusIndex = new int[expVar.size()];
         int nDim, i;
 
         int[] varlist = indicesOfExplanatoryVariables();
+        Oke = TauArgusUtils.DeleteFile(Application.getTempFile("additerr.txt"));
         nDim = expVar.size();
         File[] files = SystemUtils.getFiles(metadata.dataFile);
         for (int f = 0; f < files.length; f++) {
@@ -1095,7 +1167,7 @@ if (Application.isProtectCoverTable()){
                         throw new ArgusException("Error in file " + file.getCanonicalPath() + " on line " + tokenizer.getLineNumber() + ".\n"
                                 + "Line = " + line + "\n"
                                 + ex.getMessage());
-                    }
+                                            }
                 } // per record;
             }
             finally {
