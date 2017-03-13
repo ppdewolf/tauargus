@@ -407,6 +407,12 @@ public class DialogSpecifyMetadata extends DialogBase {
     }//GEN-LAST:event_buttonMoveDownActionPerformed
 
     private void comboBoxFormatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxFormatActionPerformed
+        if (metadata.dataOrigin == metadata.DATA_ORIGIN_TABULAR){
+           if (comboBoxFormat.getSelectedIndex()!= 1){
+               comboBoxFormat.setSelectedIndex(1);               
+               JOptionPane.showMessageDialog(this,"For tabular data free format is required");
+           }
+        }
         panelEditVariable.enableForSPSS(comboBoxFormat.getSelectedIndex()==2);
         SpssSelected = comboBoxFormat.getSelectedIndex()==2;
         switch(comboBoxFormat.getSelectedIndex()){

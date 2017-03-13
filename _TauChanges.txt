@@ -94,4 +94,8 @@ summary    : The reading of tabular data has been improved. A lot of checks have
              Especially the imputation of freq = 1 in frequency tables has been corrected (issue #5)
              Also strange symbols in numeric fields are now detected. 
              Apart from normal numerical input only "" and "-" are accepted and treated as empty fields.
+             
+date       : Mar 12,2017
+summary    : Tabular data must be free format. So the format cannot be changed any more in the meta data window.
+             A warning will be shown and the change will be overruled.  
 
