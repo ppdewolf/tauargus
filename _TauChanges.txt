@@ -95,3 +95,11 @@ summary    : The reading of tabular data has been improved. A lot of checks have
              Also strange symbols in numeric fields are now detected. 
              Apart from normal numerical input only "" and "-" are accepted and treated as empty fields.
 
+date       : Apr 14,2017
+summary    : Added some "wait"-cursors.
+			 Removed unused imports.
+			 Changed version number TauArgus to 4.1.5
+			 Changed version number libTauArgus to 1.0.5
+
+above is RELEASED IN 4.1.5
+--------------------------------------------------------------
