@@ -43,7 +43,7 @@ import tauargus.service.TableService;
 import tauargus.utils.SwingUtils;
 //import tauargus.utils.ExecUtils;
 import argus.utils.SystemUtils;
-import tauargus.utils.TauArgusUtils;
+//import tauargus.utils.TauArgusUtils;
 
 
 public class DialogSpecifyTablesMicro extends DialogBase {

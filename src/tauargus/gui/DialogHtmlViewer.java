@@ -19,7 +19,7 @@ package tauargus.gui;
 
 import java.awt.print.PrinterException;
 import java.io.IOException;
-import java.net.URL;
+//import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

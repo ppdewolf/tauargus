@@ -17,24 +17,24 @@
 
 package tauargus.gui;
 
-import java.awt.image.ImageObserver;
-import java.io.BufferedReader;
+//import java.awt.image.ImageObserver;
+//import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+//import java.io.FileNotFoundException;
+//import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Date;
-import java.util.List;
-import javax.swing.filechooser.FileNameExtensionFilter;
+//import java.util.List;
+//import javax.swing.filechooser.FileNameExtensionFilter;
 //import tauargus.utils.ExecUtils;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.commons.io.FilenameUtils;
 import tauargus.model.Application;
 import tauargus.model.ArgusException;
-import tauargus.model.DataFilePair;
+//import tauargus.model.DataFilePair;
 import tauargus.model.Metadata;
 import tauargus.model.TableSet;
 import tauargus.model.Variable;

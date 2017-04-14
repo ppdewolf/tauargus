@@ -27,6 +27,7 @@ import tauargus.model.ArgusException;
 import argus.utils.StrUtils;
 //import tauargus.utils.ExecUtils;
 import argus.utils.SystemUtils;
+import java.awt.Cursor;
 import static javax.swing.JOptionPane.YES_OPTION;
 
 public class DialogSaveTable extends DialogBase {
@@ -369,8 +370,11 @@ public class DialogSaveTable extends DialogBase {
         SaveTable.writeIntermediateUseHolding = checkBoxUseHoldingInfo.isSelected();
         SaveTable.writeJJRemoveBogus = jCheckBoxremoveTrivialLevels.isSelected();
         try {
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             SaveTable.writeTable(tableSet, selectedFormat);
+            setCursor(Cursor.getDefaultCursor());
         } catch (ArgusException ex) {
+            setCursor(Cursor.getDefaultCursor());
             tableSet.safeFileName = "";
             JOptionPane.showMessageDialog(this, ex.getMessage());
         }

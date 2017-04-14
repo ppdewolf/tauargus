@@ -38,16 +38,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
-import org.apache.commons.lang3.StringUtils;
+//import javax.swing.JOptionPane;
+//import org.apache.commons.lang3.StringUtils;
 import tauargus.extern.dataengine.TauArgus;
-import tauargus.gui.ActivityListener;
+//import tauargus.gui.ActivityListener;
 import tauargus.service.TableService;
-import argus.utils.StrUtils;
+//import argus.utils.StrUtils;
 //import tauargus.utils.ExecUtils;
 import tauargus.utils.TauArgusUtils;
 import tauargus.utils.Tokenizer;
-import tauargus.model.CellStatus;
+//import tauargus.model.CellStatus;
 import argus.utils.SystemUtils;
 import argus.utils.StrUtils;
 import static java.lang.Math.abs;
@@ -1941,14 +1941,14 @@ if (Application.isProtectCoverTable()){
 
              if (oke) {oke = tauArgus.SetTableCellStatus(tableSet.index, dimIndex, newStatus);}
              
-              if ( oke) { aPrioryStatus[1][0]++; }
-              else      { aPrioryStatus[1][1]++;
-                 if (!ignoreError){
-                   hs = "Illegal status transition for cell ("+codesString + ")\nLine " + tokenizer.getLineNumber();
-                   if (!showError(hs, lineInfo)){return 1;}
+            if ( oke) { aPrioryStatus[1][0]++; }
+            else      { aPrioryStatus[1][1]++;
+                        if (!ignoreError){
+                        hs = "Illegal status transition for cell ("+codesString + ")\nLine " + tokenizer.getLineNumber();
+                        if (!showError(hs, lineInfo)){return 1;}
 //                  throw new ArgusException ("Illegal status transition for cell ("+codesString + ")\nLine " + tokenizer.getLineNumber());
-                 };
-                 }
+                        }
+            }
              
              if (report){
                outStatus.write("<tr><td>"+codesString+"</td><td>"+CellStatus.findByValue(oldStatus).getDescription()+
