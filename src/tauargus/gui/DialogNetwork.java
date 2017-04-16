@@ -18,7 +18,7 @@
 package tauargus.gui;
 
 import javax.swing.JOptionPane;
-import tauargus.model.ArgusException;
+//import tauargus.model.ArgusException;
 import tauargus.model.TableSet;
 import argus.utils.StrUtils;
 import tauargus.model.Application;

@@ -29,7 +29,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import tauargus.model.Application;
 import tauargus.model.ArgusException;
-import tauargus.model.GHMiter;
+//import tauargus.model.GHMiter;
 import tauargus.model.TableSet;
 import tauargus.model.Variable;
 import tauargus.service.TableService;

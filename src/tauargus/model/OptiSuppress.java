@@ -1759,8 +1759,8 @@ private static void joinRounded(TableSet tableSet, int nPart) {
                     }
                     @Override
                     public void UpdateDiscrepancy(final double percentage) {
-                    pcs.firePropertyChange("value3", null, percentage);
-                    Diff = percentage;
+                    pcs.firePropertyChange("value3", null, 100*percentage); // convert to percentage notation
+                    Diff = 100*percentage;
                     }
                     @Override
                     public void UpdateTime(final int seconds) {

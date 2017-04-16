@@ -17,18 +17,19 @@
 
 package tauargus.gui;
 
-import tauargus.model.APriori;
+//import tauargus.model.APriori;
 
 import java.io.File;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import static tauargus.gui.DialogOpenTable.CANCEL_OPTION;
+//import static tauargus.gui.DialogOpenTable.CANCEL_OPTION;
 import tauargus.model.ArgusException;
 import tauargus.model.TableSet;
 import tauargus.model.APriori;
 import tauargus.service.TableService;
 //import tauargus.utils.ExecUtils;
 import argus.utils.SystemUtils;
+import java.awt.Cursor;
 
 /**
  *
@@ -204,27 +205,30 @@ public class DialogReadApriori extends DialogBase {
 //   public static int processAprioryFile(String fileName, int tableNumber, String separator,
 //                                     boolean ignoreError, boolean expandBogus, boolean report, int[][] aPrioryStatus) throws ArgusException{
         try{
-        TableSet.processAprioryFile(txtAprioriFilename.getText(), 
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            TableSet.processAprioryFile(txtAprioriFilename.getText(), 
                                     apTableNumber,  txtSeparator.getText(), 
                                     chkIgnoreIcorrectLines.isSelected(),
                                     chkExpandTrivialLevels.isSelected(), 
                                     true, aPrioryStatus);
-        jTable1.setVisible(true);
-        int line=0;
-        for(int type=0; type<5; type++)
-            { if (type!=3){           
-                jTable1.getModel().setValueAt(APriori.getStatus(type), line, 0 );
-                jTable1.getModel().setValueAt(aPrioryStatus[type][0], line, 1 );
-                jTable1.getModel().setValueAt(aPrioryStatus[type][1], line, 2 );
-                line++;
-              }  
-            }
-        
-        }catch (ArgusException ex){JOptionPane.showMessageDialog(this,ex.getMessage());
-        if(! (aPrioryStatus == null) ){
-          TableSet.CloseAprioriFiles(chkExpandTrivialLevels.isSelected(), aPrioryStatus);}
-        }
-/*   versie Wim Hacking     
+            jTable1.setVisible(true);
+            int line=0;
+            for(int type=0; type<5; type++)
+                { if (type!=3){           
+                    jTable1.getModel().setValueAt(APriori.getStatus(type), line, 0 );
+                    jTable1.getModel().setValueAt(aPrioryStatus[type][0], line, 1 );
+                    jTable1.getModel().setValueAt(aPrioryStatus[type][1], line, 2 );
+                    line++;
+                    }  
+                }   
+            setCursor(Cursor.getDefaultCursor());
+            }catch (ArgusException ex){
+                setCursor(Cursor.getDefaultCursor());
+                JOptionPane.showMessageDialog(this,ex.getMessage());
+                if(! (aPrioryStatus == null) ){
+                    TableSet.CloseAprioriFiles(chkExpandTrivialLevels.isSelected(), aPrioryStatus);}
+                }
+        /*   versie Wim Hacking     
         try
         {
         _Apriori.ProcessAprioriFile(currentTable.index, 

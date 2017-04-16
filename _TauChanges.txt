@@ -99,3 +99,11 @@ date       : Mar 12,2017
 summary    : Tabular data must be free format. So the format cannot be changed any more in the meta data window.
              A warning will be shown and the change will be overruled.  
 
+date       : Apr 14,2017
+summary    : Added some "wait"-cursors.
+			 Removed unused imports.
+			 Changed version number TauArgus to 4.1.5
+			 Changed version number libTauArgus to 1.0.5
+
+above is RELEASED IN 4.1.5
+--------------------------------------------------------------

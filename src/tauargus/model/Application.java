@@ -23,10 +23,9 @@ import java.awt.Graphics2D;
 import java.awt.SplashScreen;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.Locale;
+//import java.util.Locale;
 import java.util.logging.Logger;
-import java.util.prefs.Preferences;
+//import java.util.prefs.Preferences;
 import org.apache.commons.io.FilenameUtils;
 import tauargus.extern.dataengine.TauArgus;
 import tauargus.extern.tauhitas.HiTaSCtrl;
@@ -35,14 +34,13 @@ import tauargus.extern.taurounder.RounderCtrl;
 import tauargus.gui.FrameInfo;
 import tauargus.gui.FrameMain;
 import tauargus.service.TableService;
-//import tauargus.utils.SystemUtils;
 import argus.utils.SystemUtils;
 import argus.model.ArgusException;
 import com.ibm.statistics.util.Utility;
 import java.io.File;
 import java.io.IOException;
 import javax.swing.JOptionPane;
-import tauargus.utils.StrUtils;
+//import tauargus.utils.StrUtils;
 
 public class Application {
 
