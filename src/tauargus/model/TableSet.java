@@ -635,7 +635,7 @@ public class TableSet {
            throw new ArgusException("A real cell cannot have a frequency zero");                         
         }
 
-        //4
+        //4 ook nog naar kijken Anco 7 mei 2017
         if (cell.response != Cell.UNKNOWN && cell.freq == Cell.UNKNOWN){
           cell.freq = 1;
           hs = "";
