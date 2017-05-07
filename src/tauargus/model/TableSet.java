@@ -631,7 +631,7 @@ public class TableSet {
         }
        
         //3
-        if (cell.response != Cell.UNKNOWN && cell.freq == 0){
+        if ((cell.response != Cell.UNKNOWN && cell.response != 0)  && cell.freq == 0){
            throw new ArgusException("A real cell cannot have a frequency zero");                         
         }
 
@@ -653,7 +653,7 @@ public class TableSet {
         }
         
         //6
-        //If an empty cell has a status <>empty we will overrule this
+        //If an empty cell has a status <> empty we will overrule this
         if (cell.response == Cell.UNKNOWN && hasStatus){
             if ( !cell.status.isEmpty()){
             cell.status = CellStatus.EMPTY; 
@@ -661,9 +661,10 @@ public class TableSet {
         }
         
         //7
-        if (cell.response != Cell.UNKNOWN && cell.freq != Cell.UNKNOWN &&
+        if ((cell.response != Cell.UNKNOWN && cell.response != 0) && 
+            (cell.freq != Cell.UNKNOWN && cell.freq != 0)  &&
                 cell.status == CellStatus.EMPTY){
-           throw new ArgusException("A non-empty cell cannotyhave a status empty");                                     
+           throw new ArgusException("A non-empty cell cannot have a status empty");                                     
         }
         //????? WHAT'S HAPPENIGN HERE ????? response = freq ????? PWOF 20170227 
 //        if (cell.response == Cell.UNKNOWN && cell.freq != Cell.UNKNOWN) {
