@@ -566,16 +566,29 @@ public class OptiSuppress {
       File fileHitas = new File(Application.getTempFile("Hitastab.txt"));
       if (fileKlad.exists()) { fileKlad.delete();}
       fileHitas.renameTo(new File(Application.getTempFile("Hitastab.kld")));  
-      String hs, kop;
+      String hs, kop, zeroline = "0.0 z 0 0";
+      int aant;
       try{
        BufferedWriter out = new BufferedWriter(new FileWriter(Application.getTempFile("Hitastab.txt")));
        BufferedReader in =  new BufferedReader(new FileReader(Application.getTempFile("Hitastab.kld")));
-       while (in.ready()){
-         hs = in.readLine();
+       //while (in.ready()){
+       try {
+           hs = in.readLine();
+       } catch (IOException ex){
+           hs = null;
+       }
+       aant = hs.substring(12).indexOf(' ') + 6;
+       while (hs != null){
          kop = hs.substring(0, 11);
-         out.write(kop.substring(0, 6) + "    0" + hs.substring(12)); out.newLine();
-         out.write(kop.substring(0, 6) + "    1" + hs.substring(12)); out.newLine();
-         out.write(kop.substring(0, 6) + "    2             0.0 z 0 0"); out.newLine();
+         out.write(kop.substring(0, 6) + "    0 " + hs.substring(12)); out.newLine();
+         out.write(kop.substring(0, 6) + "    1 " + hs.substring(12)); out.newLine();
+         out.write(kop.substring(0, 6) + "    2 " + zeroline.format("%" + aant + "s",zeroline)); out.newLine();
+         //out.write(kop.substring(0, 6) + "    2             0.0 z 0 0"); out.newLine();
+         try {
+           hs = in.readLine();
+         } catch (IOException ex){
+           hs = null;
+         }
        }
       in.close();
       out.close();
@@ -797,8 +810,13 @@ public class OptiSuppress {
     
     private static void ControleerHITAStabtxt(TableSet tableSet){
         
-    String regelOut,token, status, freq; int  i;
+    String regelOut,token, status, freq, totalstring; 
+    int  i;
     Double respVal, lpl, epsilon, x;
+    int[] GTIndex = new int[tableSet.expVar.size()];
+    for (i=0;i<tableSet.expVar.size();i++){
+        GTIndex[i] = 0;
+    }
     
     DecimalFormatSymbols symbols = new DecimalFormatSymbols();
     symbols.setDecimalSeparator('.');
@@ -831,7 +849,12 @@ public class OptiSuppress {
     try{
        tokenizer = new Tokenizer(new BufferedReader(new FileReader(Application.getTempFile("Hitastab.kld"))));
        } catch (Exception ex) {};
-       
+    
+    // Get number of characters of total general
+    int aant = (int) Math.ceil((Math.log(tableSet.getCell(GTIndex).response)/Math.log(10)));
+    if (tableSet.respVar.nDecimals > 0)
+        aant = aant + tableSet.respVar.nDecimals + 1;
+        
     while (tokenizer.nextLine() != null) {
        regelOut = "";
        for (i=0;i<tableSet.expVar.size();i++){
@@ -842,7 +865,7 @@ public class OptiSuppress {
        regelOut=regelOut.substring(1);
        token = tokenizer.nextToken();  //Value
        respVal = Double.parseDouble(token);
-       regelOut = regelOut + " " + token.format("%12s", token);
+       regelOut = regelOut + " " + token.format("%" + aant + "s", token);
        status = tokenizer.nextToken();  //Status
        freq = tokenizer.nextToken();
        if ( (respVal == 0) && status.equals("z") ){
