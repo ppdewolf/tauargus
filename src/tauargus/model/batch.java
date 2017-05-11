@@ -306,7 +306,7 @@ public static int runBatchProcess(String batchFile){
                         Application.solverSelected = Application.SOLVER_XPRESS;  
                       }
                       else
-                      if (hs.equalsIgnoreCase("CLEX")){
+                      if (hs.equalsIgnoreCase("CPLEX")){
                         Application.solverSelected = Application.SOLVER_CPLEX;  
                       }
                       else
