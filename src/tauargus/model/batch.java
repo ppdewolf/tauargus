@@ -301,7 +301,7 @@ public static int runBatchProcess(String batchFile){
                       break;                      
                     }
                   case ("<SOLVER>"):
-                    { hs = tokenizer.nextToken();
+                    { hs = tokenizer.nextField(",");
                       if (hs.equalsIgnoreCase("XPRESS")){
                         Application.solverSelected = Application.SOLVER_XPRESS;  
                       }
@@ -315,6 +315,15 @@ public static int runBatchProcess(String batchFile){
                       }
                       else{
                           throw new ArgusException("Illegal solver ("+hs+") selected");
+                      }
+                      // check for license file
+                      hs = tokenizer.nextField(",");
+                      if (!hs.isEmpty()){
+                          hs = StrUtils.unQuote(hs);
+                          if (!TauArgusUtils.ExistFile(hs)){
+                             throw new ArgusException("Cplex License file ("+hs+") does not exist");                               
+                          }
+                          SystemUtils.putRegString("optimal", "cplexlicensefile", hs); 
                       }
                       break;
                     }

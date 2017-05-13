@@ -116,3 +116,8 @@ summary    : tabular data only can be free format.When editting the metadata TAU
 
 date       : May 9, 2017 11:49:20 AM
 summary    : Fixed issue with large cell values in 1-dim tables
+
+date       : May 13, 2017
+sumamry    : Issue 55 (Select solver in tauArgus batch file) has been solved by adding an additional parameter in the batch file. 
+             Only for CPLEX you can add the name of the licence file. It is advised to include the full path.
+             E.g. <SOLVER>  CPLEX,"D:\Argus\TauData\Licencefilename"  
