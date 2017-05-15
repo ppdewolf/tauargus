@@ -147,6 +147,19 @@ public class TauArgusUtils {
       return hs;        
     }
     
+    public static String getFullFileName(String Fn) throws ArgusException{
+        File f1 = new File(Fn);        
+        String hs; hs = "";
+        if (!ExistFile(Fn)){
+            throw new ArgusException ("File: "+Fn + " does not exist.");
+        }
+        try{
+            hs = f1.getCanonicalPath();
+        }
+        catch (IOException ex) {};
+        return hs;
+    }
+    
     public static String addPathExt(String fileName, String dataFile, String ext){
         String hs;
         hs = fileName;

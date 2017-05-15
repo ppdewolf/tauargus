@@ -323,6 +323,7 @@ public static int runBatchProcess(String batchFile){
                           if (!TauArgusUtils.ExistFile(hs)){
                              throw new ArgusException("Cplex License file ("+hs+") does not exist");                               
                           }
+                          hs = TauArgusUtils.getFullFileName(hs);
                           SystemUtils.putRegString("optimal", "cplexlicensefile", hs); 
                       }
                       break;
