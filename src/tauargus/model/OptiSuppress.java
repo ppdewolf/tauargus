@@ -691,7 +691,7 @@ public class OptiSuppress {
         SystemUtils.writeLogbook("Start of the modular protection for table " + TableService.getTableDescription(tableSet));
         if (tableSet.expVar.size()> 4 && !Application.isProtectCoverTable()) {
             hs = "The table has more than 4 dimensions.\n" + 
-                 "Running Modular is error-prone.\n" +
+                 "Running Modular can take a lot of time and is error-prone.\n" +
                  "Please check the results carefully.\n";
            int warningResult = ShowWarningMessage(hs);
            if (warningResult == 0 ) {
