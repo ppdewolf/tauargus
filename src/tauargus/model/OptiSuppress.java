@@ -64,6 +64,7 @@ import tauargus.extern.taurounder.RounderCtrl;
 import tauargus.gui.DialogStopTime;
 import tauargus.gui.PanelTable;
 import tauargus.utils.StrUtils;
+import static tauargus.utils.TauArgusUtils.ShowWarningMessage;
 
 public class OptiSuppress {
 //TODO    Keuze moet noguit het options scherm/registry kommen
@@ -688,6 +689,16 @@ public class OptiSuppress {
 //        try{
         Date startDate = new Date();  
         SystemUtils.writeLogbook("Start of the modular protection for table " + TableService.getTableDescription(tableSet));
+        if (tableSet.expVar.size()> 4 && !Application.isProtectCoverTable()) {
+            hs = "The table has more than 4 dimensions.\n" + 
+                 "Running Modular is error-prone.\n" +
+                 "Please check the results carefully.\n";
+           int warningResult = ShowWarningMessage(hs);
+           if (warningResult == 0 ) {
+              throw new ArgusException(hs); //overlapString);
+          }
+        }
+    
         Oke = tauArgus.PrepareHITAS(tableSet.index, Application.getTempFile("NPF.txt"), Application.getTempFile("NFS.txt"), Application.getTempDir()+"/");
         if (!Oke){throw new ArgusException("An unknown error occurred when preparing the files for Modular");} 
         // TestHitasFiles; check for a bogus at the top level
