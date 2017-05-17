@@ -38,6 +38,9 @@ public class PanelEditVariable extends javax.swing.JPanel {
     /**
      * Creates new form PanelEditVariable
      */
+    
+    Variable currentVariable;
+    
     public PanelEditVariable() {
         initComponents();
         createComponentArrays();
@@ -101,6 +104,7 @@ public class PanelEditVariable extends javax.swing.JPanel {
 
     public void load(Variable variable) {
         // Empty all text fields except name and length...
+        currentVariable = variable;
         textFieldStartingPosition.setText("");
         textFieldDecimals.setText("");
         textFieldTotalCode.setText("");
@@ -498,6 +502,17 @@ public class PanelEditVariable extends javax.swing.JPanel {
 
         labelName.setLabelFor(textFieldName);
         labelName.setText("Name:");
+
+        textFieldName.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                textFieldNameActionPerformed(evt);
+            }
+        });
+        textFieldName.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                textFieldNameFocusLost(evt);
+            }
+        });
 
         labelStartingPosition.setLabelFor(textFieldStartingPosition);
         labelStartingPosition.setText("Starting position:");
@@ -1133,6 +1148,21 @@ public class PanelEditVariable extends javax.swing.JPanel {
     private void textFieldStatusSafeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textFieldStatusSafeActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_textFieldStatusSafeActionPerformed
+
+    private void textFieldNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textFieldNameActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_textFieldNameActionPerformed
+
+    private void textFieldNameFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_textFieldNameFocusLost
+        // TODO add your handling code here:
+        currentVariable.name = textFieldName.getText();
+ //       DialogSpecifyMetadata.SetSpecificElement(currentVariable);
+        
+ //      try{
+ //       save(currentVariable);
+ //       } catch (ArgusException ex){};
+        
+    }//GEN-LAST:event_textFieldNameFocusLost
 
     private Metadata metadata;
     private int dataType;

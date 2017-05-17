@@ -189,7 +189,7 @@ public class Application {
         clearVariables();
     }
   
-    private static void clearVariables() {
+    public static void clearVariables() {
         variables.clear();
     }
 

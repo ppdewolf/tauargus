@@ -375,7 +375,13 @@ public class DialogSpecifyMetadata extends DialogBase {
         variableListModel.add(selectedIndex, variable);
         listVariables.setSelectedIndex(selectedIndex);
     }//GEN-LAST:event_buttonAddActionPerformed
-
+    public void SetSpecificElement(Variable variable){
+       int index = listVariables.getSelectedIndex(); 
+       if (index != -1){ 
+        variableListModel.set(index, variable);        
+       }
+    }
+    
     private void buttonRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonRemoveActionPerformed
         int selectedIndex = listVariables.getSelectedIndex();
         // set the selection to an item that still exists after deletion

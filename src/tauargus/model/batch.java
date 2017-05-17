@@ -46,6 +46,8 @@ import tauargus.utils.StrUtils;
 //import tauargus.utils.ExecUtils;
 import tauargus.utils.TauArgusUtils;
 import argus.utils.SystemUtils;
+import static tauargus.model.Application.clearMetadatas;
+import static tauargus.model.Application.clearVariables;
    
 
 /**
@@ -200,6 +202,8 @@ public static int runBatchProcess(String batchFile){
                   case ("<CLEAR>"):    
                       {TableService.clearTables();
                        tauArgus.CleanAll();
+                       clearMetadatas();
+                       clearVariables();
                        status = 0;
                         break;}
                   case ("<SAFETYRULE>"):    

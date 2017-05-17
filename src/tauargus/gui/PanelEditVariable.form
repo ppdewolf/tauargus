@@ -180,6 +180,10 @@
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="textFieldName">
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="textFieldNameActionPerformed"/>
+                <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="textFieldNameFocusLost"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="labelStartingPosition">
               <Properties>
