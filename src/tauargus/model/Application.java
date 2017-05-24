@@ -36,6 +36,7 @@ import tauargus.gui.FrameMain;
 import tauargus.service.TableService;
 import argus.utils.SystemUtils;
 import argus.model.ArgusException;
+import tauargus.model.batch;
 import com.ibm.statistics.util.Utility;
 import java.io.File;
 import java.io.IOException;
@@ -97,6 +98,7 @@ public class Application {
     //private static String manualPath = "C:/Users/Gebruiker/Desktop/MUmanual4.3.pdf";
     private static String manualPath;
     //private static final String acrord32 = "acrord32.exe"; // finds the acrord32.exe
+    public static String batchDataPath;
 
 
     private static Variable freqVar = new Variable(null);
@@ -462,10 +464,12 @@ public class Application {
         solverSelected = SystemUtils.getRegInteger("optimal", "solverused", SOLVER_SOPLEX);
         generalMaxHitasTime = SystemUtils.getRegInteger("optimal", "maxhitastime", 1);
         anco = SystemUtils.getRegBoolean("general", "anco", false);
+        batchDataPath = "";
         if (args.length > 0 && !args[0].equalsIgnoreCase("X")) {
             //an "X" temporarily disables the command-line parameters set in the IDE
             // Batch processing...
             setBatch(BATCH_COMMANDLINE);
+            
                         //TODO Declare global
             //the "/v" parameter is only used if the batch is called for linked tables
             //tau will then show some progress info
@@ -473,14 +477,18 @@ public class Application {
               if(args[i].equals("/v")){setBatch(BATCH_FROMMENU);}  
             }
             if (args.length > 1) {
-              if(!args[1].equals("/v")){SystemUtils.setLogbook(args[1]);}
+              if(!args[1].equals("/v") && !args[1].equals("-")){SystemUtils.setLogbook(args[1]);}
             }
 
             if (args.length > 2) {
-                if(!args[2].equals("/v")){setTempDir(args[2]);}
+                if(!args[2].equals("/v") && !args[2].equals("-")){setTempDir(args[2]);}
             }
 
-            boolean interActive = true;
+            if (args.length > 3) {
+                if(!args[3].equals("/v")){tauargus.model.batch.setBatchDataPath(args[3]);}
+                //Checking on the validity of this path willbe donewhen invokingthe batch process
+            }
+             boolean interActive = true;
             int exitCode = 0;
             
             // Do a lot of stuff...

@@ -46,6 +46,8 @@ import tauargus.utils.StrUtils;
 //import tauargus.utils.ExecUtils;
 import tauargus.utils.TauArgusUtils;
 import argus.utils.SystemUtils;
+import java.io.File;
+import org.apache.commons.io.FilenameUtils;
 import static tauargus.model.Application.clearMetadatas;
 import static tauargus.model.Application.clearVariables;
    
@@ -61,6 +63,8 @@ public class batch {
     public static final int BATCH_READ_ERROR = 3;
     static Metadata metadata;
     static Tokenizer tokenizer;
+    private static String batchDataPath;
+    private static String batchFilePath;
     private static final TauArgus tauArgus = Application.getTauArgusDll();    
         
     private static final Logger logger = Logger.getLogger(PanelTable.class.getName());        
@@ -84,6 +88,42 @@ public class batch {
         }    
     }  
     
+public static void setBatchDataPath (String f){
+    batchDataPath = FilenameUtils.normalizeNoEndSeparator(f);
+    if (!batchDataPath.endsWith("\\")){batchDataPath = batchDataPath + "\\";}
+}
+
+private static boolean checkBatchDataPath (){
+    File f = new File(batchDataPath);
+    if ( !batchDataPath.equals("")){
+        if (!f.isDirectory()) {
+            
+             SystemUtils.writeLogbook("Argus batch data directory ("+batchDataPath+") could not be found");  
+        return false;
+        }
+    }
+    return true;
+}
+public static String getBatchDataPath(){
+    return batchDataPath;
+}
+
+private static String giveRightFile (String f) throws ArgusException {
+    String hs;
+// If the file name does not contain : or / or \ we assuem that the full path si given.
+//  else we first search in the directory of the arb file and then in the batch data directory (Param 4 when calling TAU)      
+    hs = f;
+    if ( !hs.contains(":") && !hs.contains("\\") && !hs.contains("/")){
+       hs = batchFilePath + f;
+       if (!TauArgusUtils.ExistFile(hs) ) {
+          hs = getBatchDataPath() + f;
+          }
+       }
+    if (!TauArgusUtils.ExistFile(hs)){
+        throw new ArgusException ("file: "+ f + " could not be found.");
+   }
+    return hs;
+}
 /**
  * The main routine for running the batch version.\n
  * Note: there is a distinction between running from the commandline and from the menu.\n
@@ -96,12 +136,13 @@ public class batch {
 public static int runBatchProcess(String batchFile){
        String token; boolean tabularInput; int status; boolean firstCommand, silent; 
        String dataFile, metaDataFile, hs; 
-       String batchFilePath;
+//       String batchFilePath;
        String currentCommand = "";
        dataFile = ""; metaDataFile = ""; tabularInput = false;
        tokenizer = null;
        token = "";
        status = 0;
+       if (!checkBatchDataPath()){ return BATCH_NORMAL_ERROR;}
        batchFilePath = TauArgusUtils.getFilePath(batchFile);
        firstCommand  = true; silent = false;
        if (Application.batchType() == Application.BATCH_FROMMENU) {
@@ -109,6 +150,8 @@ public static int runBatchProcess(String batchFile){
            Application.windowInfo.addLabel("Progress of the batch proces");
        }    
        tauArgus.CleanAll();
+       clearMetadatas();
+       clearVariables();
        try{
        tokenizer = new Tokenizer(new BufferedReader(new FileReader(batchFile)));
        } catch (Exception ex) {
@@ -126,7 +169,7 @@ public static int runBatchProcess(String batchFile){
 //       3 SpecifyTables found       
 //       4 SafetyRule found
         try{
-        while (tokenizer.nextLine() != null) {
+        while  (tokenizer.nextLine() != null) {
           currentCommand = tokenizer.getLine();
           reportProgress(currentCommand);
           token = tokenizer.nextToken();  //.toUpperCase() niet nodig
@@ -144,6 +187,7 @@ public static int runBatchProcess(String batchFile){
                        {break;}
               case ("<OPENMICRODATA>"):{
                   dataFile =  tokenizer.nextToken();                  
+                  dataFile = giveRightFile(dataFile);
                   tabularInput = false;
                   if (status !=0){ throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
                   status = 1;
@@ -426,6 +470,9 @@ public static int runBatchProcess(String batchFile){
         if ( !hs.equals(",") ) {throw new ArgusException(", expected; not a "+ hs + "");}
         hs = nextToken(tail);
         tableSet = TableService.getTable(tabNo);
+        if (!hs.contains(":")&&!hs.contains("\\")&&!hs.contains("/")){
+            hs = getBatchDataPath() + hs;
+        }
         tableSet.safeFileName = hs;
         SaveTable.writeTable (tableSet, outputType);
         SaveTable.writeReport(tableSet);
