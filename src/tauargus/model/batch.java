@@ -187,15 +187,15 @@ public static int runBatchProcess(String batchFile){
                        {break;}
               case ("<OPENMICRODATA>"):{
                   dataFile =  tokenizer.nextToken();                  
-                  dataFile = giveRightFile(dataFile);
                   tabularInput = false;
                   if (status !=0){ throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
                   status = 1;
-                  hs = batchFilePath + dataFile;
-                  if (!TauArgusUtils.ExistFile(dataFile) && TauArgusUtils.ExistFile(hs)){dataFile = hs;}
-                  if (!TauArgusUtils.ExistFile(dataFile)){
-                      throw new ArgusException("File "+dataFile+" does not exist");
-                  }
+                  dataFile = giveRightFile(dataFile);
+//                  hs = batchFilePath + dataFile;
+//                  if (!TauArgusUtils.ExistFile(dataFile) && TauArgusUtils.ExistFile(hs)){dataFile = hs;}
+//                  if (!TauArgusUtils.ExistFile(dataFile)){
+//                    throw new ArgusException("File "+dataFile+" does not exist");
+//                  }
                        break;}
   //Case "<OPENMICRODATA>": NDataFiles = NDataFiles + 1
 //                         If NDataFiles > 1 Then GoTo FOUTEINDE
@@ -205,10 +205,11 @@ public static int runBatchProcess(String batchFile){
                   dataFile =  tokenizer.nextToken();
                   tabularInput = true;
                   if (!(status == 0 || status == 4)){ throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
-                  hs = batchFilePath + dataFile;
-                  if (!TauArgusUtils.ExistFile(dataFile) && TauArgusUtils.ExistFile(hs)){dataFile = hs;}
-                  if (!TauArgusUtils.ExistFile(dataFile)){
-                      throw new ArgusException("File "+dataFile+" does not exist");}
+                  dataFile = giveRightFile(dataFile);
+//                  hs = batchFilePath + dataFile;
+//                  if (!TauArgusUtils.ExistFile(dataFile) && TauArgusUtils.ExistFile(hs)){dataFile = hs;}
+//                  if (!TauArgusUtils.ExistFile(dataFile)){
+ //                     throw new ArgusException("File "+dataFile+" does not exist");}
                   status = 1;    
                       break;}
 // Case "<OPENTABLEDATA>": NDataFiles = NDataFiles + 1
@@ -220,11 +221,12 @@ public static int runBatchProcess(String batchFile){
                    metaDataFile =  tokenizer.nextToken();
                    if (dataFile.equals("")){ throw new ArgusException ("A data file must be specified first"); }                       
                    if (status !=1){ throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
-                   status = 2;   
-                  hs = batchFilePath + metaDataFile;
-                  if (!TauArgusUtils.ExistFile(metaDataFile) && TauArgusUtils.ExistFile(hs)){metaDataFile = hs;}
-                   if (!TauArgusUtils.ExistFile(metaDataFile)){
-                      throw new ArgusException("File "+metaDataFile+" does not exist");}
+                   status = 2;
+                   metaDataFile = giveRightFile(metaDataFile);
+//                  hs = batchFilePath + metaDataFile;
+//                  if (!TauArgusUtils.ExistFile(metaDataFile) && TauArgusUtils.ExistFile(hs)){metaDataFile = hs;}
+//                   if (!TauArgusUtils.ExistFile(metaDataFile)){
+//                      throw new ArgusException("File "+metaDataFile+" does not exist");}
                    Metadata.createMetadata(tabularInput, dataFile, metaDataFile);
                    dataFile = "";
                    break;}
