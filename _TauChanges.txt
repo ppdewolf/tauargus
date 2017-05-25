@@ -121,3 +121,10 @@ date       : May 13, 2017
 sumamry    : Issue 55 (Select solver in tauArgus batch file) has been solved by adding an additional parameter in the batch file. 
              Only for CPLEX you can add the name of the licence file. It is advised to include the full path.
              E.g. <SOLVER>  CPLEX,"D:\Argus\TauData\Licencefilename"  
+
+date       : May 25, 2017
+summary    : As requested in issue 57 we have added a fourth parameter to the TauArgus commandline. 
+             This parameter is the batch data directory. If no directory information is added to the name of the output file 
+             in <WRITETABLE> param(4) is added to the file name.
+             For the input files a file name without diretpory information is first searched in the directory of the .arb file.
+             If it cannot be found there we will then try the param(4) directory.
