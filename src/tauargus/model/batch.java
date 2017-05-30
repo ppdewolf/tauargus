@@ -63,8 +63,8 @@ public class batch {
     public static final int BATCH_READ_ERROR = 3;
     static Metadata metadata;
     static Tokenizer tokenizer;
-    private static String batchDataPath;
-    private static String batchFilePath;
+    private static String batchDataPath = "";
+    private static String batchFilePath = "";
     private static final TauArgus tauArgus = Application.getTauArgusDll();    
         
     private static final Logger logger = Logger.getLogger(PanelTable.class.getName());        
@@ -94,8 +94,8 @@ public static void setBatchDataPath (String f){
 }
 
 private static boolean checkBatchDataPath (){
-    File f = new File(batchDataPath);
     if ( !batchDataPath.equals("")){
+      File f = new File(batchDataPath);
         if (!f.isDirectory()) {
             
              SystemUtils.writeLogbook("Argus batch data directory ("+batchDataPath+") could not be found");  
@@ -473,7 +473,11 @@ public static int runBatchProcess(String batchFile){
         hs = nextToken(tail);
         tableSet = TableService.getTable(tabNo);
         if (!hs.contains(":")&&!hs.contains("\\")&&!hs.contains("/")){
-            hs = getBatchDataPath() + hs;
+            if (batchDataPath.equals("")){
+                hs = batchFilePath + hs;
+            } else {
+               hs = getBatchDataPath() + hs;
+            }
         }
         tableSet.safeFileName = hs;
         SaveTable.writeTable (tableSet, outputType);
