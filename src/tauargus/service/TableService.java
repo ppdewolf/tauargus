@@ -332,6 +332,11 @@ public class TableService {
     }
     
   
+    public static void addAdditivityParamBatch( int additParam){
+            for (TableSet table : tables) {
+                table.additivity = additParam;
+            }
+    }
     public static void readTables(PropertyChangeListener propertyChangeListener) throws ArgusException, FileNotFoundException, IOException {
         PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(TableService.class);
         propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);

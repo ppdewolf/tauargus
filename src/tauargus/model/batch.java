@@ -270,9 +270,11 @@ public static int runBatchProcess(String batchFile){
                       if ( status != 4){ throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
                       token = tokenizer.nextToken();
                       if (token.equals("")){token = "0";}
-                      if ( !token.equals("0") && !token.equals("1")) { 
-                                   throw new ArgusException ("Illegal keyword ("+token+") for ReadTable");}
-                      boolean computeTotals = ( token.equals("1"));
+                      if ( !token.equals("0") && !token.equals("1") && !token.equals("2")) { 
+                                   throw new ArgusException ("Illegal parameter ("+token+") for ReadTable");}
+                      int computeTotals = 0;
+                      if ( token.equals("1")){computeTotals = 1;}
+                      if ( token.equals("2")){computeTotals = 2;}
                       if (!readTablesBatch(computeTotals)) {}
                       reportProgress("Tables have been read");
                       break;
@@ -484,11 +486,12 @@ public static int runBatchProcess(String batchFile){
         SaveTable.writeReport(tableSet);
     }
     
-    static boolean readTablesBatch(boolean computeTotals)throws ArgusException{
+    static boolean readTablesBatch(int computeTotals)throws ArgusException{
         int i; String hs;
         TableSet tableSet;
         hs = "";
         try{
+        TableService.addAdditivityParamBatch(computeTotals);
         TableService.readTables(null);}
         catch (IOException ex){
                 throw new ArgusException ("\nError reading table"+hs);}
