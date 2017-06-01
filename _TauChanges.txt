@@ -128,3 +128,9 @@ summary    : As requested in issue 57 we have added a fourth parameter to the Ta
              in <WRITETABLE> param(4) is added to the file name.
              For the input files a file name without diretpory information is first searched in the directory of the .arb file.
              If it cannot be found there we will then try the param(4) directory.
+
+date       : June 1, 2017
+summary    : The <READTABLE> command has one parameter taking the values 0, 1 or 2
+             0 (default) requires an additive table
+             1 will compute the sub-)totals
+             2 will accept a non-additive table    
