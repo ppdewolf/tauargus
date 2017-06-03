@@ -46,7 +46,9 @@ import tauargus.utils.StrUtils;
 //import tauargus.utils.ExecUtils;
 import tauargus.utils.TauArgusUtils;
 import argus.utils.SystemUtils;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import org.apache.commons.io.FilenameUtils;
 import static tauargus.model.Application.clearMetadatas;
 import static tauargus.model.Application.clearVariables;
@@ -389,6 +391,11 @@ public static int runBatchProcess(String batchFile){
                       SystemUtils.setLogbook(hs);
                       tokenizer.clearLine();
                     break;}    
+                  case ("<VERSIONINFO>"):   
+                    { hs = StrUtils.unQuote(tokenizer.getLine());
+                      writeVersionInfo(hs);
+                      tokenizer.clearLine();
+                    break;}                   
                   default:{
 //                      FrameBatch.dispose();
                       throw  new ArgusException ("Illegal keyword "+ token);} // {throw { new ArgusException ("Illegal keyword"+ token); }
@@ -413,6 +420,26 @@ public static int runBatchProcess(String batchFile){
    
     }
 
+
+   static void writeVersionInfo (String f) throws ArgusException{
+       if (!f.contains(":")&&!f.contains("\\")&&!f.contains("/")){
+            if (batchDataPath.equals("")){
+                f = batchFilePath + f;
+            } else {
+               f = getBatchDataPath() + f;
+            }
+        }
+       
+              try{
+          BufferedWriter out = new BufferedWriter(new FileWriter(f, true));
+          out.write("TAU-ARGUS version: " + Application.getFullVersion() );
+     
+          out.close();        
+          
+          } catch(IOException ex){throw new ArgusException ("An error occurred when writing the version info file");}          
+    }
+   
+  
     /**
    * Writes a table in batch. 
    * Reads the commend and all its parameters.
