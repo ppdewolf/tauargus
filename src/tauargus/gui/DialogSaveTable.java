@@ -29,6 +29,7 @@ import argus.utils.StrUtils;
 import argus.utils.SystemUtils;
 import java.awt.Cursor;
 import static javax.swing.JOptionPane.YES_OPTION;
+import tauargus.utils.TauArgusUtils;
 
 public class DialogSaveTable extends DialogBase {
 
@@ -401,11 +402,12 @@ public class DialogSaveTable extends DialogBase {
     private void jButtonChooseSafeFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonChooseSafeFileActionPerformed
       int selectedFormat;  
       selectedFormat = whichFormat();
-        String hs = SystemUtils.getRegString("general", "datadir", "");
-        if (!hs.equals("")){
-            File file = new File(hs); 
-            jFileChooser1.setCurrentDirectory(file);
-        }
+//        String hs = SystemUtils.getRegString("general", "datadir", "");
+//        if (!hs.equals("")){
+//            File file = new File(hs); 
+//            jFileChooser1.setCurrentDirectory(file);
+//        }
+        TauArgusUtils.getDataDirFromRegistry(jFileChooser1);
         // TODO add your handling code here:
         jFileChooser1.setDialogTitle("Safe file name");
         jFileChooser1.setSelectedFile(new File(""));
@@ -417,6 +419,7 @@ public class DialogSaveTable extends DialogBase {
         if (jFileChooser1.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
             tableSet.safeFileName=jFileChooser1.getSelectedFile().toString();
             textFieldSaveFileName.setText(tableSet.safeFileName);
+            TauArgusUtils.putDataDirInRegistry(tableSet.safeFileName);
         }
     }//GEN-LAST:event_jButtonChooseSafeFileActionPerformed
 

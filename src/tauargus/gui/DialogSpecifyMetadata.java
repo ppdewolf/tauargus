@@ -35,6 +35,7 @@ import argus.utils.SystemUtils;
 import argus.model.SpssVariable;
 import argus.view.SpssSelectVariablesView;
 import tauargus.model.SpssUtilsTau;
+import tauargus.utils.TauArgusUtils;
 
 public class DialogSpecifyMetadata extends DialogBase {
 
@@ -329,6 +330,7 @@ public class DialogSpecifyMetadata extends DialogBase {
                   File file = new File(hs); 
                   fileChooser.setCurrentDirectory(file);
                 }
+                TauArgusUtils.getDataDirFromRegistry(fileChooser);
                 fileChooser.setDialogTitle("Save metadata as");
                 fileChooser.setSelectedFile(new File(""));
                 fileChooser.resetChoosableFileFilters();
@@ -337,6 +339,7 @@ public class DialogSpecifyMetadata extends DialogBase {
                 fileChooser.setApproveButtonText("Save");
                 if (fileChooser.showSaveDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
                     String fileName = fileChooser.getSelectedFile().getPath();
+                    TauArgusUtils.putDataDirInRegistry(fileName);
                     if (FilenameUtils.indexOfExtension(fileName) == -1) {
                         FileFilter fileFilter = fileChooser.getFileFilter();
                         if (fileFilter instanceof FileNameExtensionFilter) {

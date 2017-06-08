@@ -267,6 +267,7 @@ public class SpssUtilsTau {
  
 
     private static void getSpssInstallationDirectory(Frame parent) {
+        // We do not use the DataDir in the specific procedure
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Set IBM SPSS directory");
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);

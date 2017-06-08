@@ -160,6 +160,20 @@ public class TauArgusUtils {
         return hs;
     }
     
+    public static void getDataDirFromRegistry( javax.swing.JFileChooser fileChooser){
+        String hs = SystemUtils.getRegString("general", "datadir", "");
+        if (!hs.equals("")){
+            File file = new File(hs); 
+            fileChooser.setCurrentDirectory(file);
+        }
+    }
+    
+    public static void putDataDirInRegistry(String f){
+        if (!f.equals("")){
+          SystemUtils.putRegString("general", "datadir", f);  
+        }  
+    }
+    
     public static String addPathExt(String fileName, String dataFile, String ext){
         String hs;
         hs = fileName;

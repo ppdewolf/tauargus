@@ -31,6 +31,7 @@ import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileNameExtensionFilter;
 //import muargus.MuARGUS;
 import tauargus.model.Application;
+import tauargus.utils.TauArgusUtils;
 //import muargus.model.MetadataMu;
 
 /**
@@ -137,11 +138,12 @@ public class DialogBase extends javax.swing.JDialog {
      */
     public String showFileDialog(String title, boolean forSaving, String[] filter) {
         JFileChooser fileChooser = new JFileChooser();
-        String hs = SystemUtils.getRegString("general", "datadir", "");
-        if (!hs.equals("")){
-            File file = new File(hs); 
-            fileChooser.setCurrentDirectory(file);
-        }
+//        String hs = SystemUtils.getRegString("general", "datadir", "");
+//        if (!hs.equals("")){
+//            File file = new File(hs); 
+//            fileChooser.setCurrentDirectory(file);
+//        }
+        TauArgusUtils.getDataDirFromRegistry(fileChooser);
         fileChooser.setDialogTitle(title);
         fileChooser.resetChoosableFileFilters();
         String[] firstFilter = splitFilter(filter[0]);
@@ -154,7 +156,7 @@ public class DialogBase extends javax.swing.JDialog {
         if (result != JFileChooser.APPROVE_OPTION) {
             return null;
         }
-        hs = fileChooser.getSelectedFile().getParent();
+        String hs = fileChooser.getSelectedFile().getParent();
         if (!"".equals(hs)){
             SystemUtils.putRegString("general", "datadir", hs);
         }

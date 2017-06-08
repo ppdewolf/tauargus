@@ -225,11 +225,12 @@ public class DialogProtectJJFormat extends javax.swing.JDialog {
 
     private void jButtonSearchJJInputFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSearchJJInputFileActionPerformed
         // TODO add your handling code here:+
-        String hs = SystemUtils.getRegString("general", "datadir", "");
-        if (!hs.equals("")){
-            File file = new File(hs); 
-            fileChooser.setCurrentDirectory(file);
-        }
+//        String hs = SystemUtils.getRegString("general", "datadir", "");
+//        if (!hs.equals("")){
+//            File file = new File(hs); 
+//            fileChooser.setCurrentDirectory(file);
+//        }
+        TauArgusUtils.getDataDirFromRegistry(fileChooser);
         fileChooser.setDialogTitle("Open JJ file");
         fileChooser.setSelectedFile(new File(""));
         fileChooser.resetChoosableFileFilters();
@@ -237,18 +238,20 @@ public class DialogProtectJJFormat extends javax.swing.JDialog {
         fileChooser.setFileFilter(new FileNameExtensionFilter("JJ file (*.jj)", "jj"));
         if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
  //           textFieldMicrodata.setText(fileChooser.getSelectedFile().toString());
-            hs = fileChooser.getSelectedFile().getPath();
+          String hs = fileChooser.getSelectedFile().getPath();
           jTextFieldJJInputFile.setText(hs);  
+          TauArgusUtils.putDataDirInRegistry(hs);
         }   
     }//GEN-LAST:event_jButtonSearchJJInputFileActionPerformed
 
     private void jButtonSearchJJOutputFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSearchJJOutputFileActionPerformed
         // TODO add your handling code here:
-        String hs = SystemUtils.getRegString("general", "datadir", "");
-        if (!hs.equals("")){
-            File file = new File(hs); 
-            fileChooser.setCurrentDirectory(file);
-        }
+//        String hs = SystemUtils.getRegString("general", "datadir", "");
+//        if (!hs.equals("")){
+//            File file = new File(hs); 
+//            fileChooser.setCurrentDirectory(file);
+//        }
+        TauArgusUtils.getDataDirFromRegistry(fileChooser);
         fileChooser.setDialogTitle("JJ output file");
         fileChooser.setSelectedFile(new File(""));
         fileChooser.resetChoosableFileFilters();
@@ -256,8 +259,9 @@ public class DialogProtectJJFormat extends javax.swing.JDialog {
         fileChooser.setFileFilter(new FileNameExtensionFilter("JJ file (*.jj)", "jj"));
         if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
  //           textFieldMicrodata.setText(fileChooser.getSelectedFile().toString());
-            hs = fileChooser.getSelectedFile().getPath();
-          jTextFieldJJOutputFile.setText(hs);  
+          String hs = fileChooser.getSelectedFile().getPath();
+          jTextFieldJJOutputFile.setText(hs); 
+          TauArgusUtils.putDataDirInRegistry(hs); 
         }
     }//GEN-LAST:event_jButtonSearchJJOutputFileActionPerformed
 

@@ -778,11 +778,12 @@ public class FrameMain extends javax.swing.JFrame {
 
     private void menuItemOpenBatchProcessActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemOpenBatchProcessActionPerformed
         // TODO add your handling code here:
-        String hs = SystemUtils.getRegString("general", "datadir", "");
-        if (!hs.equals("")){
-            File file = new File(hs); 
-            fileChooser.setCurrentDirectory(file);
-        }
+//        String hs = SystemUtils.getRegString("general", "datadir", "");
+//        if (!hs.equals("")){
+//            File file = new File(hs); 
+//            fileChooser.setCurrentDirectory(file);
+//        }
+        TauArgusUtils.getDataDirFromRegistry(fileChooser);
         fileChooser.setDialogTitle("Open Batch file");
         fileChooser.setSelectedFile(new File(""));
         fileChooser.resetChoosableFileFilters();
@@ -790,7 +791,8 @@ public class FrameMain extends javax.swing.JFrame {
         fileChooser.setFileFilter(new FileNameExtensionFilter("Argus batch filea (*.arb)", "arb"));
         if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
             Application.clearEverythingGui();
-            hs =fileChooser.getSelectedFile().toString();
+            String hs =fileChooser.getSelectedFile().toString();
+            TauArgusUtils.putDataDirInRegistry(hs);
             Application.setBatch(Application.BATCH_FROMMENU);
           
 //              String xs =fileChooser.getSelectedFile().toString();  

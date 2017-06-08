@@ -32,6 +32,7 @@ import tauargus.model.Type;
 import tauargus.model.Variable;
 import argus.utils.StrUtils;
 import tauargus.utils.SwingUtils;
+import tauargus.utils.TauArgusUtils;
 
 public class PanelEditVariable extends javax.swing.JPanel {
 
@@ -1109,22 +1110,26 @@ public class PanelEditVariable extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttonHierFileNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonHierFileNameActionPerformed
+        TauArgusUtils.getDataDirFromRegistry(fileChooser);
         fileChooser.setDialogTitle("Hierarchy file");
         fileChooser.setSelectedFile(new File(""));
         fileChooser.resetChoosableFileFilters();
         fileChooser.setFileFilter(new FileNameExtensionFilter("Hierarchy file (*.hrc)", "hrc"));
         if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
             textFieldHierFileName.setText(fileChooser.getSelectedFile().toString());
+            TauArgusUtils.putDataDirInRegistry(fileChooser.getSelectedFile().toString());
         }
     }//GEN-LAST:event_buttonHierFileNameActionPerformed
 
     private void buttonCodeListFileNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCodeListFileNameActionPerformed
+        TauArgusUtils.getDataDirFromRegistry(fileChooser);
         fileChooser.setDialogTitle("Code List file");
         fileChooser.setSelectedFile(new File(""));
         fileChooser.resetChoosableFileFilters();
         fileChooser.setFileFilter(new FileNameExtensionFilter("Code List file (*.cdl)", "cdl"));
         if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
             textFieldCodeListFileName.setText(fileChooser.getSelectedFile().toString());
+            TauArgusUtils.putDataDirInRegistry(fileChooser.getSelectedFile().toString());
         }
     }//GEN-LAST:event_buttonCodeListFileNameActionPerformed
    

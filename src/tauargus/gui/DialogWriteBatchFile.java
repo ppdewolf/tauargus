@@ -152,11 +152,12 @@ public class DialogWriteBatchFile extends DialogBase {
     private void jButtonSearchBatchFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSearchBatchFileActionPerformed
         // TODO add your handling code here:
       boolean oke;  
-      String hs = SystemUtils.getRegString("general", "datadir", "");
-      if (!hs.equals("")){
-          File file = new File(hs);
-          jFileChooser1.setCurrentDirectory(file);
-       }
+//      String hs = SystemUtils.getRegString("general", "datadir", "");
+//      if (!hs.equals("")){
+//          File file = new File(hs);
+//          jFileChooser1.setCurrentDirectory(file);
+//       }
+       TauArgusUtils.getDataDirFromRegistry(jFileChooser1);
         // TODO add your handling code here:
         jFileChooser1.setDialogTitle("Safe file name");
         jFileChooser1.setSelectedFile(new File(""));
@@ -182,6 +183,7 @@ public class DialogWriteBatchFile extends DialogBase {
             batchFile = batchFile+ ".arb";}
 
        textBatchFileName.setText(batchFile);
+       TauArgusUtils.putDataDirInRegistry(batchFile);
        
  //      jButtonWriteBatch.setEnabled(!batchFile.equals(""));
       

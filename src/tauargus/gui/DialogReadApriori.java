@@ -30,6 +30,7 @@ import tauargus.service.TableService;
 //import tauargus.utils.ExecUtils;
 import argus.utils.SystemUtils;
 import java.awt.Cursor;
+import tauargus.utils.TauArgusUtils;
 
 /**
  *
@@ -271,11 +272,12 @@ public class DialogReadApriori extends DialogBase {
     }//GEN-LAST:event_buttonCancelActionPerformed
 
     private void btnSelectAprioriFilenameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectAprioriFilenameActionPerformed
-        String hs = SystemUtils.getRegString("general", "datadir", "");
-        if (!hs.equals("")){
-            File file = new File(hs); 
-            fileChooser.setCurrentDirectory(file);
-        }
+//        String hs = SystemUtils.getRegString("general", "datadir", "");
+//        if (!hs.equals("")){
+//            File file = new File(hs); 
+//            fileChooser.setCurrentDirectory(file);
+//        }
+        TauArgusUtils.getDataDirFromRegistry(fileChooser);
         fileChooser.setDialogTitle("Select Apriori file");
         fileChooser.setSelectedFile(new File(""));
         fileChooser.resetChoosableFileFilters();
@@ -286,8 +288,9 @@ public class DialogReadApriori extends DialogBase {
             
             _Apriori = new APriori(aprioriFile);
             
-            hs = fileChooser.getSelectedFile().getPath();
-            if (!hs.equals("")){SystemUtils.putRegString("general", "datadir", hs);}
+            String hs = fileChooser.getSelectedFile().getPath();
+//            if (!hs.equals("")){SystemUtils.putRegString("general", "datadir", hs);}
+            TauArgusUtils.putDataDirInRegistry(hs);
         }
     }//GEN-LAST:event_btnSelectAprioriFilenameActionPerformed
 

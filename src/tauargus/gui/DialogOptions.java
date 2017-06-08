@@ -26,6 +26,7 @@ import tauargus.model.Application;
 //import tauargus.service.TableService;
 //import tauargus.utils.ExecUtils;
 import argus.utils.SystemUtils;
+import tauargus.utils.TauArgusUtils;
 
 /**
  *
@@ -314,10 +315,12 @@ public class DialogOptions extends javax.swing.JDialog {
         else {fileChooser.setSelectedFile(new File(jTextLogFile.getText()));}
         fileChooser.resetChoosableFileFilters();
         fileChooser.setFileFilter(new FileNameExtensionFilter("TauArgus Logfile (*.log)", "log"));
+        TauArgusUtils.getDataDirFromRegistry(fileChooser);
+        
         if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
             jTextLogFile.setText(fileChooser.getSelectedFile().toString());
             String hs = fileChooser.getSelectedFile().toString();
-            
+            TauArgusUtils.putDataDirInRegistry(hs);
         }
         
                // TODO add your handling code here:
@@ -354,6 +357,7 @@ public class DialogOptions extends javax.swing.JDialog {
     }//GEN-LAST:event_jRadioButtonCPlexItemStateChanged
 
     private void jButtonCplexLicenseFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCplexLicenseFileActionPerformed
+    // This dialog is so specefic that we do not use the datadir in the registry here.
         fileChooser.setDialogTitle("Open Cplex License File");
         if (jTextCplexLicenseFile.getText().equals("")){ fileChooser.setSelectedFile(new File(""));}
         else {fileChooser.setSelectedFile(new File(jTextCplexLicenseFile.getText()));}
