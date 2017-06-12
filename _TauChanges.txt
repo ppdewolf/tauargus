@@ -134,3 +134,6 @@ summary    : The <READTABLE> command has one parameter taking the values 0, 1 or
              0 (default) requires an additive table
              1 will compute the sub-)totals
              2 will accept a non-additive table    
+			 
+date	   : June 12, 2017
+summary    : Issue 62 solved. New version of tauargusJava.dll (version 1.0.6.0). Maximum number of levels in a hierarchy now set consistently to 10.
