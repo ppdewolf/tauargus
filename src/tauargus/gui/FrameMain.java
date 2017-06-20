@@ -380,6 +380,7 @@ public class FrameMain extends javax.swing.JFrame {
 
         buttonSpecifyMetadata.setAction(specifyMetadataAction);
         buttonSpecifyMetadata.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/SpecifyMetadata.png"))); // NOI18N
+        buttonSpecifyMetadata.setToolTipText("Specify Metadata");
         buttonSpecifyMetadata.setFocusable(false);
         buttonSpecifyMetadata.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         buttonSpecifyMetadata.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -666,9 +667,9 @@ public class FrameMain extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(toolBar, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 657, Short.MAX_VALUE)
+                .addComponent(toolBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(1, 1, 1)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 667, Short.MAX_VALUE)
                 .addContainerGap())
         );
 

@@ -118,7 +118,7 @@ public class Application {
 
     
     public static String getFullVersion() {
-        return "" + MAJOR + "." + MINOR + "." + REVISION + "; build: " + BUILD;
+        return "" + MAJOR + "." + MINOR + "." + REVISION; // + "; build: " + BUILD; build is shown separately in lower left corner
     }
     
     public static String getSolverName( int solver){
