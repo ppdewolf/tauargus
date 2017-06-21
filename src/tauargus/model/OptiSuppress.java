@@ -689,15 +689,57 @@ public class OptiSuppress {
 //        try{
         Date startDate = new Date();  
         SystemUtils.writeLogbook("Start of the modular protection for table " + TableService.getTableDescription(tableSet));
-        if (tableSet.expVar.size()> 4 && !Application.isProtectCoverTable()) {
-            hs = "The table has more than 4 dimensions.\n" + 
+ //       if (tableSet.expVar.size()> 4 && !Application.isProtectCoverTable()) {
+ //           hs = "The table has more than 4 dimensions.\n" + 
+ //                "Running Modular can take a lot of time and is error-prone.\n" +
+ //                "Please check the results carefully.\n";
+ //          int warningResult = ShowWarningMessage(hs);
+ //          if (warningResult == 0 ) {
+ //             throw new ArgusException(hs); //overlapString);
+ //         }
+ //       }
+        
+ // checking for too many dimensions and additivity
+        if (!Application.isProtectCoverTable()){
+           if (tableSet.expVar.size()== 4) {
+              hs = "The table has 4 dimensions.\n" + 
+                 "Running Modular can take a lot of time and maybe it is difficult to obtain a correct result.\n" +
+                 "Please check the results carefully.\n";
+             int warningResult = ShowWarningMessage(hs);
+             if (warningResult == 0 ) {
+                throw new ArgusException(hs); //overlapString);
+             }
+          }
+
+            
+            if (tableSet.expVar.size() > 4 ) {
+             if (Application.isAnco()) {
+               hs = "The table has more than 4 dimensions.\n" + 
                  "Running Modular can take a lot of time and is error-prone.\n" +
                  "Please check the results carefully.\n";
-           int warningResult = ShowWarningMessage(hs);
-           if (warningResult == 0 ) {
-              throw new ArgusException(hs); //overlapString);
+              int warningResult = ShowWarningMessage(hs);
+              if (warningResult == 0 ) {
+                throw new ArgusException(hs); //overlapString);
+                }
+              }
+             else{
+               hs = "The table has more than 4 dimensions.\n" + 
+                    "Running Modular is not possible.\n";   
+               throw new ArgusException(hs); //overlapString);
+             }
+        
+          }
+          if (tableSet.additivity == TableSet.ADDITIVITY_NOT_REQUIRED){
+               hs = "The table might be not additive.\n" + 
+                 "Running Modular successfully Is not guaranteed.\n";
+              int warningResult = ShowWarningMessage(hs);
+              if (warningResult == 0 ) {
+                throw new ArgusException(hs); //overlapString);
+              }
+              
           }
         }
+
     
         Oke = tauArgus.PrepareHITAS(tableSet.index, Application.getTempFile("NPF.txt"), Application.getTempFile("NFS.txt"), Application.getTempDir()+"/");
         if (!Oke){throw new ArgusException("An unknown error occurred when preparing the files for Modular");} 
