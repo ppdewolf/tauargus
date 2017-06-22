@@ -431,8 +431,8 @@ public static int runBatchProcess(String batchFile){
         }
        
               try{
-          BufferedWriter out = new BufferedWriter(new FileWriter(f, true));
-          out.write("TAU-ARGUS version: " + Application.getFullVersion() );
+          BufferedWriter out = new BufferedWriter(new FileWriter(f));
+          out.write("TAU-ARGUS version: " + Application.getFullVersion() + "; build: " + Application.BUILD);
      
           out.close();        
           
