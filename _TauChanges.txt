@@ -117,11 +117,20 @@ summary    : tabular data only can be free format.When editting the metadata TAU
 date       : May 9, 2017 11:49:20 AM
 summary    : Fixed issue with large cell values in 1-dim tables
 
+date       : May 11, 2017
+summary    : Select Solver in batch had a typo. It was CLEX instead of CPLEX. Has been corrected.
+
 date       : May 13, 2017
 sumamry    : Issue 55 (Select solver in tauArgus batch file) has been solved by adding an additional parameter in the batch file. 
              Only for CPLEX you can add the name of the licence file. It is advised to include the full path.
              E.g. <SOLVER>  CPLEX,"D:\Argus\TauData\Licencefilename"  
 
+date       : May 16, 2017
+summary    : A warning has been added if a more than 4 dim table is protected with Modular.			 
+
+date       : May 17, 2017
+summary    : The <CLEAR> command in batch has been improved by adding more clear-statements.
+			 
 date       : May 25, 2017
 summary    : As requested in issue 57 we have added a fourth parameter to the TauArgus commandline. 
              This parameter is the batch data directory. If no directory information is added to the name of the output file 
@@ -129,11 +138,32 @@ summary    : As requested in issue 57 we have added a fourth parameter to the Ta
              For the input files a file name without diretpory information is first searched in the directory of the .arb file.
              If it cannot be found there we will then try the param(4) directory.
 
+date       : May 30, 2017
+summary    : If no batch output directory has been specified, we now use the directory of the .ARB file as the output directory if no directory info is specified in the <writetable> command.
+             In the previous version the current directory is often the directory of TAU_ARGUS itself, which would cause the output to be written there.			 
+			 
 date       : June 1, 2017
 summary    : The <READTABLE> command has one parameter taking the values 0, 1 or 2
              0 (default) requires an additive table
              1 will compute the sub-)totals
-             2 will accept a non-additive table    
+             2 will accept a non-additive table 
+
+date       : June 3, 2017
+summary    : The <VERSIONINFO> command has been added to the batch file.
+			 It takes one parameter,the file to write the info.
+			 We follow the same procedure for adding path information an in <WRITETABLE>
+			 
+date       : June 8, 2017
+summary    : We have checked all FileChoosers and Tau ill now remember the location of the last location where a file has been searched. This should solve the issue of the current directory.			 
 			 
 date	   : June 12, 2017
 summary    : Issue 62 solved. New version of tauargusJava.dll (version 1.0.6.0). Maximum number of levels in a hierarchy now set consistently to 10.
+
+date	   : June 20, 2017
+summary    : New menu icons + added GenerateApriori and Linked Tables button to toolbar
+
+date       : June 21, 2017
+summary    : The build is now correctly added to the <VERSIONINFO> + Some checks on additivity and higher dimensions for modular have been added.
+
+above is pre-RELEASED IN 4.1.6
+--------------------------------------------------------------
