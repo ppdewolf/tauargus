@@ -137,6 +137,12 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="menuItemLinkedTables">
               <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="LinkedTablesAction" type="code"/>
+                </Property>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/tauargus/resources/linked.png"/>
+                </Property>
                 <Property name="mnemonic" type="int" value="76"/>
                 <Property name="text" type="java.lang.String" value="Linked Tables..."/>
               </Properties>
@@ -193,6 +199,12 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="menuItemGenerateApriory">
               <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="GenerateAprioriAction" type="code"/>
+                </Property>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/tauargus/resources/apriori.png"/>
+                </Property>
                 <Property name="mnemonic" type="int" value="71"/>
                 <Property name="text" type="java.lang.String" value="Generate Apriory..."/>
               </Properties>
@@ -231,6 +243,9 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="menuItemNews">
               <Properties>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/tauargus/resources/news.png"/>
+                </Property>
                 <Property name="mnemonic" type="int" value="78"/>
                 <Property name="text" type="java.lang.String" value="News"/>
               </Properties>
@@ -251,6 +266,12 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="menuItemOptions">
               <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="OptionsAction" type="code"/>
+                </Property>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/tauargus/resources/options.png"/>
+                </Property>
                 <Property name="mnemonic" type="int" value="79"/>
                 <Property name="text" type="java.lang.String" value="Options..."/>
               </Properties>
@@ -309,11 +330,15 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="toolBar" alignment="1" pref="904" max="32767" attributes="0"/>
-          <Group type="102" alignment="0" attributes="0">
+          <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jScrollPane1" max="32767" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="jScrollPane1" pref="884" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                  </Group>
+                  <Component id="toolBar" alignment="1" max="32767" attributes="0"/>
+              </Group>
           </Group>
       </Group>
     </DimensionLayout>
@@ -333,6 +358,7 @@
       <Properties>
         <Property name="floatable" type="boolean" value="false"/>
         <Property name="rollover" type="boolean" value="true"/>
+        <Property name="borderPainted" type="boolean" value="false"/>
       </Properties>
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBoxLayout"/>
@@ -414,7 +440,21 @@
             <Property name="verticalTextPosition" type="int" value="3"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JToolBar$Separator" name="separator6">
+        <Component class="javax.swing.JButton" name="buttonLinkedTables">
+          <Properties>
+            <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="LinkedTablesAction" type="code"/>
+            </Property>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/tauargus/resources/linked.png"/>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Linked Tables"/>
+            <Property name="focusable" type="boolean" value="false"/>
+            <Property name="horizontalTextPosition" type="int" value="0"/>
+            <Property name="verticalTextPosition" type="int" value="3"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JToolBar$Separator" name="jSeparator1">
         </Component>
         <Component class="javax.swing.JButton" name="buttonSaveTable">
           <Properties>
@@ -444,7 +484,36 @@
             <Property name="verticalTextPosition" type="int" value="3"/>
           </Properties>
         </Component>
+        <Component class="javax.swing.JButton" name="buttonGenerateApriori">
+          <Properties>
+            <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="GenerateAprioriAction" type="code"/>
+            </Property>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/tauargus/resources/apriori.png"/>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Generate Apriori"/>
+            <Property name="focusable" type="boolean" value="false"/>
+            <Property name="horizontalTextPosition" type="int" value="0"/>
+            <Property name="name" type="java.lang.String" value="" noResource="true"/>
+            <Property name="verticalTextPosition" type="int" value="3"/>
+          </Properties>
+        </Component>
         <Component class="javax.swing.JToolBar$Separator" name="separator7">
+        </Component>
+        <Component class="javax.swing.JButton" name="buttonOptions">
+          <Properties>
+            <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="OptionsAction" type="code"/>
+            </Property>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/tauargus/resources/options.png"/>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Options"/>
+            <Property name="focusable" type="boolean" value="false"/>
+            <Property name="horizontalTextPosition" type="int" value="0"/>
+            <Property name="verticalTextPosition" type="int" value="3"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JButton" name="buttonHelp">
           <Properties>

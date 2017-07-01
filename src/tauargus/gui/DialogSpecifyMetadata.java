@@ -110,7 +110,7 @@ public class DialogSpecifyMetadata extends DialogBase {
         labelSeparator = new javax.swing.JLabel();
         textFieldSeparator = new javax.swing.JTextField();
         scrollPane = new javax.swing.JScrollPane();
-        listVariables = new javax.swing.JList<tauargus.model.Variable>();
+        listVariables = new javax.swing.JList<>();
         buttonAdd = new javax.swing.JButton();
         buttonRemove = new javax.swing.JButton();
         buttonMoveUp = new javax.swing.JButton();
@@ -419,7 +419,7 @@ public class DialogSpecifyMetadata extends DialogBase {
         if (metadata.dataOrigin == metadata.DATA_ORIGIN_TABULAR){
            if (comboBoxFormat.getSelectedIndex()!= 1){
                comboBoxFormat.setSelectedIndex(1);               
-               JOptionPane.showMessageDialog(this,"For tabular data free format is required");
+               JOptionPane.showMessageDialog(null,"For tabular data free format is required");
            }
         }
         panelEditVariable.enableForSPSS(comboBoxFormat.getSelectedIndex()==2);

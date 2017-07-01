@@ -186,6 +186,32 @@ public class FrameMain extends javax.swing.JFrame {
         }
     };
 
+    private final Action LinkedTablesAction = new AbstractAction(){
+        @Override
+        public void actionPerformed(ActionEvent actionEvent){
+        try {
+            if (LinkedTables.TestLinkedPossible()){
+                DialogLinkedTables dialog = new DialogLinkedTables(FrameMain.this, true);
+                dialog.setVisible(true);
+        
+                panelTable.setTable(currentTable);
+                organise();
+            }
+        }
+        catch (ArgusException ex){
+                 JOptionPane.showMessageDialog(FrameMain.this, ex.getMessage());}
+        // TODO add your handling code here:
+        }
+    };
+    
+    private final Action GenerateAprioriAction = new AbstractAction(){
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            DialogAPriori dialog = new DialogAPriori(FrameMain.this, true);
+            dialog.setVisible(true);
+        }        
+    };
+    
     private final Action saveTableAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
@@ -208,6 +234,15 @@ public class FrameMain extends javax.swing.JFrame {
         }
     };
     
+    private final Action OptionsAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+            DialogOptions dialog = new DialogOptions(FrameMain.this, true);
+            dialog.setVisible(true);
+            if (TableService.numberOfTables() != 0) {panelTable.enableHiddenFeatures(Application.isAnco());}
+        }
+    };
+        
     private void showReport(){
 
                 DialogHtmlViewer dialog = new DialogHtmlViewer(FrameMain.this, true);
@@ -272,7 +307,8 @@ public class FrameMain extends javax.swing.JFrame {
 
         selectTableAction.setEnabled(TableService.numberOfTables() > 1);     
         menuItemLinkedTables.setEnabled(TableService.numberOfTables() != 0);
-
+        LinkedTablesAction.setEnabled(TableService.numberOfTables() != 0);
+        
         saveTableAction.setEnabled(TableService.numberOfTables() != 0);
         viewReportAction.setEnabled(TableService.numberOfTables() != 0);      
         menuItemWriteBatchFile.setEnabled(Application.numberOfMetadatas() > 0);  
@@ -313,10 +349,13 @@ public class FrameMain extends javax.swing.JFrame {
         buttonSpecifyTables = new javax.swing.JButton();
         separator5 = new javax.swing.JToolBar.Separator();
         buttonSelectTable = new javax.swing.JButton();
-        separator6 = new javax.swing.JToolBar.Separator();
+        buttonLinkedTables = new javax.swing.JButton();
+        jSeparator1 = new javax.swing.JToolBar.Separator();
         buttonSaveTable = new javax.swing.JButton();
         buttonViewReport = new javax.swing.JButton();
+        buttonGenerateApriori = new javax.swing.JButton();
         separator7 = new javax.swing.JToolBar.Separator();
+        buttonOptions = new javax.swing.JButton();
         buttonHelp = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         menuBar = new javax.swing.JMenuBar();
@@ -355,6 +394,7 @@ public class FrameMain extends javax.swing.JFrame {
 
         toolBar.setFloatable(false);
         toolBar.setRollover(true);
+        toolBar.setBorderPainted(false);
 
         buttonOpenMicrodata.setAction(openMicrodataAction);
         buttonOpenMicrodata.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/OpenMicrodata.png"))); // NOI18N
@@ -402,7 +442,15 @@ public class FrameMain extends javax.swing.JFrame {
         buttonSelectTable.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         buttonSelectTable.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         toolBar.add(buttonSelectTable);
-        toolBar.add(separator6);
+
+        buttonLinkedTables.setAction(LinkedTablesAction);
+        buttonLinkedTables.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/linked.png"))); // NOI18N
+        buttonLinkedTables.setToolTipText("Linked Tables");
+        buttonLinkedTables.setFocusable(false);
+        buttonLinkedTables.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        buttonLinkedTables.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        toolBar.add(buttonLinkedTables);
+        toolBar.add(jSeparator1);
 
         buttonSaveTable.setAction(saveTableAction);
         buttonSaveTable.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/SaveTable.png"))); // NOI18N
@@ -419,7 +467,24 @@ public class FrameMain extends javax.swing.JFrame {
         buttonViewReport.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         buttonViewReport.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         toolBar.add(buttonViewReport);
+
+        buttonGenerateApriori.setAction(GenerateAprioriAction);
+        buttonGenerateApriori.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/apriori.png"))); // NOI18N
+        buttonGenerateApriori.setToolTipText("Generate Apriori");
+        buttonGenerateApriori.setFocusable(false);
+        buttonGenerateApriori.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        buttonGenerateApriori.setName(""); // NOI18N
+        buttonGenerateApriori.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        toolBar.add(buttonGenerateApriori);
         toolBar.add(separator7);
+
+        buttonOptions.setAction(OptionsAction);
+        buttonOptions.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/options.png"))); // NOI18N
+        buttonOptions.setToolTipText("Options");
+        buttonOptions.setFocusable(false);
+        buttonOptions.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        buttonOptions.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        toolBar.add(buttonOptions);
 
         buttonHelp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/Help.png"))); // NOI18N
         buttonHelp.setToolTipText("Help");
@@ -525,6 +590,8 @@ public class FrameMain extends javax.swing.JFrame {
         });
         menuModify.add(menuItemSelectTable);
 
+        menuItemLinkedTables.setAction(LinkedTablesAction);
+        menuItemLinkedTables.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/linked.png"))); // NOI18N
         menuItemLinkedTables.setMnemonic('L');
         menuItemLinkedTables.setText("Linked Tables...");
         menuItemLinkedTables.addActionListener(new java.awt.event.ActionListener() {
@@ -570,6 +637,8 @@ public class FrameMain extends javax.swing.JFrame {
         });
         menuOutput.add(menuItemViewReport);
 
+        menuItemGenerateApriory.setAction(GenerateAprioriAction);
+        menuItemGenerateApriory.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/apriori.png"))); // NOI18N
         menuItemGenerateApriory.setMnemonic('G');
         menuItemGenerateApriory.setText("Generate Apriory...");
         menuItemGenerateApriory.addActionListener(new java.awt.event.ActionListener() {
@@ -603,6 +672,7 @@ public class FrameMain extends javax.swing.JFrame {
         });
         menuHelp.add(menuItemContent);
 
+        menuItemNews.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/news.png"))); // NOI18N
         menuItemNews.setMnemonic('N');
         menuItemNews.setText("News");
         menuItemNews.addActionListener(new java.awt.event.ActionListener() {
@@ -622,6 +692,8 @@ public class FrameMain extends javax.swing.JFrame {
         menuHelp.add(menuItemAncoNews);
         menuHelp.add(separator3);
 
+        menuItemOptions.setAction(OptionsAction);
+        menuItemOptions.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/options.png"))); // NOI18N
         menuItemOptions.setMnemonic('O');
         menuItemOptions.setText("Options...");
         menuItemOptions.addActionListener(new java.awt.event.ActionListener() {
@@ -658,11 +730,13 @@ public class FrameMain extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(toolBar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 904, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 884, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addComponent(toolBar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -742,14 +816,14 @@ public class FrameMain extends javax.swing.JFrame {
     }//GEN-LAST:event_menuItemSaveTableActionPerformed
 
     private void menuItemGenerateAprioryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemGenerateAprioryActionPerformed
-        DialogAPriori dialog = new DialogAPriori(FrameMain.this, true);
-        dialog.setVisible(true);
+//        DialogAPriori dialog = new DialogAPriori(FrameMain.this, true);
+//        dialog.setVisible(true);
     }//GEN-LAST:event_menuItemGenerateAprioryActionPerformed
 
     private void menuItemOptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemOptionsActionPerformed
-        DialogOptions dialog = new DialogOptions(FrameMain.this, true);
-        dialog.setVisible(true);
-        if (TableService.numberOfTables() != 0) {panelTable.enableHiddenFeatures(Application.isAnco());}
+//        DialogOptions dialog = new DialogOptions(FrameMain.this, true);
+//        dialog.setVisible(true);
+//        if (TableService.numberOfTables() != 0) {panelTable.enableHiddenFeatures(Application.isAnco());}
         // TODO add your handling code here:
     }//GEN-LAST:event_menuItemOptionsActionPerformed
 
@@ -759,7 +833,7 @@ public class FrameMain extends javax.swing.JFrame {
 //                                                          "a minimum of 2 tables is needed");           
 //       }else{
         
-        try {
+/*        try {
             if (LinkedTables.TestLinkedPossible()){
                 DialogLinkedTables dialog = new DialogLinkedTables(FrameMain.this, true);
                 dialog.setVisible(true);
@@ -770,7 +844,7 @@ public class FrameMain extends javax.swing.JFrame {
         }
         catch (ArgusException ex){
                  JOptionPane.showMessageDialog(FrameMain.this, ex.getMessage());}
-        // TODO add your handling code here:
+        // TODO add your handling code here:*/
     }//GEN-LAST:event_menuItemLinkedTablesActionPerformed
 
     private void menuItemOpenMicrodataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemOpenMicrodataActionPerformed
@@ -861,15 +935,19 @@ public class FrameMain extends javax.swing.JFrame {
     }//GEN-LAST:event_menuItemContentActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton buttonGenerateApriori;
     private javax.swing.JButton buttonHelp;
+    private javax.swing.JButton buttonLinkedTables;
     private javax.swing.JButton buttonOpenMicrodata;
     private javax.swing.JButton buttonOpenTable;
+    private javax.swing.JButton buttonOptions;
     private javax.swing.JButton buttonSaveTable;
     private javax.swing.JButton buttonSelectTable;
     private javax.swing.JButton buttonSpecifyMetadata;
     private javax.swing.JButton buttonSpecifyTables;
     private javax.swing.JButton buttonViewReport;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenu menuFile;
     private javax.swing.JMenu menuHelp;
@@ -901,7 +979,6 @@ public class FrameMain extends javax.swing.JFrame {
     private javax.swing.JPopupMenu.Separator separator3;
     private javax.swing.JToolBar.Separator separator4;
     private javax.swing.JToolBar.Separator separator5;
-    private javax.swing.JToolBar.Separator separator6;
     private javax.swing.JToolBar.Separator separator7;
     private javax.swing.JToolBar toolBar;
     // End of variables declaration//GEN-END:variables
