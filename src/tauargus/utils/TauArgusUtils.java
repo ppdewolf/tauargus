@@ -31,6 +31,7 @@ import tauargus.model.ArgusException;
 import tauargus.model.Metadata;
 import tauargus.model.Variable;
 import argus.utils.SystemUtils;
+import tauargus.utils.TauArgusUtils;
 import java.util.List;
 import javax.swing.JOptionPane;
 
@@ -324,7 +325,19 @@ public class TauArgusUtils {
         return token;
     }
        
-    public static String GetCplexLicenceFile(){
-       return SystemUtils.getRegString("optimal", "cplexlicensefile", "access.ilm"); 
+    public static String GetCplexLicenceFile() throws ArgusException {
+        String hs;
+        hs = SystemUtils.getRegString("optimal", "cplexlicensefile", "access.ilm");
+        //if needed add the application path
+        if (!hs.contains(":") && !hs.contains("/") && !hs.contains("//")){
+            try{
+          hs = SystemUtils.getApplicationDirectory(Application.class).getCanonicalPath()+  "\\" + hs ; 
+            }
+           catch (IOException ex){};
+        }
+       if (!TauArgusUtils.ExistFile(hs)){ throw new ArgusException("Cplex licence file: "+ hs + " could not be found");}
+       return hs;
+//     return SystemUtils.getRegString("optimal", "cplexlicensefile", "access.ilm"); 
+       
     }   
 }

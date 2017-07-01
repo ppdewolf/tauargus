@@ -707,10 +707,9 @@ public class OptiSuppress {
                  "Please check the results carefully.\n";
              int warningResult = ShowWarningMessage(hs);
              if (warningResult == 0 ) {
-                throw new ArgusException(hs); //overlapString);
+                throw new ArgusException(hs); //overlapString); 
              }
           }
-
             
             if (tableSet.expVar.size() > 4 ) {
              if (Application.isAnco()) {
