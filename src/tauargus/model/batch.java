@@ -1092,7 +1092,10 @@ public static int runBatchProcess(String batchFile){
        hs = tokenizer.nextChar(); //we know it is correct
        hs = tokenizer.nextField("|");
        if (hs.equalsIgnoreCase("<FREQ>")) {
-         tableSet.respVar = Application.getFreqVar();
+//         tableSet.respVar = Application.getFreqVar();
+//           tableSet.respVar = null;
+           tableSet.respVar = metadata.find(tauargus.model.Type.FREQUENCY);
+           tableSet.readFreqOnlyTable = true;
        }
        else {tableSet.respVar=metadata.find(hs);
          if (!tableSet.respVar.isNumeric()){throw new ArgusException ("Response variable ("+hs+") is not numeric ");}

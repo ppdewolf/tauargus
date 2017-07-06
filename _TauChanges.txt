@@ -165,5 +165,8 @@ summary    : New menu icons + added GenerateApriori and Linked Tables button to 
 date       : June 21, 2017
 summary    : The build is now correctly added to the <VERSIONINFO> + Some checks on additivity and higher dimensions for modular have been added.
 
+date       : July 6, 2017
+summary    : The <FREQ> in batch is working now. 
+
 above is pre-RELEASED IN 4.1.6
 --------------------------------------------------------------
