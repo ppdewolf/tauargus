@@ -323,7 +323,7 @@ public class FrameMain extends javax.swing.JFrame {
 
     @Override
     public List<Image> getIconImages() {
-        URL url = FrameMain.class.getResource("/tauargus/resources/Tau.png");
+        URL url = FrameMain.class.getResource("/tauargus/resources/Tau32.png");
         Image image = Toolkit.getDefaultToolkit().getImage(url);
 // Anco 1.6
 //        ArrayList<Image> imageList = new ArrayList<>();

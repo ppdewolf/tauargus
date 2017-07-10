@@ -1395,7 +1395,7 @@ if (Application.isProtectCoverTable()){
           writer.close();
         }
 
-        String metadataFileName = StrUtils.replaceExtension(fileName, ".rda");
+        String metadataFileName = StrUtils.replaceExtension(fileName, METADATA_FILE_EXTENSION);
         metadata.writeTableMetadata(metadataFileName, nExpVar, expVar.toArray(new Variable[expVar.size()]), respVar, shadowVar, costFunc, costVar, numberOfTopNNeeded, simple, withAudit);
     }
 
