@@ -21,7 +21,7 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
-import java.awt.font.GlyphMetrics;
+//import java.awt.font.GlyphMetrics;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,8 +31,8 @@ import javax.swing.JRadioButton;
 import javax.swing.JTable;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
+//import javax.swing.event.TableModelEvent;
+//import javax.swing.event.TableModelListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
@@ -43,9 +43,11 @@ import tauargus.utils.TableColumnResizer;
 
 import tauargus.model.APriori.Mapping;
 import tauargus.model.APriori;
-import tauargus.model.APrioriCell;
+//import tauargus.model.APrioriCell;
 import tauargus.model.ArgusException;
 import argus.utils.SystemUtils;
+import tauargus.utils.TauArgusUtils;
+import java.awt.Cursor;
 
 
 /*!
@@ -575,10 +577,10 @@ public class DialogAPriori extends DialogBase {
 //            }
 //            
 //        }
-        
+        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         apriori.WriteMappingsToRegistry();
         apriori.WriteAprioriFile(textFieldAprioryFile.getText(), textFieldSeparator.getText(), comboBoxOutputDimension.getSelectedIndex()+1);
-        
+        setCursor(Cursor.getDefaultCursor());
         setVisible(false);
     }//GEN-LAST:event_buttonOkActionPerformed
 
@@ -674,28 +676,32 @@ public class DialogAPriori extends DialogBase {
     private void buttonSafeFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSafeFileActionPerformed
                 
         String hs = SystemUtils.getRegString("general", "datadir", "");
-        if (!hs.equals("")){
-            File file = new File(hs); 
-            fileChooser.setCurrentDirectory(file);
-        }
+//        if (!hs.equals("")){
+//            File file = new File(hs); 
+//            fileChooser.setCurrentDirectory(file);
+ //       }
+        TauArgusUtils.getDataDirFromRegistry(fileChooser);
         fileChooser.setDialogTitle("Select Safe file");
         fileChooser.setSelectedFile(new File(""));
         fileChooser.resetChoosableFileFilters();
         fileChooser.setFileFilter(new FileNameExtensionFilter("Safe file (*.txt)", "txt"));
         if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             String safeFile = fileChooser.getSelectedFile().toString();
-            
             if( safeFile.indexOf(".")<0)
                 safeFile+=".txt";
-            
+             
             textFieldSafeFile.setText(safeFile);
 
             
             InputFileSpecsChanged();
             
             
-            hs = fileChooser.getSelectedFile().getPath();
-            if (!hs.equals("")){SystemUtils.putRegString("general", "datadir", hs);}
+//            hs = fileChooser.getSelectedFile().getPath();
+//            if (!hs.equals("")){SystemUtils.putRegString("general", "datadir", hs);}
+            TauArgusUtils.putDataDirInRegistry(safeFile);
+
+            setCursor(Cursor.getDefaultCursor());
         }
     }//GEN-LAST:event_buttonSafeFileActionPerformed
 
@@ -705,15 +711,17 @@ public class DialogAPriori extends DialogBase {
     private void buttonAprioryFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonAprioryFileActionPerformed
 
         String hs = SystemUtils.getRegString("general", "datadir", "");
-        if (!hs.equals("")){
-            File file = new File(hs); 
-            fileChooser.setCurrentDirectory(file);
-        }
+//        if (!hs.equals("")){
+//            File file = new File(hs); 
+//            fileChooser.setCurrentDirectory(file);
+//        }
+        TauArgusUtils.getDataDirFromRegistry(fileChooser);
         fileChooser.setDialogTitle("Select APriory file");
         fileChooser.setSelectedFile(new File(""));
         fileChooser.resetChoosableFileFilters();
         fileChooser.setFileFilter(new FileNameExtensionFilter("APRiori file (*.hst)", "hst"));
         if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             String aprioriFile = fileChooser.getSelectedFile().toString();
             
             if( aprioriFile.indexOf(".")<0)
@@ -724,8 +732,10 @@ public class DialogAPriori extends DialogBase {
             textFieldAprioryFile.setText(aprioriFile);
             ChangeOkButtonState();
             
-            hs = fileChooser.getSelectedFile().getPath();
-            if (!hs.equals("")){SystemUtils.putRegString("general", "datadir", hs);}
+//            hs = fileChooser.getSelectedFile().getPath();
+//            if (!hs.equals("")){SystemUtils.putRegString("general", "datadir", hs);}
+//            setCursor(Cursor.getDefaultCursor());
+             TauArgusUtils.putDataDirInRegistry(aprioriFile);
         }
     }//GEN-LAST:event_buttonAprioryFileActionPerformed
 

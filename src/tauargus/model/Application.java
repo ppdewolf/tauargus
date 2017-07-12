@@ -17,16 +17,16 @@
 
 package tauargus.model;
 
+import java.awt.*;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.SplashScreen;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.Locale;
+//import java.util.Locale;
 import java.util.logging.Logger;
-import java.util.prefs.Preferences;
+//import java.util.prefs.Preferences;
 import org.apache.commons.io.FilenameUtils;
 import tauargus.extern.dataengine.TauArgus;
 import tauargus.extern.tauhitas.HiTaSCtrl;
@@ -35,14 +35,14 @@ import tauargus.extern.taurounder.RounderCtrl;
 import tauargus.gui.FrameInfo;
 import tauargus.gui.FrameMain;
 import tauargus.service.TableService;
-//import tauargus.utils.SystemUtils;
 import argus.utils.SystemUtils;
 import argus.model.ArgusException;
+import tauargus.model.batch;
 import com.ibm.statistics.util.Utility;
 import java.io.File;
 import java.io.IOException;
 import javax.swing.JOptionPane;
-import tauargus.utils.StrUtils;
+//import tauargus.utils.StrUtils;
 
 public class Application {
 
@@ -51,8 +51,8 @@ public class Application {
     // Version info
     public static final int MAJOR = 4;
     public static final int MINOR = 1;
-    public static final String REVISION = "4";
-    public static final int BUILD = 1;
+    public static final String REVISION = "6";
+    public static final int BUILD = 2;
     
     // Error codes returned by functions in TauArgusJava dll
     public static final int ERR_CODENOTINCODELIST = 1017;
@@ -99,6 +99,7 @@ public class Application {
     //private static String manualPath = "C:/Users/Gebruiker/Desktop/MUmanual4.3.pdf";
     private static String manualPath;
     //private static final String acrord32 = "acrord32.exe"; // finds the acrord32.exe
+    public static String batchDataPath;
 
 
     private static Variable freqVar = new Variable(null);
@@ -118,7 +119,7 @@ public class Application {
 
     
     public static String getFullVersion() {
-        return "" + MAJOR + "." + MINOR + "." + REVISION;
+        return "" + MAJOR + "." + MINOR + "." + REVISION; // + "; build: " + BUILD; build is shown separately in lower left corner
     }
     
     public static String getSolverName( int solver){
@@ -191,7 +192,7 @@ public class Application {
         clearVariables();
     }
   
-    private static void clearVariables() {
+    public static void clearVariables() {
         variables.clear();
     }
 
@@ -464,10 +465,12 @@ public class Application {
         solverSelected = SystemUtils.getRegInteger("optimal", "solverused", SOLVER_SOPLEX);
         generalMaxHitasTime = SystemUtils.getRegInteger("optimal", "maxhitastime", 1);
         anco = SystemUtils.getRegBoolean("general", "anco", false);
+        batchDataPath = "";
         if (args.length > 0 && !args[0].equalsIgnoreCase("X")) {
             //an "X" temporarily disables the command-line parameters set in the IDE
             // Batch processing...
             setBatch(BATCH_COMMANDLINE);
+            
                         //TODO Declare global
             //the "/v" parameter is only used if the batch is called for linked tables
             //tau will then show some progress info
@@ -475,14 +478,18 @@ public class Application {
               if(args[i].equals("/v")){setBatch(BATCH_FROMMENU);}  
             }
             if (args.length > 1) {
-              if(!args[1].equals("/v")){SystemUtils.setLogbook(args[1]);}
+              if(!args[1].equals("/v") && !args[1].equals("-")){SystemUtils.setLogbook(args[1]);}
             }
 
             if (args.length > 2) {
-                if(!args[2].equals("/v")){setTempDir(args[2]);}
+                if(!args[2].equals("/v") && !args[2].equals("-")){setTempDir(args[2]);}
             }
 
-            boolean interActive = true;
+            if (args.length > 3) {
+                if(!args[3].equals("/v")){tauargus.model.batch.setBatchDataPath(args[3]);}
+                //Checking on the validity of this path willbe donewhen invokingthe batch process
+            }
+             boolean interActive = true;
             int exitCode = 0;
             
             // Do a lot of stuff...

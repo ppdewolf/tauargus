@@ -23,6 +23,7 @@ import org.apache.commons.io.FilenameUtils;
 import tauargus.model.DataFilePair;
 //import tauargus.utils.ExecUtils;
 import argus.utils.SystemUtils;
+import tauargus.utils.TauArgusUtils;
 
 /**
  *
@@ -183,6 +184,7 @@ public class PanelSelectTableFiles extends javax.swing.JPanel {
             File file = new File(hs); 
             fileChooser.setCurrentDirectory(file);
         }
+        TauArgusUtils.getDataDirFromRegistry(fileChooser);
         fileChooser.setDialogTitle("Open Table Data");
         fileChooser.setSelectedFile(new File(""));
         fileChooser.resetChoosableFileFilters();
@@ -190,19 +192,22 @@ public class PanelSelectTableFiles extends javax.swing.JPanel {
         if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
             textFieldTableData.setText(fileChooser.getSelectedFile().toString());
             hs = fileChooser.getSelectedFile().getPath();
-            if (!hs.equals("")){SystemUtils.putRegString("general", "datadir", hs);}
+//            if (!hs.equals("")){SystemUtils.putRegString("general", "datadir", hs);}
+            TauArgusUtils.putDataDirInRegistry(hs);
             setMetaDataFileNameIfPossible();
         }
         setInfo();
     }//GEN-LAST:event_buttonTableDataActionPerformed
 
     private void buttonTableMetadataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonTableMetadataActionPerformed
+        TauArgusUtils.getDataDirFromRegistry(fileChooser);
         fileChooser.setDialogTitle("Open Table Metadata");
         fileChooser.setSelectedFile(new File(""));
         fileChooser.resetChoosableFileFilters();
         fileChooser.setFileFilter(new FileNameExtensionFilter("Table Metadata (*.rda)", "rda"));
         if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
             textFieldTableMetadata.setText(fileChooser.getSelectedFile().toString());
+            TauArgusUtils.putDataDirInRegistry(fileChooser.getSelectedFile().toString());
         }
     }//GEN-LAST:event_buttonTableMetadataActionPerformed
 

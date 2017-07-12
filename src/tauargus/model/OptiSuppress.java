@@ -64,6 +64,7 @@ import tauargus.extern.taurounder.RounderCtrl;
 import tauargus.gui.DialogStopTime;
 import tauargus.gui.PanelTable;
 import tauargus.utils.StrUtils;
+import static tauargus.utils.TauArgusUtils.ShowWarningMessage;
 
 public class OptiSuppress {
 //TODO    Keuze moet noguit het options scherm/registry kommen
@@ -566,16 +567,29 @@ public class OptiSuppress {
       File fileHitas = new File(Application.getTempFile("Hitastab.txt"));
       if (fileKlad.exists()) { fileKlad.delete();}
       fileHitas.renameTo(new File(Application.getTempFile("Hitastab.kld")));  
-      String hs, kop;
+      String hs, kop, zeroline = "0.0 z 0 0";
+      int aant;
       try{
        BufferedWriter out = new BufferedWriter(new FileWriter(Application.getTempFile("Hitastab.txt")));
        BufferedReader in =  new BufferedReader(new FileReader(Application.getTempFile("Hitastab.kld")));
-       while (in.ready()){
-         hs = in.readLine();
+       //while (in.ready()){
+       try {
+           hs = in.readLine();
+       } catch (IOException ex){
+           hs = null;
+       }
+       aant = hs.substring(12).indexOf(' ') + 6;
+       while (hs != null){
          kop = hs.substring(0, 11);
-         out.write(kop.substring(0, 6) + "    0" + hs.substring(12)); out.newLine();
-         out.write(kop.substring(0, 6) + "    1" + hs.substring(12)); out.newLine();
-         out.write(kop.substring(0, 6) + "    2             0.0 z 0 0"); out.newLine();
+         out.write(kop.substring(0, 6) + "    0 " + hs.substring(12)); out.newLine();
+         out.write(kop.substring(0, 6) + "    1 " + hs.substring(12)); out.newLine();
+         out.write(kop.substring(0, 6) + "    2 " + zeroline.format("%" + aant + "s",zeroline)); out.newLine();
+         //out.write(kop.substring(0, 6) + "    2             0.0 z 0 0"); out.newLine();
+         try {
+           hs = in.readLine();
+         } catch (IOException ex){
+           hs = null;
+         }
        }
       in.close();
       out.close();
@@ -675,6 +689,57 @@ public class OptiSuppress {
 //        try{
         Date startDate = new Date();  
         SystemUtils.writeLogbook("Start of the modular protection for table " + TableService.getTableDescription(tableSet));
+ //       if (tableSet.expVar.size()> 4 && !Application.isProtectCoverTable()) {
+ //           hs = "The table has more than 4 dimensions.\n" + 
+ //                "Running Modular can take a lot of time and is error-prone.\n" +
+ //                "Please check the results carefully.\n";
+ //          int warningResult = ShowWarningMessage(hs);
+ //          if (warningResult == 0 ) {
+ //             throw new ArgusException(hs); //overlapString);
+ //         }
+ //       }
+        
+ // checking for too many dimensions and additivity
+        if (!Application.isProtectCoverTable()){
+           if (tableSet.expVar.size()== 4) {
+              hs = "The table has 4 dimensions.\n" + 
+                 "Running Modular can take a lot of time and maybe it is difficult to obtain a correct result.\n" +
+                 "Please check the results carefully.\n";
+             int warningResult = ShowWarningMessage(hs);
+             if (warningResult == 0 ) {
+                throw new ArgusException(hs); //overlapString); 
+             }
+          }
+            
+            if (tableSet.expVar.size() > 4 ) {
+             if (Application.isAnco()) {
+               hs = "The table has more than 4 dimensions.\n" + 
+                 "Running Modular can take a lot of time and is error-prone.\n" +
+                 "Please check the results carefully.\n";
+              int warningResult = ShowWarningMessage(hs);
+              if (warningResult == 0 ) {
+                throw new ArgusException(hs); //overlapString);
+                }
+              }
+             else{
+               hs = "The table has more than 4 dimensions.\n" + 
+                    "Running Modular is not possible.\n";   
+               throw new ArgusException(hs); //overlapString);
+             }
+        
+          }
+          if (tableSet.additivity == TableSet.ADDITIVITY_NOT_REQUIRED){
+               hs = "The table might be not additive.\n" + 
+                 "Running Modular successfully Is not guaranteed.\n";
+              int warningResult = ShowWarningMessage(hs);
+              if (warningResult == 0 ) {
+                throw new ArgusException(hs); //overlapString);
+              }
+              
+          }
+        }
+
+    
         Oke = tauArgus.PrepareHITAS(tableSet.index, Application.getTempFile("NPF.txt"), Application.getTempFile("NFS.txt"), Application.getTempDir()+"/");
         if (!Oke){throw new ArgusException("An unknown error occurred when preparing the files for Modular");} 
         // TestHitasFiles; check for a bogus at the top level
@@ -735,7 +800,9 @@ public class OptiSuppress {
     //    hs = Application.getTempDir();
         //hs = tauargus.utils.ExecUtils.getApplicationDirectory(OptiSuppress.class).getCanonicalPath()+"\\access.ilm";  
         //hs = ExecUtils.getRegString("optimal", "cplexlicensefile", ExecUtils.getApplicationDirectory(OptiSuppress.class).getCanonicalPath()+"\\access.ilm");
-        hs = TauArgusUtils.GetCplexLicenceFile();
+        hs = "";
+        if (Application.solverSelected == Application.SOLVER_CPLEX) hs = TauArgusUtils.GetCplexLicenceFile();
+        
         tableSet.maxHitasTime = Application.generalMaxHitasTime;
  
         tauHitas.SetDebugMode(Application.SaveDebugHiTaS);
@@ -797,8 +864,13 @@ public class OptiSuppress {
     
     private static void ControleerHITAStabtxt(TableSet tableSet){
         
-    String regelOut,token, status, freq; int  i;
+    String regelOut,token, status, freq, totalstring; 
+    int  i;
     Double respVal, lpl, epsilon, x;
+    int[] GTIndex = new int[tableSet.expVar.size()];
+    for (i=0;i<tableSet.expVar.size();i++){
+        GTIndex[i] = 0;
+    }
     
     DecimalFormatSymbols symbols = new DecimalFormatSymbols();
     symbols.setDecimalSeparator('.');
@@ -831,7 +903,12 @@ public class OptiSuppress {
     try{
        tokenizer = new Tokenizer(new BufferedReader(new FileReader(Application.getTempFile("Hitastab.kld"))));
        } catch (Exception ex) {};
-       
+    
+    // Get number of characters of total general
+    int aant = (int) Math.ceil((Math.log(tableSet.getCell(GTIndex).response)/Math.log(10)));
+    if (tableSet.respVar.nDecimals > 0)
+        aant = aant + tableSet.respVar.nDecimals + 1;
+        
     while (tokenizer.nextLine() != null) {
        regelOut = "";
        for (i=0;i<tableSet.expVar.size();i++){
@@ -842,7 +919,7 @@ public class OptiSuppress {
        regelOut=regelOut.substring(1);
        token = tokenizer.nextToken();  //Value
        respVal = Double.parseDouble(token);
-       regelOut = regelOut + " " + token.format("%12s", token);
+       regelOut = regelOut + " " + token.format("%" + aant + "s", token);
        status = tokenizer.nextToken();  //Status
        freq = tokenizer.nextToken();
        if ( (respVal == 0) && status.equals("z") ){
@@ -1076,10 +1153,10 @@ public class OptiSuppress {
                solutionType = rounder.DoRound(solverName, Application.getTempFile("JJ"+xs+".IN"), X, upperBound, lowerBound, 0,  
                                   Application.getTempFile("JJ"+xs+".OUT"), 
                                   Application.getTempFile("JJstat"+xs+".OUT"),
-                                  "access.ilm", 
+                                  TauArgusUtils.GetCplexLicenceFile(), 
                                   Application.getTempFile("JJRound"+xs+".log"),
                                   maxRoundTime, 0,
-                                  "Dir",
+                                  Application.getTempDir()+"/",
                                    maxJump, numberJump , usedTime, errorCode); //, activityListener );
                if (solutionType>2) {throw new ArgusException("Rounding error code = "+tauArgus.GetErrorString(errorCode[0]) + "\noccured in subtable "+j);}             
                tableSet.roundMaxJump = Math.max(tableSet.roundMaxJump, maxJump[0]);
@@ -1091,7 +1168,7 @@ public class OptiSuppress {
                  TauArgusUtils.renameFile(Application.getTempFile("JJRound"+xs+".OUT.RAPID"),Application.getTempFile("JJRound"+xs+".OUT"));
                 }
                }                
-               tableSet.roundSolType[solutionType-1]++;
+               tableSet.roundSolType[solutionType]++;
                hs =  "<tr><td align=\"Right\">" + xs + "</td><td align=\"Right\">";
                if (solutionType == 2){hs = hs + "Rapid";}
                if (solutionType == 1){hs = hs + "Feasible";}
@@ -1759,8 +1836,8 @@ private static void joinRounded(TableSet tableSet, int nPart) {
                     }
                     @Override
                     public void UpdateDiscrepancy(final double percentage) {
-                    pcs.firePropertyChange("value3", null, percentage);
-                    Diff = percentage;
+                    pcs.firePropertyChange("value3", null, 100*percentage); // convert to percentage notation
+                    Diff = 100*percentage;
                     }
                     @Override
                     public void UpdateTime(final int seconds) {

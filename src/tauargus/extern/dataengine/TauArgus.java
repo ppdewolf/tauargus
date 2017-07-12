@@ -143,8 +143,8 @@ public class TauArgus {
     return TauArgusJavaJNI.TauArgus_SetInCodeList(swigCPtr, this, NumberofVar, VarIndex, sCode, ErrorCode, ErrorInVarIndex);
   }
 
-  public boolean WriteCellRecords(int TableIndex, String FileName, int SBS, boolean SBSLevel, boolean SuppressEmpty, String FirstLine, boolean ShowUnsafe, int RespType) {
-    return TauArgusJavaJNI.TauArgus_WriteCellRecords(swigCPtr, this, TableIndex, FileName, SBS, SBSLevel, SuppressEmpty, FirstLine, ShowUnsafe, RespType);
+  public boolean WriteCellRecords(int TableIndex, String FileName, int SBS, boolean SBSLevel, boolean SuppressEmpty, String FirstLine, boolean ShowUnsafe, boolean EmbedQuotes, int RespType) {
+    return TauArgusJavaJNI.TauArgus_WriteCellRecords(swigCPtr, this, TableIndex, FileName, SBS, SBSLevel, SuppressEmpty, FirstLine, ShowUnsafe, EmbedQuotes, RespType);
   }
 
   public void GetTotalTabelSize(int TableIndex, int[] nCell, int[] SizeDataCell) {
@@ -159,12 +159,8 @@ public class TauArgus {
     return TauArgusJavaJNI.TauArgus_WriteJJFormat(swigCPtr, this, TableIndex, FileName, LowerBound, UpperBound, WithBogus, AsPerc, ForRounding);
   }
 
-  public boolean WriteCSV(int TableIndex, String FileName, int[] DimSequence, int RespType) {
-    return TauArgusJavaJNI.TauArgus_WriteCSV(swigCPtr, this, TableIndex, FileName, DimSequence, RespType);
-  }
-
-  public boolean WriteCSVBasic(int TableIndex, String FileName, int[] DimSequence, int RespType) {
-    return TauArgusJavaJNI.TauArgus_WriteCSVBasic(swigCPtr, this, TableIndex, FileName, DimSequence, RespType);
+  public boolean WriteCSV(int TableIndex, String FileName, boolean EmbedQuotes, int[] DimSequence, int RespType) {
+    return TauArgusJavaJNI.TauArgus_WriteCSV(swigCPtr, this, TableIndex, FileName, EmbedQuotes, DimSequence, RespType);
   }
 
   public boolean GetCellDistance(int TableIndex, int[] DimIndex, int[] Distance) {
@@ -191,11 +187,11 @@ public class TauArgus {
     return TauArgusJavaJNI.TauArgus_GetVarCodeProperties(swigCPtr, this, VarIndex, CodeIndex, IsParent, IsActive, IsMissing, Level, nChildren, Code);
   }
 
-  public boolean UnsafeVariableCodes(int VarIndex, int CodeIndex, int[] IsMissing, int[] Freq, String[] Code, int[] Count, int[] UCArray) {
+  public boolean UnsafeVariableCodes(int VarIndex, int CodeIndex, int[] IsMissing, int[] Freq, java.lang.String[] Code, int[] Count, int[] UCArray) {
     return TauArgusJavaJNI.TauArgus_UnsafeVariableCodes(swigCPtr, this, VarIndex, CodeIndex, IsMissing, Freq, Code, Count, UCArray);
   }
 
-  public boolean GetVarCode(int VarIndex, int CodeIndex, int[] CodeType, String[] CodeString, int[] IsMissing, int[] Level) {
+  public boolean GetVarCode(int VarIndex, int CodeIndex, int[] CodeType, java.lang.String[] CodeString, int[] IsMissing, int[] Level) {
     return TauArgusJavaJNI.TauArgus_GetVarCode(swigCPtr, this, VarIndex, CodeIndex, CodeType, CodeString, IsMissing, Level);
   }
 

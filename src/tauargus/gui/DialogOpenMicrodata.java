@@ -17,7 +17,7 @@
 
 package tauargus.gui;
 
-import argus.model.SpssVariable;
+//import argus.model.SpssVariable;
 import java.io.File;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -26,10 +26,10 @@ import org.apache.commons.io.FilenameUtils;
 import tauargus.model.DataFilePair;
 //import tauargus.utils.ExecUtils;
 import argus.utils.SystemUtils;
-import java.util.List;
+//import java.util.List;
 import tauargus.model.Application;
 import tauargus.model.ArgusException;
-import tauargus.model.SpssUtilsTau;
+//import tauargus.model.SpssUtilsTau;
 import tauargus.utils.TauArgusUtils;
 
 public class DialogOpenMicrodata extends DialogBase{ //javax.swing.JDialog {
@@ -193,11 +193,12 @@ public class DialogOpenMicrodata extends DialogBase{ //javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttonMicrodataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonMicrodataActionPerformed
-        String hs = SystemUtils.getRegString("general", "datadir", "");
-        if (!hs.equals("")){
-            File file = new File(hs); 
-            fileChooser.setCurrentDirectory(file);
-        }
+//        String hs = SystemUtils.getRegString("general", "datadir", "");
+//        if (!hs.equals("")){
+//            File file = new File(hs); 
+//            fileChooser.setCurrentDirectory(file);
+//        }
+         TauArgusUtils.getDataDirFromRegistry(fileChooser);
         fileChooser.setDialogTitle("Open Microdata");
         fileChooser.setSelectedFile(new File(""));
         fileChooser.resetChoosableFileFilters();
@@ -206,28 +207,33 @@ public class DialogOpenMicrodata extends DialogBase{ //javax.swing.JDialog {
         fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Microdata (*.dat)", "dat"));
         fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("SPSS system file (*.sav)", "sav"));
         if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
+            String hs = fileChooser.getSelectedFile().toString();
             textFieldMicrodata.setText(fileChooser.getSelectedFile().toString());
-            hs = fileChooser.getSelectedFile().getPath();
-            if (!hs.equals("")){SystemUtils.putRegString("general", "datadir", hs);}
+//            hs = fileChooser.getSelectedFile().getPath();
+//            if (!hs.equals("")){SystemUtils.putRegString("general", "datadir", hs);}
+            TauArgusUtils.putDataDirInRegistry(hs);
             setMetadataFileNameIfPossible();
         }
         setInfo();
     }//GEN-LAST:event_buttonMicrodataActionPerformed
 
     private void buttonMetadataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonMetadataActionPerformed
-        String hs = SystemUtils.getRegString("general", "datadir", "");
-        if (!hs.equals("")){
-            File file = new File(hs); 
-            fileChooser.setCurrentDirectory(file);
-        }
+//        String hs = SystemUtils.getRegString("general", "datadir", "");
+//        if (!hs.equals("")){
+//            File file = new File(hs); 
+//            fileChooser.setCurrentDirectory(file);
+//        }
+        TauArgusUtils.getDataDirFromRegistry(fileChooser);
         fileChooser.setDialogTitle("Open Metadata");
         fileChooser.setSelectedFile(new File(""));
         fileChooser.resetChoosableFileFilters();
         fileChooser.setFileFilter(new FileNameExtensionFilter("Metadata (*.rda)", "rda"));
         if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
+            String hs = fileChooser.getSelectedFile().toString();
             textFieldMetadata.setText(fileChooser.getSelectedFile().toString());
-            hs = fileChooser.getSelectedFile().getPath();
-            if (!hs.equals("")){SystemUtils.putRegString("general", "datadir", hs);}
+ //           hs = fileChooser.getSelectedFile().getPath();
+ //           if (!hs.equals("")){SystemUtils.putRegString("general", "datadir", hs);}
+            TauArgusUtils.putDataDirInRegistry(hs);
         }
     }//GEN-LAST:event_buttonMetadataActionPerformed
 

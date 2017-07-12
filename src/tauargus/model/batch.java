@@ -20,7 +20,7 @@ package tauargus.model;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
+//import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.logging.Level;
 import java.io.IOException;
@@ -28,25 +28,30 @@ import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 import tauargus.extern.dataengine.TauArgus;
-//import tauargus.utils.Tokenizer;
 import argus.utils.Tokenizer;
-import tauargus.model.Metadata;
+//import tauargus.model.Metadata;
 import tauargus.service.TableService;
-import tauargus.gui.ActivityListener;
-import tauargus.model.GHMiter;
-import tauargus.model.OptiSuppress;
-import tauargus.model.ArgusException;
+//import tauargus.gui.ActivityListener;
+//import tauargus.model.GHMiter;
+//import tauargus.model.OptiSuppress;
+//import tauargus.model.ArgusException;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
-import javax.swing.table.AbstractTableModel;
-import tauargus.gui.DialogRoundingParameters;
-import tauargus.gui.FrameMain;
+//import javax.swing.table.AbstractTableModel;
+//import tauargus.gui.DialogRoundingParameters;
+//import tauargus.gui.FrameMain;
 import tauargus.gui.PanelTable;
-import tauargus.model.TableSet;
+//import tauargus.model.TableSet;
 import tauargus.utils.StrUtils;
 //import tauargus.utils.ExecUtils;
 import tauargus.utils.TauArgusUtils;
 import argus.utils.SystemUtils;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import org.apache.commons.io.FilenameUtils;
+import static tauargus.model.Application.clearMetadatas;
+import static tauargus.model.Application.clearVariables;
    
 
 /**
@@ -60,6 +65,8 @@ public class batch {
     public static final int BATCH_READ_ERROR = 3;
     static Metadata metadata;
     static Tokenizer tokenizer;
+    private static String batchDataPath = "";
+    private static String batchFilePath = "";
     private static final TauArgus tauArgus = Application.getTauArgusDll();    
         
     private static final Logger logger = Logger.getLogger(PanelTable.class.getName());        
@@ -83,6 +90,42 @@ public class batch {
         }    
     }  
     
+public static void setBatchDataPath (String f){
+    batchDataPath = FilenameUtils.normalizeNoEndSeparator(f);
+    if (!batchDataPath.endsWith("\\")){batchDataPath = batchDataPath + "\\";}
+}
+
+private static boolean checkBatchDataPath (){
+    if ( !batchDataPath.equals("")){
+      File f = new File(batchDataPath);
+        if (!f.isDirectory()) {
+            
+             SystemUtils.writeLogbook("Argus batch data directory ("+batchDataPath+") could not be found");  
+        return false;
+        }
+    }
+    return true;
+}
+public static String getBatchDataPath(){
+    return batchDataPath;
+}
+
+private static String giveRightFile (String f) throws ArgusException {
+    String hs;
+// If the file name does not contain : or / or \ we assuem that the full path si given.
+//  else we first search in the directory of the arb file and then in the batch data directory (Param 4 when calling TAU)      
+    hs = f;
+    if ( !hs.contains(":") && !hs.contains("\\") && !hs.contains("/")){
+       hs = batchFilePath + f;
+       if (!TauArgusUtils.ExistFile(hs) ) {
+          hs = getBatchDataPath() + f;
+          }
+       }
+    if (!TauArgusUtils.ExistFile(hs)){
+        throw new ArgusException ("file: "+ f + " could not be found.");
+   }
+    return hs;
+}
 /**
  * The main routine for running the batch version.\n
  * Note: there is a distinction between running from the commandline and from the menu.\n
@@ -95,12 +138,13 @@ public class batch {
 public static int runBatchProcess(String batchFile){
        String token; boolean tabularInput; int status; boolean firstCommand, silent; 
        String dataFile, metaDataFile, hs; 
-       String batchFilePath;
+//       String batchFilePath;
        String currentCommand = "";
        dataFile = ""; metaDataFile = ""; tabularInput = false;
        tokenizer = null;
        token = "";
        status = 0;
+       if (!checkBatchDataPath()){ return BATCH_NORMAL_ERROR;}
        batchFilePath = TauArgusUtils.getFilePath(batchFile);
        firstCommand  = true; silent = false;
        if (Application.batchType() == Application.BATCH_FROMMENU) {
@@ -108,6 +152,8 @@ public static int runBatchProcess(String batchFile){
            Application.windowInfo.addLabel("Progress of the batch proces");
        }    
        tauArgus.CleanAll();
+       clearMetadatas();
+       clearVariables();
        try{
        tokenizer = new Tokenizer(new BufferedReader(new FileReader(batchFile)));
        } catch (Exception ex) {
@@ -125,7 +171,7 @@ public static int runBatchProcess(String batchFile){
 //       3 SpecifyTables found       
 //       4 SafetyRule found
         try{
-        while (tokenizer.nextLine() != null) {
+        while  (tokenizer.nextLine() != null) {
           currentCommand = tokenizer.getLine();
           reportProgress(currentCommand);
           token = tokenizer.nextToken();  //.toUpperCase() niet nodig
@@ -146,11 +192,12 @@ public static int runBatchProcess(String batchFile){
                   tabularInput = false;
                   if (status !=0){ throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
                   status = 1;
-                  hs = batchFilePath + dataFile;
-                  if (!TauArgusUtils.ExistFile(dataFile) && TauArgusUtils.ExistFile(hs)){dataFile = hs;}
-                  if (!TauArgusUtils.ExistFile(dataFile)){
-                      throw new ArgusException("File "+dataFile+" does not exist");
-                  }
+                  dataFile = giveRightFile(dataFile);
+//                  hs = batchFilePath + dataFile;
+//                  if (!TauArgusUtils.ExistFile(dataFile) && TauArgusUtils.ExistFile(hs)){dataFile = hs;}
+//                  if (!TauArgusUtils.ExistFile(dataFile)){
+//                    throw new ArgusException("File "+dataFile+" does not exist");
+//                  }
                        break;}
   //Case "<OPENMICRODATA>": NDataFiles = NDataFiles + 1
 //                         If NDataFiles > 1 Then GoTo FOUTEINDE
@@ -160,10 +207,11 @@ public static int runBatchProcess(String batchFile){
                   dataFile =  tokenizer.nextToken();
                   tabularInput = true;
                   if (!(status == 0 || status == 4)){ throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
-                  hs = batchFilePath + dataFile;
-                  if (!TauArgusUtils.ExistFile(dataFile) && TauArgusUtils.ExistFile(hs)){dataFile = hs;}
-                  if (!TauArgusUtils.ExistFile(dataFile)){
-                      throw new ArgusException("File "+dataFile+" does not exist");}
+                  dataFile = giveRightFile(dataFile);
+//                  hs = batchFilePath + dataFile;
+//                  if (!TauArgusUtils.ExistFile(dataFile) && TauArgusUtils.ExistFile(hs)){dataFile = hs;}
+//                  if (!TauArgusUtils.ExistFile(dataFile)){
+ //                     throw new ArgusException("File "+dataFile+" does not exist");}
                   status = 1;    
                       break;}
 // Case "<OPENTABLEDATA>": NDataFiles = NDataFiles + 1
@@ -175,11 +223,12 @@ public static int runBatchProcess(String batchFile){
                    metaDataFile =  tokenizer.nextToken();
                    if (dataFile.equals("")){ throw new ArgusException ("A data file must be specified first"); }                       
                    if (status !=1){ throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
-                   status = 2;   
-                  hs = batchFilePath + metaDataFile;
-                  if (!TauArgusUtils.ExistFile(metaDataFile) && TauArgusUtils.ExistFile(hs)){metaDataFile = hs;}
-                   if (!TauArgusUtils.ExistFile(metaDataFile)){
-                      throw new ArgusException("File "+metaDataFile+" does not exist");}
+                   status = 2;
+                   metaDataFile = giveRightFile(metaDataFile);
+//                  hs = batchFilePath + metaDataFile;
+//                  if (!TauArgusUtils.ExistFile(metaDataFile) && TauArgusUtils.ExistFile(hs)){metaDataFile = hs;}
+//                   if (!TauArgusUtils.ExistFile(metaDataFile)){
+//                      throw new ArgusException("File "+metaDataFile+" does not exist");}
                    Metadata.createMetadata(tabularInput, dataFile, metaDataFile);
                    dataFile = "";
                    break;}
@@ -201,6 +250,8 @@ public static int runBatchProcess(String batchFile){
                   case ("<CLEAR>"):    
                       {TableService.clearTables();
                        tauArgus.CleanAll();
+                       clearMetadatas();
+                       clearVariables();
                        status = 0;
                         break;}
                   case ("<SAFETYRULE>"):    
@@ -221,9 +272,11 @@ public static int runBatchProcess(String batchFile){
                       if ( status != 4){ throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
                       token = tokenizer.nextToken();
                       if (token.equals("")){token = "0";}
-                      if ( !token.equals("0") && !token.equals("1")) { 
-                                   throw new ArgusException ("Illegal keyword ("+token+") for ReadTable");}
-                      boolean computeTotals = ( token.equals("1"));
+                      if ( !token.equals("0") && !token.equals("1") && !token.equals("2")) { 
+                                   throw new ArgusException ("Illegal parameter ("+token+") for ReadTable");}
+                      int computeTotals = 0;
+                      if ( token.equals("1")){computeTotals = 1;}
+                      if ( token.equals("2")){computeTotals = 2;}
                       if (!readTablesBatch(computeTotals)) {}
                       reportProgress("Tables have been read");
                       break;
@@ -302,12 +355,12 @@ public static int runBatchProcess(String batchFile){
                       break;                      
                     }
                   case ("<SOLVER>"):
-                    { hs = tokenizer.nextToken();
+                    { hs = tokenizer.nextField(",");
                       if (hs.equalsIgnoreCase("XPRESS")){
                         Application.solverSelected = Application.SOLVER_XPRESS;  
                       }
                       else
-                      if (hs.equalsIgnoreCase("CLEX")){
+                      if (hs.equalsIgnoreCase("CPLEX")){
                         Application.solverSelected = Application.SOLVER_CPLEX;  
                       }
                       else
@@ -316,6 +369,16 @@ public static int runBatchProcess(String batchFile){
                       }
                       else{
                           throw new ArgusException("Illegal solver ("+hs+") selected");
+                      }
+                      // check for license file
+                      hs = tokenizer.nextField(",");
+                      if (!hs.isEmpty()){
+                          hs = StrUtils.unQuote(hs);
+                          if (!TauArgusUtils.ExistFile(hs)){
+                             throw new ArgusException("Cplex License file ("+hs+") does not exist");                               
+                          }
+                          hs = TauArgusUtils.getFullFileName(hs);
+                          SystemUtils.putRegString("optimal", "cplexlicensefile", hs); 
                       }
                       break;
                     }
@@ -328,6 +391,11 @@ public static int runBatchProcess(String batchFile){
                       SystemUtils.setLogbook(hs);
                       tokenizer.clearLine();
                     break;}    
+                  case ("<VERSIONINFO>"):   
+                    { hs = StrUtils.unQuote(tokenizer.getLine());
+                      writeVersionInfo(hs);
+                      tokenizer.clearLine();
+                    break;}                   
                   default:{
 //                      FrameBatch.dispose();
                       throw  new ArgusException ("Illegal keyword "+ token);} // {throw { new ArgusException ("Illegal keyword"+ token); }
@@ -352,6 +420,26 @@ public static int runBatchProcess(String batchFile){
    
     }
 
+
+   static void writeVersionInfo (String f) throws ArgusException{
+       if (!f.contains(":")&&!f.contains("\\")&&!f.contains("/")){
+            if (batchDataPath.equals("")){
+                f = batchFilePath + f;
+            } else {
+               f = getBatchDataPath() + f;
+            }
+        }
+       
+              try{
+          BufferedWriter out = new BufferedWriter(new FileWriter(f));
+          out.write("TAU-ARGUS version: " + Application.getFullVersion() + "; build: " + Application.BUILD);
+     
+          out.close();        
+          
+          } catch(IOException ex){throw new ArgusException ("An error occurred when writing the version info file");}          
+    }
+   
+  
     /**
    * Writes a table in batch. 
    * Reads the commend and all its parameters.
@@ -413,16 +501,24 @@ public static int runBatchProcess(String batchFile){
         if ( !hs.equals(",") ) {throw new ArgusException(", expected; not a "+ hs + "");}
         hs = nextToken(tail);
         tableSet = TableService.getTable(tabNo);
+        if (!hs.contains(":")&&!hs.contains("\\")&&!hs.contains("/")){
+            if (batchDataPath.equals("")){
+                hs = batchFilePath + hs;
+            } else {
+               hs = getBatchDataPath() + hs;
+            }
+        }
         tableSet.safeFileName = hs;
         SaveTable.writeTable (tableSet, outputType);
         SaveTable.writeReport(tableSet);
     }
     
-    static boolean readTablesBatch(boolean computeTotals)throws ArgusException{
+    static boolean readTablesBatch(int computeTotals)throws ArgusException{
         int i; String hs;
         TableSet tableSet;
         hs = "";
         try{
+        TableService.addAdditivityParamBatch(computeTotals);
         TableService.readTables(null);}
         catch (IOException ex){
                 throw new ArgusException ("\nError reading table"+hs);}
@@ -996,7 +1092,10 @@ public static int runBatchProcess(String batchFile){
        hs = tokenizer.nextChar(); //we know it is correct
        hs = tokenizer.nextField("|");
        if (hs.equalsIgnoreCase("<FREQ>")) {
-         tableSet.respVar = Application.getFreqVar();
+//         tableSet.respVar = Application.getFreqVar();
+//           tableSet.respVar = null;
+           tableSet.respVar = metadata.find(tauargus.model.Type.FREQUENCY);
+           tableSet.readFreqOnlyTable = true;
        }
        else {tableSet.respVar=metadata.find(hs);
          if (!tableSet.respVar.isNumeric()){throw new ArgusException ("Response variable ("+hs+") is not numeric ");}

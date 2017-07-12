@@ -20,7 +20,7 @@ package tauargus.service;
 import argus.utils.SystemUtils;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.File;
+//import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -332,6 +332,11 @@ public class TableService {
     }
     
   
+    public static void addAdditivityParamBatch( int additParam){
+            for (TableSet table : tables) {
+                table.additivity = additParam;
+            }
+    }
     public static void readTables(PropertyChangeListener propertyChangeListener) throws ArgusException, FileNotFoundException, IOException {
         PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(TableService.class);
         propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);

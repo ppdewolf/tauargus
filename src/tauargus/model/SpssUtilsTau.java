@@ -18,31 +18,31 @@
 //TODO: test for String format and add the possibility to add/read/write date/time format
 package tauargus.model;;
 
-import tauargus.model.ArgusException;
-import argus.model.DataFilePair;
-import argus.utils.StrUtils;
-import argus.utils.Tokenizer;
-import java.io.BufferedReader;
+//import tauargus.model.ArgusException;
+//import argus.model.DataFilePair;
+//import argus.utils.StrUtils;
+//import argus.utils.Tokenizer;
+//import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
+//import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.List;
+//import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
+//import javax.swing.JOptionPane;
 //import muargus.model.MetadataMu;
 import argus.model.SpssVariable;
 import com.ibm.statistics.plugin.Case;
 import com.ibm.statistics.plugin.Cursor;
 import com.ibm.statistics.plugin.DataUtil;
-import com.ibm.statistics.plugin.NumericMissingValueType;
+//import com.ibm.statistics.plugin.NumericMissingValueType;
 import com.ibm.statistics.plugin.StatsException;
 import com.ibm.statistics.plugin.StatsUtil;
-import com.ibm.statistics.plugin.Variable;
-import com.ibm.statistics.plugin.VariableFormat;
+//import com.ibm.statistics.plugin.Variable;
+//import com.ibm.statistics.plugin.VariableFormat;
 import java.awt.Frame;
 import javax.swing.JFileChooser;
 //import muargus.model.VariableMu;
@@ -267,6 +267,7 @@ public class SpssUtilsTau {
  
 
     private static void getSpssInstallationDirectory(Frame parent) {
+        // We do not use the DataDir in the specific procedure
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Set IBM SPSS directory");
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);

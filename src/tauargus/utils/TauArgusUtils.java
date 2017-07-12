@@ -19,9 +19,9 @@ package tauargus.utils;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileFilter;
+//import java.io.FileFilter;
 import java.io.FileWriter;
-import java.io.FilenameFilter;
+//import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
@@ -31,6 +31,7 @@ import tauargus.model.ArgusException;
 import tauargus.model.Metadata;
 import tauargus.model.Variable;
 import argus.utils.SystemUtils;
+import tauargus.utils.TauArgusUtils;
 import java.util.List;
 import javax.swing.JOptionPane;
 
@@ -145,6 +146,33 @@ public class TauArgusUtils {
       l= hs.length()-l;
       hs = hs.substring(0,l);
       return hs;        
+    }
+    
+    public static String getFullFileName(String Fn) throws ArgusException{
+        File f1 = new File(Fn);        
+        String hs; hs = "";
+        if (!ExistFile(Fn)){
+            throw new ArgusException ("File: "+Fn + " does not exist.");
+        }
+        try{
+            hs = f1.getCanonicalPath();
+        }
+        catch (IOException ex) {};
+        return hs;
+    }
+    
+    public static void getDataDirFromRegistry( javax.swing.JFileChooser fileChooser){
+        String hs = SystemUtils.getRegString("general", "datadir", "");
+        if (!hs.equals("")){
+            File file = new File(hs); 
+            fileChooser.setCurrentDirectory(file);
+        }
+    }
+    
+    public static void putDataDirInRegistry(String f){
+        if (!f.equals("")){
+          SystemUtils.putRegString("general", "datadir", f);  
+        }  
     }
     
     public static String addPathExt(String fileName, String dataFile, String ext){
@@ -297,7 +325,19 @@ public class TauArgusUtils {
         return token;
     }
        
-    public static String GetCplexLicenceFile(){
-       return SystemUtils.getRegString("optimal", "cplexlicensefile", "access.ilm"); 
+    public static String GetCplexLicenceFile() throws ArgusException {
+        String hs;
+        hs = SystemUtils.getRegString("optimal", "cplexlicensefile", "access.ilm");
+        //if needed add the application path
+        if (!hs.contains(":") && !hs.contains("/") && !hs.contains("//")){
+            try{
+          hs = SystemUtils.getApplicationDirectory(Application.class).getCanonicalPath()+  "\\" + hs ; 
+            }
+           catch (IOException ex){};
+        }
+       if (!TauArgusUtils.ExistFile(hs)){ throw new ArgusException("Cplex licence file: "+ hs + " could not be found");}
+       return hs;
+//     return SystemUtils.getRegString("optimal", "cplexlicensefile", "access.ilm"); 
+       
     }   
 }

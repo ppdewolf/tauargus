@@ -384,7 +384,7 @@ public class Metadata implements Cloneable {
         if (f.isFile()) {
             return f.getPath();
         } else {
-            throw new ArgusException("Hierarchical file with name " + fileName + " does not exist.");
+            throw new ArgusException("File with name " + fileName + " does not exist.");
         }
     }
     
@@ -585,7 +585,11 @@ public class Metadata implements Cloneable {
                     writer.println();
                 }
                 if (StringUtils.isNotEmpty(variable.codeListFile)) {
-                    writer.println("    <CODELIST> " + StrUtils.quote(variable.codeListFile));
+                    String hs = variable.codeListFile;
+                    // If no path is specified in codeListFile, datadir is assumed
+                    if ( hs.indexOf("\\",0)>0 ||hs.indexOf(":",0)>0||hs.indexOf(":",0)>0){}
+                    else { hs = variable.metadata.getFilePath(variable.codeListFile);}
+                    writer.println("    <CODELIST> " + StrUtils.quote(hs));
                 }
                 if (variable.hierarchical != Variable.HIER_NONE) {
                     writer.println("    <HIERARCHICAL>");

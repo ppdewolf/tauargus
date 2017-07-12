@@ -17,24 +17,24 @@
 
 package tauargus.gui;
 
-import java.awt.image.ImageObserver;
-import java.io.BufferedReader;
+//import java.awt.image.ImageObserver;
+//import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+//import java.io.FileNotFoundException;
+//import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Date;
-import java.util.List;
-import javax.swing.filechooser.FileNameExtensionFilter;
+//import java.util.List;
+//import javax.swing.filechooser.FileNameExtensionFilter;
 //import tauargus.utils.ExecUtils;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.commons.io.FilenameUtils;
 import tauargus.model.Application;
 import tauargus.model.ArgusException;
-import tauargus.model.DataFilePair;
+//import tauargus.model.DataFilePair;
 import tauargus.model.Metadata;
 import tauargus.model.TableSet;
 import tauargus.model.Variable;
@@ -152,11 +152,12 @@ public class DialogWriteBatchFile extends DialogBase {
     private void jButtonSearchBatchFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSearchBatchFileActionPerformed
         // TODO add your handling code here:
       boolean oke;  
-      String hs = SystemUtils.getRegString("general", "datadir", "");
-      if (!hs.equals("")){
-          File file = new File(hs);
-          jFileChooser1.setCurrentDirectory(file);
-       }
+//      String hs = SystemUtils.getRegString("general", "datadir", "");
+//      if (!hs.equals("")){
+//          File file = new File(hs);
+//          jFileChooser1.setCurrentDirectory(file);
+//       }
+       TauArgusUtils.getDataDirFromRegistry(jFileChooser1);
         // TODO add your handling code here:
         jFileChooser1.setDialogTitle("Safe file name");
         jFileChooser1.setSelectedFile(new File(""));
@@ -182,6 +183,7 @@ public class DialogWriteBatchFile extends DialogBase {
             batchFile = batchFile+ ".arb";}
 
        textBatchFileName.setText(batchFile);
+       TauArgusUtils.putDataDirInRegistry(batchFile);
        
  //      jButtonWriteBatch.setEnabled(!batchFile.equals(""));
       

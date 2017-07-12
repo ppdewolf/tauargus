@@ -31,9 +31,9 @@ public enum CellStatus {
     UNSAFE_SINGLETON        ( 7, CellStatusCategory.PRIMARY_UNSAFE,     "Unsafe (singleton)",          Color.red),
     UNSAFE_SINGLETON_MANUAL ( 8, CellStatusCategory.PRIMARY_UNSAFE,     "Unsafe (singleton) (manual)", Color.pink),
     UNSAFE_MANUAL           ( 9, CellStatusCategory.PRIMARY_UNSAFE,     "Unsafe (manual)",             Color.red), // light red
-    PROTECT_MANUAL          (10, CellStatusCategory.SAFE_PROTECTED,     "Protected",                   Color.green),
+    PROTECT_MANUAL          (10, CellStatusCategory.SAFE_PROTECTED,     "Protected",                   new Color(0,153,0)),//Color.green.darker()),
     SECONDARY_UNSAFE        (11, CellStatusCategory.SECONDARY_UNSAFE,   "Secondary",                   Color.blue),
-    SECONDARY_UNSAFE_MANUAL (12, CellStatusCategory.SECONDARY_UNSAFE,   "Secondary (from manual)",     Color.cyan), // "Secondary (CTA)", light blue
+    SECONDARY_UNSAFE_MANUAL (12, CellStatusCategory.SECONDARY_UNSAFE,   "Secondary (from manual)",     new Color(51,153,255)),//Color.cyan), // "Secondary (CTA)", light blue
     EMPTY_NONSTRUCT         (13, CellStatusCategory.SAFE_NOT_PROTECTED, "Empty (non-struct.)",         Color.gray),
     EMPTY                   (14, CellStatusCategory.SAFE_PROTECTED,     "Empty",                       Color.black);
 

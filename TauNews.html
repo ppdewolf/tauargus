@@ -8,7 +8,48 @@
 <body>
 <h1>&tau;-ARGUS New developments </h1><p>
 <hr>
-<h2>Last modified: 23 November 2015</h2>
+<h2>Last modified: 10 July 2017</h2>
+<h2>&tau;-ARGUS version 4.1.6</h2>
+<hr><i>10 July 2017</i><br>
+Version 4.1.6 build 2<br>
+Explicit empty cells are accepted again in tabular data input<br>
+Checks added that tabular data input can only be in free format<br>
+Large cell values in 1-dim table now read correctly<br>
+Added functionality to batch commands<br>
+&nbsp;&nbsp;&nbsp;&lt;SOLVER&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;WRITETABLE&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;READTABLE&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;CLEAR&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;VERSIONINFO&gt;<br>
+Additional parameter to comamndline call to define batch-data directory<br>
+Maximum number of levels in a hierarchy now set consistently to 10<br>
+The &lt;FREQ&gt; is now working correctly in batch-mode<br>
+Solved issue with directory name of .CDL-file in intermediate format<br>
+Changed some icons<br>
+<h2>&tau;-ARGUS version 4.1.5</h2>
+<hr><i>14 April 2017</i><br>
+Version 4.1.5 build 1<br>
+Modular and Optimal approach now deal with Scaling Costs in the same way, fixing issues #7 and #34<br>
+Issue #40 on possibility of crashing when using weights is fixed<br>
+Issues #29 and #46 on number of significant digits fixed<br>
+Issue #8 on partitioning in rounding fixed<br>
+Issue #42 on saving options (quotes around variables, name on first line, ...) fixed<br>
+Numbering of levels in display and in recode is now the same<br>
+Many checks on data added to tabular input. Should resolve issue #5<br>
+At some places, the cursor will change in a 'waiting'-cursor when working<br>
+Some small bugs in the interface fixed<br>
+<h2>&tau;-ARGUS version 4.1.4</h2>
+<hr><i>21 December 2016</i><br>
+Version 4.1.4 build 1<br>
+In “Generate Apriori” it is now possible to only adjust the cost of a cell, without changing the status (combining “omit” with “cost”).<br>
+Bug fix: minimum frequency rule was used even when not selected. This is corrected.<br>
+Length of code names in Hypercube is no longer limited.<br>
+Zero unsafe is now correctly used in Calculate Table.<br>
+Some small bugs in csv output fixed.<br>
+Overlapping variables in fixed format allowed.<br>
+<LOGBOOK> command in batch-job fixed (quotes can be used again).<br>
+Workaround for use of dots in codes in hierarchies (note: still not allowed to start with a dot).<br>
+Some small bugs in interface fixed.<br>
 <h2>&tau;-ARGUS version 4.1.3</h2>
 <hr><i>23 November 2015</i><br>
 Version 4.1.3 build 1<br>

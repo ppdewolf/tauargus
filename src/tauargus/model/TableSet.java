@@ -38,16 +38,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
-import org.apache.commons.lang3.StringUtils;
+//import javax.swing.JOptionPane;
+//import org.apache.commons.lang3.StringUtils;
 import tauargus.extern.dataengine.TauArgus;
-import tauargus.gui.ActivityListener;
+//import tauargus.gui.ActivityListener;
 import tauargus.service.TableService;
-import argus.utils.StrUtils;
+//import argus.utils.StrUtils;
 //import tauargus.utils.ExecUtils;
 import tauargus.utils.TauArgusUtils;
 import tauargus.utils.Tokenizer;
-import tauargus.model.CellStatus;
+//import tauargus.model.CellStatus;
 import argus.utils.SystemUtils;
 import argus.utils.StrUtils;
 import static java.lang.Math.abs;
@@ -513,13 +513,15 @@ public class TableSet {
 
     private boolean buildCell(Tokenizer tokenizer, String[] codes, Cell cell) throws ArgusException {
         final double EPSILON = 0.000000001;
+        boolean hasResp = false, hasFreq = false, hasStatus = false;
+        String hs;
 
         int iExp = 0;
         int iTop = 0;
         cell.response = Cell.UNKNOWN;
         cell.shadow = Cell.UNKNOWN;
         cell.cost = Cell.UNKNOWN;
-        cell.freq = 1; // - 1
+        cell.freq = Cell.UNKNOWN; //0; // - 1
         for (int i = 0; i < TableSet.MAX_TOP_N_VAR; i++) {
             cell.maxScore[i] = 0;
             cell.holdingMaxScore[i] = 0;
@@ -540,30 +542,47 @@ public class TableSet {
                     iExp++;
                     break;
                 case RESPONSE:
-                    if (value.equals("")){ cell.status = CellStatus.EMPTY;}
-                    try{cell.response = StrUtils.toDouble(value);} catch(Exception ex){}
+                    hasResp = true;
+                    if (value.equals("") || value.equals("-")){ cell.status = CellStatus.EMPTY;}
+                    else
+                    try{cell.response = StrUtils.toDouble(value);} catch(Exception ex)
+                      {throw new ArgusException (ex.getMessage());}
                     break;
                 case SHADOW:
-                    try{cell.shadow = StrUtils.toDouble(value);} catch(Exception ex){}
+                    if ((value.equals("") || value.equals("-"))){break;}
+                    try{cell.shadow = StrUtils.toDouble(value);} catch(Exception ex)
+                      {throw new ArgusException (ex.getMessage());}
                     break;
                 case COST:
-                    try{ cell.cost = StrUtils.toDouble(value);} catch(Exception ex){}
+                    if ((value.equals("") || value.equals("-"))){break;}
+                    try{ cell.cost = StrUtils.toDouble(value);} catch(Exception ex)
+                      {throw new ArgusException (ex.getMessage());}
                     break;
                 case FREQUENCY:
-                    if (value.equals("")){ cell.status = CellStatus.EMPTY;}
-                    try{cell.freq = StrUtils.toInteger(value);} catch(Exception ex){}
+                    hasFreq = true;
+                    if (value.equals("") || value.equals("-")){ cell.status = CellStatus.EMPTY;}// cell.freq=0;}
+                    else
+                    try{cell.freq = StrUtils.toInteger(value);} catch(Exception ex)
+                      {throw new ArgusException (ex.getMessage());}
                     break;
                 case TOP_N:
-                    try{cell.maxScore[iTop] = StrUtils.toDouble(value);} catch(Exception ex){}
+                    if ((value.equals("") || value.equals("-"))){iTop++;break;}
+                    try{cell.maxScore[iTop] = StrUtils.toDouble(value);} catch(Exception ex)
+                      {throw new ArgusException (ex.getMessage());}
                     iTop++;
                     break;
                 case LOWER_PROTECTION_LEVEL:
-                    try{cell.lower = StrUtils.toDouble(value);} catch(Exception ex){}
+                    if ((value.equals("") || value.equals("-"))){break;}
+                    try{cell.lower = StrUtils.toDouble(value);} catch(Exception ex)
+                      {throw new ArgusException (ex.getMessage());}
                     break;
                 case UPPER_PROTECTION_LEVEL:
-                    try{cell.upper = StrUtils.toDouble(value);} catch(Exception ex){}
+                    if ((value.equals("") || value.equals("-"))){break;}
+                    try{cell.upper = StrUtils.toDouble(value);} catch(Exception ex)
+                      {throw new ArgusException (ex.getMessage());}
                     break;
                 case STATUS:
+                    hasStatus = true;
                     value = value.toUpperCase();
                     if (value.equals("")) {cell.status = CellStatus.EMPTY;}
                     else if (value.equals("E")) {
@@ -590,7 +609,70 @@ public class TableSet {
                     }
             } // end of switch statement
         } // end loop over all variables;
+        
 
+        if (readFreqOnlyTable) {
+            cell.response = cell.freq;
+        }
+ //       if (hasResp  && !hasFreq) { cell.freq = 1;}
+        // Checking for consistency of empty cells etc
+        
+        //1
+        if (cell.response == Cell.UNKNOWN && cell.freq == Cell.UNKNOWN){
+            if (cell.status == CellStatus.SAFE ||cell.status == CellStatus.SAFE_MANUAL) {cell.status = CellStatus.EMPTY;}
+            if (cell.status != CellStatus.EMPTY){
+           throw new ArgusException("An empty cell cannot have a status different from empty");             
+            
+        } 
+        }
+        //2
+        if (cell.response == Cell.UNKNOWN && cell.freq != Cell.UNKNOWN){
+           throw new ArgusException("An empty cell cannot have a real frequency");                         
+        }
+       
+        //3
+        if ((cell.response != Cell.UNKNOWN && cell.response != 0)  && cell.freq == 0){
+           throw new ArgusException("A real cell cannot have a frequency zero");                         
+        }
+
+        //4 ook nog naar kijken Anco 7 mei 2017
+        if (cell.response != Cell.UNKNOWN && cell.freq == Cell.UNKNOWN){
+          cell.freq = 1;
+          hs = "";
+          for (int j=0;j<iExp;j++){
+            if (codes[j].equals("")) {hs =hs + "Total";}
+                                else {hs = hs + codes[j];}
+            if (j+1<iExp) {hs=hs+",";}
+                }
+          SystemUtils.writeLogbook("A real cell with no frequency is strange;"
+                  + " In cell ("+ hs+") freq = 1 has been imputed.");
+        }
+        //5
+        if (cell.response == Cell.UNKNOWN && cell.freq == Cell.UNKNOWN){
+            cell.status = CellStatus.EMPTY;
+        }
+        
+        //6
+        //If an empty cell has a status <> empty we will overrule this
+        if (cell.response == Cell.UNKNOWN && hasStatus){
+            if ( !cell.status.isEmpty()){
+            cell.status = CellStatus.EMPTY; 
+            }                
+        }
+        
+        //7
+        if ((cell.response != Cell.UNKNOWN && cell.response != 0) && 
+            (cell.freq != Cell.UNKNOWN && cell.freq != 0)  &&
+                cell.status == CellStatus.EMPTY){
+           throw new ArgusException("A non-empty cell cannot have a status empty");                                     
+        }
+        //????? WHAT'S HAPPENIGN HERE ????? response = freq ????? PWOF 20170227 
+//        if (cell.response == Cell.UNKNOWN && cell.freq != Cell.UNKNOWN) {
+//            cell.response = cell.freq;
+//        }
+//        if (cell.response == Cell.UNKNOWN) {
+//            throw new ArgusException("Response variable is unknown");
+//        }
         if (cell.status == CellStatus.UNSAFE_MANUAL) {
             if (cell.lower == Cell.UNKNOWN) {
                 cell.lower = Math.abs(cell.response * manualMarge / 100);
@@ -609,16 +691,7 @@ public class TableSet {
             cell.lower = 0;
             cell.upper = 0;
         }
-
-        if (readFreqOnlyTable) {
-            cell.response = cell.freq;
-        }
-        if (cell.response == Cell.UNKNOWN && cell.freq != Cell.UNKNOWN) {
-            cell.response = cell.freq;
-        }
-        if (cell.response == Cell.UNKNOWN) {
-            throw new ArgusException("Response variable is unknown");
-        }
+        
         if (cell.shadow == Cell.UNKNOWN) {
             cell.shadow = cell.response;
         }
@@ -723,12 +796,13 @@ public class TableSet {
         int[] dimIndex = new int[expVar.size()];
         computeTotals = (additivity == TableSet.ADDITIVITY_RECOMPUTE);
         hasRealFreq = metadata.containsFrequencyVariable();
-        boolean continueBogusCovertable;
+        boolean continueBogusCovertable, Oke;
         int[][] bogusRange = new int[expVar.size()][2];
         int[] bogusIndex = new int[expVar.size()];
         int nDim, i;
 
         int[] varlist = indicesOfExplanatoryVariables();
+        Oke = TauArgusUtils.DeleteFile(Application.getTempFile("additerr.txt"));
         nDim = expVar.size();
         File[] files = SystemUtils.getFiles(metadata.dataFile);
         for (int f = 0; f < files.length; f++) {
@@ -1094,7 +1168,7 @@ if (Application.isProtectCoverTable()){
                         throw new ArgusException("Error in file " + file.getCanonicalPath() + " on line " + tokenizer.getLineNumber() + ".\n"
                                 + "Line = " + line + "\n"
                                 + ex.getMessage());
-                    }
+                                            }
                 } // per record;
             }
             finally {
@@ -1181,7 +1255,7 @@ if (Application.isProtectCoverTable()){
         minTabVal = XMin;
     }
       
-    public void write(String fileName, boolean suppressEmpty, boolean simple, boolean holdinglevel, boolean withAudit, PropertyChangeListener propertyChangeListener) throws IOException, ArgusException {
+    public void write(String fileName, boolean suppressEmpty, boolean simple, boolean holdinglevel, boolean withAudit, boolean EmbedQuotes, PropertyChangeListener propertyChangeListener) throws IOException, ArgusException {
         PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
         propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);
 
@@ -1216,6 +1290,11 @@ if (Application.isProtectCoverTable()){
 
             VarCode varCode = new VarCode();
             int cellIndex = 0;
+            int nDec = respVar.nDecimals;
+            DecimalFormat mdecimalFormat = new DecimalFormat();
+            mdecimalFormat.setMinimumFractionDigits(nDec);
+            mdecimalFormat.setMaximumFractionDigits(nDec);
+            mdecimalFormat.setGroupingUsed(false);
             for (;;) {
                 Cell cell = getCell(dimArray);
                 if (cell.status != CellStatus.EMPTY || !suppressEmpty) {
@@ -1226,9 +1305,14 @@ if (Application.isProtectCoverTable()){
                         if (codeString.equals("")) {
                             codeString = variable.getTotalCode();
                         }
-                        writer.print(StrUtils.quote(codeString) + ";");
+                        if (EmbedQuotes){
+                            writer.print(StrUtils.quote(codeString) + ";");
+                        }
+                        else{
+                            writer.print(codeString + ";");
+                        }
                     }
-                    writer.print(cell.response + ";");
+                    writer.print(mdecimalFormat.format(cell.response) + ";");
                     // for freq tables no double column resp and freq nor shadow variable
                     if (!isFrequencyTable()){
                      if (!holdinglevel) {
@@ -1237,24 +1321,24 @@ if (Application.isProtectCoverTable()){
                          writer.print(cell.holdingFreq + ";");
                      }
                      if (!simple) {
-                         writer.print(cell.shadow + ";");
+                         writer.print(mdecimalFormat.format(cell.shadow) + ";");
                      }
                     } 
-                    writer.print(cell.cost + ";");
+                    writer.print(mdecimalFormat.format(cell.cost) + ";");
                     if (!simple) {
                         if (holdinglevel) {
                             for (int j = cell.holdingFreq; j < numberOfTopNNeeded; j++) {
                                 cell.holdingMaxScore[j] = 0;
                             }
                             for (int j = 0; j < numberOfTopNNeeded; j++) {
-                                writer.print(cell.holdingMaxScore[j] + ";");
+                                writer.print(mdecimalFormat.format(cell.holdingMaxScore[j]) + ";");
                             }
                         } else {
                             for (int j = cell.freq; j < numberOfTopNNeeded; j++) {
                                 cell.maxScore[j] = 0;
                             }
                             for (int j = 0; j < numberOfTopNNeeded; j++) {
-                                writer.print(cell.maxScore[j] + ";");
+                                writer.print(mdecimalFormat.format(cell.maxScore[j]) + ";");
                             }
                         }
                     }
@@ -1263,20 +1347,22 @@ if (Application.isProtectCoverTable()){
                     } else {
                         writer.print(cell.status.getCategory().getSymbol());
                     }
-                    writer.print(";" + cell.lower + ";" + cell.upper);
-
+                    writer.print(";" + mdecimalFormat.format(cell.lower) + ";" + mdecimalFormat.format(cell.upper));
                     if (withAudit) {
-                        writer.print(";" + cell.realizedLower + ";" + cell.realizedUpper + ";" + (cell.realizedUpper - cell.realizedLower));
+                        writer.print(";" + mdecimalFormat.format(cell.realizedLower) + ";" + mdecimalFormat.format(cell.realizedUpper) + ";" + mdecimalFormat.format(cell.realizedUpper - cell.realizedLower));
                         if (cell.response == 0 || cell.status.isSafeNotProtected()) {
                             writer.print(";0;0;0");
                         } else {
-                            DecimalFormat decimalFormat = new DecimalFormat();
-                            decimalFormat.setMinimumFractionDigits(2);
-                            decimalFormat.setMaximumFractionDigits(2);
+                            //DecimalFormat decimalFormat = new DecimalFormat();
+                            mdecimalFormat.setMinimumFractionDigits(2);
+                            mdecimalFormat.setMaximumFractionDigits(2);
+                            //decimalFormat.setGroupingUsed(false);
                             writer.print(";"
-                                    + decimalFormat.format(100 * (cell.response - cell.realizedLower) / cell.response) + ";"
-                                    + decimalFormat.format(100 * (cell.realizedUpper - cell.response) / cell.response) + ";"
-                                    + decimalFormat.format(100 * (cell.realizedUpper - cell.realizedLower) / cell.response));
+                                    + mdecimalFormat.format(100 * (cell.response - cell.realizedLower) / cell.response) + ";"
+                                    + mdecimalFormat.format(100 * (cell.realizedUpper - cell.response) / cell.response) + ";"
+                                    + mdecimalFormat.format(100 * (cell.realizedUpper - cell.realizedLower) / cell.response));
+                            mdecimalFormat.setMinimumFractionDigits(nDec);
+                            mdecimalFormat.setMaximumFractionDigits(nDec);
                         }
                     }
                     writer.println();
@@ -1309,7 +1395,7 @@ if (Application.isProtectCoverTable()){
           writer.close();
         }
 
-        String metadataFileName = StrUtils.replaceExtension(fileName, ".rda");
+        String metadataFileName = StrUtils.replaceExtension(fileName, METADATA_FILE_EXTENSION);
         metadata.writeTableMetadata(metadataFileName, nExpVar, expVar.toArray(new Variable[expVar.size()]), respVar, shadowVar, costFunc, costVar, numberOfTopNNeeded, simple, withAudit);
     }
 
@@ -1856,14 +1942,14 @@ if (Application.isProtectCoverTable()){
 
              if (oke) {oke = tauArgus.SetTableCellStatus(tableSet.index, dimIndex, newStatus);}
              
-              if ( oke) { aPrioryStatus[1][0]++; }
-              else      { aPrioryStatus[1][1]++;
-                 if (!ignoreError){
-                   hs = "Illegal status transition for cell ("+codesString + ")\nLine " + tokenizer.getLineNumber();
-                   if (!showError(hs, lineInfo)){return 1;}
+            if ( oke) { aPrioryStatus[1][0]++; }
+            else      { aPrioryStatus[1][1]++;
+                        if (!ignoreError){
+                        hs = "Illegal status transition for cell ("+codesString + ")\nLine " + tokenizer.getLineNumber();
+                        if (!showError(hs, lineInfo)){return 1;}
 //                  throw new ArgusException ("Illegal status transition for cell ("+codesString + ")\nLine " + tokenizer.getLineNumber());
-                 };
-                 }
+                        }
+            }
              
              if (report){
                outStatus.write("<tr><td>"+codesString+"</td><td>"+CellStatus.findByValue(oldStatus).getDescription()+
@@ -2022,9 +2108,10 @@ if (Application.isProtectCoverTable()){
     }
 
     public static void MakeAdditErrorList(int tableIndex){
-       int deci; String hs, hs1, regel; double xTot;
+       int deci; String hs, hs1, regel; double xTot,xSub, epsilon, upl;
        double[] x = new double[1]; String spaces = "                            ";
        int i, n, cn, p, nRel; Boolean oke;
+       epsilon = 1.0E-14; upl = 2;
        //There is something open for incomplete/linked tables
        String Streep = "--------------------------------------------------";
        TableSet tableSet = TableService.getTable(tableIndex);
@@ -2065,15 +2152,22 @@ if (Application.isProtectCoverTable()){
             cn = 0;
             try{cn = StrUtils.toInteger(hs.substring(0,p));} catch(Exception ex){}
             tauArgus.GetTableCellValue(tableIndex, cn, x);
-            xTot = x[0];
+            xTot = x[0]; xSub = 0;
             for (i=1;i<n;i++){
               hs1 = hs1.substring(p+4);
               p = hs1.indexOf("(");
               try{cn = StrUtils.toInteger(hs1.substring(0,p));} catch(Exception ex){}
               tauArgus.GetTableCellValue(tableIndex, cn, x);
-              xTot = xTot - x[0];
+              xSub = xSub + x[0];
             }
-            oke = (Math.abs(xTot) <= 0.00001);
+            // Differs from test in TauArgusJava.dll !!!!!!
+            // oke = (Math.abs(xTot) <= 0.00001);
+            // Math.ulp(1d) is machine precision in Java for double
+ //           oke = (Math.abs(xTot) < Math.ulp(1d)*Math.abs(xTot)*2);
+//            std::abs(x - y) < std::numeric_limits<double>::epsilon() * std::abs(x + y) * ulp 
+//                              || std::abs(x - y) < epsilon            // in case x = y = 0
+            oke = ((Math.abs(xTot - xSub) < epsilon * Math.abs(xTot + xSub) * upl) || (Math.abs(xTot - xSub) < epsilon));
+            
             if (!oke){ //write an entry
               p = hs.indexOf("(");
               try{cn = StrUtils.toInteger(hs.substring(0,p));} catch(Exception ex){}
@@ -2093,7 +2187,7 @@ if (Application.isProtectCoverTable()){
                 out.write(regel); out.newLine();
               }
             out.newLine();
-            regel =  String.format(Locale.US, "%."+deci+"f", xTot);
+            regel =  String.format(Locale.US, "%."+deci+"f", xTot-xSub);
             regel = spaces.substring(0,19-regel.length())+ regel;
             out.write(regel + "  Difference"); out.newLine();
             out.write(Streep);  out.newLine();

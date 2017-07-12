@@ -22,7 +22,7 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.Date;
-import javax.swing.JOptionPane;
+//import javax.swing.JOptionPane;
 import tauargus.service.TableService;
 import tauargus.utils.TauArgusUtils;
 import tauargus.extern.dataengine.TauArgus;
@@ -197,7 +197,7 @@ public class LinkedTables {
             tableSet = TableService.getTable(i);
             try{
             tableSet.write(Application.getTempFile("temp"+i+".tab"),
-                           false, false, false, false, null);}
+                           false, false, false, false, false, null);}
             catch (Exception ex){ throw new ArgusException (ex.getMessage()+ "\nError writing intermediate table "+(i+1) );
             }
         }

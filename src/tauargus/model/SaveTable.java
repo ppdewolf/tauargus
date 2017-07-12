@@ -18,10 +18,10 @@
 package tauargus.model;
 
 import java.io.BufferedReader;
-import tauargus.model.Application;
+//import tauargus.model.Application;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FilenameFilter;
+//import java.io.FilenameFilter;
 import java.io.FileWriter;
 import java.io.FileReader;
 import java.io.IOException;
@@ -32,14 +32,14 @@ import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
-import tauargus.model.DataFilePair;
-import tauargus.model.Metadata;
-import tauargus.model.Variable;
-import tauargus.model.APriori;
+//import tauargus.model.DataFilePair;
+//import tauargus.model.Metadata;
+//import tauargus.model.Variable;
+//import tauargus.model.APriori;
 import tauargus.utils.TauArgusUtils; 
 import tauargus.extern.dataengine.TauArgus;
-import tauargus.gui.ActivityListener;
-import tauargus.model.Metadata;
+//import tauargus.gui.ActivityListener;
+//import tauargus.model.Metadata;
 import static tauargus.model.TableSet.MAX_GH_MITER_RATIO;
 import tauargus.service.TableService;
 import argus.utils.StrUtils;
@@ -80,7 +80,7 @@ public class SaveTable {
         if (tableSet.ctaProtect) {respType = 2;}
         switch (selectedFormat) {
             case TableSet.FILE_FORMAT_CSV:
-                if (!tauArgus.WriteCSV(tableSet.index, tableSet.safeFileName, dimSequence, respType)){
+                if (!tauArgus.WriteCSV(tableSet.index, tableSet.safeFileName, writeEmbedQuotes, dimSequence, respType)){
                     throw new ArgusException ("An unexpected error occurred when writing the CVS file to "+
                             tableSet.safeFileName);
                     }
@@ -88,21 +88,25 @@ public class SaveTable {
             case TableSet.FILE_FORMAT_PIVOT_TABLE:
                 hs = makeFirstLine(tableSet, respType);
                 if (!tauArgus.WriteCellRecords(tableSet.index, tableSet.safeFileName, 0,
-                        false, writeSupppressEmpty, hs, writeAddStatus, respType)){
+                        false, writeSupppressEmpty, hs, writeAddStatus, writeEmbedQuotes, respType)){
                     throw new ArgusException ("An unexpected error occurred when writing the CVS file to "+
                             tableSet.safeFileName);
                     }
                 break;
             case TableSet.FILE_FORMAT_CODE_VALUE:
+                if (writeVarnamesOnFirstLine) {
+                    hs = makeFirstLine(tableSet, respType);
+                }
+                else {hs = "";}
                 if (!tauArgus.WriteCellRecords(tableSet.index, tableSet.safeFileName, 0,
-                        false, writeSupppressEmpty, "", writeAddStatus, respType)){
+                        false, writeSupppressEmpty, hs, writeAddStatus, writeEmbedQuotes, respType)){
                     throw new ArgusException ("An unexpected error occurred when writing the Code-value file to "+
                             tableSet.safeFileName);
                     }
                 break;
             case TableSet.FILE_FORMAT_SBS:
                 if (!tauArgus.WriteCellRecords(tableSet.index, tableSet.safeFileName, 1,
-                        writeSBSHierarchicalLevels, true, "", true, respType)){
+                        writeSBSHierarchicalLevels, true, "", true, writeEmbedQuotes, respType)){
                     throw new ArgusException ("An unexpected error occurred when writing the SBSS file to "+
                             tableSet.safeFileName);
                     }
@@ -121,6 +125,7 @@ public class SaveTable {
                                 writeIntermediateStatusOnly,
                                 writeIntermediateUseHolding,
                                 writeIntermediateAddAudit,
+                                writeEmbedQuotes,
                                 getPropertyChangeListener());
                         return null;
                     }
@@ -159,23 +164,26 @@ public class SaveTable {
      */
     private static String makeFirstLine (TableSet tableSet, int respType){
         String hs;
+        String quote = "";
+        if (writeEmbedQuotes) quote = "\"";
         hs = "";
         for (int i=0; i<tableSet.expVar.size();i++){
-            hs = hs + "\""+tableSet.expVar.get(i).name+"\",";
+            //hs = hs + "\""+tableSet.expVar.get(i).name+"\",";
+            hs = hs + quote + tableSet.expVar.get(i).name + quote +",";
         }
         hs = hs.substring(0, hs.length()-1);
-        if (tableSet.respVar  == Application.getFreqVar()){ hs = hs + ",\"Freq\",";}
-             else {hs = hs + ",\""+tableSet.respVar.name;
+        if (tableSet.respVar  == Application.getFreqVar()){ hs = hs + ","+ quote + "Freq" + quote + ",";}
+             else {hs = hs + "," + quote + tableSet.respVar.name;
              if (respType == 1){hs = hs + "_Round";}
              if (respType == 2){hs = hs + "_CTA";}
-             hs = hs + "\"";
+             hs = hs + quote; //"\"";
 //             hs = hs +"\","; 
         }
         //TODO CTA and rounded
         if (writeAddStatus){
-            if ( respType == 0 ){hs = hs + ",\"Status\"";}       
-            if ( (respType == 1) || (respType == 2) ){hs = hs + ",\"" + tableSet.respVar.name + "_Orig\"";}       
-            if ( respType == 2 ){hs = hs + ",\"Status\"";}       
+            if ( respType == 0 ){hs = hs + "," + quote + "Status" + quote;}       
+            if ( (respType == 1) || (respType == 2) ){hs = hs + "," + quote + tableSet.respVar.name + "_Orig" + quote;}       
+            if ( respType == 2 ){hs = hs + "," + quote + "Status" + quote;}       
         }
         return hs;
     }

@@ -35,6 +35,7 @@ import argus.utils.SystemUtils;
 import argus.model.SpssVariable;
 import argus.view.SpssSelectVariablesView;
 import tauargus.model.SpssUtilsTau;
+import tauargus.utils.TauArgusUtils;
 
 public class DialogSpecifyMetadata extends DialogBase {
 
@@ -109,7 +110,7 @@ public class DialogSpecifyMetadata extends DialogBase {
         labelSeparator = new javax.swing.JLabel();
         textFieldSeparator = new javax.swing.JTextField();
         scrollPane = new javax.swing.JScrollPane();
-        listVariables = new javax.swing.JList<tauargus.model.Variable>();
+        listVariables = new javax.swing.JList<>();
         buttonAdd = new javax.swing.JButton();
         buttonRemove = new javax.swing.JButton();
         buttonMoveUp = new javax.swing.JButton();
@@ -329,6 +330,7 @@ public class DialogSpecifyMetadata extends DialogBase {
                   File file = new File(hs); 
                   fileChooser.setCurrentDirectory(file);
                 }
+                TauArgusUtils.getDataDirFromRegistry(fileChooser);
                 fileChooser.setDialogTitle("Save metadata as");
                 fileChooser.setSelectedFile(new File(""));
                 fileChooser.resetChoosableFileFilters();
@@ -337,6 +339,7 @@ public class DialogSpecifyMetadata extends DialogBase {
                 fileChooser.setApproveButtonText("Save");
                 if (fileChooser.showSaveDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
                     String fileName = fileChooser.getSelectedFile().getPath();
+                    TauArgusUtils.putDataDirInRegistry(fileName);
                     if (FilenameUtils.indexOfExtension(fileName) == -1) {
                         FileFilter fileFilter = fileChooser.getFileFilter();
                         if (fileFilter instanceof FileNameExtensionFilter) {
@@ -375,7 +378,13 @@ public class DialogSpecifyMetadata extends DialogBase {
         variableListModel.add(selectedIndex, variable);
         listVariables.setSelectedIndex(selectedIndex);
     }//GEN-LAST:event_buttonAddActionPerformed
-
+    public void SetSpecificElement(Variable variable){
+       int index = listVariables.getSelectedIndex(); 
+       if (index != -1){ 
+        variableListModel.set(index, variable);        
+       }
+    }
+    
     private void buttonRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonRemoveActionPerformed
         int selectedIndex = listVariables.getSelectedIndex();
         // set the selection to an item that still exists after deletion
@@ -407,6 +416,12 @@ public class DialogSpecifyMetadata extends DialogBase {
     }//GEN-LAST:event_buttonMoveDownActionPerformed
 
     private void comboBoxFormatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxFormatActionPerformed
+        if (metadata.dataOrigin == metadata.DATA_ORIGIN_TABULAR){
+           if (comboBoxFormat.getSelectedIndex()!= 1){
+               comboBoxFormat.setSelectedIndex(1);               
+               JOptionPane.showMessageDialog(null,"For tabular data free format is required");
+           }
+        }
         panelEditVariable.enableForSPSS(comboBoxFormat.getSelectedIndex()==2);
         SpssSelected = comboBoxFormat.getSelectedIndex()==2;
         switch(comboBoxFormat.getSelectedIndex()){
@@ -426,6 +441,8 @@ public class DialogSpecifyMetadata extends DialogBase {
               panelEditVariable.setDataType(Metadata.DATA_FILE_TYPE_SPSS); 
         }
        jButtonGetSPSSMeta.setEnabled(comboBoxFormat.getSelectedIndex() == 2);
+//       if (Metadata.dataOrigin = Metadata.DATA_ORIGIN_TABULAR)
+// Hier controle op data origin en free format       
        calculateButtonStates();       
     }//GEN-LAST:event_comboBoxFormatActionPerformed
 

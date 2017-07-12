@@ -739,23 +739,26 @@ public class DialogGlobalRecode extends DialogBase {
     }//GEN-LAST:event_buttonApplyActionPerformed
 
     private void buttonCodelistActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCodelistActionPerformed
+        TauArgusUtils.getDataDirFromRegistry(fileChooser);
         fileChooser.setDialogTitle("Select CodeList files");
         fileChooser.setSelectedFile(new File(""));
         fileChooser.resetChoosableFileFilters();
         fileChooser.setFileFilter(new FileNameExtensionFilter("CodeList files (*.cdl)", "cdl"));
         if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
             String codeListFile = fileChooser.getSelectedFile().toString();
+            TauArgusUtils.putDataDirInRegistry(codeListFile);            
             textFieldCodelist.setText(codeListFile);
             variable.currentRecodeCodeListFile = codeListFile;
         }
     }//GEN-LAST:event_buttonCodelistActionPerformed
 
     private void buttonReadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonReadActionPerformed
-        String hs = SystemUtils.getRegString("general", "datadir", "");
-        if (!hs.equals("")){
-            File file = new File(hs); 
-            fileChooser.setCurrentDirectory(file);
-        }
+//        String hs = SystemUtils.getRegString("general", "datadir", "");
+//        if (!hs.equals("")){
+//            File file = new File(hs); 
+//            fileChooser.setCurrentDirectory(file);
+//        }
+        TauArgusUtils.getDataDirFromRegistry(fileChooser);        
         fileChooser.setDialogTitle("Recode files");
         fileChooser.setSelectedFile(new File(""));
         fileChooser.resetChoosableFileFilters();
@@ -764,6 +767,7 @@ public class DialogGlobalRecode extends DialogBase {
         if (fromTree) {
             if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
                 String recodeListFile = fileChooser.getSelectedFile().toString();
+                TauArgusUtils.putDataDirInRegistry(recodeListFile);
                 try {
                     variable.applyRecodeTree(recodeListFile);
                     variable.recoded = true;
@@ -780,6 +784,7 @@ public class DialogGlobalRecode extends DialogBase {
         } else {
             if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
                 String fileName = fileChooser.getSelectedFile().toString();
+                TauArgusUtils.putDataDirInRegistry(fileName);
                 if (StringUtils.isNotBlank(fileName)) {
                     try {
                     if (!TauArgusUtils.ExistFile(fileName)){ throw new ArgusException ("Recode file ("+fileName+ ") does not exist");}
@@ -804,16 +809,18 @@ public class DialogGlobalRecode extends DialogBase {
         RecodeInfo recodeInfo = new RecodeInfo(textAreaRecodeData.getText(), textFieldMissing1.getText(), textFieldMissing2.getText(), textFieldCodelist.getText());
         int i = JOptionPane.showConfirmDialog(this, "Recode information has been changed.\nSave recodefile?", "ARGUS-recodefiles", JOptionPane.YES_NO_OPTION);
         if (i == JOptionPane.YES_OPTION) {
-        String hs = SystemUtils.getRegString("general", "datadir", "");
-        if (!hs.equals("")){
-            File file = new File(hs); 
-            fileChooser.setCurrentDirectory(file);
-        }
+//        String hs = SystemUtils.getRegString("general", "datadir", "");
+//        if (!hs.equals("")){
+//            File file = new File(hs); 
+//            fileChooser.setCurrentDirectory(file);
+//        }
+            TauArgusUtils.getDataDirFromRegistry(fileChooser);
             fileChooser.setDialogTitle("Save global recode file");
             fileChooser.setSelectedFile(new File(variable.currentRecodeFile));
             fileChooser.setFileFilter(new FileNameExtensionFilter("Recode files (*.grc)", "grc"));
             if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
                 variable.currentRecodeFile = fileChooser.getSelectedFile().toString();
+                TauArgusUtils.putDataDirInRegistry(variable.currentRecodeFile);
                 try {
                     variable.writeRecodeFile(variable.currentRecodeFile, recodeInfo);
                 } catch (Exception ex) {
