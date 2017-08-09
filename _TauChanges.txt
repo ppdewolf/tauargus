@@ -168,5 +168,8 @@ summary    : The build is now correctly added to the <VERSIONINFO> + Some checks
 date       : July 6, 2017
 summary    : The <FREQ> in batch is working now. 
 
-above is pre-RELEASED IN 4.1.6
+date       : July 10, 2017
+summary    : Issue #47 on filepath of cdl-file with intermediate format solved 
+
+above is RELEASED IN 4.1.6
 --------------------------------------------------------------

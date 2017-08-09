@@ -800,7 +800,9 @@ public class OptiSuppress {
     //    hs = Application.getTempDir();
         //hs = tauargus.utils.ExecUtils.getApplicationDirectory(OptiSuppress.class).getCanonicalPath()+"\\access.ilm";  
         //hs = ExecUtils.getRegString("optimal", "cplexlicensefile", ExecUtils.getApplicationDirectory(OptiSuppress.class).getCanonicalPath()+"\\access.ilm");
-        hs = TauArgusUtils.GetCplexLicenceFile();
+        hs = "";
+        if (Application.solverSelected == Application.SOLVER_CPLEX) hs = TauArgusUtils.GetCplexLicenceFile();
+        
         tableSet.maxHitasTime = Application.generalMaxHitasTime;
  
         tauHitas.SetDebugMode(Application.SaveDebugHiTaS);
