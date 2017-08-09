@@ -1874,7 +1874,8 @@ private static void joinRounded(TableSet tableSet, int nPart) {
 //  TauFunctions.AprioryWeightJJ TempDir + "\jj.in", TempDir,   PQQ, 2
 // End If 
         result = 9998;
-        hs = SystemUtils.getRegString("optimal", "cplexlicensefile", "");
+//        hs = SystemUtils.getRegString("optimal", "cplexlicensefile", "");
+        hs = TauArgusUtils.GetCplexLicenceFile();
         tauHitas.SetDebugMode(Application.SaveDebugHiTaS);
         
         loadJJParamFromRegistry();
