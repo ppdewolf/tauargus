@@ -61,8 +61,11 @@ public class LinkedTables {
     }
     
     public static boolean runLinkedModular(DialogLinkedTables Moeder) throws ArgusException{
-        String hs = ""; int i; TableSet tableSet0, tableSet;
+        String hs = ""; int i,j; TableSet tableSet0, tableSet;
         Date startDate = new Date();
+        if (coverDim > 10){
+            throw new ArgusException ("The total number of explanatory variables for the Modular approach is 10");
+        }
         for (i=0;i<TableService.numberOfTables();i++){
             hs = hs + "\n"+ (i+1) + ": "+ TableService.getTableDescription(TableService.getTable(i));        } 
         SystemUtils.writeLogbook("Start of modular linked tables procedure\n"+
@@ -71,6 +74,10 @@ public class LinkedTables {
         TauArgusUtils.DeleteFile(Application.getTempFile("tempTot.txt"));
         for (i=0;i<TableService.numberOfTables();i++){
           tableSet = TableService.getTable(i);
+          j = tableSet.expVar.size();
+          if (j > 4) {
+              throw new ArgusException ("The max. dimension of the indivudual tables must not exceed 4");
+          }
           TableService.undoSuppress(i);
           tableSet.singletonSingletonCheck = tableSet0.singletonSingletonCheck; 
           tableSet.singletonMultipleCheck = tableSet0.singletonMultipleCheck; 

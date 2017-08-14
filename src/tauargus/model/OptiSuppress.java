@@ -1820,6 +1820,24 @@ private static void joinRounded(TableSet tableSet, int nPart) {
         public static void runOptimal(TableSet tableSet, final PropertyChangeListener propertyChangeListener, Boolean inverseWeight, Boolean externalJJFile, int maxTime) throws ArgusException, FileNotFoundException, IOException{
             int i,result; double apBound = 0.5; String hs;
             int[] nSecondary = new int[1]; int maxTimeAllowed;
+            // First check for the max. dimension of the table. 
+            if (tableSet.expVar.size() > 4 ) {
+              if (Application.isAnco()) {
+                hs = "The table has more than 4 dimensions.\n" + 
+                 "Running Optimal can take a lot of time and is error-prone.\n" +
+                 "Please check the results carefully.\n";
+              int warningResult = ShowWarningMessage(hs);
+              if (warningResult == 0 ) {
+                throw new ArgusException("Optimal has not been completed"); //overlapString);
+                }
+              }
+             else{
+               hs = "The table has more than 4 dimensions.\n" + 
+                    "Running Optimal is not possible.\n";   
+               throw new ArgusException(hs); 
+             }
+        
+          }
           
             final PropertyChangeSupport pcs = new PropertyChangeSupport(TableService.class);
             pcs.addPropertyChangeListener(propertyChangeListener);
@@ -1859,25 +1877,6 @@ private static void joinRounded(TableSet tableSet, int nPart) {
           
             Date startDate = new Date();  
             
-            if (tableSet.expVar.size() > 4 ) {
-              if (Application.isAnco()) {
-                hs = "The table has more than 4 dimensions.\n" + 
-                 "Running Optimal can take a lot of time and is error-prone.\n" +
-                 "Please check the results carefully.\n";
-              int warningResult = ShowWarningMessage(hs);
-              if (warningResult == 0 ) {
-                throw new ArgusException("Optimal has not been completed"); //overlapString);
-                }
-              }
-             else{
-               hs = "The table has more than 4 dimensions.\n" + 
-                    "Running Optimal is not possible.\n";   
-               throw new ArgusException(hs); 
-             }
-        
-          }
-
-
           TauArgusUtils.DeleteFile(Application.getTempFile("JJ.OUT"));//DeleteFile (Temp + "\JJ.OUT")
           TauArgusUtils.DeleteFile(Application.getTempFile("JJ2.OUT"));//DeleteFile (Temp + "\JJ2.OUT") 
               
