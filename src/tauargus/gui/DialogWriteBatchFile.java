@@ -268,7 +268,7 @@ public class DialogWriteBatchFile extends DialogBase {
             } else if (tableSet.costFunc == TableSet.COST_FREQ) { hs = hs + "-1";
             } else if (tableSet.costFunc == TableSet.COST_DIST) {hs = hs + "-3";
             }
-            if (tableSet.lambda!=1) hs = hs + "," + Double.toString(tableSet.lambda);
+            if (tableSet.lambda!=1) hs = hs + "|" + Double.toString(tableSet.lambda);
             batch.write(hs); batch.newLine();
          
             hs = "<SAFETYRULE>       ";
@@ -303,6 +303,12 @@ public class DialogWriteBatchFile extends DialogBase {
                                 Integer.toString(tableSet.piepMinFreq[1])+","+ 
                                 Integer.toString(tableSet.piepMarge[1])+")|";                  
             } 
+            if (tableSet.weighted){
+                hs = hs + "WGT(1)|";
+            }
+            if (tableSet.missingIsSafe){
+                hs = hs + "MIS(1)|";
+            }
             hs = hs.substring(0, hs.length()-1);
             batch.write(hs); batch.newLine();
           }
@@ -358,7 +364,10 @@ public class DialogWriteBatchFile extends DialogBase {
           for (t=0; t<TableService.numberOfTables();t++){
             tableSet= TableService.getTable(t); 
             if(!tableSet.safeFileName.equals("")){
-                hs = "<WRITETABLE>     (" + Integer.toString(i)+ ",3,1,"+tableSet.safeFileName+")" ;
+                hs = "<WRITETABLE>      (" + Integer.toString(i+1)+ "," + 
+                        Integer.toString(tableSet.safeFileFormat+1)+ "," + 
+                        tableSet.safeFileOptions + "," + StrUtils.quote(tableSet.safeFileName)+ ")";
+                batch.write(hs); batch.newLine();
             }
           }
           batch.write("<GOINTERACTIVE>"); batch.newLine();

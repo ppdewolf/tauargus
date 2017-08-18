@@ -111,6 +111,7 @@ public class TableSet {
     public static final int ADDITIVITY_RECOMPUTE = 1;
     public static final int ADDITIVITY_NOT_REQUIRED = 2;
 
+    public static final int FILE_FORMAT_UNKNOWN = -1;
     public static final int FILE_FORMAT_CSV = 0;
     public static final int FILE_FORMAT_PIVOT_TABLE = 1;
     public static final int FILE_FORMAT_CODE_VALUE = 2;
@@ -216,6 +217,8 @@ public class TableSet {
     public int nPrim = 0;
     public int nSecond = 0;
     public String safeFileName = "";
+    public int safeFileFormat = FILE_FORMAT_UNKNOWN;
+    public String safeFileOptions = "";
     public double ratio = 0;
     public String ghMiterMessage = "";
     public int ghMiterSize = 0;
