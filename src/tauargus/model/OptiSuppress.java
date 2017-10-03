@@ -904,8 +904,15 @@ public class OptiSuppress {
        tokenizer = new Tokenizer(new BufferedReader(new FileReader(Application.getTempFile("Hitastab.kld"))));
        } catch (Exception ex) {};
     
-    // Get number of characters of total general
-    int aant = (int) Math.ceil((Math.log(tableSet.getCell(GTIndex).response)/Math.log(10)));
+    // Get number of characters of largest value, not necessary the total general
+    // This value is only used to write HitasTab a bit more readable   
+    double x1, x2;
+    x1 = Math.abs(tableSet.maxTabVal);
+    x2 = Math.abs(tableSet.minTabVal);
+    x1 = Math.max(x1,x2);
+    int aant = (int) Math.ceil((Math.log(x1)/Math.log(10)));
+    if (x2<0) {aant = aant + 1;}
+//    int aant = (int) Math.ceil((Math.log(tableSet.getCell(GTIndex).response)/Math.log(10)));
     if (tableSet.respVar.nDecimals > 0)
         aant = aant + tableSet.respVar.nDecimals + 1;
         

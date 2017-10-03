@@ -603,8 +603,9 @@ public class TableSet {
                     } else if (value.equals(metadata.protectStatus)) {
                         cell.status = CellStatus.PROTECT_MANUAL;
                     } else {
-                        if (Application.isAnco() && value.equals("M")) {
-                            cell.status = CellStatus.SECONDARY_UNSAFE;
+//                        if (Application.isAnco() && value.equals("M")) {
+                        if (value.equals("M")) {
+                              cell.status = CellStatus.SECONDARY_UNSAFE;
                             suppressed = SUP_HITAS;
                         } else {
                             throw new ArgusException("Unknown status(" + value + ")");
