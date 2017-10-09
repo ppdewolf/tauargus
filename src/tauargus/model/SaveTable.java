@@ -71,6 +71,11 @@ public class SaveTable {
      * @throws ArgusException 
      */
     
+    private static String addOption ( String optStr, boolean active ){
+        if (active) { return optStr + "+";}
+        else        { return optStr + "-";}
+    }
+    
     static public void writeTable(final TableSet tableSet, int selectedFormat)throws ArgusException{
         int respType = 0; 
         String hs;
@@ -78,6 +83,19 @@ public class SaveTable {
         int[] dimSequence = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
         if (tableSet.rounded ){respType = 1;}
         if (tableSet.ctaProtect) {respType = 2;}
+        tableSet.safeFileFormat = selectedFormat;
+        hs = "";
+        hs = hs + addOption ("HL",SaveTable.writeSBSHierarchicalLevels);
+        hs = hs + addOption ("SO",SaveTable.writeIntermediateStatusOnly);        
+        hs = hs + addOption ("AR",SaveTable.writeIntermediateAddAudit);
+        hs = hs + addOption ("HI",SaveTable.writeIntermediateUseHolding);
+        hs = hs + addOption ("AS",SaveTable.writeAddStatus);
+        hs = hs + addOption ("SE",SaveTable.writeSupppressEmpty);
+        hs = hs + addOption ("FL",SaveTable.writeVarnamesOnFirstLine);
+        hs = hs + addOption ("QU",SaveTable.writeEmbedQuotes);
+        hs = hs + addOption ("TR",SaveTable.writeJJRemoveBogus);
+        tableSet.safeFileOptions= hs;                
+        
         switch (selectedFormat) {
             case TableSet.FILE_FORMAT_CSV:
                 if (!tauArgus.WriteCSV(tableSet.index, tableSet.safeFileName, writeEmbedQuotes, dimSequence, respType)){

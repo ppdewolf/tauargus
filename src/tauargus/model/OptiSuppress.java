@@ -707,7 +707,7 @@ public class OptiSuppress {
                  "Please check the results carefully.\n";
              int warningResult = ShowWarningMessage(hs);
              if (warningResult == 0 ) {
-                throw new ArgusException(hs); //overlapString); 
+                throw new ArgusException("Modular has not been completed"); //overlapString); 
              }
           }
             
@@ -718,7 +718,7 @@ public class OptiSuppress {
                  "Please check the results carefully.\n";
               int warningResult = ShowWarningMessage(hs);
               if (warningResult == 0 ) {
-                throw new ArgusException(hs); //overlapString);
+                throw new ArgusException("Modular has not been completed"); //overlapString);
                 }
               }
              else{
@@ -904,8 +904,15 @@ public class OptiSuppress {
        tokenizer = new Tokenizer(new BufferedReader(new FileReader(Application.getTempFile("Hitastab.kld"))));
        } catch (Exception ex) {};
     
-    // Get number of characters of total general
-    int aant = (int) Math.ceil((Math.log(tableSet.getCell(GTIndex).response)/Math.log(10)));
+    // Get number of characters of largest value, not necessary the total general
+    // This value is only used to write HitasTab a bit more readable   
+    double x1, x2;
+    x1 = Math.abs(tableSet.maxTabVal);
+    x2 = Math.abs(tableSet.minTabVal);
+    x1 = Math.max(x1,x2);
+    int aant = (int) Math.ceil((Math.log(x1)/Math.log(10)));
+    if (x2<0) {aant = aant + 1;}
+//    int aant = (int) Math.ceil((Math.log(tableSet.getCell(GTIndex).response)/Math.log(10)));
     if (tableSet.respVar.nDecimals > 0)
         aant = aant + tableSet.respVar.nDecimals + 1;
         
@@ -1824,6 +1831,24 @@ private static void joinRounded(TableSet tableSet, int nPart) {
         public static void runOptimal(TableSet tableSet, final PropertyChangeListener propertyChangeListener, Boolean inverseWeight, Boolean externalJJFile, int maxTime) throws ArgusException, FileNotFoundException, IOException{
             int i,result; double apBound = 0.5; String hs;
             int[] nSecondary = new int[1]; int maxTimeAllowed;
+            // First check for the max. dimension of the table. 
+            if (tableSet.expVar.size() > 4 ) {
+              if (Application.isAnco()) {
+                hs = "The table has more than 4 dimensions.\n" + 
+                 "Running Optimal can take a lot of time and is error-prone.\n" +
+                 "Please check the results carefully.\n";
+              int warningResult = ShowWarningMessage(hs);
+              if (warningResult == 0 ) {
+                throw new ArgusException("Optimal has not been completed"); //overlapString);
+                }
+              }
+             else{
+               hs = "The table has more than 4 dimensions.\n" + 
+                    "Running Optimal is not possible.\n";   
+               throw new ArgusException(hs); 
+             }
+        
+          }
           
             final PropertyChangeSupport pcs = new PropertyChangeSupport(TableService.class);
             pcs.addPropertyChangeListener(propertyChangeListener);
@@ -1862,7 +1887,7 @@ private static void joinRounded(TableSet tableSet, int nPart) {
             tauHitas.SetCallback(jCallback);
           
             Date startDate = new Date();  
-
+            
           TauArgusUtils.DeleteFile(Application.getTempFile("JJ.OUT"));//DeleteFile (Temp + "\JJ.OUT")
           TauArgusUtils.DeleteFile(Application.getTempFile("JJ2.OUT"));//DeleteFile (Temp + "\JJ2.OUT") 
               
@@ -1880,7 +1905,8 @@ private static void joinRounded(TableSet tableSet, int nPart) {
 //  TauFunctions.AprioryWeightJJ TempDir + "\jj.in", TempDir,   PQQ, 2
 // End If 
         result = 9998;
-        hs = SystemUtils.getRegString("optimal", "cplexlicensefile", "");
+//        hs = SystemUtils.getRegString("optimal", "cplexlicensefile", "");
+        hs = TauArgusUtils.GetCplexLicenceFile();
         tauHitas.SetDebugMode(Application.SaveDebugHiTaS);
         
         loadJJParamFromRegistry();

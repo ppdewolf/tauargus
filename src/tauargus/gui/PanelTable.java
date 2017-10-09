@@ -1665,7 +1665,7 @@ public class PanelTable extends javax.swing.JPanel {
         }
 
         if (Soort == SuppressionMethod.OPTIMAL && totalUnsafeCells > 50) {
-            if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(this, "This tabel contains " + totalUnsafeCells + " unsafe cells\nthis might take a long time; do you want to proceed?", "Question", JOptionPane.YES_NO_OPTION)) {
+            if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(this, "This table contains " + totalUnsafeCells + " unsafe cells\nthis might take a long time; do you want to proceed?", "Question", JOptionPane.YES_NO_OPTION)) {
                 return;
             }
         }
