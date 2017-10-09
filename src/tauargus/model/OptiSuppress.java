@@ -1042,7 +1042,8 @@ public class OptiSuppress {
     
 //    public static void runRounder(TableSet tableSet) throws ArgusException, IOException{
       public static void runRounder(TableSet tableSet, final PropertyChangeListener propertyChangeListener) throws ArgusException, IOException{
-        int i, j, j1, nPart=0; String solutionString, hs, xs, solverName;
+        int i, j, j1, nPart=0; 
+        String solutionString, hs, xs, solverName, LicenceFile;
         int solutionType, maxRoundTime;
         double[] upperBound = new double[] { 1.0E40 }; 
         double[] lowerBound = new double[] { 0.0 };
@@ -1127,6 +1128,9 @@ public class OptiSuppress {
 
            double X = (int) tableSet.roundBase;
            solutionString = "";
+           LicenceFile = "";
+           if (Application.solverSelected == Application.SOLVER_CPLEX) LicenceFile = TauArgusUtils.GetCplexLicenceFile();
+           
            if (tableSet.roundPartitions > 0){ //round all the partitions
              j1 = 1;  
              solutionString = "<h2>Rounding procedure was applied with partitioning";
@@ -1153,7 +1157,7 @@ public class OptiSuppress {
                solutionType = rounder.DoRound(solverName, Application.getTempFile("JJ"+xs+".IN"), X, upperBound, lowerBound, 0,  
                                   Application.getTempFile("JJ"+xs+".OUT"), 
                                   Application.getTempFile("JJstat"+xs+".OUT"),
-                                  TauArgusUtils.GetCplexLicenceFile(), 
+                                  LicenceFile, 
                                   Application.getTempFile("JJRound"+xs+".log"),
                                   maxRoundTime, 0,
                                   Application.getTempDir()+"/",
@@ -1192,7 +1196,7 @@ public class OptiSuppress {
               solutionType = rounder.DoRound(solverName, Application.getTempFile("JJ"+xs+".IN"), X, upperBound, lowerBound, 0,  
                                   Application.getTempFile("JJ"+xs+".OUT"), 
                                   Application.getTempFile("JJstat"+xs+".OUT"),
-                                  TauArgusUtils.GetCplexLicenceFile(),
+                                  LicenceFile,
                                   Application.getTempFile("JJRound"+xs+".log"),
                                   maxRoundTime, 0,  //Max time,zero restricted
                                   Application.getTempDir()+"/",   // NamePathExe

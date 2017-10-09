@@ -172,7 +172,7 @@ public class LinkedTables {
      //java -jar "D:\TauJava\tauargus\dist\TauArgus.jar"  "C:\Users\ahnl\AppData\Local\Temp\tempTot.arb"
      hs = "java -jar \"";
      try{  appDir = SystemUtils.getApplicationDirectory(LinkedTables.class).toString(); }
-     catch (Exception ex){ throw new ArgusException(ex.getMessage()+"\nerror running the cover table");}
+     catch (Exception ex){ throw new ArgusException(ex.getMessage()+"\nError running the cover table:\nCan't find TauArgus.jar");}
      hs = hs + appDir + "/TauArgus.jar\" \"" + Application.getTempFile("tempTot.arb") + "\"";
      commandline.add("java");
      commandline.add("-jar");
@@ -184,7 +184,7 @@ public class LinkedTables {
      TauArgusUtils.writeBatchFileForExec( "TempTot", commandline);
      SystemUtils.writeLogbook("Start of the Tau-Argus procedure for the modular linked tables procedure");
      int result = ExecUtils.execCommand(commandline, null, false, "Run cover table");
-     if (result != 0) { throw new ArgusException("Error running the cover table");}
+     if (result != 0) { throw new ArgusException("Error running the cover table\nReturned value: "+result);}
     }
     
     static void exportTables()throws ArgusException{
