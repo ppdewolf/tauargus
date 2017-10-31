@@ -1511,6 +1511,7 @@ public class PanelTable extends javax.swing.JPanel {
         }
         // Is eigenlijk onzin !!!!!!!
         table.minTabVal = x;
+        if (xMax[1]<0) {xMax[0] = 0;}
         table.maxTabVal = 1.5 * xMax[0];
         return true;
     }

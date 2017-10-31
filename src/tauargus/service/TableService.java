@@ -310,7 +310,9 @@ public class TableService {
             double[] xMaxTemp = new double[]{0.0};
             double xMin = tauArgus.GetMinimumCellValue(i, xMaxTemp);
             double xMax = xMaxTemp[0];
-            xMax = 1.5 * xMax;
+            if (xMax > 0){
+              xMax = 1.5 * xMax;}
+            else {xMax = 0;}
             if (xMin > 0) {
                 xMin = 0;
             }

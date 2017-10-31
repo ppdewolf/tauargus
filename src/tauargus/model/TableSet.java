@@ -1248,7 +1248,8 @@ if (Application.isProtectCoverTable()){
         double[] XMaxArr = new double[1];
         double XMin = tauArgus.GetMinimumCellValue(index, XMaxArr);
         double XMax = XMaxArr[0];
-        XMax = 1.5 * XMax;
+        if (XMax > 0) {XMax = 1.5 * XMax;}
+        else {XMax = 0;}
         if (XMin > 0) {
             XMin = 0;
         }
