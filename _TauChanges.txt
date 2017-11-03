@@ -173,3 +173,24 @@ summary    : Issue #47 on filepath of cdl-file with intermediate format solved
 
 above is RELEASED IN 4.1.6
 --------------------------------------------------------------
+date       : August 13, 2017
+summary    : Optimal also checks for four dimensions max
+
+date       : August 14, 2017
+summary    : Also the linked procedure checks (when Modular is chosen) that the individual tables have a max. dim 4 and the cover table has a max. dim 10 
+
+date       : August 18, 2017
+summary    : The generator of the batch-file has been improved. The weight and missing=safe parameters have been included and also the WRITETABLE command has been added
+
+
+date       : October 3, 2017
+summary    : For Luigi: Status M will now be accepted when reading a (protected) table.
+
+date       : October 9, 2017
+summary    : No more check for CPLEX Licence file while using other solvers in Rounder.
+
+date       : October 31, 2017
+summary    : The maxTabVal and the minTabVal are now also correct if the table max is negative. These values are always interpreted as the upper and lower bound of the table.
+				If the max > 0 and the min > 0 these bounds are 1.5 x  max and 0
+				If the max > 0 and the min < 0 these bounds are 1.5 x  max and 1.5 x min
+				If the max < 0 and the min < 0 the bounds are 0 and 1.5 x min.
