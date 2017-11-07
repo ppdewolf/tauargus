@@ -194,3 +194,6 @@ summary    : The maxTabVal and the minTabVal are now also correct if the table m
 				If the max > 0 and the min > 0 these bounds are 1.5 x  max and 0
 				If the max > 0 and the min < 0 these bounds are 1.5 x  max and 1.5 x min
 				If the max < 0 and the min < 0 the bounds are 0 and 1.5 x min.
+
+date	   : November 7, 2017
+summary    : Small fix in "dirty tricks" for negative cells (in tauhitas.dll)
