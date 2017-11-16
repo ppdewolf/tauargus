@@ -201,3 +201,6 @@ summary    : Small fix in "dirty tricks" for negative cells (in tauhitas.dll)
 date       : Nov 16, 2017
 summary    : Small fix in saving tabular data (totcode was not passed by call from java) (in tauhitas.dll and java-call)
 
+date       : Nov 16, 2017
+summary    : Able to "walk" through table cells with arrow keys
+             Cell stays selected after changing its state
