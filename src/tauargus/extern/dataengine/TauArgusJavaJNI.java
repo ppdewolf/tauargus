@@ -36,7 +36,7 @@ public class TauArgusJavaJNI {
   public final static native boolean TauArgus_SetRealizedLowerAndUpper(long jarg1, TauArgus jarg1_, int jarg2, int jarg3, double jarg4, double jarg5);
   public final static native boolean TauArgus_UndoSecondarySuppress(long jarg1, TauArgus jarg1_, int jarg2, int jarg3);
   public final static native boolean TauArgus_SetTableSafetyInfo(long jarg1, TauArgus jarg1_, int jarg2, boolean jarg3, boolean jarg4, int[] jarg5, int[] jarg6, boolean jarg7, int[] jarg8, int[] jarg9, int[] jarg10, boolean jarg11, int jarg12, int jarg13, boolean jarg14, int jarg15, boolean jarg16, double jarg17, boolean jarg18, int jarg19, int[] jarg20);
-  public final static native boolean TauArgus_SetVariableForTable(long jarg1, TauArgus jarg1_, int jarg2, int jarg3, String jarg4, String jarg5, int jarg6, boolean jarg7, String jarg8, boolean jarg9, boolean jarg10, int jarg11);
+  public final static native boolean TauArgus_SetVariableForTable(long jarg1, TauArgus jarg1_, int jarg2, int jarg3, String jarg4, String jarg5, String jarg6, int jarg7, boolean jarg8, String jarg9, boolean jarg10, boolean jarg11, int jarg12);
   public final static native boolean TauArgus_CompletedTable(long jarg1, TauArgus jarg1_, int jarg2, int[] jarg3, String jarg4, boolean jarg5, boolean jarg6, boolean jarg7);
   public final static native boolean TauArgus_SetInTable(long jarg1, TauArgus jarg1_, int jarg2, String[] jarg3, double jarg4, double jarg5, double jarg6, int jarg7, double[] jarg8, double[] jarg9, int jarg10, double jarg11, double jarg12, int[] jarg13, int[] jarg14);
   public final static native void TauArgus_ThroughTable(long jarg1, TauArgus jarg1_);

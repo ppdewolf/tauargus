@@ -88,7 +88,11 @@ public class TauArgusUtils {
                 throw new ArgusException("Error in specification of variable " + variable.name);
             }
         } else if (variable.metadata.dataOrigin == Metadata.DATA_ORIGIN_TABULAR) {
-            if (!tauArgus.SetVariableForTable(variable.index, nMissings, nMissings >= 1 ? variable.missing[0] : "", nMissings >= 2 ? variable.missing[1] : "", variable.nDecimals, variable.type == tauargus.model.Type.REQUEST, variable.type == tauargus.model.Type.REQUEST ? variable.requestCode[0] : null, (variable.hierarchical != Variable.HIER_NONE), variable.isNumeric(), variable.varLen)) {
+            if (!tauArgus.SetVariableForTable(variable.index, nMissings, nMissings >= 1 ? variable.missing[0] : "", 
+                                              nMissings >= 2 ? variable.missing[1] : "", 
+                                              variable.totCode, variable.nDecimals, variable.type == tauargus.model.Type.REQUEST, 
+                                              variable.type == tauargus.model.Type.REQUEST ? variable.requestCode[0] : null, 
+                                              (variable.hierarchical != Variable.HIER_NONE), variable.isNumeric(), variable.varLen)) {
                 throw new ArgusException("Error in specification of variable " + variable.index);
             }
         } else {

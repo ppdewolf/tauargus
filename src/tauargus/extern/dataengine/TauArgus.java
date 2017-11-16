@@ -119,8 +119,8 @@ public class TauArgus {
     return TauArgusJavaJNI.TauArgus_SetTableSafetyInfo(swigCPtr, this, TabIndex, HasMaxScore, DominanceRule, DominanceNumber, DominancePerc, PQRule, PriorPosteriorP, PriorPosteriorQ, PriorPosteriorN, HasFreq, CellFreqSafetyPerc, SafeMinRec, HasStatus, ManualSafetyPerc, ApplyZeroRule, ZeroSafetyRange, EmptyCellAsNonStructural, NSEmptySafetyRange, ErrorCode);
   }
 
-  public boolean SetVariableForTable(int Index, int nMissing, String Missing1, String Missing2, int nDec, boolean IsPeeper, String PeeperCode, boolean IsHierarchical, boolean IsNumeriek, int nPos) {
-    return TauArgusJavaJNI.TauArgus_SetVariableForTable(swigCPtr, this, Index, nMissing, Missing1, Missing2, nDec, IsPeeper, PeeperCode, IsHierarchical, IsNumeriek, nPos);
+  public boolean SetVariableForTable(int Index, int nMissing, String Missing1, String Missing2, String TotalCode, int nDec, boolean IsPeeper, String PeeperCode, boolean IsHierarchical, boolean IsNumeriek, int nPos) {
+    return TauArgusJavaJNI.TauArgus_SetVariableForTable(swigCPtr, this, Index, nMissing, Missing1, Missing2, TotalCode, nDec, IsPeeper, PeeperCode, IsHierarchical, IsNumeriek, nPos);
   }
 
   public boolean CompletedTable(int Index, int[] ErrorCode, String FileName, boolean CalculateTotals, boolean SetCalculatedTotalsAsSafe, boolean ForCoverTable) {

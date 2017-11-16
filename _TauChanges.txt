@@ -197,3 +197,7 @@ summary    : The maxTabVal and the minTabVal are now also correct if the table m
 
 date	   : November 7, 2017
 summary    : Small fix in "dirty tricks" for negative cells (in tauhitas.dll)
+
+date       : Nov 16, 2017
+summary    : Small fix in saving tabular data (totcode was not passed by call from java) (in tauhitas.dll and java-call)
+
