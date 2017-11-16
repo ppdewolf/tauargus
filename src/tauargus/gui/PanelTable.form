@@ -441,6 +441,9 @@
         <Component class="javax.swing.JButton" name="buttonSecondary">
           <Properties>
             <Property name="text" type="java.lang.String" value="Set to second."/>
+            <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+              <ComponentRef name="table"/>
+            </Property>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonSetStatusActionPerformed"/>
@@ -449,6 +452,9 @@
         <Component class="javax.swing.JButton" name="buttonSafe">
           <Properties>
             <Property name="text" type="java.lang.String" value="Set to safe"/>
+            <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+              <ComponentRef name="table"/>
+            </Property>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonSetStatusActionPerformed"/>
@@ -457,6 +463,9 @@
         <Component class="javax.swing.JButton" name="buttonUnsafe">
           <Properties>
             <Property name="text" type="java.lang.String" value="Set to unsafe"/>
+            <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+              <ComponentRef name="table"/>
+            </Property>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonSetStatusActionPerformed"/>
@@ -465,6 +474,9 @@
         <Component class="javax.swing.JButton" name="buttonProtected">
           <Properties>
             <Property name="text" type="java.lang.String" value="Set to protected"/>
+            <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+              <ComponentRef name="table"/>
+            </Property>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonSetStatusActionPerformed"/>
@@ -473,6 +485,9 @@
         <Component class="javax.swing.JButton" name="buttonCost">
           <Properties>
             <Property name="text" type="java.lang.String" value="Set cost"/>
+            <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+              <ComponentRef name="table"/>
+            </Property>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonCostActionPerformed"/>

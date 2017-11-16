@@ -906,6 +906,7 @@ public class PanelTable extends javax.swing.JPanel {
         panelStatus.setToolTipText("");
 
         buttonSecondary.setText("Set to second.");
+        buttonSecondary.setNextFocusableComponent(table);
         buttonSecondary.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonSetStatusActionPerformed(evt);
@@ -913,6 +914,7 @@ public class PanelTable extends javax.swing.JPanel {
         });
 
         buttonSafe.setText("Set to safe");
+        buttonSafe.setNextFocusableComponent(table);
         buttonSafe.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonSetStatusActionPerformed(evt);
@@ -920,6 +922,7 @@ public class PanelTable extends javax.swing.JPanel {
         });
 
         buttonUnsafe.setText("Set to unsafe");
+        buttonUnsafe.setNextFocusableComponent(table);
         buttonUnsafe.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonSetStatusActionPerformed(evt);
@@ -927,6 +930,7 @@ public class PanelTable extends javax.swing.JPanel {
         });
 
         buttonProtected.setText("Set to protected");
+        buttonProtected.setNextFocusableComponent(table);
         buttonProtected.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonSetStatusActionPerformed(evt);
@@ -934,6 +938,7 @@ public class PanelTable extends javax.swing.JPanel {
         });
 
         buttonCost.setText("Set cost");
+        buttonCost.setNextFocusableComponent(table);
         buttonCost.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonCostActionPerformed(evt);
