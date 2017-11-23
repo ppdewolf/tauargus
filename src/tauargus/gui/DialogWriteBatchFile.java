@@ -364,7 +364,7 @@ public class DialogWriteBatchFile extends DialogBase {
           for (t=0; t<TableService.numberOfTables();t++){
             tableSet= TableService.getTable(t); 
             if(!tableSet.safeFileName.equals("")){
-                hs = "<WRITETABLE>      (" + Integer.toString(i+1)+ "," + 
+                hs = "<WRITETABLE>      (" + Integer.toString(t+1)+ "," + 
                         Integer.toString(tableSet.safeFileFormat+1)+ "," + 
                         tableSet.safeFileOptions + "," + StrUtils.quote(tableSet.safeFileName)+ ")";
                 batch.write(hs); batch.newLine();

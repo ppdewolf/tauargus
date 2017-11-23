@@ -1261,8 +1261,11 @@ if (Application.isProtectCoverTable()){
     }
       
     public void write(String fileName, boolean suppressEmpty, boolean simple, boolean holdinglevel, boolean withAudit, boolean EmbedQuotes, PropertyChangeListener propertyChangeListener) throws IOException, ArgusException {
-        PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
-        propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);
+        PropertyChangeSupport propertyChangeSupport = null;
+        if (!Application.isBatch()){
+          propertyChangeSupport  = new PropertyChangeSupport(this);
+          propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);
+          }  
 
         int nExpVar = expVar.size();
         int[] maxDim = new int[nExpVar];
@@ -1373,10 +1376,12 @@ if (Application.isProtectCoverTable()){
                     writer.println();
                 }
                 cellIndex++;
-                if (cellIndex % 100 == 0) {
-                    int percentage = (int)(100L * cellIndex / numberOfCells);
-                    propertyChangeSupport.firePropertyChange("progressMain", null, percentage);
-                    propertyChangeSupport.firePropertyChange("activityMain", null, "(" + cellIndex + ")");
+                if (!Application.isBatch()){
+                  if (cellIndex % 1000 == 0) {
+                      int percentage = (int)(100L * cellIndex / numberOfCells);
+                      propertyChangeSupport.firePropertyChange("progressMain", null, percentage);
+                      propertyChangeSupport.firePropertyChange("activityMain", null, "(" + cellIndex + ")");
+                  }
                 }
 
                 // dimArray ophogen

@@ -132,7 +132,25 @@ public class SaveTable {
             case TableSet.FILE_FORMAT_INTERMEDIATE:
                 // The GUI thread (EDT) should not be used for long running tasks, 
                 // so use the SwingWorker class
-                final SwingWorker<Void, Void> worker = new ProgressSwingWorker<Void, Void>(ProgressSwingWorker.SINGLE, "Saving table") {
+                //However  in batch this has been disabled.
+                if (Application.isBatch()){
+                    try{
+                        tableSet.write(
+                                tableSet.safeFileName,
+                                writeSupppressEmpty,
+                                writeIntermediateStatusOnly,
+                                writeIntermediateUseHolding,
+                                writeIntermediateAddAudit,
+                                writeEmbedQuotes,
+                                null);
+                        return;  
+                    }
+                     catch (IOException ex) {
+                            // logger.log(Level.SEVERE, null, ex);
+                        }                            
+                }
+                else{
+                  final SwingWorker<Void, Void> worker = new ProgressSwingWorker<Void, Void>(ProgressSwingWorker.SINGLE, "Saving table") {
                     // called in a separate thread...
                     @Override
                     protected Void doInBackground() throws Exception {
@@ -163,6 +181,7 @@ public class SaveTable {
                 };
 
                 worker.execute();
+                }
                 break;
             case TableSet.FILE_FORMAT_JJ:
                 writeJJ(tableSet, "", false, false, 0, writeJJRemoveBogus, false);
@@ -170,6 +189,7 @@ public class SaveTable {
 
 // TODO removequotes                        
             }
+        
         SystemUtils.writeLogbook("Table: " + tableSet.toString() + " has been written\n"+
                                  "Output file name: "+tableSet.safeFileName);
                                  
