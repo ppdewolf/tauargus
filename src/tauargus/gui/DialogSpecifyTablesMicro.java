@@ -402,6 +402,23 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         organiseZeroUnsafeRuleOptions();
         organiseButtonAddTableOption();
         organiseDistanceOption();
+        SelectPanel();
+    }
+    
+    private void SelectPanel(){
+        if (checkBoxDominanceRule.isSelected()){
+            tabbedPaneRules.setSelectedComponent(panelDominanceRule);
+        }
+        else{
+            if (checkBoxPqRule.isSelected()){
+                tabbedPaneRules.setSelectedComponent(panelPqRule);
+            }
+            else{
+                if (checkBoxRequestRule.isSelected()){
+                    tabbedPaneRules.setSelectedComponent(panelRequestRule);
+                }
+            }
+        }        
     }
     
     private void organiseHoldingOptions() {
@@ -1788,6 +1805,9 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         if (checkBoxRequestRule.isSelected()) {
             tabbedPaneRules.setSelectedComponent(panelRequestRule);
         }
+        else{
+            SelectPanel();
+        }
     }//GEN-LAST:event_checkBoxRequestRuleActionPerformed
 
     private void checkBoxDominanceRuleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxDominanceRuleActionPerformed
@@ -1795,12 +1815,18 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         if (checkBoxDominanceRule.isSelected()) {
             tabbedPaneRules.setSelectedComponent(panelDominanceRule);
         }
+        else{
+         SelectPanel();   
+        }
     }//GEN-LAST:event_checkBoxDominanceRuleActionPerformed
 
     private void checkBoxPqRuleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxPqRuleActionPerformed
         organisePqRuleOptions();
         if (checkBoxPqRule.isSelected()) {
             tabbedPaneRules.setSelectedComponent(panelPqRule);
+        }
+        else{
+            SelectPanel();
         }
     }//GEN-LAST:event_checkBoxPqRuleActionPerformed
 
