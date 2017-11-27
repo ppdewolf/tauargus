@@ -206,7 +206,10 @@ summary    : Able to "walk" through table cells with arrow keys
              Cell stays selected after changing its state
 
 date       : Nov 23, 2017
-summary    : Writeing intermediate in Batch no longer invokes the SwingWorker. This should solve issue 36
+summary    : Writing intermediate in Batch no longer invokes the SwingWorker. This should solve issue 36
 
 date       : Nov 23, 2017
 summary    : When generating a batch-file the writetable command now writes the correct table number.
+
+date       : Nov 27, 2017
+summary    : Correct tab of rules-panel is chosen in DialogSelectTable
