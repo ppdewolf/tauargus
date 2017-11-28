@@ -213,3 +213,6 @@ summary    : When generating a batch-file the writetable command now writes the 
 
 date       : Nov 27, 2017
 summary    : Correct tab of rules-panel is chosen in DialogSelectTable
+
+date       : Nov 28, 2017
+summary    : Fixed bug of issue 79 (protected cells in combination with distance costs) in tauhitas.dll
