@@ -306,8 +306,8 @@ public class FrameMain extends javax.swing.JFrame {
         specifyTablesAction.setEnabled(Application.numberOfMetadatas() > 0);
 
         selectTableAction.setEnabled(TableService.numberOfTables() > 1);     
-        menuItemLinkedTables.setEnabled(TableService.numberOfTables() != 0);
-        LinkedTablesAction.setEnabled(TableService.numberOfTables() != 0);
+        menuItemLinkedTables.setEnabled(TableService.numberOfTables() > 1);
+        LinkedTablesAction.setEnabled(TableService.numberOfTables() > 1);
         
         saveTableAction.setEnabled(TableService.numberOfTables() != 0);
         viewReportAction.setEnabled(TableService.numberOfTables() != 0);      
