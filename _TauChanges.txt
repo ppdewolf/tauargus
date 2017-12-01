@@ -216,3 +216,6 @@ summary    : Correct tab of rules-panel is chosen in DialogSelectTable
 
 date       : Nov 28, 2017
 summary    : Fixed bug of issue 79 (protected cells in combination with distance costs) in tauhitas.dll
+
+date       : Dec 01, 2017
+summary    : Linked Tables menu item now only enabled when at least 2 tables present
