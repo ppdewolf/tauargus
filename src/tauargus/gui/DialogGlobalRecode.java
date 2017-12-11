@@ -106,13 +106,13 @@ public class DialogGlobalRecode extends DialogBase {
             this.variables = variables;
             fireTableDataChanged();
         }
-
+        
         @Override
         public int getRowCount() {
             return variables.size();
         }
 
-        static String[] columnNames = { "R", "Variable", "Extended variable" };
+        static String[] columnNames = { "Recode", "Variable", "Extended variable" };
 
         @Override
         public int getColumnCount() {
@@ -186,9 +186,9 @@ public class DialogGlobalRecode extends DialogBase {
                 Variable variable = (Variable) value;
                 if (column == 0) {
                     if (variable.recoded)
-                        value = "R";
+                        value = " R";
                     else if (variable.truncLevels > 0)
-                        value = "T";
+                        value = " T";
                     else
                         value = "";
                 }
@@ -199,8 +199,13 @@ public class DialogGlobalRecode extends DialogBase {
                     value = variable.name; // metadata.Varlist(i).Name
                 }
                 Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                if ((variable.recoded || variable.truncLevels > 0) && !isSelected) {
-                    component.setForeground(Color.red);
+                if ((variable.recoded || variable.truncLevels > 0)){// && !isSelected) {
+                        if (!isSelected) {
+                            component.setForeground(Color.red);
+                        }
+                        else {
+                            component.setForeground(Color.white);
+                        }
                 } else {
                     component.setForeground(Color.black);
                 }
@@ -641,6 +646,7 @@ public class DialogGlobalRecode extends DialogBase {
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttonUndoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonUndoActionPerformed
+        int rowIndex = tableVariables.getSelectedRow();
         if (!tauArgus.UndoRecode(variable.index)) {
             JOptionPane.showMessageDialog(this, "Unknown error when undoing recode");
         } else {
@@ -662,6 +668,7 @@ public class DialogGlobalRecode extends DialogBase {
             buttonRead.setEnabled(!fromTree);
             textAreaWarning.setText("");
         }
+        tableVariables.setRowSelectionInterval(rowIndex, rowIndex);
     }//GEN-LAST:event_buttonUndoActionPerformed
 
     private void buttonCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCloseActionPerformed
@@ -670,7 +677,7 @@ public class DialogGlobalRecode extends DialogBase {
             documentListener.setChanged(false);
             saveRecodeInfo();
         }
-
+        
         tauArgus.ApplyRecode();
         for (int i=0;i<TableService.numberOfTables();i++){
             TableSet tableSet = TableService.getTable(i);
@@ -687,6 +694,7 @@ public class DialogGlobalRecode extends DialogBase {
     }//GEN-LAST:event_comboBoxMaxLevelActionPerformed
 
     private void buttonApplyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonApplyActionPerformed
+        int rowIndex = tableVariables.getSelectedRow();
         if (fromTree) {
             tauArgus.UndoRecode(variable.index);
             for (int row = 0; row < treeCode.getRowCount(); row++) {
@@ -736,6 +744,7 @@ public class DialogGlobalRecode extends DialogBase {
                 JOptionPane.showMessageDialog(this, ex.getMessage());
             }
         }
+        tableVariables.setRowSelectionInterval(rowIndex, rowIndex);
     }//GEN-LAST:event_buttonApplyActionPerformed
 
     private void buttonCodelistActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCodelistActionPerformed
@@ -758,6 +767,7 @@ public class DialogGlobalRecode extends DialogBase {
 //            File file = new File(hs); 
 //            fileChooser.setCurrentDirectory(file);
 //        }
+        int rowIndex = tableVariables.getSelectedRow();
         TauArgusUtils.getDataDirFromRegistry(fileChooser);        
         fileChooser.setDialogTitle("Recode files");
         fileChooser.setSelectedFile(new File(""));
@@ -803,6 +813,7 @@ public class DialogGlobalRecode extends DialogBase {
                 } 
             }
         }
+        tableVariables.setRowSelectionInterval(rowIndex, rowIndex);
     }//GEN-LAST:event_buttonReadActionPerformed
 
     private void saveRecodeInfo() {

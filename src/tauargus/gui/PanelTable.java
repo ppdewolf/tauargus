@@ -1532,7 +1532,7 @@ public class PanelTable extends javax.swing.JPanel {
         if (oldRowExpVarIndex != -1) RowVar = tableSet.expVar.get(oldRowExpVarIndex);
         if (oldColumnExpVarIndex != -1) ColVar = tableSet.expVar.get(oldColumnExpVarIndex);
         //setRowColumnVariables(tableSet.expVar.get(oldRowExpVarIndex), tableSet.expVar.get(oldColumnExpVarIndex));
-        setRowColumnVariables(RowVar,ColVar);
+       setRowColumnVariables(RowVar,ColVar);
     }//GEN-LAST:event_buttonRecodeActionPerformed
 
     private void checkBoxOutputViewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxOutputViewActionPerformed

@@ -17,7 +17,7 @@
 
 package tauargus.model;
 
-import argus.model.SpssVariable;
+//import argus.model.SpssVariable;
 import java.beans.PropertyChangeSupport;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
