@@ -112,7 +112,7 @@ public class DialogGlobalRecode extends DialogBase {
             return variables.size();
         }
 
-        static String[] columnNames = { "Recode", "Variable", "Extended variable" };
+        static String[] columnNames = {"Recoded", "Variable"};//, "Extended variable" };
 
         @Override
         public int getColumnCount() {
@@ -195,19 +195,14 @@ public class DialogGlobalRecode extends DialogBase {
                 if (column == 1) {
                     value = variable.name; // VarName(i)
                 }
-                if (column == 2) {
+/*                if (column == 2) { // Why is this column here? Equals column 1?
                     value = variable.name; // metadata.Varlist(i).Name
-                }
+                }*/
                 Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 if ((variable.recoded || variable.truncLevels > 0)){// && !isSelected) {
-                        if (!isSelected) {
                             component.setForeground(Color.red);
-                        }
-                        else {
-                            component.setForeground(Color.white);
-                        }
                 } else {
-                    component.setForeground(Color.black);
+                    component.setForeground(isSelected ? Color.white : Color.black);
                 }
                 return component;
             }
@@ -315,7 +310,9 @@ public class DialogGlobalRecode extends DialogBase {
         this.tableSet = tableSet;
 
         tableVariables.setModel(new VariableTableModel(tableSet.expVar));
-        TableColumnResizer.adjustColumnPreferredWidths(tableVariables, false);
+        //TableColumnResizer.adjustColumnPreferredWidths(tableVariables, false);
+        tableVariables.getColumnModel().getColumn(0).setPreferredWidth(60);
+        tableVariables.getColumnModel().getColumn(0).setMaxWidth(60);
         
         if (tableSet.expVar.size() != 0) {
             tableVariables.setRowSelectionInterval(0, 0);
@@ -373,11 +370,11 @@ public class DialogGlobalRecode extends DialogBase {
 
             },
             new String [] {
-                "R", "Variable", "Extended variable"
+                "Recoded", "Variable"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false
+                false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -385,6 +382,8 @@ public class DialogGlobalRecode extends DialogBase {
             }
         });
         tableVariables.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        tableVariables.setShowHorizontalLines(false);
+        tableVariables.setShowVerticalLines(false);
         tableVariables.getTableHeader().setReorderingAllowed(false);
         scrollPaneVariables.setViewportView(tableVariables);
 
