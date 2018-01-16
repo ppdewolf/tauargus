@@ -358,7 +358,7 @@ public class DialogGlobalRecode extends DialogBase {
         textAreaWarning = new javax.swing.JTextArea();
         panelTree = new javax.swing.JPanel();
         labelMaxLevel = new javax.swing.JLabel();
-        comboBoxMaxLevel = new javax.swing.JComboBox();
+        comboBoxMaxLevel = new javax.swing.JComboBox<>();
         scrollPaneCodeTree = new javax.swing.JScrollPane();
         treeCode = new javax.swing.JTree();
         labelTreeResult = new javax.swing.JLabel();
@@ -563,7 +563,7 @@ public class DialogGlobalRecode extends DialogBase {
         labelMaxLevel.setText("Maximum level:");
 
         comboBoxMaxLevel.setMaximumRowCount(9);
-        comboBoxMaxLevel.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }));
+        comboBoxMaxLevel.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }));
         comboBoxMaxLevel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comboBoxMaxLevelActionPerformed(evt);
@@ -976,7 +976,7 @@ public class DialogGlobalRecode extends DialogBase {
     private javax.swing.JButton buttonCodelist;
     private javax.swing.JButton buttonRead;
     private javax.swing.JButton buttonUndo;
-    private javax.swing.JComboBox comboBoxMaxLevel;
+    private javax.swing.JComboBox<String> comboBoxMaxLevel;
     private javax.swing.JFileChooser fileChooser;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel labelCodelist;

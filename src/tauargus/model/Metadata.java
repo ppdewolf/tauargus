@@ -65,7 +65,7 @@ public class Metadata implements Cloneable {
 
 // Anco 1.6
 //    public List<Variable> variables = new ArrayList<>();
-    public List<Variable> variables = new ArrayList<Variable>();
+    public List<Variable> variables = new ArrayList<>();
     public String safeStatus = "S";
     public String unSafeStatus = "U";
     public String protectStatus = "P";
@@ -1035,7 +1035,9 @@ public class Metadata implements Cloneable {
     public Object clone() throws CloneNotSupportedException {
         Metadata metadata = (Metadata)super.clone(); 
 
-        metadata.variables = (ArrayList<Variable>)((ArrayList<Variable>)variables).clone();
+        //metadata.variables = (ArrayList<Variable>)((ArrayList<Variable>)variables).clone();
+        metadata.variables = new ArrayList<>();
+        for (Variable var : variables) metadata.variables.add(var);
         
         return metadata;
     }

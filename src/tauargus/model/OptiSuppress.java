@@ -930,8 +930,8 @@ public class OptiSuppress {
        status = tokenizer.nextToken();  //Status
        freq = tokenizer.nextToken();
        if ( (respVal == 0) && status.equals("z") ){
-         if ( tableSet.additivity == TableSet.ADDITIVITY_NOT_REQUIRED || Application.isProtectCoverTable()){
-//          if ( Application.isProtectCoverTable()){
+         //if ( tableSet.additivity == TableSet.ADDITIVITY_NOT_REQUIRED || Application.isProtectCoverTable()){
+          if ( Application.isProtectCoverTable()){
              if (tokenizer.getLine().equals("0")) {regelOut = regelOut + " n ";}
              else                                   {regelOut = regelOut + " z ";}              
           } else {     regelOut = regelOut + " z ";}

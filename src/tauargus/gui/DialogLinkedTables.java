@@ -83,7 +83,7 @@ public class DialogLinkedTables extends DialogBase {
         listTable7.setVisible(n>=7);
 
         if (n>=1){tableSet=TableService.getTable(0);
-        DefaultListModel hulpModel1 = new DefaultListModel();
+        DefaultListModel<String> hulpModel1 = new DefaultListModel<>();
         hulpModel1.clear();          
         for (i=0;i<tableSet.expVar.size();i++){
            variable = tableSet.expVar.get(i);
@@ -92,7 +92,7 @@ public class DialogLinkedTables extends DialogBase {
           listTable1.setModel(hulpModel1);}
 
         if (n>=2){tableSet=TableService.getTable(1);
-        DefaultListModel hulpModel2 = new DefaultListModel();
+        DefaultListModel<String> hulpModel2 = new DefaultListModel<>();
         hulpModel2.clear();          
         for (i=0;i<tableSet.expVar.size();i++){
            variable = tableSet.expVar.get(i);
@@ -101,7 +101,7 @@ public class DialogLinkedTables extends DialogBase {
           listTable2.setModel(hulpModel2);}
         
         if (n>=3){tableSet=TableService.getTable(2);
-        DefaultListModel hulpModel3 = new DefaultListModel();
+        DefaultListModel<String> hulpModel3 = new DefaultListModel<>();
         hulpModel3.clear();          
         for (i=0;i<tableSet.expVar.size();i++){
            variable = tableSet.expVar.get(i);
@@ -110,7 +110,7 @@ public class DialogLinkedTables extends DialogBase {
           listTable3.setModel(hulpModel3);}
 
         if (n>=4){tableSet=TableService.getTable(3);
-        DefaultListModel hulpModel4 = new DefaultListModel();
+        DefaultListModel<String> hulpModel4 = new DefaultListModel<>();
         hulpModel4.clear();          
         for (i=0;i<tableSet.expVar.size();i++){
            variable = tableSet.expVar.get(i);
@@ -119,7 +119,7 @@ public class DialogLinkedTables extends DialogBase {
           listTable4.setModel(hulpModel4);}
 
        if (n>=5){tableSet=TableService.getTable(4);
-        DefaultListModel hulpModel5 = new DefaultListModel();
+        DefaultListModel<String> hulpModel5 = new DefaultListModel<>();
         hulpModel5.clear();          
         for (i=0;i<tableSet.expVar.size();i++){
            variable = tableSet.expVar.get(i);
@@ -128,7 +128,7 @@ public class DialogLinkedTables extends DialogBase {
           listTable5.setModel(hulpModel5);}
 
        if (n>=6){tableSet=TableService.getTable(5);
-        DefaultListModel hulpModel6 = new DefaultListModel();
+        DefaultListModel<String> hulpModel6 = new DefaultListModel<>();
         hulpModel6.clear();          
         for (i=0;i<tableSet.expVar.size();i++){
            variable = tableSet.expVar.get(i);
@@ -137,7 +137,7 @@ public class DialogLinkedTables extends DialogBase {
           listTable6.setModel(hulpModel6);}
 
         if (n>=7){tableSet=TableService.getTable(6);
-        DefaultListModel hulpModel7 = new DefaultListModel();
+        DefaultListModel<String> hulpModel7 = new DefaultListModel<>();
         hulpModel7.clear();          
         for (i=0;i<tableSet.expVar.size();i++){
            variable = tableSet.expVar.get(i);
@@ -177,7 +177,7 @@ public class DialogLinkedTables extends DialogBase {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        listTable1 = new javax.swing.JList();
+        listTable1 = new javax.swing.JList<>();
         labelTable1 = new javax.swing.JLabel();
         buttonSuppressHypercube = new javax.swing.JButton();
         buttonSuppressModular = new javax.swing.JButton();
@@ -189,26 +189,26 @@ public class DialogLinkedTables extends DialogBase {
         labelTable6 = new javax.swing.JLabel();
         labelTable7 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        listTable2 = new javax.swing.JList();
+        listTable2 = new javax.swing.JList<>();
         jScrollPane3 = new javax.swing.JScrollPane();
-        listTable7 = new javax.swing.JList();
+        listTable7 = new javax.swing.JList<>();
         jScrollPane4 = new javax.swing.JScrollPane();
-        listTable3 = new javax.swing.JList();
+        listTable3 = new javax.swing.JList<>();
         jScrollPane5 = new javax.swing.JScrollPane();
-        listTable4 = new javax.swing.JList();
+        listTable4 = new javax.swing.JList<>();
         jScrollPane6 = new javax.swing.JScrollPane();
-        listTable5 = new javax.swing.JList();
+        listTable5 = new javax.swing.JList<>();
         jScrollPane7 = new javax.swing.JScrollPane();
-        listTable6 = new javax.swing.JList();
+        listTable6 = new javax.swing.JList<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Linked tables");
         setModal(true);
 
-        listTable1.setModel(new javax.swing.AbstractListModel() {
+        listTable1.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Var1", "Var2" };
             public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
+            public String getElementAt(int i) { return strings[i]; }
         });
         listTable1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         listTable1.setToolTipText("");
@@ -250,45 +250,45 @@ public class DialogLinkedTables extends DialogBase {
 
         labelTable7.setText("Table 7");
 
-        listTable2.setModel(new javax.swing.AbstractListModel() {
+        listTable2.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Var1", "Var2" };
             public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
+            public String getElementAt(int i) { return strings[i]; }
         });
         jScrollPane2.setViewportView(listTable2);
 
-        listTable7.setModel(new javax.swing.AbstractListModel() {
+        listTable7.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Var1", "Var2" };
             public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
+            public String getElementAt(int i) { return strings[i]; }
         });
         jScrollPane3.setViewportView(listTable7);
 
-        listTable3.setModel(new javax.swing.AbstractListModel() {
+        listTable3.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Var1", "Var2" };
             public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
+            public String getElementAt(int i) { return strings[i]; }
         });
         jScrollPane4.setViewportView(listTable3);
 
-        listTable4.setModel(new javax.swing.AbstractListModel() {
+        listTable4.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Var1", "Var2" };
             public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
+            public String getElementAt(int i) { return strings[i]; }
         });
         jScrollPane5.setViewportView(listTable4);
 
-        listTable5.setModel(new javax.swing.AbstractListModel() {
+        listTable5.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Var1", "Var2" };
             public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
+            public String getElementAt(int i) { return strings[i]; }
         });
         jScrollPane6.setViewportView(listTable5);
 
-        listTable6.setModel(new javax.swing.AbstractListModel() {
+        listTable6.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Var1", "Var2" };
             public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
+            public String getElementAt(int i) { return strings[i]; }
         });
         jScrollPane7.setViewportView(listTable6);
 
@@ -541,12 +541,12 @@ public class DialogLinkedTables extends DialogBase {
     private javax.swing.JLabel labelTable5;
     private javax.swing.JLabel labelTable6;
     private javax.swing.JLabel labelTable7;
-    private javax.swing.JList listTable1;
-    private javax.swing.JList listTable2;
-    private javax.swing.JList listTable3;
-    private javax.swing.JList listTable4;
-    private javax.swing.JList listTable5;
-    private javax.swing.JList listTable6;
-    private javax.swing.JList listTable7;
+    private javax.swing.JList<String> listTable1;
+    private javax.swing.JList<String> listTable2;
+    private javax.swing.JList<String> listTable3;
+    private javax.swing.JList<String> listTable4;
+    private javax.swing.JList<String> listTable5;
+    private javax.swing.JList<String> listTable6;
+    private javax.swing.JList<String> listTable7;
     // End of variables declaration//GEN-END:variables
 }

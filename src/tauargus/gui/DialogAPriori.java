@@ -305,15 +305,15 @@ public class DialogAPriori extends DialogBase {
         buttonCancel = new javax.swing.JButton();
         buttonOk = new javax.swing.JButton();
         labelOutputDimension = new javax.swing.JLabel();
-        comboBoxOutputDimension = new javax.swing.JComboBox();
-        comboBoxOutVar1 = new javax.swing.JComboBox();
+        comboBoxOutputDimension = new javax.swing.JComboBox<>();
+        comboBoxOutVar1 = new javax.swing.JComboBox<>();
         labelOutVar1 = new javax.swing.JLabel();
         labelOutVar2 = new javax.swing.JLabel();
-        comboBoxOutVar2 = new javax.swing.JComboBox();
+        comboBoxOutVar2 = new javax.swing.JComboBox<>();
         labelOutVar3 = new javax.swing.JLabel();
-        comboBoxOutVar3 = new javax.swing.JComboBox();
+        comboBoxOutVar3 = new javax.swing.JComboBox<>();
         labelOutVar4 = new javax.swing.JLabel();
-        comboBoxOutVar4 = new javax.swing.JComboBox();
+        comboBoxOutVar4 = new javax.swing.JComboBox<>();
         labelSeparator = new javax.swing.JLabel();
         textFieldSeparator = new javax.swing.JTextField();
         panelTable = new javax.swing.JPanel();
@@ -363,14 +363,14 @@ public class DialogAPriori extends DialogBase {
 
         labelOutputDimension.setText("Output dimension:");
 
-        comboBoxOutputDimension.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "2", "3", "4" }));
+        comboBoxOutputDimension.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4" }));
         comboBoxOutputDimension.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 comboBoxOutputDimensionItemStateChanged(evt);
             }
         });
 
-        comboBoxOutVar1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item1", "Item 2", "Item 3", "Item 4" }));
+        comboBoxOutVar1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item1", "Item 2", "Item 3", "Item 4" }));
         comboBoxOutVar1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comboBoxOutVar1ActionPerformed(evt);
@@ -381,7 +381,7 @@ public class DialogAPriori extends DialogBase {
 
         labelOutVar2.setText("2");
 
-        comboBoxOutVar2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboBoxOutVar2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         comboBoxOutVar2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comboBoxOutVar2ActionPerformed(evt);
@@ -390,7 +390,7 @@ public class DialogAPriori extends DialogBase {
 
         labelOutVar3.setText("3");
 
-        comboBoxOutVar3.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboBoxOutVar3.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         comboBoxOutVar3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comboBoxOutVar3ActionPerformed(evt);
@@ -399,7 +399,7 @@ public class DialogAPriori extends DialogBase {
 
         labelOutVar4.setText("4");
 
-        comboBoxOutVar4.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboBoxOutVar4.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         comboBoxOutVar4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comboBoxOutVar4ActionPerformed(evt);
@@ -594,7 +594,7 @@ public class DialogAPriori extends DialogBase {
 
     
     
-    private void ShowDimension(JLabel label, JComboBox comboBox, boolean visible, int MaxNumber)
+    private void ShowDimension(JLabel label, JComboBox<String> comboBox, boolean visible, int MaxNumber)
     {
         label.setVisible((visible));
         comboBox.setVisible((visible));
@@ -604,7 +604,7 @@ public class DialogAPriori extends DialogBase {
             comboBox.removeAllItems();
             comboBox.addItem("Other");
             for(Integer i=0; i<MaxNumber; i++)
-                comboBox.addItem("ExpVar"+ new Integer(i+1).toString());
+                comboBox.addItem("ExpVar"+ Integer.toString(i+1));
             
             comboBox.setSelectedIndex(0);
         }
@@ -626,7 +626,7 @@ public class DialogAPriori extends DialogBase {
             if( MaxNumber>0)
             {                
                 programmatically = true;  // to shield of the state changed listener
-                for (int i=0;i<maxOutDim;i++){comboBoxOutputDimension.addItem(i+1);}
+                for (int i=0;i<maxOutDim;i++){comboBoxOutputDimension.addItem(Integer.toString(i+1));}
                 
                 
                 for(int i=0; i<maxOutDim; i++)
@@ -833,11 +833,11 @@ public class DialogAPriori extends DialogBase {
     private javax.swing.JButton buttonCancel;
     private javax.swing.JButton buttonOk;
     private javax.swing.JButton buttonSafeFile;
-    private javax.swing.JComboBox comboBoxOutVar1;
-    private javax.swing.JComboBox comboBoxOutVar2;
-    private javax.swing.JComboBox comboBoxOutVar3;
-    private javax.swing.JComboBox comboBoxOutVar4;
-    private javax.swing.JComboBox comboBoxOutputDimension;
+    private javax.swing.JComboBox<String> comboBoxOutVar1;
+    private javax.swing.JComboBox<String> comboBoxOutVar2;
+    private javax.swing.JComboBox<String> comboBoxOutVar3;
+    private javax.swing.JComboBox<String> comboBoxOutVar4;
+    private javax.swing.JComboBox<String> comboBoxOutputDimension;
     private javax.swing.JFileChooser fileChooser;
     private javax.swing.JLabel labelAprioryFile;
     private javax.swing.JLabel labelMapping;

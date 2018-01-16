@@ -26,6 +26,7 @@ import java.awt.event.MouseEvent;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -91,7 +92,7 @@ public class PanelTable extends javax.swing.JPanel {
     }
 
     // Component arrays for easy reference...
-    private javax.swing.JComboBox<String>[] comboBoxSpan;
+    private ArrayList<javax.swing.JComboBox<String>> comboBoxSpan;
     private javax.swing.JLabel[] labelSpan;
     private javax.swing.JRadioButton[] radioButtonSuppress;
     
@@ -313,16 +314,15 @@ public class PanelTable extends javax.swing.JPanel {
      * Create arrays of component so we can easier handle them as a group
      */
     private void initComponentArrays() {
-        comboBoxSpan = new javax.swing.JComboBox[] {
-            comboBoxSpan0,
-            comboBoxSpan1,
-            comboBoxSpan2,
-            comboBoxSpan3,
-            comboBoxSpan4,
-            comboBoxSpan5,
-            comboBoxSpan6,
-            comboBoxSpan7,
-        };
+        comboBoxSpan = new ArrayList<javax.swing.JComboBox<String>>();
+        comboBoxSpan.add(comboBoxSpan0);
+        comboBoxSpan.add(comboBoxSpan1);
+        comboBoxSpan.add(comboBoxSpan2);
+        comboBoxSpan.add(comboBoxSpan3);
+        comboBoxSpan.add(comboBoxSpan4);
+        comboBoxSpan.add(comboBoxSpan5);
+        comboBoxSpan.add(comboBoxSpan6);
+        comboBoxSpan.add(comboBoxSpan7);
 
         labelSpan = new javax.swing.JLabel[] {
             labelSpan0,
@@ -397,11 +397,13 @@ public class PanelTable extends javax.swing.JPanel {
         if (isSingleColumn){n=0;}
         for (int i = 0; i < n; i++) {
             labelSpan[i].setVisible(true);
-            comboBoxSpan[i].setVisible(true);
+            //comboBoxSpan[i].setVisible(true);
+            comboBoxSpan.get(i).setVisible(true);
         }
         for (int i = n; i < labelSpan.length; i++) {
             labelSpan[i].setVisible(false);
-            comboBoxSpan[i].setVisible(false);
+            //comboBoxSpan[i].setVisible(false);
+            comboBoxSpan.get(i).setVisible(false);
         }
         
         buttonCost.setVisible(tableSet.costFunc == TableSet.COST_VAR);
@@ -476,19 +478,32 @@ public class PanelTable extends javax.swing.JPanel {
 //        createRowIndices();
 //        createColumnIndices();
 
-        String hs =tableSet.expVar.get(rowExpVarIndex).name;
-        if (!isSingleColumn) {hs = tableSet.expVar.get(rowExpVarIndex).name + " x " + tableSet.expVar.get(columnExpVarIndex).name;}
+        Variable RowVar = tableSet.expVar.get(rowExpVarIndex);
+        String hs = RowVar.name;
+        if (RowVar.recoded) hs += "(R)";
+        
+        if (!isSingleColumn){
+            Variable ColVar = tableSet.expVar.get(columnExpVarIndex);
+            hs += " x " + ColVar.name;
+            if (ColVar.recoded) hs += "(R)";
+        }
+//        String hs =tableSet.expVar.get(rowExpVarIndex).name;
+//        if (!isSingleColumn) {hs = tableSet.expVar.get(rowExpVarIndex).name + " x " + tableSet.expVar.get(columnExpVarIndex).name;}
         labelRowColVars.setText(hs);
         
         int n = tableSet.expVar.size();
         for (int i = 0; i < n - 2; i++) {
             labelSpan[i].setText(tableSet.expVar.get(expVarPermutation[i + 2]).name);
+            if (tableSet.expVar.get(expVarPermutation[i + 2]).recoded) labelSpan[i].setText(tableSet.expVar.get(expVarPermutation[i + 2]).name + "(R)");
             int expvarIndex = expVarPermutation[i + 2];
-            comboBoxSpan[i].removeAllItems();
+            //comboBoxSpan[i].removeAllItems();
+            comboBoxSpan.get(i).removeAllItems();
             for (int j = 0; j < codeList[expvarIndex].length; j++) {
-                comboBoxSpan[i].addItem(codeList[expvarIndex][j].label);
+                //comboBoxSpan[i].addItem(codeList[expvarIndex][j].label);
+                comboBoxSpan.get(i).addItem(codeList[expvarIndex][j].label);
             }
-            comboBoxSpan[i].setSelectedIndex(0);
+            //comboBoxSpan[i].setSelectedIndex(0);
+            comboBoxSpan.get(i).setSelectedIndex(0);
         }
         
         table.setModel(new AbstractTableModel() {
@@ -745,7 +760,8 @@ public class PanelTable extends javax.swing.JPanel {
         if (isSingleColumn){return dimArray;}
         dimArray[columnExpVarIndex] = columnToColumnCodeIndex(column);
         for (int i = 2; i < n; i++) {
-            dimArray[expVarPermutation[i]] = comboBoxSpan[i - 2].getSelectedIndex();
+            //dimArray[expVarPermutation[i]] = comboBoxSpan[i - 2].getSelectedIndex();
+            dimArray[expVarPermutation[i]] = comboBoxSpan.get(i-2).getSelectedIndex();
         }
                 
         return dimArray;
@@ -807,9 +823,9 @@ public class PanelTable extends javax.swing.JPanel {
         buttonSelectView = new javax.swing.JButton();
         buttonTableSummary = new javax.swing.JButton();
         LabelNrOfHorLevels = new javax.swing.JLabel();
-        comboBoxNrOfHorLevels = new javax.swing.JComboBox();
+        comboBoxNrOfHorLevels = new javax.swing.JComboBox<>();
         LabelNrOfVertLevels = new javax.swing.JLabel();
-        comboBoxNrOfVertLevels = new javax.swing.JComboBox();
+        comboBoxNrOfVertLevels = new javax.swing.JComboBox<>();
         labelDecimals = new javax.swing.JLabel();
         comboBoxDecimals = new javax.swing.JComboBox();
         checkBoxOutputView = new javax.swing.JCheckBox();
@@ -1193,7 +1209,7 @@ public class PanelTable extends javax.swing.JPanel {
 
         LabelNrOfHorLevels.setText("Hor. levels:");
 
-        comboBoxNrOfHorLevels.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }));
+        comboBoxNrOfHorLevels.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }));
         comboBoxNrOfHorLevels.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comboBoxNrOfHorLevelsActionPerformed(evt);
@@ -1202,7 +1218,7 @@ public class PanelTable extends javax.swing.JPanel {
 
         LabelNrOfVertLevels.setText("Vert. levels:");
 
-        comboBoxNrOfVertLevels.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }));
+        comboBoxNrOfVertLevels.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }));
         comboBoxNrOfVertLevels.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comboBoxNrOfVertLevelsActionPerformed(evt);
@@ -2083,8 +2099,8 @@ public class PanelTable extends javax.swing.JPanel {
     private javax.swing.JCheckBox checkBoxOutputView;
     private javax.swing.JCheckBox checkBoxThousandSeparator;
     private javax.swing.JComboBox comboBoxDecimals;
-    private javax.swing.JComboBox comboBoxNrOfHorLevels;
-    private javax.swing.JComboBox comboBoxNrOfVertLevels;
+    private javax.swing.JComboBox<String> comboBoxNrOfHorLevels;
+    private javax.swing.JComboBox<String> comboBoxNrOfVertLevels;
     private javax.swing.JComboBox<String> comboBoxSpan0;
     private javax.swing.JComboBox<String> comboBoxSpan1;
     private javax.swing.JComboBox<String> comboBoxSpan2;

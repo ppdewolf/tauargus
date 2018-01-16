@@ -219,3 +219,10 @@ summary    : Fixed bug of issue 79 (protected cells in combination with distance
 
 date       : Dec 01, 2017
 summary    : Linked Tables menu item now only enabled when at least 2 tables present
+
+date       : Dec 11, 2017
+summary    : Attempt to solve bug with Cancel in Specify Tables
+
+date       : Dec 12, 2017
+summary    : Some minor GUI things
+

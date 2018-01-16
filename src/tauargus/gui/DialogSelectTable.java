@@ -65,9 +65,10 @@ public class DialogSelectTable extends DialogBase {
                 for (int i = 0; i < table.expVar.size(); i++) {
                     Variable variable = table.expVar.get(i);
                     if (i != 0) {
-                        s += ",";
+                        s += ", ";
                     }
                     s += variable.name;
+                    if (variable.recoded) s+= " (R)";
                 }
                 return s;
             } else {
