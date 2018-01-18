@@ -344,6 +344,8 @@ public class FrameMain extends javax.swing.JFrame {
         toolBar = new javax.swing.JToolBar();
         buttonOpenMicrodata = new javax.swing.JButton();
         buttonOpenTable = new javax.swing.JButton();
+        buttonOpenTableSet = new javax.swing.JButton();
+        buttonOpenBatchProcess = new javax.swing.JButton();
         separator4 = new javax.swing.JToolBar.Separator();
         buttonSpecifyMetadata = new javax.swing.JButton();
         buttonSpecifyTables = new javax.swing.JButton();
@@ -355,8 +357,9 @@ public class FrameMain extends javax.swing.JFrame {
         buttonViewReport = new javax.swing.JButton();
         buttonGenerateApriori = new javax.swing.JButton();
         separator7 = new javax.swing.JToolBar.Separator();
-        buttonOptions = new javax.swing.JButton();
         buttonHelp = new javax.swing.JButton();
+        buttonOptions = new javax.swing.JButton();
+        buttonAbout = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         menuBar = new javax.swing.JMenuBar();
         menuFile = new javax.swing.JMenu();
@@ -402,11 +405,6 @@ public class FrameMain extends javax.swing.JFrame {
         buttonOpenMicrodata.setFocusable(false);
         buttonOpenMicrodata.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         buttonOpenMicrodata.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        buttonOpenMicrodata.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonOpenMicrodataActionPerformed(evt);
-            }
-        });
         toolBar.add(buttonOpenMicrodata);
 
         buttonOpenTable.setAction(openTableAction);
@@ -416,6 +414,30 @@ public class FrameMain extends javax.swing.JFrame {
         buttonOpenTable.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         buttonOpenTable.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         toolBar.add(buttonOpenTable);
+
+        buttonOpenTableSet.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/OpenTableSet.png"))); // NOI18N
+        buttonOpenTableSet.setToolTipText("Open TableSet...");
+        buttonOpenTableSet.setFocusable(false);
+        buttonOpenTableSet.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        buttonOpenTableSet.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        buttonOpenTableSet.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemOpenTableSetActionPerformed(evt);
+            }
+        });
+        toolBar.add(buttonOpenTableSet);
+
+        buttonOpenBatchProcess.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/OpenBatch.png"))); // NOI18N
+        buttonOpenBatchProcess.setToolTipText("Open Batch Process...");
+        buttonOpenBatchProcess.setFocusable(false);
+        buttonOpenBatchProcess.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        buttonOpenBatchProcess.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        buttonOpenBatchProcess.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemOpenBatchProcessActionPerformed(evt);
+            }
+        });
+        toolBar.add(buttonOpenBatchProcess);
         toolBar.add(separator4);
 
         buttonSpecifyMetadata.setAction(specifyMetadataAction);
@@ -478,14 +500,6 @@ public class FrameMain extends javax.swing.JFrame {
         toolBar.add(buttonGenerateApriori);
         toolBar.add(separator7);
 
-        buttonOptions.setAction(OptionsAction);
-        buttonOptions.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/options.png"))); // NOI18N
-        buttonOptions.setToolTipText("Options");
-        buttonOptions.setFocusable(false);
-        buttonOptions.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        buttonOptions.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        toolBar.add(buttonOptions);
-
         buttonHelp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/Help.png"))); // NOI18N
         buttonHelp.setToolTipText("Help");
         buttonHelp.setFocusable(false);
@@ -497,6 +511,27 @@ public class FrameMain extends javax.swing.JFrame {
             }
         });
         toolBar.add(buttonHelp);
+
+        buttonOptions.setAction(OptionsAction);
+        buttonOptions.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/options.png"))); // NOI18N
+        buttonOptions.setToolTipText("Options");
+        buttonOptions.setFocusable(false);
+        buttonOptions.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        buttonOptions.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        toolBar.add(buttonOptions);
+
+        buttonAbout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/about.png"))); // NOI18N
+        buttonAbout.setToolTipText("About");
+        buttonAbout.setFocusable(false);
+        buttonAbout.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        buttonAbout.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        buttonAbout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemAboutActionPerformed(evt);
+            }
+        });
+        toolBar.add(buttonAbout);
+        buttonAbout.getAccessibleContext().setAccessibleDescription("About");
 
         jScrollPane1.setMaximumSize(new java.awt.Dimension(0, 0));
 
@@ -527,6 +562,7 @@ public class FrameMain extends javax.swing.JFrame {
         });
         menuFile.add(menuItemOpenTable);
 
+        menuItemOpenTableSet.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/OpenTableSet.png"))); // NOI18N
         menuItemOpenTableSet.setMnemonic('S');
         menuItemOpenTableSet.setText("Open Table Set...");
         menuItemOpenTableSet.addActionListener(new java.awt.event.ActionListener() {
@@ -537,6 +573,7 @@ public class FrameMain extends javax.swing.JFrame {
         menuFile.add(menuItemOpenTableSet);
         menuFile.add(separator1);
 
+        menuItemOpenBatchProcess.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/OpenBatch.png"))); // NOI18N
         menuItemOpenBatchProcess.setMnemonic('B');
         menuItemOpenBatchProcess.setText("Open Batch Process...");
         menuItemOpenBatchProcess.addActionListener(new java.awt.event.ActionListener() {
@@ -583,11 +620,6 @@ public class FrameMain extends javax.swing.JFrame {
         menuItemSelectTable.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/SelectTable.png"))); // NOI18N
         menuItemSelectTable.setMnemonic('S');
         menuItemSelectTable.setText("Select Table...");
-        menuItemSelectTable.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuItemSelectTableActionPerformed(evt);
-            }
-        });
         menuModify.add(menuItemSelectTable);
 
         menuItemLinkedTables.setAction(LinkedTablesAction);
@@ -712,6 +744,7 @@ public class FrameMain extends javax.swing.JFrame {
         });
         menuHelp.add(menuItemSolverOptions);
 
+        menuItemAbout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/about.png"))); // NOI18N
         menuItemAbout.setMnemonic('A');
         menuItemAbout.setText("About");
         menuItemAbout.setName(""); // NOI18N
@@ -903,10 +936,6 @@ public class FrameMain extends javax.swing.JFrame {
         dialog.setVisible(true);
     }//GEN-LAST:event_menuItemWriteBatchFileActionPerformed
 
-    private void menuItemSelectTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemSelectTableActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_menuItemSelectTableActionPerformed
-
     private void menuItemViewReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemViewReportActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_menuItemViewReportActionPerformed
@@ -917,10 +946,6 @@ public class FrameMain extends javax.swing.JFrame {
         dialog.setVisible(true);       
         
     }//GEN-LAST:event_menuItemProtectJJFormatActionPerformed
-
-    private void buttonOpenMicrodataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonOpenMicrodataActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_buttonOpenMicrodataActionPerformed
 
     private void menuItemContentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemContentActionPerformed
         // TODO add your handling code here:
@@ -935,11 +960,14 @@ public class FrameMain extends javax.swing.JFrame {
     }//GEN-LAST:event_menuItemContentActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton buttonAbout;
     private javax.swing.JButton buttonGenerateApriori;
     private javax.swing.JButton buttonHelp;
     private javax.swing.JButton buttonLinkedTables;
+    private javax.swing.JButton buttonOpenBatchProcess;
     private javax.swing.JButton buttonOpenMicrodata;
     private javax.swing.JButton buttonOpenTable;
+    private javax.swing.JButton buttonOpenTableSet;
     private javax.swing.JButton buttonOptions;
     private javax.swing.JButton buttonSaveTable;
     private javax.swing.JButton buttonSelectTable;
