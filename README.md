@@ -1,4 +1,4 @@
-## Argus Open Source
+## Tau-Argus Open Source [![Mentioned in Awesome Official Statistics ](https://awesome.re/mentioned-badge.svg)](http://www.awesomeofficialstatistics.org)
 Software to apply Statistical Disclosure Control techniques
 
 Copyright 2014 Statistics Netherlands
