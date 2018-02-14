@@ -123,8 +123,8 @@ public class LinkedTables {
       for (int i=0;i<TableService.numberOfTables();i++){
         tableSet = TableService.getTable(i);
         try{ 
-//          for (j=0;j<coverDim;j++){codeIndex[j] = -1; totCodes[j] = "\"" + coverCodelist[j][0] +"\"" ;}
-          for (j=0;j<coverDim;j++){codeIndex[j] = -1; totCodes[j] = "\"Total\"" ;}
+          for (j=0;j<coverDim;j++){codeIndex[j] = -1; totCodes[j] = "\"" + coverCodelist[j][0] +"\"" ;}
+          //for (j=0;j<coverDim;j++){codeIndex[j] = -1; totCodes[j] = "\"Total\"" ;}
           for (j=0;j<tableSet.expVar.size();j++) {codeIndex[toCoverIndex[i][j]]=toCoverIndex[i][j];}
           
           BufferedWriter out = new BufferedWriter(new FileWriter(Application.getTempFile("temp"+i+".hst")));
