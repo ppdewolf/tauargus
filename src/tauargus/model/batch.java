@@ -52,6 +52,7 @@ import java.io.FileWriter;
 import org.apache.commons.io.FilenameUtils;
 import static tauargus.model.Application.clearMetadatas;
 import static tauargus.model.Application.clearVariables;
+import static tauargus.model.Metadata.DATA_ORIGIN_MICRO;
    
 
 /**
@@ -1092,9 +1093,12 @@ public static int runBatchProcess(String batchFile){
        hs = tokenizer.nextChar(); //we know it is correct
        hs = tokenizer.nextField("|");
        if (hs.equalsIgnoreCase("<FREQ>")) {
-//         tableSet.respVar = Application.getFreqVar();
+           if (metadata.dataOrigin == DATA_ORIGIN_MICRO){
+               tableSet.respVar = Application.getFreqVar();
+           } else {
 //           tableSet.respVar = null;
-           tableSet.respVar = metadata.find(tauargus.model.Type.FREQUENCY);
+               tableSet.respVar = metadata.find(tauargus.model.Type.FREQUENCY);
+           }
            tableSet.readFreqOnlyTable = true;
        }
        else {tableSet.respVar=metadata.find(hs);
