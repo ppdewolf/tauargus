@@ -226,3 +226,10 @@ summary    : Attempt to solve bug with Cancel in Specify Tables
 date       : Dec 12, 2017
 summary    : Some minor GUI things
 
+date       : Feb 12, 2018
+summary    : Solved bug reading back secondary suppressions when using linked-tables in special set-up
+
+above is RELEASED IN 4.1.7
+--------------------------------------------------------------
+date       : Mar 6, 2018
+summary    : No longer check for Cplex licence file in Optimal when not using Cplex
