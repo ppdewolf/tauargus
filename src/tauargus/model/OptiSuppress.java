@@ -1906,7 +1906,8 @@ private static void joinRounded(TableSet tableSet, int nPart) {
 // End If 
         result = 9998;
 //        hs = SystemUtils.getRegString("optimal", "cplexlicensefile", "");
-        hs = TauArgusUtils.GetCplexLicenceFile();
+        if (Application.solverSelected == Application.SOLVER_CPLEX) hs = TauArgusUtils.GetCplexLicenceFile();
+        else hs ="";
         tauHitas.SetDebugMode(Application.SaveDebugHiTaS);
         
         loadJJParamFromRegistry();
