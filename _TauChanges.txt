@@ -226,3 +226,22 @@ summary    : Attempt to solve bug with Cancel in Specify Tables
 date       : Dec 12, 2017
 summary    : Some minor GUI things
 
+date	   : Jan 16, 2018
+summary	   : Fixed some compile-time warnings
+
+date	   : Jan 18, 2018
+summary	   : Added some icons
+
+date	   : Fab 2, 2018
+summary	   : Results from linked table protection were not handled correctly in GUI. Fixed this.
+
+date       : Feb 12, 2018
+summary    : Solved bug reading back secondary suppressions when using linked-tables in special set-up
+
+date       : Feb 14, 2018
+summary    : Fixed use of <FREQ> in batch with microdata input (issue 86)
+
+above is RELEASED IN 4.1.7
+--------------------------------------------------------------
+date       : Mar 6, 2018
+summary : No longer check for Cplex licence file in Optimal when not using Cplex
