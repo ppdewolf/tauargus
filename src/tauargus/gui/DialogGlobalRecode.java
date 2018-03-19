@@ -718,6 +718,13 @@ public class DialogGlobalRecode extends DialogBase {
                 logger.info("Var: " + variable.name + " has been recoded\n"); // VarName(CurrentVar) 
                 SystemUtils.writeLogbook("Var: " + variable.name + " has been recoded");
                 buildTree();
+                if (Application.isAnco()) {
+                    int i= JOptionPane.showConfirmDialog(this, "Do you want to save the recoding of the tree", "", JOptionPane.YES_NO_OPTION);
+                    if (i == JOptionPane.YES_OPTION){
+                       //WriteTree
+                       i = JOptionPane.YES_OPTION;
+                    }
+                }
             } else {
                 JOptionPane.showMessageDialog(this, "This hierarchical recoding could not be applied");
                 labelTreeResult.setText("Tree recode could not be applied");
