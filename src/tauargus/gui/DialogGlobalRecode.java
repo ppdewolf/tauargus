@@ -218,7 +218,7 @@ public class DialogGlobalRecode extends DialogBase {
             public void valueChanged(ListSelectionEvent e) {
                 if (documentListener.isChanged()) {
                     documentListener.setChanged(false);
-                    saveRecodeInfo();
+                    saveRecodeInfo(false);
                 }
                 int selectedRow = tableVariables.getSelectedRow();
                 if (selectedRow != -1) {
@@ -296,7 +296,7 @@ public class DialogGlobalRecode extends DialogBase {
             public void windowClosing(WindowEvent e) {
                 if (documentListener.isChanged()) {
                     documentListener.setChanged(false);
-                    saveRecodeInfo();
+                    saveRecodeInfo(false);
                 }
 
                 tauArgus.ApplyRecode();
@@ -674,7 +674,7 @@ public class DialogGlobalRecode extends DialogBase {
         setVisible(false);
         if (documentListener.isChanged()) {
             documentListener.setChanged(false);
-            saveRecodeInfo();
+            saveRecodeInfo(false);
         }
         
         tauArgus.ApplyRecode();
@@ -719,11 +719,11 @@ public class DialogGlobalRecode extends DialogBase {
                 SystemUtils.writeLogbook("Var: " + variable.name + " has been recoded");
                 buildTree();
                 if (Application.isAnco()) {
-                    int i= JOptionPane.showConfirmDialog(this, "Do you want to save the recoding of the tree", "", JOptionPane.YES_NO_OPTION);
-                    if (i == JOptionPane.YES_OPTION){
-                       //WriteTree
-                       i = JOptionPane.YES_OPTION;
-                    }
+//                    int i= JOptionPane.showConfirmDialog(this, "Do you want to save the recoding of the tree", "", JOptionPane.YES_NO_OPTION);
+//                    if (i == JOptionPane.YES_OPTION){
+                       saveRecodeInfo(true);
+                       JOptionPane.showMessageDialog(this, "Not yet complete");
+//                    }
                 }
             } else {
                 JOptionPane.showMessageDialog(this, "This hierarchical recoding could not be applied");
@@ -822,9 +822,12 @@ public class DialogGlobalRecode extends DialogBase {
         tableVariables.setRowSelectionInterval(rowIndex, rowIndex);
     }//GEN-LAST:event_buttonReadActionPerformed
 
-    private void saveRecodeInfo() {
+    private void saveRecodeInfo(Boolean forTreeRecode) {
         RecodeInfo recodeInfo = new RecodeInfo(textAreaRecodeData.getText(), textFieldMissing1.getText(), textFieldMissing2.getText(), textFieldCodelist.getText());
-        int i = JOptionPane.showConfirmDialog(this, "Recode information has been changed.\nSave recodefile?", "ARGUS-recodefiles", JOptionPane.YES_NO_OPTION);
+        String message;
+        message = "Recode information has been changed.\nSave recodefile?";
+        if (forTreeRecode){message = "Do you want to save the recoded tree information";}
+        int i = JOptionPane.showConfirmDialog(this, message, "ARGUS-recodefiles", JOptionPane.YES_NO_OPTION);
         if (i == JOptionPane.YES_OPTION) {
 //        String hs = SystemUtils.getRegString("general", "datadir", "");
 //        if (!hs.equals("")){
@@ -838,13 +841,24 @@ public class DialogGlobalRecode extends DialogBase {
             if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
                 variable.currentRecodeFile = fileChooser.getSelectedFile().toString();
                 TauArgusUtils.putDataDirInRegistry(variable.currentRecodeFile);
-                try {
-                    variable.writeRecodeFile(variable.currentRecodeFile, recodeInfo);
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(DialogGlobalRecode.this, ex.getMessage());
+                if (!forTreeRecode){
+                   try {
+                       variable.writeRecodeFile(variable.currentRecodeFile, recodeInfo);
+                   } catch (Exception ex) {
+                       JOptionPane.showMessageDialog(DialogGlobalRecode.this, ex.getMessage());
+                   }
+                   return;
                 }
-                return;
-            }
+                else // Save a real tree
+                {
+                    try {
+                       variable.writeRecodeTreeFile(variable.currentRecodeFile); 
+                    } catch (Exception ex) {
+                       JOptionPane.showMessageDialog(DialogGlobalRecode.this, ex.getMessage());
+                   }
+                   return;    
+                 }
+                }    
         }
         String tempDir = Application.getTempDir();
         File f = new File(tempDir, "Argus" + variable.index + ".grc");

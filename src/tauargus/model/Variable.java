@@ -214,6 +214,17 @@ public class Variable implements Cloneable {
        finally {writer.close();}
     }
 
+        public void writeRecodeTreeFile(String fileName) throws IOException {
+// anco 1.6 try with resources        
+//        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));) {
+       BufferedWriter writer = null; 
+       try {writer = new BufferedWriter(new FileWriter(fileName));  
+            writer.write("<TREERECODE>\n");
+// write here the recoded tree           
+       }
+       finally {writer.close();}
+    }
+
     public void recode(RecodeInfo recodeInfo) throws ArgusException {
         int nMissing = 0; String hs;
         if (StringUtils.isNotBlank(recodeInfo.getMissing1())) {
