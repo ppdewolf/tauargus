@@ -722,7 +722,7 @@ public class DialogGlobalRecode extends DialogBase {
 //                    int i= JOptionPane.showConfirmDialog(this, "Do you want to save the recoding of the tree", "", JOptionPane.YES_NO_OPTION);
 //                    if (i == JOptionPane.YES_OPTION){
                        saveRecodeInfo(true);
-                       JOptionPane.showMessageDialog(this, "Not yet complete");
+                       JOptionPane.showMessageDialog(this, "Reading back has not yet been implemented");
 //                    }
                 }
             } else {
@@ -860,6 +860,8 @@ public class DialogGlobalRecode extends DialogBase {
                  }
                 }    
         }
+        if(forTreeRecode){return;}
+        // we do not need a temp recode file for a hierarchical recode
         String tempDir = Application.getTempDir();
         File f = new File(tempDir, "Argus" + variable.index + ".grc");
         variable.currentRecodeFile = f.getAbsolutePath();
