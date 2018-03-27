@@ -60,12 +60,12 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="panelVariables" min="-2" pref="134" max="-2" attributes="0"/>
                   <Component id="panelCost" min="-2" max="-2" attributes="0"/>
+                  <Component id="panelVariables" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="panelSafetyRules" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="buttonOk" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="buttonCancel" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -86,6 +86,9 @@
               </Border>
             </TitledBorder>
           </Border>
+        </Property>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[306, 137]"/>
         </Property>
       </Properties>
 
@@ -136,18 +139,6 @@
                           <Component id="labelExpVar" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="scrollPaneExpVar" min="-2" pref="52" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="labelNExpVarCount" alignment="1" max="32767" attributes="0"/>
-                              <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="labelNExpVar" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="labelTopNVar" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="labelStatusVar" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="labelFrequencyVar" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="labelTopNVarCount" alignment="3" min="-2" pref="14" max="-2" attributes="0"/>
-                                  <Component id="labelCostVar" alignment="3" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                          </Group>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="radioButtonAdditivityForce" min="-2" max="-2" attributes="0"/>
@@ -155,10 +146,20 @@
                           <Component id="radioButtonAdditivityRecompute" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="radioButtonAdditivityNone" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       </Group>
                   </Group>
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="labelNExpVarCount" alignment="1" min="-2" pref="14" max="-2" attributes="0"/>
+                      <Group type="103" alignment="0" groupAlignment="3" attributes="0">
+                          <Component id="labelNExpVar" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="labelTopNVar" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="labelStatusVar" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="labelFrequencyVar" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="labelTopNVarCount" alignment="3" min="-2" pref="14" max="-2" attributes="0"/>
+                          <Component id="labelCostVar" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
               </Group>
           </Group>
         </DimensionLayout>
@@ -268,18 +269,15 @@
                       <Component id="radioButtonCostVar" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="radioButtonResponseVar" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                  <EmptySpace pref="6" max="32767" attributes="0"/>
                   <Group type="103" groupAlignment="1" attributes="0">
                       <Component id="labelMaxScaleCost" min="-2" max="-2" attributes="0"/>
                       <Component id="labelLambda" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="textFieldMaxScaleCost" pref="55" max="32767" attributes="0"/>
-                      <Group type="102" attributes="0">
-                          <Component id="textFieldLambda" min="-2" pref="40" max="-2" attributes="0"/>
-                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                      </Group>
+                      <Component id="textFieldMaxScaleCost" min="-2" pref="55" max="-2" attributes="0"/>
+                      <Component id="textFieldLambda" min="-2" pref="55" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -293,7 +291,7 @@
                       <Component id="textFieldMaxScaleCost" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="radioButtonResponseVar" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="textFieldLambda" min="-2" max="-2" attributes="0"/>
                       <Group type="103" alignment="0" groupAlignment="3" attributes="0">
@@ -410,6 +408,19 @@
               <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="checkBoxMissingIsSafe" min="-2" max="-2" attributes="0"/>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="labelManualSafetyRange" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="textFieldManualSafetyRange" min="-2" pref="40" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="labelPercSign3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="radioButtonUseGivenStatus" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="radioButtonUseSafetyRules" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <Group type="102" alignment="0" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="checkBoxDominanceRule" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -429,43 +440,11 @@
                                   </Group>
                               </Group>
                           </Group>
-                          <EmptySpace min="-2" pref="50" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="checkBoxPqRule" min="-2" max="-2" attributes="0"/>
-                              <Group type="103" alignment="0" groupAlignment="1" attributes="0">
-                                  <Group type="102" alignment="1" attributes="0">
-                                      <Component id="labelQ" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="textFieldQ" min="-2" pref="40" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Group type="102" alignment="1" attributes="0">
-                                      <Component id="labelP" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="textFieldP" min="-2" pref="40" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Group type="102" alignment="1" attributes="0">
-                                      <Component id="labelN" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="textFieldN" min="-2" pref="40" max="-2" attributes="0"/>
-                                  </Group>
-                              </Group>
-                          </Group>
-                      </Group>
-                      <Component id="checkBoxMissingIsSafe" min="-2" max="-2" attributes="0"/>
-                      <Group type="102" alignment="0" attributes="0">
-                          <Component id="labelManualSafetyRange" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="textFieldManualSafetyRange" min="-2" pref="40" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="labelPercSign3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <Group type="102" alignment="0" attributes="0">
-                          <Component id="radioButtonUseGivenStatus" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="radioButtonUseSafetyRules" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="33" max="-2" attributes="0"/>
+                          <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
-                  <EmptySpace min="-2" pref="50" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
                           <Component id="checkBoxMinimumFrequency" min="-2" max="-2" attributes="0"/>
@@ -507,38 +486,33 @@
                       <Component id="radioButtonUseSafetyRules" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="checkBoxDominanceRule" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="checkBoxPqRule" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="checkBoxMinimumFrequency" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="checkBoxZeroUnsafe" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="labelNumber" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="textFieldNumber" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="labelP" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="textFieldP" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="labelFrequency" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="textFieldFrequency" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="labelZeroMargin" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="textFieldZeroMargin" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="labelPercentage" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="textFieldPercentage" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="labelQ" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="textFieldQ" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="labelRange" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="textFieldRange" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="labelPercSign1" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="labelPercSign2" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="labelN" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="textFieldN" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" attributes="0">
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="checkBoxDominanceRule" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="checkBoxMinimumFrequency" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="checkBoxZeroUnsafe" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="labelNumber" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="textFieldNumber" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="labelFrequency" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="textFieldFrequency" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="labelZeroMargin" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="textFieldZeroMargin" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="labelPercentage" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="textFieldPercentage" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="labelRange" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="textFieldRange" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="labelPercSign1" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="labelPercSign2" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                      <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="checkBoxMissingIsSafe" min="-2" max="-2" attributes="0"/>
@@ -548,7 +522,7 @@
                       <Component id="textFieldManualSafetyRange" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="labelPercSign3" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace pref="22" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -603,44 +577,6 @@
         <Component class="javax.swing.JTextField" name="textFieldNumber">
         </Component>
         <Component class="javax.swing.JTextField" name="textFieldPercentage">
-        </Component>
-        <Component class="javax.swing.JCheckBox" name="checkBoxPqRule">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="PQ-rule"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="safetyRulesActionPerformed"/>
-          </Events>
-        </Component>
-        <Component class="javax.swing.JLabel" name="labelP">
-          <Properties>
-            <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-              <ComponentRef name="textFieldP"/>
-            </Property>
-            <Property name="text" type="java.lang.String" value="P:"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JTextField" name="textFieldP">
-        </Component>
-        <Component class="javax.swing.JLabel" name="labelQ">
-          <Properties>
-            <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-              <ComponentRef name="textFieldQ"/>
-            </Property>
-            <Property name="text" type="java.lang.String" value="Q:"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JTextField" name="textFieldQ">
-        </Component>
-        <Component class="javax.swing.JLabel" name="labelN">
-          <Properties>
-            <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-              <ComponentRef name="textFieldN"/>
-            </Property>
-            <Property name="text" type="java.lang.String" value="N:"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JTextField" name="textFieldN">
         </Component>
         <Component class="javax.swing.JCheckBox" name="checkBoxMinimumFrequency">
           <Properties>
@@ -718,6 +654,102 @@
             <Property name="text" type="java.lang.String" value="%"/>
           </Properties>
         </Component>
+        <Container class="javax.swing.JPanel" name="jPanel1">
+
+          <Layout>
+            <DimensionLayout dim="0">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="checkBoxPqRule" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" alignment="0" groupAlignment="1" attributes="0">
+                              <Group type="102" alignment="1" attributes="0">
+                                  <Component id="labelQ" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="textFieldQ" min="-2" pref="40" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="102" alignment="1" attributes="0">
+                                  <Component id="labelP" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="textFieldP" min="-2" pref="40" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="102" alignment="1" attributes="0">
+                                  <Component id="labelN" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="textFieldN" min="-2" pref="40" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                      </Group>
+                      <EmptySpace pref="21" max="32767" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+            <DimensionLayout dim="1">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="checkBoxPqRule" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="labelP" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="textFieldP" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="labelQ" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="textFieldQ" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="labelN" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="textFieldN" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+          </Layout>
+          <SubComponents>
+            <Component class="javax.swing.JCheckBox" name="checkBoxPqRule">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="PQ-rule"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="safetyRulesActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JTextField" name="textFieldP">
+            </Component>
+            <Component class="javax.swing.JTextField" name="textFieldQ">
+            </Component>
+            <Component class="javax.swing.JTextField" name="textFieldN">
+            </Component>
+            <Component class="javax.swing.JLabel" name="labelN">
+              <Properties>
+                <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+                  <ComponentRef name="textFieldN"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="N:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="labelQ">
+              <Properties>
+                <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+                  <ComponentRef name="textFieldQ"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Q:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="labelP">
+              <Properties>
+                <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+                  <ComponentRef name="textFieldP"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="P:"/>
+              </Properties>
+            </Component>
+          </SubComponents>
+        </Container>
       </SubComponents>
     </Container>
     <Component class="javax.swing.JButton" name="buttonOk">

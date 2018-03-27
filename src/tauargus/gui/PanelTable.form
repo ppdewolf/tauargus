@@ -74,13 +74,11 @@
                   </Group>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="panelSuppress" alignment="0" max="-2" attributes="0"/>
-                  <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
-                      <Component id="panelStatus" alignment="0" max="32767" attributes="0"/>
-                      <Component id="panelCellInformation" alignment="0" max="32767" attributes="0"/>
-                  </Group>
-                  <Component id="buttonRecode" alignment="0" min="-2" pref="264" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                  <Component id="panelSuppress" alignment="0" max="32767" attributes="0"/>
+                  <Component id="panelStatus" alignment="0" max="32767" attributes="0"/>
+                  <Component id="panelCellInformation" alignment="0" max="32767" attributes="0"/>
+                  <Component id="buttonRecode" alignment="0" max="32767" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
           </Group>
@@ -377,6 +375,12 @@
             <TitledBorder title="Cell Information"/>
           </Border>
         </Property>
+        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[273, 368]"/>
+        </Property>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[273, 368]"/>
+        </Property>
       </Properties>
     </Component>
     <Container class="javax.swing.JPanel" name="panelStatus">
@@ -387,6 +391,9 @@
           </Border>
         </Property>
         <Property name="toolTipText" type="java.lang.String" value=""/>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[273, 155]"/>
+        </Property>
       </Properties>
 
       <Layout>
@@ -400,13 +407,13 @@
                       <Component id="buttonCost" alignment="0" max="32767" attributes="0"/>
                       <Component id="buttonSafe" alignment="0" max="32767" attributes="0"/>
                   </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                  <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="1" attributes="0">
+                      <Component id="buttonSecondary" alignment="0" max="32767" attributes="0"/>
+                      <Component id="buttonNonStructEmpty" alignment="0" max="32767" attributes="0"/>
                       <Component id="buttonPriory" alignment="0" max="32767" attributes="0"/>
-                      <Component id="buttonSecondary" alignment="0" pref="111" max="32767" attributes="0"/>
-                      <Component id="buttonNonStructEmpty" max="32767" attributes="0"/>
                   </Group>
-                  <EmptySpace pref="23" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -421,11 +428,11 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="buttonUnsafe" min="-2" max="-2" attributes="0"/>
-                      <Component id="buttonPriory" min="-2" pref="23" max="-2" attributes="0"/>
+                      <Component id="buttonPriory" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
+                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                      <Group type="102" attributes="0">
                           <Component id="buttonProtected" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="buttonCost" min="-2" max="-2" attributes="0"/>
@@ -551,7 +558,7 @@
                                       <Component id="radioButtonHyperCube" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Component id="radioButtonNetwork" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <EmptySpace pref="65" max="32767" attributes="0"/>
+                                  <EmptySpace max="32767" attributes="0"/>
                                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
                                       <Component id="buttonSuppress" alignment="1" max="32767" attributes="0"/>
                                       <Component id="buttonAudit" alignment="1" min="-2" pref="103" max="-2" attributes="0"/>
