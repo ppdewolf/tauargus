@@ -106,7 +106,11 @@ public class PanelCellDetails extends javax.swing.JPanel {
             textFieldContributions.setText(integerFormatter.format(cell.freq));
         }
         sb.append("</html>");
-        labelTopNValue.setText(sb.toString());
+        if (!cell.status.isEmpty()){
+            labelTopNValue.setText(sb.toString());
+        } else {
+            labelTopNValue.setText("<html><p align=\"right\">-</p></html>");
+        }
         
         visible = cell.status.isPrimaryUnsafe();
         labelProtectionInterval.setVisible(visible);
@@ -160,8 +164,6 @@ public class PanelCellDetails extends javax.swing.JPanel {
         labelContributions = new javax.swing.JLabel();
         labelCost = new javax.swing.JLabel();
 
-        setPreferredSize(new java.awt.Dimension(273, 345));
-
         labelValue.setText("Value");
 
         textFieldValue.setEditable(false);
@@ -191,8 +193,7 @@ public class PanelCellDetails extends javax.swing.JPanel {
         labelTopNValue.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         labelTopNValue.setVerticalAlignment(javax.swing.SwingConstants.TOP);
         labelTopNValue.setAlignmentX(0.5F);
-        labelTopNValue.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(192, 192, 192)), javax.swing.BorderFactory.createEmptyBorder(3, 3, 3, 3)));
-        labelTopNValue.setPreferredSize(new java.awt.Dimension(6, 20));
+        labelTopNValue.setBorder(javax.swing.BorderFactory.createCompoundBorder(textFieldCost.getBorder(), javax.swing.BorderFactory.createEmptyBorder(3, 3, 3, 3)));
 
         textFieldRequest.setEditable(false);
         textFieldRequest.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
@@ -232,12 +233,20 @@ public class PanelCellDetails extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(labelAuditInterval, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(labelProtectionInterval, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(labelAuditInterval, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(labelProtectionInterval, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(textFieldProtectionLower, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(textFieldProtectionUpper, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(textFieldRealizedLower, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(textFieldRealizedUpper, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(labelTopN, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(labelContributions)
@@ -246,7 +255,6 @@ public class PanelCellDetails extends javax.swing.JPanel {
                             .addComponent(labelStatus)
                             .addComponent(labelShadow)
                             .addComponent(labelCost)
-                            .addComponent(checkBoxHoldingLevel)
                             .addComponent(labelRequest, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -258,14 +266,9 @@ public class PanelCellDetails extends javax.swing.JPanel {
                             .addComponent(textFieldRequest, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(textFieldContributions, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(textFieldValue, javax.swing.GroupLayout.Alignment.TRAILING)))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addComponent(textFieldRealizedLower)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(textFieldRealizedUpper))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addComponent(textFieldProtectionLower)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(textFieldProtectionUpper)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(checkBoxHoldingLevel, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -296,9 +299,9 @@ public class PanelCellDetails extends javax.swing.JPanel {
                     .addComponent(labelContributions)
                     .addComponent(textFieldContributions, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(labelTopNValue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(labelTopN))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(labelTopN)
+                    .addComponent(labelTopNValue))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(checkBoxHoldingLevel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -317,7 +320,7 @@ public class PanelCellDetails extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(textFieldRealizedLower, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(textFieldRealizedUpper, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 

@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.3" maxVersion="1.8" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
-  <Properties>
-    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-      <Dimension value="[273, 345]"/>
-    </Property>
-  </Properties>
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
@@ -21,11 +16,21 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="1" attributes="0">
+          <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="1" attributes="0">
+              <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="labelAuditInterval" alignment="1" max="32767" attributes="0"/>
                   <Component id="labelProtectionInterval" alignment="1" max="32767" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="textFieldProtectionLower" min="-2" pref="113" max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
+                      <Component id="textFieldProtectionUpper" min="-2" pref="113" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="textFieldRealizedLower" min="-2" pref="113" max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
+                      <Component id="textFieldRealizedUpper" min="-2" pref="113" max="-2" attributes="0"/>
+                  </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
                           <Component id="labelTopN" alignment="0" max="32767" attributes="0"/>
@@ -35,7 +40,6 @@
                           <Component id="labelStatus" alignment="0" max="-2" attributes="0"/>
                           <Component id="labelShadow" alignment="0" max="-2" attributes="0"/>
                           <Component id="labelCost" alignment="0" max="-2" attributes="0"/>
-                          <Component id="checkBoxHoldingLevel" alignment="0" max="32767" attributes="0"/>
                           <Component id="labelRequest" alignment="0" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -51,17 +55,11 @@
                       </Group>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="textFieldRealizedLower" max="32767" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="textFieldRealizedUpper" max="32767" attributes="0"/>
-                  </Group>
-                  <Group type="102" alignment="0" attributes="0">
-                      <Component id="textFieldProtectionLower" max="32767" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="textFieldProtectionUpper" max="32767" attributes="0"/>
+                      <Component id="checkBoxHoldingLevel" min="-2" pref="80" max="-2" attributes="0"/>
+                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
               </Group>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -99,9 +97,9 @@
                   <Component id="textFieldContributions" alignment="3" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="2" attributes="0">
-                  <Component id="labelTopNValue" alignment="2" min="-2" max="-2" attributes="0"/>
-                  <Component id="labelTopN" alignment="2" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="labelTopN" min="-2" max="-2" attributes="0"/>
+                  <Component id="labelTopNValue" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="checkBoxHoldingLevel" min="-2" max="-2" attributes="0"/>
@@ -110,7 +108,7 @@
                   <Component id="labelRequest" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="textFieldRequest" alignment="3" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="labelProtectionInterval" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -124,7 +122,7 @@
                   <Component id="textFieldRealizedLower" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="textFieldRealizedUpper" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -194,19 +192,12 @@
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.CompoundBorderInfo">
             <CompoundBorder>
-              <Border PropertyName="outside" info="org.netbeans.modules.form.compat2.border.LineBorderInfo">
-                <LineBorder>
-                  <Color PropertyName="color" blue="c0" green="c0" red="c0" type="rgb"/>
-                </LineBorder>
-              </Border>
+              <Connection PropertyName="outside" component="textFieldCost" name="getBorder" type="method"/>
               <Border PropertyName="inside" info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
                 <EmptyBorder bottom="3" left="3" right="3" top="3"/>
               </Border>
             </CompoundBorder>
           </Border>
-        </Property>
-        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-          <Dimension value="[6, 20]"/>
         </Property>
       </Properties>
     </Component>
