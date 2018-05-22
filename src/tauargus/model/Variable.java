@@ -66,6 +66,7 @@ public class Variable implements Cloneable {
     public boolean hasDistanceFunction;
     public int[] distanceFunction;
     public String codeListFile = "";
+    public String PTableFile = "";
     public int hierarchical;
     public int hierLevelsSum;
     public int[] hierLevels;
@@ -106,6 +107,10 @@ public class Variable implements Cloneable {
     public boolean isResponse() {
         return type.isResponse();
     }
+    
+    public boolean isRecordKey() {
+        return type.isRecordKey();
+    }   
     
     public boolean isTotalCode(String code) {
         return code.equalsIgnoreCase(totCode);

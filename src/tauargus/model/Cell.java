@@ -48,6 +48,7 @@ public class Cell {
     public double upper;
     public double realizedLower;
     public double realizedUpper;
+    public double cellKey;
     
     public void setStatusAndAuditByValue(int status) {
         this.auditOk = false;
