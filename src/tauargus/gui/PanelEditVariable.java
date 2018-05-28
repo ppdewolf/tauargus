@@ -1157,7 +1157,7 @@ public class PanelEditVariable extends javax.swing.JPanel {
         });
 
         buttonGroupPTable.add(radioButtonPTableFile);
-        radioButtonPTableFile.setText("p-table filename");
+        radioButtonPTableFile.setText("P-table filename");
         radioButtonPTableFile.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 radioButtonPTableActionPerformed(evt);
@@ -1219,7 +1219,7 @@ public class PanelEditVariable extends javax.swing.JPanel {
                 .addComponent(panelCodelist, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panelHierarchy, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(22, 22, 22))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 

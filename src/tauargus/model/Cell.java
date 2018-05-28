@@ -32,6 +32,7 @@ public class Cell {
     public double CTAValue; // value of response after CTA suppression
     public double shadow; 
     public double cost; 
+    public double cellkey;
     public int freq;
     public CellStatus status;
     public boolean auditOk;
