@@ -360,6 +360,16 @@ public class Metadata implements Cloneable {
                     case "<TRUNCABLE>":
                         variable.truncatable = true;
                         break;
+                    case "<RECORDKEY>":
+                        hs = tokenizer.nextToken();
+                        if (!hs.equals("")) {
+                            throw new ArgusException("Unknown token (" + hs + ") in line " + tokenizer.getLineNumber() + " after keyword <NUMERIC>.");
+                        }
+                        variable.type = Type.RECORD_KEY;
+                        break;
+                    case "<PFILE>":
+                        variable.PTableFile = tokenizer.nextToken();
+                        break;
                     default:
                         throw new ArgusException("Unknown keyword (" + token + ") in line " + tokenizer.getLineNumber());
                 }
