@@ -201,7 +201,7 @@ public class PanelEditVariable extends javax.swing.JPanel {
             case RECORD_KEY:
                 // TODO: read record key filename
                 radioButtonPTableFile.setEnabled(true);
-                textFieldPTableFileName.setText("TODO: Filename from metadata");
+                textFieldPTableFileName.setText(variable.PTableFile);
                 if (StringUtils.isBlank(variable.PTableFile)) {
                     radioButtonPTableCalculate.setSelected(true);
                     textFieldPTableFileName.setText("");
@@ -385,12 +385,11 @@ public class PanelEditVariable extends javax.swing.JPanel {
     }
     
     private void ptablePanelSetEnabled(boolean enabled) {
-        panelPTable.setVisible(enabled);
         containerSetAllEnabled(panelPTable, enabled);
         // For the time being calculation of p-table not implemented
         // so radioButtonPTableFile is selected automaticly
         radioButtonPTableCalculate.setEnabled(false);
-        radioButtonPTableFile.setEnabled(true);
+        radioButtonPTableFile.setSelected(true);
         
         if (enabled) {
             textFieldPTableFileName.setEnabled(radioButtonPTableFile.isSelected());
@@ -399,7 +398,6 @@ public class PanelEditVariable extends javax.swing.JPanel {
     }
     
     private void codelistPanelSetEnabled(boolean enabled) {
-        panelCodelist.setVisible(enabled);
         containerSetAllEnabled(panelCodelist, enabled);
         if (enabled) {
             textFieldCodeListFileName.setEnabled(radioButtonCodelistFilename.isSelected());
@@ -408,7 +406,6 @@ public class PanelEditVariable extends javax.swing.JPanel {
     }
     
     private void hierarchyPanelSetEnabled(boolean enabled) {
-        panelHierarchy.setVisible(enabled);
         containerSetAllEnabled(panelHierarchy, enabled);
         if (enabled) {
             for (javax.swing.JTextField textField : textFieldHierLevel) {
@@ -1157,7 +1154,7 @@ public class PanelEditVariable extends javax.swing.JPanel {
         });
 
         buttonGroupPTable.add(radioButtonPTableFile);
-        radioButtonPTableFile.setText("p-table filename");
+        radioButtonPTableFile.setText("P-table filename");
         radioButtonPTableFile.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 radioButtonPTableActionPerformed(evt);
@@ -1178,13 +1175,17 @@ public class PanelEditVariable extends javax.swing.JPanel {
             .addGroup(panelPTableLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelPTableLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(radioButtonPTableCalculate)
-                    .addComponent(radioButtonPTableFile)
                     .addGroup(panelPTableLayout.createSequentialGroup()
-                        .addComponent(textFieldPTableFileName, javax.swing.GroupLayout.PREFERRED_SIZE, 550, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(textFieldPTableFileName, javax.swing.GroupLayout.DEFAULT_SIZE, 550, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(buttonPTableFileName, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(buttonPTableFileName, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(10, 10, 10))
+                    .addGroup(panelPTableLayout.createSequentialGroup()
+                        .addGroup(panelPTableLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(radioButtonPTableCalculate, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(radioButtonPTableFile, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 495, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         panelPTableLayout.setVerticalGroup(
             panelPTableLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1214,12 +1215,12 @@ public class PanelEditVariable extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(panelAttributes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(panelPTable, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(panelCodelist, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panelHierarchy, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(22, 22, 22))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(panelPTable, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
