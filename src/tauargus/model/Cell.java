@@ -32,6 +32,7 @@ public class Cell {
     public double CTAValue; // value of response after CTA suppression
     public double shadow; 
     public double cost; 
+    public double cellkey;
     public int freq;
     public CellStatus status;
     public boolean auditOk;
@@ -48,7 +49,6 @@ public class Cell {
     public double upper;
     public double realizedLower;
     public double realizedUpper;
-    public double cellKey;
     
     public void setStatusAndAuditByValue(int status) {
         this.auditOk = false;

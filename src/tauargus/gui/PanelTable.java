@@ -343,7 +343,8 @@ public class PanelTable extends javax.swing.JPanel {
             radioButtonUwe,
             radioButtonMarginal,
             radioButtonCta,            
-            radioButtonRounding
+            radioButtonRounding,
+            radioButtonCellKey
         };
     }
 
@@ -587,23 +588,40 @@ public class PanelTable extends javax.swing.JPanel {
         try {
            hs = SystemUtils.getApplicationDirectory(PanelTable.class).getCanonicalPath();
         } catch (Exception ex) {}
+        
         if (Application.isAnco()) {
                 radioButtonUwe.setVisible(TauArgusUtils.ExistFile(hs+"/EXP_ExternalUnpickerOnJJ.exe"));        
         }
-        radioButtonNetwork.setVisible(TauArgusUtils.ExistFile(hs+"/main1H2D.exe")||TauArgusUtils.ExistFile(hs+"/main1H2D"));        
+        
+        radioButtonNetwork.setVisible(TauArgusUtils.ExistFile(hs+"/main1H2D.exe")||TauArgusUtils.ExistFile(hs+"/main1H2D")); 
+        
+        radioButtonCellKey.setVisible(tableSet.UseCellKey);
+        
         for (int i = 0; i < radioButtonSuppress.length; i++) {
             radioButtonSuppress[i].setEnabled(s == TableSet.SUP_NO);
             if (radioButtonSuppress[i].isSelected()){radioSelect = i;}
         }
+        
         checkBoxInverseWeight.setEnabled(radioButtonSuppress[radioSelect]== radioButtonOptimal);
-        if (radioSelect == radioButtonSuppress.length-1 || s == TableSet.SUP_ROUNDING){ //Rounder selected
+        if (radioSelect == radioButtonSuppress.length-2 || s == TableSet.SUP_ROUNDING){ //Rounder selected
           buttonSuppress.setText("Round");
           buttonUndoSuppress.setText("Undo round");
         }
         else{
-          buttonSuppress.setText("Suppress");
-          buttonUndoSuppress.setText("Undo suppress");
-            
+            if (radioButtonCta.isSelected()) {
+                buttonSuppress.setText("CTA");
+                buttonUndoSuppress.setText("Undo CTA");
+            }
+            else{
+                if (radioButtonCellKey.isSelected()) {
+                    buttonSuppress.setText("Cell Key");
+                    buttonUndoSuppress.setText("Undo Cell Key");
+                }
+                else{
+                    buttonSuppress.setText("Suppress");
+                    buttonUndoSuppress.setText("Undo suppress");
+                }
+            }
         }
         boolean b = (s == TableSet.SUP_ROUNDING)  || (s == TableSet.SUP_CTA);
         checkBoxOutputView.setEnabled(!b);
@@ -818,6 +836,7 @@ public class PanelTable extends javax.swing.JPanel {
         buttonUndoSuppress = new javax.swing.JButton();
         buttonAudit = new javax.swing.JButton();
         radioButtonNetwork = new javax.swing.JRadioButton();
+        radioButtonCellKey = new javax.swing.JRadioButton();
         labelRowColVars = new javax.swing.JLabel();
         panelBottomButtons = new javax.swing.JPanel();
         buttonSelectView = new javax.swing.JButton();
@@ -1124,6 +1143,14 @@ public class PanelTable extends javax.swing.JPanel {
             }
         });
 
+        buttonGroupSuppress.add(radioButtonCellKey);
+        radioButtonCellKey.setText("Cell Key Method");
+        radioButtonCellKey.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                radioButtonCellKeyActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout panelSuppressLayout = new javax.swing.GroupLayout(panelSuppress);
         panelSuppress.setLayout(panelSuppressLayout);
         panelSuppressLayout.setHorizontalGroup(
@@ -1151,15 +1178,16 @@ public class PanelTable extends javax.swing.JPanel {
                         .addComponent(radioButtonRounding)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(panelSuppressLayout.createSequentialGroup()
-                        .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(radioButtonUwe)
-                            .addComponent(radioButtonMarginal))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(panelSuppressLayout.createSequentialGroup()
                         .addComponent(radioButtonCta)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(checkBoxInverseWeight, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(20, 20, 20))))
+                        .addGap(20, 20, 20))
+                    .addGroup(panelSuppressLayout.createSequentialGroup()
+                        .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(radioButtonUwe)
+                            .addComponent(radioButtonMarginal)
+                            .addComponent(radioButtonCellKey))
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         panelSuppressLayout.setVerticalGroup(
             panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1189,7 +1217,8 @@ public class PanelTable extends javax.swing.JPanel {
                     .addComponent(checkBoxInverseWeight))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(radioButtonRounding)
-                .addGap(21, 21, 21))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(radioButtonCellKey))
         );
 
         buttonGroupSuppress.add(radioButtonModular);
@@ -1230,8 +1259,8 @@ public class PanelTable extends javax.swing.JPanel {
 
         labelDecimals.setText("Number of decimals:");
 
-        comboBoxDecimals.setMaximumRowCount(10);
-        comboBoxDecimals.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" }));
+        comboBoxDecimals.setMaximumRowCount(15);
+        comboBoxDecimals.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15" }));
         comboBoxDecimals.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comboBoxDecimalsActionPerformed(evt);
@@ -1661,6 +1690,7 @@ public class PanelTable extends javax.swing.JPanel {
         if (radioButtonUwe.isSelected()) Soort = SuppressionMethod.UWE;
         if (radioButtonCta.isSelected()) Soort = SuppressionMethod.CTA;
         if (radioButtonRounding.isSelected()) Soort = SuppressionMethod.ROUNDING;
+        if (radioButtonCellKey.isSelected()) Soort = SuppressionMethod.CELLKEY;
 
         if (Soort.isAdditivityDesirable() && !tableSet.isAdditive) {
             if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(this, "Table is not additive. Optimisation routines might be tricky\nDo you want to proceed?", "Question", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)) {
@@ -1681,7 +1711,7 @@ public class PanelTable extends javax.swing.JPanel {
         }
         int totalUnsafeCells  = statistics.totalPrimaryUnsafe();
 
-        if (!Soort.isCosmetic()) {
+        if (!Soort.isCosmetic() && !Soort.isCellKey()) {
             if (totalUnsafeCells == 0) {
                 JOptionPane.showMessageDialog(this, "No unsafe cells found\nNo protection required");
                 return;
@@ -1968,9 +1998,30 @@ public class PanelTable extends javax.swing.JPanel {
                     }.start();
               }
               break; 
-            case MARGINAL: {
+            case MARGINAL: 
                 JOptionPane.showMessageDialog(null,"The marginal method still has to be implemented");
-            }    
+                break;
+            case CELLKEY:
+                JOptionPane.showMessageDialog(null,"Option to change ptable(-file)? P-table is table-specific!");
+                new Thread(){
+                    @Override public void run(){
+                        try {
+                            OptiSuppress.RunCellKey(tableSet, "ptablefilename");
+                            adjustColumnWidths();
+                            updateSuppressButtons();
+                        }
+                        catch (ArgusException ex){
+                            JOptionPane.showMessageDialog(null,ex.getMessage());
+                        }
+                        catch (FileNotFoundException ex){
+                            JOptionPane.showMessageDialog(null,ex.getMessage());
+                        }
+                        catch (IOException ex){
+                            JOptionPane.showMessageDialog(null,ex.getMessage());
+                        }
+                    }
+                }.start();
+                break;
         }
         //updateSuppressButtons(); // Needs to be at each try{} of "done"because it will not wait for finishing of ProcessSwingWorker
         //        Suppress(tableIndex, false, Soort);
@@ -2026,6 +2077,11 @@ public class PanelTable extends javax.swing.JPanel {
 //          checkBoxInverseWeight.setSelected(false);
 //        }
     }//GEN-LAST:event_checkBoxInverseWeightActionPerformed
+
+    private void radioButtonCellKeyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioButtonCellKeyActionPerformed
+        // TODO add your handling code here:
+        updateSuppressButtons();
+    }//GEN-LAST:event_radioButtonCellKeyActionPerformed
 
     private void organiseSafetyButtons(CellStatus status) {
          if (status.isEmpty()) {
@@ -2125,6 +2181,7 @@ public class PanelTable extends javax.swing.JPanel {
     private tauargus.gui.PanelCellDetails panelCellInformation;
     private javax.swing.JPanel panelStatus;
     private javax.swing.JPanel panelSuppress;
+    private javax.swing.JRadioButton radioButtonCellKey;
     private javax.swing.JRadioButton radioButtonCta;
     private javax.swing.JRadioButton radioButtonHyperCube;
     private javax.swing.JRadioButton radioButtonMarginal;

@@ -65,6 +65,7 @@ public class PanelCellDetails extends javax.swing.JPanel {
         
         textFieldValue.setText(doubleFormatter.format(cell.response));
 
+        // Use AdjustedValue to show perturbed value in case of cellkey method?
         visible = table.rounded || table.ctaProtect;
         labelAdjustedValue.setVisible(visible);
         textFieldAdjustedValue.setVisible(visible);

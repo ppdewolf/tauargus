@@ -138,6 +138,9 @@ public class TableSet {
 
     // shadow variable
     public Variable shadowVar;
+    
+    // variable to calculate cellkey
+    public Variable cellkeyVar;
 
     // cost func/variable/parameters
     public int costFunc = COST_VAR;
@@ -206,6 +209,7 @@ public class TableSet {
     public boolean weighted = false;
     public boolean missingIsSafe = false;
     public boolean holding = false;
+    public boolean UseCellKey = false;
     ////////////////////////////////////////////
     public boolean singletonUsed = false;
     public int suppressed = SUP_NO;
@@ -325,9 +329,11 @@ public class TableSet {
             if (shadowVar == null) {
                 shadowVar = respVar;
             }
+            
+            cellkeyVar = metadata.find(tauargus.model.Type.RECORD_KEY);
+            
             costVar = metadata.find(tauargus.model.Type.COST);
             if (costVar == null) {
-                
                 costVar = respVar;
             }
         }
@@ -347,6 +353,11 @@ public class TableSet {
             iShadow = indexOfResponseVariable();
         }
         return iShadow;
+    }
+    
+    public int indexOfCellKeyVariable(){
+        int iCellKey = Application.indexOfVariable(cellkeyVar);
+        return iCellKey;
     }
 
     public int indexOfCostVariable() {
@@ -376,6 +387,7 @@ public class TableSet {
         double[] CTAValue = {0.0};
         double[] shadow = {0.0};
         double[] cost = {0.0};
+        double[] cellkey = {0.0};
         int[] freq = {0};
         int[] status = {0};
         int[] holdingFreq = {0};
@@ -388,7 +400,7 @@ public class TableSet {
         double[] realizedLower = {0.0};
         double[] realizedUpper = {0.0};
         Cell cell = new Cell();
-        if (!tauArgus.GetTableCell(index, dimIndex, response, roundedResponse, CTAValue, shadow, cost, freq, status, cell.maxScore, cell.maxScoreWeight, holdingFreq, cell.holdingMaxScore, cell.holdingNrPerMaxScore, peepCell, peepHolding, peepSortCell, peepSortHolding, lower, upper, realizedLower, realizedUpper)) {
+        if (!tauArgus.GetTableCell(index, dimIndex, response, roundedResponse, CTAValue, shadow, cost, cellkey, freq, status, cell.maxScore, cell.maxScoreWeight, holdingFreq, cell.holdingMaxScore, cell.holdingNrPerMaxScore, peepCell, peepHolding, peepSortCell, peepSortHolding, lower, upper, realizedLower, realizedUpper)) {
             return null;
         }
         cell.response = response[0];
@@ -396,6 +408,7 @@ public class TableSet {
         cell.CTAValue = CTAValue[0];
         cell.shadow = shadow[0];
         cell.cost = cost[0];
+        cell.cellkey = cellkey[0];
         cell.freq = freq[0];
         cell.setStatusAndAuditByValue(status[0]);
         cell.holdingFreq = holdingFreq[0];
@@ -747,7 +760,7 @@ public class TableSet {
         }
     }
 
-    private static boolean getTableCell (int tabNo, int[] dimIndex, double[] CellResp, int[] CellStatus, double[] CellLower, double[] CellUpper, double[]CellCost){
+    private static boolean getTableCell (int tabNo, int[] dimIndex, double[] CellResp, int[] CellStatus, double[] CellLower, double[] CellUpper, double[] CellCost, double[] CellKey){
       double[] CR = new double[1];
       double[] Lower = new double[1];
       double[] Upper = new double[1];
@@ -759,6 +772,7 @@ public class TableSet {
       double[] x5 = new double[MAX_TOP_N_VAR];
       double[] x8 = new double[1];
       double[] x9 = new double[1];
+      double[] x10 = new double[1]; //CellKey
       double[] xcta = new double[1];
       double[] hms = new double[MAX_TOP_N_VAR];
       double[] peep = new double[1];
@@ -773,7 +787,7 @@ public class TableSet {
         int[] peepsrthold = new int[1];
         boolean oke;       
         oke = tauArgus.GetTableCell(tabNo, dimIndex, CR, ix, xcta,
-                                    x2, x3, cf, Status, x4,
+                                    x2, x3, x10, cf, Status, x4,
                                     x5, cfh,   hms, holdnr,
                                     peep, peephold, peepsrt,  peepsrthold,  Lower,
                                     Upper, x8, x9);
@@ -783,6 +797,7 @@ public class TableSet {
       CellLower[0] = Lower[0];
       CellUpper[0] = Upper[0];
       CellCost[0] = x3[0];
+      CellKey[0] = x10[0];
       return oke;
     //public boolean GetTableCell(int TableIndex, int[] DimIndex, double[] CellResponse, int[] CellRoundedResp,
     //        double[] CellCTAResp, double[] CellShadow, double[] CellCost, int[] CellFreq,
@@ -904,7 +919,9 @@ public class TableSet {
 
   //      boolean isFrequencyTable = respVar == Application.getFreqVar();
 
-        if (!tauArgus.SetTable(index, varlist.length, varlist, isFrequencyTable(), indexOfResponseVariable(), indexOfShadowVariable(), indexOfCostVariable(), lambda, maxScaleCost, 0, missingIsSafe)) {
+        if (!tauArgus.SetTable(index, varlist.length, varlist, isFrequencyTable(), 
+                                indexOfResponseVariable(), indexOfShadowVariable(), indexOfCostVariable(), indexOfCellKeyVariable(), 
+                                lambda, maxScaleCost, 0, missingIsSafe)) {
             throw new ArgusException("Error in specifying table " + index);
         }
         boolean hasMaxScore = metadata.numberOfTopNVariables() > 0;
@@ -1675,6 +1692,7 @@ if (Application.isProtectCoverTable()){
         double[] x7 = new double[1];
         double[] x8 = new double[1];
         double[] x9 = new double[1];
+        double[] x10 = new double[1];
         double[] xcta = new double[1];
         double[] hms = new double[MAX_TOP_N_VAR];
         double[] peep = new double[1];
@@ -1688,7 +1706,7 @@ if (Application.isProtectCoverTable()){
         int[] peepsrt = new int[1];
         int[] peepsrthold = new int[1];
         oke = tauArgus.GetTableCell(tableSet.index, dimArray, x, ix, xcta,
-                                    x2, x3, cf, cellStatus, x4,
+                                    x2, x3, x10, cf, cellStatus, x4,
                                     x5, cfh,   hms, holdnr,
                                     peep, peephold, peepsrt,  peepsrthold,  x6,
                                     x7, x8, x9);
@@ -1749,6 +1767,7 @@ if (Application.isProtectCoverTable()){
      double[] CellLower = new double[1];
      double[] CellUpper = new double[1];
      double[] CellCost = new double[1];
+     double[] CellKey = new double[1];
      TableSet tableSet = TableService.getTable(tableNumber);
      String[] codes = new String[tableSet.expVar.size()]; String codesString;
      int[] dimIndex = new int[tableSet.expVar.size()];
@@ -1974,7 +1993,7 @@ if (Application.isProtectCoverTable()){
              if(x1==0){x1=1;} //zero is a silly value
              oke = (x1 > 0);
              if (oke) {
-                 getTableCell (tableNumber, dimIndex, CellResp, CellStat, CellLower, CellUpper, CellCost);
+                 getTableCell (tableNumber, dimIndex, CellResp, CellStat, CellLower, CellUpper, CellCost, CellKey);
                  oke =tauArgus.SetTableCellCost(tableSet.index, dimIndex, x1);}
              if ( oke) { aPrioryStatus[2][0]++; }
              else      { aPrioryStatus[2][1]++;
@@ -2006,7 +2025,7 @@ if (Application.isProtectCoverTable()){
              }
              if (oke){
                oldStatus = getCellStatus(tableSet, dimIndex);
-               getTableCell (tableNumber, dimIndex, CellResp, CellStat, CellLower, CellUpper, CellCost);
+               getTableCell (tableNumber, dimIndex, CellResp, CellStat, CellLower, CellUpper, CellCost, CellKey);
                if ( (oldStatus < CellStatus.UNSAFE_RULE.getValue())||(oldStatus > CellStatus.UNSAFE_MANUAL.getValue()) ){
                  oke = false; 
                  hs = "Protection levels can only be changed for unsafe cells"; 

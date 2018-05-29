@@ -84,7 +84,7 @@ public class TauArgusUtils {
         if (variable.metadata.dataOrigin == Metadata.DATA_ORIGIN_MICRO) {
             if (!tauArgus.SetVariable(variable.index, variable.bPos, variable.varLen, variable.nDecimals, nMissings, nMissings >= 1 ? variable.missing[0] : "",
                     nMissings >= 2 ? variable.missing[1] : "", variable.totCode, variable.type == tauargus.model.Type.REQUEST, variable.type == tauargus.model.Type.REQUEST ? variable.requestCode[0] : "", variable.type == tauargus.model.Type.REQUEST ? variable.requestCode[1] : "", variable.isCategorical(),
-                    variable.isNumeric(), variable.type == tauargus.model.Type.WEIGHT, (variable.hierarchical != Variable.HIER_NONE), variable.type == tauargus.model.Type.HOLDING)) {
+                    variable.isNumeric(), variable.type == tauargus.model.Type.WEIGHT, (variable.hierarchical != Variable.HIER_NONE), variable.type == tauargus.model.Type.HOLDING, variable.type == tauargus.model.Type.RECORD_KEY)) {
                 throw new ArgusException("Error in specification of variable " + variable.name);
             }
         } else if (variable.metadata.dataOrigin == Metadata.DATA_ORIGIN_TABULAR) {
