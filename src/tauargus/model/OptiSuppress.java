@@ -2040,6 +2040,13 @@ private static void joinRounded(TableSet tableSet, int nPart) {
 
     public static void RunCellKey (TableSet tableSet, String PTableFile)throws ArgusException, FileNotFoundException, IOException{
         JOptionPane.showMessageDialog(null,"Still to be implemented");
+        // Assumptions on format of p-table:
+        // i runs from 0 to maxNi
+        // for each i map of pij for which pij > 0
+        
+        ArrayList<PTableRow> ptable = new ArrayList<>();
+        BufferedReader ptable_in;
+        
     }
       
 }
