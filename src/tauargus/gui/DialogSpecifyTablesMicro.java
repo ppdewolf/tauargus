@@ -214,7 +214,7 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         checkBoxApplyWeights.setEnabled(metadata.containsWeightVariable());
         checkBoxUseHoldingsInfo.setEnabled(metadata.containsHoldingVariable());
         checkBoxCellKey.setEnabled(metadata.contains(tauargus.model.Type.RECORD_KEY));
-        
+                
         //load(new TableSet(metadata));
         if (TableService.numberOfTables()==0)
         {
@@ -1960,7 +1960,7 @@ public class DialogSpecifyTablesMicro extends DialogBase {
             return false;
         }
         
-        if (checkBoxCellKey.isSelected())
+        if (checkBoxCellKey.isSelected() && checkBoxCellKey.isEnabled())
         {
             if (responseVariable != freqVar){
                 JOptionPane.showMessageDialog(this,"Cell Key method currently only available for response variable <freq>");

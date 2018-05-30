@@ -63,26 +63,33 @@ public class PanelCellDetails extends javax.swing.JPanel {
     private void update() {
         boolean visible;
         
-        textFieldValue.setText(doubleFormatter.format(cell.response));
-
-        // Use AdjustedValue to show perturbed value in case of cellkey method?
-        visible = table.rounded || table.ctaProtect;
-        labelAdjustedValue.setVisible(visible);
-        textFieldAdjustedValue.setVisible(visible);
-        if (table.rounded) {
-            labelAdjustedValue.setText("Rounded");
-            textFieldAdjustedValue.setText(integerFormatter.format(cell.roundedResponse));
-        } else if (table.ctaProtect) {
-            labelAdjustedValue.setText("CTA-Adjusted");
-            textFieldAdjustedValue.setText(doubleFormatter.format(cell.CTAValue));
-        }
-
         textFieldStatus.setText(cell.status.getDescription());
-        textFieldShadow.setText(doubleFormatter.format(cell.shadow));
-        if (table.costFunc == TableSet.COST_DIST) {
-            textFieldCost.setText("dist");
-        } else {
-            textFieldCost.setText(doubleFormatter.format(cell.cost));
+        if (cell.status.isEmpty()){
+            textFieldValue.setText("-");
+            textFieldShadow.setText("-");
+            textFieldCost.setText("-");
+        }
+        else{
+            textFieldValue.setText(doubleFormatter.format(cell.response));
+        
+            // Use AdjustedValue to show perturbed value in case of cellkey method?
+            visible = table.rounded || table.ctaProtect;
+            labelAdjustedValue.setVisible(visible);
+            textFieldAdjustedValue.setVisible(visible);
+            if (table.rounded) {
+                labelAdjustedValue.setText("Rounded");
+                textFieldAdjustedValue.setText(integerFormatter.format(cell.roundedResponse));
+            } else if (table.ctaProtect) {
+                labelAdjustedValue.setText("CTA-Adjusted");
+                textFieldAdjustedValue.setText(doubleFormatter.format(cell.CTAValue));
+            }
+            
+            textFieldShadow.setText(doubleFormatter.format(cell.shadow));
+            if (table.costFunc == TableSet.COST_DIST) {
+                textFieldCost.setText("dist");
+            } else {
+                textFieldCost.setText(doubleFormatter.format(cell.cost));
+            }
         }
         
         // fill top n box
@@ -107,7 +114,7 @@ public class PanelCellDetails extends javax.swing.JPanel {
             textFieldContributions.setText(integerFormatter.format(cell.freq));
         }
         sb.append("</html>");
-        if (!cell.status.isEmpty()){
+        if (!cell.status.isEmpty() && !(table.respVar.name=="<freq>")){
             labelTopNValue.setText(sb.toString());
         } else {
             labelTopNValue.setText("<html><p align=\"right\">-</p></html>");
