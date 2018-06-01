@@ -53,6 +53,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -2038,15 +2040,26 @@ private static void joinRounded(TableSet tableSet, int nPart) {
                                                   "The problem might be infeasible"); }
     }
 
-    public static void RunCellKey (TableSet tableSet, String PTableFile)throws ArgusException, FileNotFoundException, IOException{
+    public static boolean RunCellKey (TableSet tableSet, String PTableFile) throws ArgusException, FileNotFoundException, IOException{
         JOptionPane.showMessageDialog(null,"Still to be implemented");
         // Assumptions on format of p-table:
         // i runs from 0 to maxNi
         // for each i map of pij for which pij > 0
+
+        Map<Integer,Double> row;
+        PTable ptable = new PTable();
         
-        ArrayList<PTableRow> ptable = new ArrayList<>();
-        BufferedReader ptable_in;
+        // Currently only reading ptable from file possible
+        tauArgus.SetCellKeyValues(tableSet.index, PTableFile); 
         
+        double cellkey = 0.238475;
+        int freq_orig = 3;
+        int freq_new;
+                
+        //row = ptable.GetRow(freq_orig);
+        
+
+        return true;
     }
       
 }

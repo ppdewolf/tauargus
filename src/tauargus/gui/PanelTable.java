@@ -2002,13 +2002,14 @@ public class PanelTable extends javax.swing.JPanel {
                 JOptionPane.showMessageDialog(null,"The marginal method still has to be implemented");
                 break;
             case CELLKEY:
-                JOptionPane.showMessageDialog(null,"Option to change ptable(-file)? P-table is table-specific!");
-                new Thread(){
-                    @Override public void run(){
+                JOptionPane.showMessageDialog(null,"Option to change ptable(-file)? P-table is table-specific?!?");
+                //new Thread(){
+                //    @Override public void run(){
                         try {
-                            OptiSuppress.RunCellKey(tableSet, "ptablefilename");
-                            adjustColumnWidths();
-                            updateSuppressButtons();
+                            if(OptiSuppress.RunCellKey(tableSet, "C:\\Users\\pwof\\Documents\\FPA\\SGA On the fly\\Tobias\\20160511_szenario_5a.csv")){
+                                adjustColumnWidths();
+                                updateSuppressButtons();
+                            }
                         }
                         catch (ArgusException ex){
                             JOptionPane.showMessageDialog(null,ex.getMessage());
@@ -2019,8 +2020,8 @@ public class PanelTable extends javax.swing.JPanel {
                         catch (IOException ex){
                             JOptionPane.showMessageDialog(null,ex.getMessage());
                         }
-                    }
-                }.start();
+                    //}
+                //}.start();
                 break;
         }
         //updateSuppressButtons(); // Needs to be at each try{} of "done"because it will not wait for finishing of ProcessSwingWorker
