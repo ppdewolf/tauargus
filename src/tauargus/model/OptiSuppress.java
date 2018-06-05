@@ -2045,20 +2045,11 @@ private static void joinRounded(TableSet tableSet, int nPart) {
         // Assumptions on format of p-table:
         // i runs from 0 to maxNi
         // for each i map of pij for which pij > 0
-
         Map<Integer,Double> row;
-        PTable ptable = new PTable();
         
         // Currently only reading ptable from file possible
         tauArgus.SetCellKeyValues(tableSet.index, PTableFile); 
         
-        double cellkey = 0.238475;
-        int freq_orig = 3;
-        int freq_new;
-                
-        //row = ptable.GetRow(freq_orig);
-        
-
         return true;
     }
       

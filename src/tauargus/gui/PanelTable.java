@@ -64,6 +64,7 @@ import tauargus.service.TableService;
 import argus.utils.StrUtils;
 //import tauargus.utils.ExecUtils;
 import argus.utils.SystemUtils;
+import tauargus.model.Type;
 
 public class PanelTable extends javax.swing.JPanel {
 
@@ -2005,8 +2006,11 @@ public class PanelTable extends javax.swing.JPanel {
                 JOptionPane.showMessageDialog(null,"Option to change ptable(-file)? P-table is table-specific?!?");
                 //new Thread(){
                 //    @Override public void run(){
+                
+                // Assumes ONE AND ONLY ONE RECORD_KEY variable !
                         try {
-                            if(OptiSuppress.RunCellKey(tableSet, "C:\\Users\\pwof\\Documents\\FPA\\SGA On the fly\\Tobias\\20160511_szenario_5a.csv")){
+                            if(OptiSuppress.RunCellKey(tableSet, tableSet.metadata.find(Type.RECORD_KEY).PTableFile)){
+                                ((AbstractTableModel)table.getModel()).fireTableDataChanged();
                                 adjustColumnWidths();
                                 updateSuppressButtons();
                             }
