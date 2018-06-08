@@ -37,7 +37,7 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="24" max="32767" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -45,8 +45,8 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jPanel1" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -65,58 +65,84 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="jSeparator6" alignment="1" max="32767" attributes="0"/>
-              <Component id="jSeparator7" alignment="0" max="32767" attributes="0"/>
-              <Component id="jSeparator4" alignment="1" max="32767" attributes="0"/>
-              <Component id="jSeparator5" alignment="0" max="32767" attributes="0"/>
-              <Component id="jSeparator2" alignment="0" max="32767" attributes="0"/>
-              <Component id="jSeparator3" alignment="0" max="32767" attributes="0"/>
               <Component id="jSeparator1" alignment="1" max="32767" attributes="0"/>
-              <Group type="102" alignment="0" attributes="0">
+              <Component id="jSeparator3" alignment="0" max="32767" attributes="0"/>
+              <Component id="jSeparator2" alignment="0" max="32767" attributes="0"/>
+              <Component id="jSeparator4" alignment="1" max="32767" attributes="0"/>
+              <Component id="jSeparator6" alignment="1" max="32767" attributes="0"/>
+              <Component id="jSeparator5" alignment="1" max="32767" attributes="0"/>
+              <Component id="jSeparator8" alignment="0" max="32767" attributes="0"/>
+              <Component id="jSeparator7" alignment="0" max="32767" attributes="0"/>
+              <Group type="102" attributes="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace min="6" pref="6" max="-2" attributes="0"/>
+                          <Component id="jRadioSBSFormat" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace min="6" pref="6" max="-2" attributes="0"/>
+                          <Component id="jRadioIntermediate" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Component id="jRadioJJFormat" max="32767" attributes="0"/>
+                              <Component id="jRadioCKMFormat" pref="105" max="32767" attributes="0"/>
+                          </Group>
+                      </Group>
+                  </Group>
+                  <EmptySpace min="-2" pref="40" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="jCheckBoxEmbedSpanningVarQuotes" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="jCheckBoxVarNamesOnFirstRow" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="jCheckBoxSuppressEmptyCells" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="jCheckBoxAddStatus" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="jCheckBoxAddCellKey" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="jCheckBoxAddDiff" alignment="0" min="-2" pref="111" max="-2" attributes="0"/>
+                      <Component id="jCheckBoxAddOrigVal" alignment="0" max="32767" attributes="0"/>
+                      <Component id="jCheckBoxremoveTrivialLevels" alignment="0" min="-2" pref="146" max="-2" attributes="0"/>
+                      <Component id="checkBoxUseHoldingInfo" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="checkBoxAddAuditResults" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="checkBoxStatusOnly" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="jCheckBoxAddHierarchicalLevels" alignment="0" min="-2" max="-2" attributes="0"/>
+                  </Group>
                   <EmptySpace max="32767" attributes="0"/>
-                  <Component id="jButtonWrite" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="buttonCancel" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
               </Group>
               <Group type="102" attributes="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jRadioCSVFormat" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="jRadioCSVPivot" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="jRadioCodeValue" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="jRadioSBSFormat" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="jRadioIntermediate" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="jRadioJJFormat" alignment="0" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace min="-2" pref="40" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jCheckBoxAddHierarchicalLevels" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="checkBoxStatusOnly" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="checkBoxAddAuditResults" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="checkBoxUseHoldingInfo" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="jCheckBoxremoveTrivialLevels" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="jCheckBoxAddStatus" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="jCheckBoxSuppressEmptyCells" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="jCheckBoxVarNamesOnFirstRow" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="jCheckBoxEmbedSpanningVarQuotes" alignment="0" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                      </Group>
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
                           <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                       </Group>
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace min="6" pref="6" max="-2" attributes="0"/>
+                          <Component id="jRadioCodeValue" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace min="6" pref="6" max="-2" attributes="0"/>
+                          <Component id="jRadioCSVPivot" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace min="6" pref="6" max="-2" attributes="0"/>
+                          <Component id="jRadioCSVFormat" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="1" attributes="0">
+                              <Group type="102" alignment="1" attributes="0">
+                                  <Component id="jButtonWrite" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="buttonCancel" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="102" alignment="1" attributes="0">
+                                  <Component id="textFieldSaveFileName" min="-2" pref="302" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="jButtonChooseSafeFile" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                      </Group>
                   </Group>
-                  <EmptySpace min="130" max="32767" attributes="0"/>
-              </Group>
-              <Group type="102" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="textFieldSaveFileName" min="-2" pref="302" max="-2" attributes="0"/>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="jButtonChooseSafeFile" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="0" pref="10" max="32767" attributes="0"/>
+                  <EmptySpace pref="24" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -159,7 +185,18 @@
                       <Component id="jCheckBoxremoveTrivialLevels" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jSeparator5" min="-2" max="-2" attributes="0"/>
+                  <Component id="jSeparator5" min="-2" pref="2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="jRadioCKMFormat" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jCheckBoxAddOrigVal" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="jCheckBoxAddDiff" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="jCheckBoxAddCellKey" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="jSeparator8" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -178,12 +215,12 @@
                       <Component id="textFieldSaveFileName" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jButtonChooseSafeFile" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="buttonCancel" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jButtonWrite" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -351,6 +388,37 @@
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonChooseSafeFileActionPerformed"/>
           </Events>
+        </Component>
+        <Component class="javax.swing.JRadioButton" name="jRadioCKMFormat">
+          <Properties>
+            <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+              <ComponentRef name="buttonGroupFormat"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="CKM format"/>
+          </Properties>
+          <Events>
+            <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="jRadioCKMFormatItemStateChanged"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="jCheckBoxAddOrigVal">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Add original value"/>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="jCheckBoxAddDiff">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Add difference"/>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="jCheckBoxAddCellKey">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Add cell-key"/>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JSeparator" name="jSeparator8">
         </Component>
       </SubComponents>
     </Container>

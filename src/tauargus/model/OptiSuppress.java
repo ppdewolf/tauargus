@@ -2041,14 +2041,17 @@ private static void joinRounded(TableSet tableSet, int nPart) {
     }
 
     public static boolean RunCellKey (TableSet tableSet, String PTableFile) throws ArgusException, FileNotFoundException, IOException{
-        JOptionPane.showMessageDialog(null,"Still to be implemented");
         // Assumptions on format of p-table:
         // i runs from 0 to maxNi
         // for each i map of pij for which pij > 0
-        Map<Integer,Double> row;
         
         // Currently only reading ptable from file possible
-        tauArgus.SetCellKeyValues(tableSet.index, PTableFile); 
+        tableSet.maxDiff = tauArgus.SetCellKeyValues(tableSet.index, PTableFile); 
+        
+        tableSet.suppressINFO = "Cell Key Method has been applied<br>";
+        tableSet.suppressed = TableSet.SUP_CKM;
+        tableSet.ckmProtect = true;
+        batch.reportProgress("Cell Key Method successfully completed\n");
         
         return true;
     }

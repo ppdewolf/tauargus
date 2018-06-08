@@ -61,7 +61,7 @@ public class TauArgusJavaJNI {
   public final static native boolean TauArgus_PrepareHITAS(long jarg1, TauArgus jarg1_, int jarg2, String jarg3, String jarg4, String jarg5);
   public final static native boolean TauArgus_SetTableSafety(long jarg1, TauArgus jarg1_, int jarg2, boolean jarg3, int[] jarg4, int[] jarg5, boolean jarg6, int[] jarg7, int[] jarg8, int[] jarg9, int[] jarg10, int[] jarg11, int[] jarg12, int[] jarg13, boolean jarg14, boolean jarg15, boolean jarg16, boolean jarg17, boolean jarg18, boolean jarg19, int jarg20, double jarg21, int jarg22, int[] jarg23);
   public final static native boolean TauArgus_GetTableCellValue(long jarg1, TauArgus jarg1_, int jarg2, int jarg3, double[] jarg4);
-  public final static native boolean TauArgus_GetTableCell(long jarg1, TauArgus jarg1_, int jarg2, int[] jarg3, double[] jarg4, double[] jarg5, double[] jarg6, double[] jarg7, double[] jarg8, double[] jarg9, int[] jarg10, int[] jarg11, double[] jarg12, double[] jarg13, int[] jarg14, double[] jarg15, int[] jarg16, double[] jarg17, double[] jarg18, int[] jarg19, int[] jarg20, double[] jarg21, double[] jarg22, double[] jarg23, double[] jarg24);
+  public final static native boolean TauArgus_GetTableCell(long jarg1, TauArgus jarg1_, int jarg2, int[] jarg3, double[] jarg4, double[] jarg5, double[] jarg6, double[] jarg7, double[] jarg8, double[] jarg9, double[] jarg10, int[] jarg11, int[] jarg12, double[] jarg13, double[] jarg14, int[] jarg15, double[] jarg16, int[] jarg17, double[] jarg18, double[] jarg19, int[] jarg20, int[] jarg21, double[] jarg22, double[] jarg23, double[] jarg24, double[] jarg25);
   public final static native boolean TauArgus_SetTable(long jarg1, TauArgus jarg1_, int jarg2, int jarg3, int[] jarg4, boolean jarg5, int jarg6, int jarg7, int jarg8, int jarg9, double jarg10, double jarg11, int jarg12, boolean jarg13);
   public final static native boolean TauArgus_SetVariable(long jarg1, TauArgus jarg1_, int jarg2, int jarg3, int jarg4, int jarg5, int jarg6, String jarg7, String jarg8, String jarg9, boolean jarg10, String jarg11, String jarg12, boolean jarg13, boolean jarg14, boolean jarg15, boolean jarg16, boolean jarg17, boolean jarg18);
   public final static native boolean TauArgus_DoActiveRecode(long jarg1, TauArgus jarg1_, int jarg2);
@@ -84,7 +84,7 @@ public class TauArgusJavaJNI {
   public final static native double TauArgus_GetMinimumCellValue(long jarg1, TauArgus jarg1_, int jarg2, double[] jarg3);
   public final static native boolean TauArgus_SetProtectionLevelsForResponseTable(long jarg1, TauArgus jarg1_, int jarg2, int[] jarg3, double jarg4, double jarg5);
   public final static native String TauArgus_GetErrorString(long jarg1, TauArgus jarg1_, int jarg2);
-  public final static native boolean TauArgus_SetCellKeyValues(long jarg1, TauArgus jarg1_, int jarg2, String jarg3);
+  public final static native int TauArgus_SetCellKeyValues(long jarg1, TauArgus jarg1_, int jarg2, String jarg3);
 
   public static void SwigDirector_IProgressListener_UpdateProgress(IProgressListener jself, int Perc) {
     jself.UpdateProgress(Perc);

@@ -913,6 +913,42 @@ public class Metadata implements Cloneable {
         }
         finally {writer.close();}
     }
+
+    public void writeCKMMetadata(String fileName, int NExpVar, Variable[] ExpVar, Variable RespVar, boolean addOrig, boolean addDiff, boolean addCellKey) throws IOException, ArgusException {
+        int dataFileType = DATA_FILE_TYPE_FREE;
+        int microTabularData = DATA_ORIGIN_TABULAR;
+
+        FileWriter fw = null;
+        BufferedWriter bw = null;
+        PrintWriter writer = null;
+        try {
+            fw = new FileWriter(fileName);
+            bw = new BufferedWriter(fw);
+            writer = new PrintWriter(bw);
+            writer.println("   <SEPARATOR> " + StrUtils.quote(";"));
+            for (int i = 0; i < NExpVar; i++) {
+                Variable variable = ExpVar[i];
+                writeVariable(dataFileType, microTabularData, fileName, writer, variable, Type.CATEGORICAL);
+            }
+
+            writeVariable(dataFileType, microTabularData, fileName, writer, RespVar, Type.RESPONSE);
+
+            if (addOrig){
+                writer.println("OrigVar");
+                writer.println("    <NUMERIC>");
+            }
+            if (addDiff){
+                writer.println("Difference");
+                writer.println("    <NUMERIC>");
+            }
+            if (addCellKey){
+                writer.println("CellKey");
+                writer.println("    <CELLKEY>");
+            }
+        }
+        finally {writer.close();}
+    }
+
     
     private void updateProgress(long Fread, long Flen, int LineNo, PropertyChangeSupport propertyChangeSupport) {
         if (LineNo % 100 == 0) {

@@ -718,6 +718,9 @@
         <Component class="javax.swing.JButton" name="buttonSuppress">
           <Properties>
             <Property name="text" type="java.lang.String" value="Suppress"/>
+            <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+              <ComponentRef name="table"/>
+            </Property>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonSuppressActionPerformed"/>
@@ -726,6 +729,9 @@
         <Component class="javax.swing.JButton" name="buttonUndoSuppress">
           <Properties>
             <Property name="text" type="java.lang.String" value="Undo suppress"/>
+            <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+              <ComponentRef name="table"/>
+            </Property>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonUndoSuppressActionPerformed"/>
@@ -734,6 +740,9 @@
         <Component class="javax.swing.JButton" name="buttonAudit">
           <Properties>
             <Property name="text" type="java.lang.String" value="Audit"/>
+            <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+              <ComponentRef name="table"/>
+            </Property>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonAuditActionPerformed"/>

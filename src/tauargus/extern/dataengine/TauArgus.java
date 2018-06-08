@@ -219,8 +219,8 @@ public class TauArgus {
     return TauArgusJavaJNI.TauArgus_GetTableCellValue(swigCPtr, this, TableIndex, CellIndex, CellResponse);
   }
 
-  public boolean GetTableCell(int TableIndex, int[] DimIndex, double[] CellResponse, double[] CellRoundedResp, double[] CellCTAResp, double[] CellShadow, double[] CellCost, double[] CellKey, int[] CellFreq, int[] CellStatus, double[] CellMaxScore, double[] CellMaxScoreWeight, int[] HoldingFreq, double[] HoldingMaxScore, int[] HoldingNrPerMaxScore, double[] PeepCell, double[] PeepHolding, int[] PeepSortCell, int[] PeepSortHolding, double[] Lower, double[] Upper, double[] RealizedLower, double[] RealizedUpper) {
-    return TauArgusJavaJNI.TauArgus_GetTableCell(swigCPtr, this, TableIndex, DimIndex, CellResponse, CellRoundedResp, CellCTAResp, CellShadow, CellCost, CellKey, CellFreq, CellStatus, CellMaxScore, CellMaxScoreWeight, HoldingFreq, HoldingMaxScore, HoldingNrPerMaxScore, PeepCell, PeepHolding, PeepSortCell, PeepSortHolding, Lower, Upper, RealizedLower, RealizedUpper);
+  public boolean GetTableCell(int TableIndex, int[] DimIndex, double[] CellResponse, double[] CellRoundedResp, double[] CellCTAResp, double[] CellCKMResp, double[] CellShadow, double[] CellCost, double[] CellKey, int[] CellFreq, int[] CellStatus, double[] CellMaxScore, double[] CellMaxScoreWeight, int[] HoldingFreq, double[] HoldingMaxScore, int[] HoldingNrPerMaxScore, double[] PeepCell, double[] PeepHolding, int[] PeepSortCell, int[] PeepSortHolding, double[] Lower, double[] Upper, double[] RealizedLower, double[] RealizedUpper) {
+    return TauArgusJavaJNI.TauArgus_GetTableCell(swigCPtr, this, TableIndex, DimIndex, CellResponse, CellRoundedResp, CellCTAResp, CellCKMResp, CellShadow, CellCost, CellKey, CellFreq, CellStatus, CellMaxScore, CellMaxScoreWeight, HoldingFreq, HoldingMaxScore, HoldingNrPerMaxScore, PeepCell, PeepHolding, PeepSortCell, PeepSortHolding, Lower, Upper, RealizedLower, RealizedUpper);
   }
 
   public boolean SetTable(int Index, int nDim, int[] ExplanatoryVarList, boolean IsFrequencyTable, int ResponseVar, int ShadowVar, int CostVar, int CellKeyVar, double Lambda, double MaxScaledCost, int PeepVarnr, boolean SetMissingAsSafe) {
@@ -311,7 +311,7 @@ public class TauArgus {
     return TauArgusJavaJNI.TauArgus_GetErrorString(swigCPtr, this, ErrorNumber);
   }
 
-  public boolean SetCellKeyValues(int TabNo, String PTableFile) {
+  public int SetCellKeyValues(int TabNo, String PTableFile) {
     return TauArgusJavaJNI.TauArgus_SetCellKeyValues(swigCPtr, this, TabNo, PTableFile);
   }
 

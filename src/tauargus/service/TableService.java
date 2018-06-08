@@ -94,6 +94,7 @@ public class TableService {
         tableSet.nSecond = 0;
         tableSet.rounded = false;
         tableSet.ctaProtect =false;
+        tableSet.ckmProtect =false;
         tableSet.roundTime = 0;
         tableSet.processingTime = 0;
         tableSet.hasBeenAudited = false;

@@ -1968,10 +1968,22 @@ public class DialogSpecifyTablesMicro extends DialogBase {
             }
         }
         
+        if (checkBoxMinimumFrequency.isSelected() && checkBoxCellKey.isEnabled()){
+            if (checkBoxCellKey.isSelected()){
+                JOptionPane.showMessageDialog(this, "When using the Cell Key Method, you should not specify any rule");
+                return false;
+            }
+        }
+        
         // Alleen de freq-regel bij freq-tabellen!!!!
         if (checkBoxDominanceRule.isSelected() || checkBoxPqRule.isSelected() || checkBoxRequestRule.isSelected() || checkBoxZeroUnsafe.isSelected()) {
             if (responseVariable == freqVar) {
-                JOptionPane.showMessageDialog(this, "Only the frequency rule is allowed, when a freq-table is requested");
+                if (checkBoxCellKey.isSelected() && checkBoxCellKey.isEnabled()){
+                    JOptionPane.showMessageDialog(this, "When using the Cell Key Method, you should not specify any rule");
+                }
+                else{
+                    JOptionPane.showMessageDialog(this, "When using response variable <freq>, only the frequency rule is allowed");
+                }
                 return false;
             }
         }

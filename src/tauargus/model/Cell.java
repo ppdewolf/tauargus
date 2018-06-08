@@ -30,6 +30,7 @@ public class Cell {
     //public int roundedResponse; // value of response after rounding suppression
     public double roundedResponse;
     public double CTAValue; // value of response after CTA suppression
+    public double CKMValue; // value of response after cell key method application
     public double shadow; 
     public double cost; 
     public double cellkey;

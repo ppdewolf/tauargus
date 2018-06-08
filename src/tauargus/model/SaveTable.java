@@ -61,6 +61,10 @@ public class SaveTable {
     public static boolean writeIntermediateAddAudit;
     public static boolean writeIntermediateUseHolding;
     public static boolean writeJJRemoveBogus;
+    public static boolean writeCKMOriginalValues;
+    public static boolean writeCKMDifferences;
+    public static boolean writeCKMCellKeys;
+        
     private static String[] HI = {"Individual", "Holding"};
     
     private static TauArgus tauArgus = Application.getTauArgusDll();
@@ -185,6 +189,9 @@ public class SaveTable {
                 break;
             case TableSet.FILE_FORMAT_JJ:
                 writeJJ(tableSet, "", false, false, 0, writeJJRemoveBogus, false);
+                break;
+            case TableSet.FILE_FORMAT_CKM:
+                writeCKM(tableSet, writeCKMOriginalValues, writeCKMDifferences, writeCKMCellKeys);
                 break;
 
 // TODO removequotes                        
@@ -476,6 +483,19 @@ public class SaveTable {
       if (rupl<epsilon){rupl = epsilon;}
       return rupl;
   }
+  
+public static void writeCKM(TableSet tableSet, boolean AddOrigVal, 
+                               boolean AddDiff, boolean AddCellKey)throws ArgusException{
+    try{
+        tableSet.writeCKM(tableSet, AddOrigVal, AddDiff, AddCellKey, writeSupppressEmpty, writeEmbedQuotes, null);
+        return;
+    }
+    catch (Exception ex) {
+        throw new ArgusException ("An error occured when writing the CKM file");
+    }
+}
+  
+  
  /**
   * Writes the first lines of an HTML file
   * @param tableSet

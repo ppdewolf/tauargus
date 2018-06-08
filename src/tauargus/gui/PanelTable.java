@@ -64,6 +64,7 @@ import tauargus.service.TableService;
 import argus.utils.StrUtils;
 //import tauargus.utils.ExecUtils;
 import argus.utils.SystemUtils;
+import java.awt.Cursor;
 import tauargus.model.Type;
 
 public class PanelTable extends javax.swing.JPanel {
@@ -155,6 +156,17 @@ public class PanelTable extends javax.swing.JPanel {
 //            } else {
 //                return Color.orange;
 //            }
+        } else if (tableSet.ckmProtect){
+            float maxDiff = (float) tableSet.maxDiff;
+            float diff = (float) Math.abs(cell.CKMValue - cell.response);
+            if (diff >= maxDiff) diff = maxDiff;
+            int R, G, B = 225; // darkest: (85,85,255) brightest: (240,240,255)
+            R = (int) (240 - (240-85)*(diff-1)/(maxDiff-1));
+            G = R;
+            if (diff > 0){
+                return(new Color(R,G,B));
+            }
+            return getBackgroundColor(code);
         } else {
             return getBackgroundColor(code);
         }
@@ -233,6 +245,8 @@ public class PanelTable extends javax.swing.JPanel {
                 setText(doubleFormatter.format(cell.roundedResponse));
             } else if (tableSet.ctaProtect) {
                 setText(doubleFormatter.format(cell.CTAValue));
+            } else if (tableSet.ckmProtect) {
+                setText(doubleFormatter.format(cell.CKMValue));
             } else {
                 setText(doubleFormatter.format(cell.response));
             }
@@ -1116,6 +1130,7 @@ public class PanelTable extends javax.swing.JPanel {
         });
 
         buttonSuppress.setText("Suppress");
+        buttonSuppress.setNextFocusableComponent(table);
         buttonSuppress.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonSuppressActionPerformed(evt);
@@ -1123,6 +1138,7 @@ public class PanelTable extends javax.swing.JPanel {
         });
 
         buttonUndoSuppress.setText("Undo suppress");
+        buttonUndoSuppress.setNextFocusableComponent(table);
         buttonUndoSuppress.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonUndoSuppressActionPerformed(evt);
@@ -1130,6 +1146,7 @@ public class PanelTable extends javax.swing.JPanel {
         });
 
         buttonAudit.setText("Audit");
+        buttonAudit.setNextFocusableComponent(table);
         buttonAudit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonAuditActionPerformed(evt);
@@ -2003,25 +2020,22 @@ public class PanelTable extends javax.swing.JPanel {
                 JOptionPane.showMessageDialog(null,"The marginal method still has to be implemented");
                 break;
             case CELLKEY:
-                JOptionPane.showMessageDialog(null,"Option to change ptable(-file)? P-table is table-specific?!?");
                 //new Thread(){
                 //    @Override public void run(){
                 
                 // Assumes ONE AND ONLY ONE RECORD_KEY variable !
                         try {
+                            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                             if(OptiSuppress.RunCellKey(tableSet, tableSet.metadata.find(Type.RECORD_KEY).PTableFile)){
+                                JOptionPane.showMessageDialog(null, "The Cell Key Method has been applied succesfully\n");
                                 ((AbstractTableModel)table.getModel()).fireTableDataChanged();
                                 adjustColumnWidths();
                                 updateSuppressButtons();
                             }
+                            setCursor(Cursor.getDefaultCursor());
                         }
-                        catch (ArgusException ex){
-                            JOptionPane.showMessageDialog(null,ex.getMessage());
-                        }
-                        catch (FileNotFoundException ex){
-                            JOptionPane.showMessageDialog(null,ex.getMessage());
-                        }
-                        catch (IOException ex){
+                        catch (ArgusException | IOException ex){
+                            setCursor(Cursor.getDefaultCursor());
                             JOptionPane.showMessageDialog(null,ex.getMessage());
                         }
                     //}

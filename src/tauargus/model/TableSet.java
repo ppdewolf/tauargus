@@ -100,6 +100,7 @@ public class TableSet {
     public static final int SUP_MARGINAL = 7;
     public static final int SUP_UWE = 8;
     public static final int SUP_CTA = 9;
+    public static final int SUP_CKM = 10;
 
     public static final int CT_RESPONSE = 1;
     public static final int CT_SHADOW = 2;
@@ -118,6 +119,7 @@ public class TableSet {
     public static final int FILE_FORMAT_SBS = 3;
     public static final int FILE_FORMAT_INTERMEDIATE = 4;
     public static final int FILE_FORMAT_JJ = 5;
+    public static final int FILE_FORMAT_CKM = 6;
 
     public static final String DATA_FILE_EXTENSION = ".tab";
     public static final String METADATA_FILE_EXTENSION = ".rda";
@@ -238,6 +240,7 @@ public class TableSet {
     public boolean minFreqCheck = true;
     public int processingTime = 0;
     public boolean ctaProtect = false;
+    public boolean ckmProtect = false;
     public int networkSolverType = 1;
     public int networkPrimariesOrder = 1;
     public int networkMaxProtLevel = 20;
@@ -267,6 +270,7 @@ public class TableSet {
     boolean scalingUsed = false;
     public double minTabVal = 0;
     public double maxTabVal;
+    public int maxDiff = 0;
     public boolean computeTotals = false;
     public boolean useStatusOnly = false;
     public int additivity = ADDITIVITY_CHECK;
@@ -385,6 +389,7 @@ public class TableSet {
         //int[] roundedResponse = {0};
         double[] roundedResponse = {0.0};
         double[] CTAValue = {0.0};
+        double[] CKMValue = {0.0};
         double[] shadow = {0.0};
         double[] cost = {0.0};
         double[] cellkey = {0.0};
@@ -400,12 +405,13 @@ public class TableSet {
         double[] realizedLower = {0.0};
         double[] realizedUpper = {0.0};
         Cell cell = new Cell();
-        if (!tauArgus.GetTableCell(index, dimIndex, response, roundedResponse, CTAValue, shadow, cost, cellkey, freq, status, cell.maxScore, cell.maxScoreWeight, holdingFreq, cell.holdingMaxScore, cell.holdingNrPerMaxScore, peepCell, peepHolding, peepSortCell, peepSortHolding, lower, upper, realizedLower, realizedUpper)) {
+        if (!tauArgus.GetTableCell(index, dimIndex, response, roundedResponse, CTAValue, CKMValue, shadow, cost, cellkey, freq, status, cell.maxScore, cell.maxScoreWeight, holdingFreq, cell.holdingMaxScore, cell.holdingNrPerMaxScore, peepCell, peepHolding, peepSortCell, peepSortHolding, lower, upper, realizedLower, realizedUpper)) {
             return null;
         }
         cell.response = response[0];
         cell.roundedResponse = roundedResponse[0];
         cell.CTAValue = CTAValue[0];
+        cell.CKMValue = CKMValue[0];
         cell.shadow = shadow[0];
         cell.cost = cost[0];
         cell.cellkey = cellkey[0];
@@ -774,6 +780,7 @@ public class TableSet {
       double[] x9 = new double[1];
       double[] x10 = new double[1]; //CellKey
       double[] xcta = new double[1];
+      double[] xckm = new double[1];
       double[] hms = new double[MAX_TOP_N_VAR];
       double[] peep = new double[1];
       double[] peephold = new double[1];
@@ -787,6 +794,7 @@ public class TableSet {
         int[] peepsrthold = new int[1];
         boolean oke;       
         oke = tauArgus.GetTableCell(tabNo, dimIndex, CR, ix, xcta,
+                                    xckm,
                                     x2, x3, x10, cf, Status, x4,
                                     x5, cfh,   hms, holdnr,
                                     peep, peephold, peepsrt,  peepsrthold,  Lower,
@@ -1426,6 +1434,113 @@ if (Application.isProtectCoverTable()){
         metadata.writeTableMetadata(metadataFileName, nExpVar, expVar.toArray(new Variable[expVar.size()]), respVar, shadowVar, costFunc, costVar, numberOfTopNNeeded, simple, withAudit);
     }
 
+    
+public void writeCKM(TableSet tableSet, boolean addOrig, boolean addDiff, boolean addCellKey, 
+                     boolean suppressEmpty, boolean EmbedQuotes, PropertyChangeListener propertyChangeListener) throws IOException, ArgusException {
+        PropertyChangeSupport propertyChangeSupport = null;
+        if (!Application.isBatch()){
+          propertyChangeSupport  = new PropertyChangeSupport(this);
+          propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);
+          }  
+
+        int nExpVar = expVar.size();
+        int[] maxDim = new int[nExpVar];
+        int[] dimArray = new int[nExpVar];
+
+        // including empty cells
+        int numberOfCells = 1;
+        for (int i = 0; i < nExpVar; i++) {
+            dimArray[i] = 0;
+            maxDim[i] = TauArgusUtils.getNumberOfActiveCodes(expVar.get(i).index);
+            numberOfCells = numberOfCells * maxDim[i];
+        }
+
+        FileWriter fw = null;
+        BufferedWriter bw = null;
+        PrintWriter writer = null;
+        try {
+            fw = new FileWriter(tableSet.safeFileName);
+            bw = new BufferedWriter(fw);
+            writer = new PrintWriter(bw);
+
+            VarCode varCode = new VarCode();
+            int cellIndex = 0;
+            int nDec = respVar.nDecimals;
+            DecimalFormat mdecimalFormat = new DecimalFormat();
+            mdecimalFormat.setMinimumFractionDigits(nDec);
+            mdecimalFormat.setMaximumFractionDigits(nDec);
+            mdecimalFormat.setGroupingUsed(false);
+            
+            DecimalFormat CKdecimalFormat = new DecimalFormat();
+            CKdecimalFormat.setMinimumFractionDigits(cellkeyVar.nDecimals);
+            CKdecimalFormat.setMaximumFractionDigits(cellkeyVar.nDecimals);
+            CKdecimalFormat.setGroupingUsed(false);
+            
+            for (;;) {
+                Cell cell = getCell(dimArray);
+                if (cell.status != CellStatus.EMPTY || !suppressEmpty) {
+                    for (int j = 0; j < expVar.size(); j++) {
+                        Variable variable = expVar.get(j);
+                        varCode.setCode(variable.index, dimArray[j]);
+                        String codeString = varCode.getCodeString();
+                        if (codeString.equals("")) {
+                            codeString = variable.getTotalCode();
+                        }
+                        if (EmbedQuotes){
+                            writer.print(StrUtils.quote(codeString) + ";");
+                        }
+                        else{
+                            writer.print(codeString + ";");
+                        }
+                    }
+                    writer.print(mdecimalFormat.format(cell.CKMValue));
+                    if (addOrig){
+                        writer.print(";" + mdecimalFormat.format(cell.response));
+                    }
+                    if (addDiff){
+                        writer.print(";" + mdecimalFormat.format(cell.CKMValue - cell.response));
+                    }
+                    if (addCellKey){
+                        writer.print(";" + CKdecimalFormat.format(cell.cellkey));
+                    }
+                    writer.println();
+                }
+                cellIndex++;
+                if (!Application.isBatch()){
+                  if (cellIndex % 1000 == 0) {
+                      int percentage = (int)(100L * cellIndex / numberOfCells);
+                      propertyChangeSupport.firePropertyChange("progressMain", null, percentage);
+                      propertyChangeSupport.firePropertyChange("activityMain", null, "(" + cellIndex + ")");
+                  }
+                }
+
+                // dimArray ophogen
+                int k = nExpVar;
+                while (k-- > 0) {
+                    dimArray[k]++;
+                    if (dimArray[k] < maxDim[k]) {
+                        break;
+                    } else {
+                        dimArray[k] = 0;
+                    }
+                }
+                if (k == -1) {
+                    break;
+                }
+            }
+        }
+        finally {
+ //         fw.close();
+ //         bw.close();
+          writer.close();
+        }
+
+        String metadataFileName = StrUtils.replaceExtension(tableSet.safeFileName, METADATA_FILE_EXTENSION);
+        metadata.writeCKMMetadata(metadataFileName, nExpVar, expVar.toArray(new Variable[expVar.size()]), respVar, addOrig, addDiff, addCellKey);
+    }    
+    
+    
+    
     //dubbel op gebruik de TableService
   //  public void undoSuppressFOUT(){;
   //    suppressed = SUP_NO;
@@ -1694,6 +1809,7 @@ if (Application.isProtectCoverTable()){
         double[] x9 = new double[1];
         double[] x10 = new double[1];
         double[] xcta = new double[1];
+        double[] xckm = new double[1];
         double[] hms = new double[MAX_TOP_N_VAR];
         double[] peep = new double[1];
         double[] peephold = new double[1];
@@ -1706,6 +1822,7 @@ if (Application.isProtectCoverTable()){
         int[] peepsrt = new int[1];
         int[] peepsrthold = new int[1];
         oke = tauArgus.GetTableCell(tableSet.index, dimArray, x, ix, xcta,
+                                    xckm,
                                     x2, x3, x10, cf, cellStatus, x4,
                                     x5, cfh,   hms, holdnr,
                                     peep, peephold, peepsrt,  peepsrthold,  x6,

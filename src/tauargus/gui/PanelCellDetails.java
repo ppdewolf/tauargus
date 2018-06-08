@@ -68,12 +68,13 @@ public class PanelCellDetails extends javax.swing.JPanel {
             textFieldValue.setText("-");
             textFieldShadow.setText("-");
             textFieldCost.setText("-");
+            textFieldAdjustedValue.setText("-");
         }
         else{
             textFieldValue.setText(doubleFormatter.format(cell.response));
         
             // Use AdjustedValue to show perturbed value in case of cellkey method?
-            visible = table.rounded || table.ctaProtect;
+            visible = table.rounded || table.ctaProtect || table.ckmProtect;
             labelAdjustedValue.setVisible(visible);
             textFieldAdjustedValue.setVisible(visible);
             if (table.rounded) {
@@ -82,6 +83,9 @@ public class PanelCellDetails extends javax.swing.JPanel {
             } else if (table.ctaProtect) {
                 labelAdjustedValue.setText("CTA-Adjusted");
                 textFieldAdjustedValue.setText(doubleFormatter.format(cell.CTAValue));
+            } else if (table.ckmProtect) {
+                labelAdjustedValue.setText("CKM-Adjusted");
+                textFieldAdjustedValue.setText(doubleFormatter.format(cell.CKMValue));
             }
             
             textFieldShadow.setText(doubleFormatter.format(cell.shadow));
