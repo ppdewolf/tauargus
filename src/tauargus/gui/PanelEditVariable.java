@@ -1293,7 +1293,7 @@ public class PanelEditVariable extends javax.swing.JPanel {
         fileChooser.setDialogTitle("p-table file");
         fileChooser.setSelectedFile(new File(""));
         fileChooser.resetChoosableFileFilters();
-        fileChooser.setFileFilter(new FileNameExtensionFilter("ptable file (*.ptb)", "ptb"));
+        fileChooser.setFileFilter(new FileNameExtensionFilter("ptable file (*.csv, *.txt)", "csv", "txt"));
         if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
             textFieldPTableFileName.setText(fileChooser.getSelectedFile().toString());
             TauArgusUtils.putDataDirInRegistry(fileChooser.getSelectedFile().toString());

@@ -160,8 +160,8 @@ public class PanelTable extends javax.swing.JPanel {
             float maxDiff = (float) tableSet.maxDiff;
             float diff = (float) Math.abs(cell.CKMValue - cell.response);
             if (diff >= maxDiff) diff = maxDiff;
-            int R, G, B = 225; // darkest: (85,85,255) brightest: (240,240,255)
-            R = (int) (240 - (240-85)*(diff-1)/(maxDiff-1));
+            int R, G, B = 255; // darkest: (85,85,255) brightest: (235,235,255)
+            R = (int) (235 - (235-85)*(diff-1)/(maxDiff-1));
             G = R;
             if (diff > 0){
                 return(new Color(R,G,B));

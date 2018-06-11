@@ -2045,8 +2045,12 @@ private static void joinRounded(TableSet tableSet, int nPart) {
         // i runs from 0 to maxNi
         // for each i map of pij for which pij > 0
         
-        // Currently only reading ptable from file possible
-        tableSet.maxDiff = tauArgus.SetCellKeyValues(tableSet.index, PTableFile); 
+        // Currently only reading ptable from file as given in metadata is possible
+        tableSet.maxDiff = tauArgus.SetCellKeyValues(tableSet.index, tableSet.cellkeyVar.metadata.getFilePath(PTableFile)); 
+        if (tableSet.maxDiff == -9){
+            JOptionPane.showMessageDialog(null, "Error reading ptable file " + tableSet.cellkeyVar.metadata.getFilePath(PTableFile));
+            return false;
+        }
         
         tableSet.suppressINFO = "Cell Key Method has been applied<br>";
         tableSet.suppressed = TableSet.SUP_CKM;
