@@ -208,6 +208,7 @@ public class TableService {
             TableSet tableSet = TableService.getTable(i);
             tableSet.hasRealFreq = true;
             tableSet.suppressed = TableSet.SUP_NO;
+            tableSet.ckmProtect = false;
             tableSet.undoAudit();
             tableSet.nSecond = 0;
             tableSet.processingTime = 0;
