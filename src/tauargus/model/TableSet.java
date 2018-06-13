@@ -51,6 +51,7 @@ import tauargus.utils.Tokenizer;
 import argus.utils.SystemUtils;
 import argus.utils.StrUtils;
 import static java.lang.Math.abs;
+import java.util.TreeMap;
 import tauargus.gui.DialogErrorApriori;
 
 public class TableSet {
@@ -1435,7 +1436,7 @@ if (Application.isProtectCoverTable()){
     }
 
     
-public void writeCKM(TableSet tableSet, boolean addOrig, boolean addDiff, boolean addCellKey, 
+public void writeCKM(TableSet tableSet, TreeMap<Integer, Integer> CKMStatistics, long nEmpty, boolean addOrig, boolean addDiff, boolean addCellKey, 
                      boolean suppressEmpty, boolean EmbedQuotes, PropertyChangeListener propertyChangeListener) throws IOException, ArgusException {
         PropertyChangeSupport propertyChangeSupport = null;
         if (!Application.isBatch()){
@@ -1446,6 +1447,10 @@ public void writeCKM(TableSet tableSet, boolean addOrig, boolean addDiff, boolea
         int nExpVar = expVar.size();
         int[] maxDim = new int[nExpVar];
         int[] dimArray = new int[nExpVar];
+
+        for (int i=-tableSet.maxDiff; i<tableSet.maxDiff; i++){
+            CKMStatistics.put(i,0);
+        }
 
         // including empty cells
         int numberOfCells = 1;
@@ -1478,6 +1483,12 @@ public void writeCKM(TableSet tableSet, boolean addOrig, boolean addDiff, boolea
             
             for (;;) {
                 Cell cell = getCell(dimArray);
+                if (cell.status == CellStatus.EMPTY) {
+                    nEmpty++;
+                }else{
+                    CKMStatistics.put((int)(cell.CKMValue-cell.response),CKMStatistics.get((int)(cell.CKMValue-cell.response))+1);
+                }
+                
                 if (cell.status != CellStatus.EMPTY || !suppressEmpty) {
                     for (int j = 0; j < expVar.size(); j++) {
                         Variable variable = expVar.get(j);

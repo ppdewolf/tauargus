@@ -2026,8 +2026,8 @@ public class PanelTable extends javax.swing.JPanel {
                 // Assumes ONE AND ONLY ONE RECORD_KEY variable !
                         try {
                             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                            if(OptiSuppress.RunCellKey(tableSet, tableSet.metadata.find(Type.RECORD_KEY).PTableFile)){
-                                JOptionPane.showMessageDialog(null, "The Cell Key Method has been applied succesfully\n");
+                            if(OptiSuppress.RunCellKey(tableSet, tableSet.cellkeyVar.PTableFile)){
+                                JOptionPane.showMessageDialog(null, "The Cell Key Method has been applied succesfully in " + tableSet.processingTime + " seconds\n");
                                 ((AbstractTableModel)table.getModel()).fireTableDataChanged();
                                 adjustColumnWidths();
                                 updateSuppressButtons();

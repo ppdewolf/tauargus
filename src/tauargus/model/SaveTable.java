@@ -46,6 +46,7 @@ import argus.utils.StrUtils;
 //import tauargus.utils.ExecUtils;
 import tauargus.utils.Tokenizer;
 import argus.utils.SystemUtils;
+import java.util.TreeMap;
 
 /**
  *
@@ -64,6 +65,9 @@ public class SaveTable {
     public static boolean writeCKMOriginalValues;
     public static boolean writeCKMDifferences;
     public static boolean writeCKMCellKeys;
+    
+    private static TreeMap<Integer,Integer> CKMStats;
+    private static long nEmpty;
         
     private static String[] HI = {"Individual", "Holding"};
     
@@ -191,9 +195,47 @@ public class SaveTable {
                 writeJJ(tableSet, "", false, false, 0, writeJJRemoveBogus, false);
                 break;
             case TableSet.FILE_FORMAT_CKM:
-                writeCKM(tableSet, writeCKMOriginalValues, writeCKMDifferences, writeCKMCellKeys);
-                break;
+                if (Application.isBatch()){
+                    try{
+                        TreeMap<Integer,Integer> CKMStats = new TreeMap<Integer,Integer>();
+                        long nEmpty=0;
+                        tableSet.writeCKM(tableSet, CKMStats, nEmpty, writeCKMOriginalValues, writeCKMDifferences, writeCKMCellKeys, 
+                                writeSupppressEmpty, writeEmbedQuotes, null);
+                        return;  
+                    } catch (IOException ex) {
+                         // logger.log(Level.SEVERE, null, ex);
+                    }                            
+                }
+                else{
+                  final SwingWorker<Void, Void> worker = new ProgressSwingWorker<Void, Void>(ProgressSwingWorker.SINGLE, "Saving table") {
+                    // called in a separate thread...
+                    @Override
+                    protected Void doInBackground() throws Exception {
+                        super.doInBackground();
+                        TreeMap<Integer,Integer> CKMStats = new TreeMap<Integer,Integer>();
+                        long nEmpty=0;
+                        tableSet.writeCKM(tableSet, CKMStats, nEmpty, writeCKMOriginalValues, writeCKMDifferences, writeCKMCellKeys, 
+                                writeSupppressEmpty, writeEmbedQuotes, getPropertyChangeListener());
+                        return null;
+                    }
 
+                    // called on the GUI thread
+                    @Override
+                    public void done() {
+                        super.done();
+                        try {
+                            get();
+                        } catch (InterruptedException ex) {
+                            // logger.log(Level.SEVERE, null, ex);
+                        } catch (ExecutionException ex) {
+                            JOptionPane.showMessageDialog(null, ex.getCause().getMessage());
+                        }
+                    }
+                };
+
+                worker.execute();
+                }
+                break;                
 // TODO removequotes                        
             }
         
@@ -484,16 +526,18 @@ public class SaveTable {
       return rupl;
   }
   
-public static void writeCKM(TableSet tableSet, boolean AddOrigVal, 
+/*public static void writeCKM(TableSet tableSet, boolean AddOrigVal, 
                                boolean AddDiff, boolean AddCellKey)throws ArgusException{
     try{
-        tableSet.writeCKM(tableSet, AddOrigVal, AddDiff, AddCellKey, writeSupppressEmpty, writeEmbedQuotes, null);
+        CKMStats = new TreeMap<Integer,Integer>();
+        nEmpty = 0;
+        tableSet.writeCKM(tableSet, CKMStats, nEmpty, AddOrigVal, AddDiff, AddCellKey, writeSupppressEmpty, writeEmbedQuotes, null);
         return;
     }
     catch (Exception ex) {
         throw new ArgusException ("An error occured when writing the CKM file");
     }
-}
+}*/
   
   
  /**
@@ -614,7 +658,10 @@ public static void writeCKM(TableSet tableSet, boolean AddOrigVal,
         out.write("<br>Missing totals have been computed\n");
     }
     out.write("<p>\n");
-    out.write("<h2>Safety Rule:</h2><h3>\n");
+    out.write("<h2>Sensitivity Rule:</h2><h3>\n");
+    if (tableSet.ckmProtect){
+        out.write("None");
+    }
     if (tableSet.domRule) {
         for (i=1;i<4;i++){
           hs = prDOM(i, tableSet);
@@ -664,17 +711,16 @@ public static void writeCKM(TableSet tableSet, boolean AddOrigVal,
                 tableSet.zeroRange+"%<br>\n");
   }
 
-  out.write("Manual safety margin: " + tableSet.manualMarge + "%<br>\n");
+  if (!tableSet.ckmProtect) {
+      out.write("Manual safety margin: " + tableSet.manualMarge + "%<br>\n");
+      out.write("Missing codes have been considered ");
+      if (!tableSet.missingIsSafe){out.write("un");}
+      out.write ("safe<br>\n");
+  }
   if (tableSet.weighted){out.write("Sample weights have been used<br>\n");}
-  
-  out.write("Missing codes have been considered ");
-  if (!tableSet.missingIsSafe){out.write("un");}
-  out.write ("safe<br>\n");
   if (tableSet.minTabVal !=0){out.write("Minimum lower bound for each cell " + tableSet.minTabVal + "<br>\n");} 
-  
- 
-  
-   out.write("</h3>\n");
+
+    out.write("</h3>\n");
    
    switch (tableSet.suppressed) {
        case TableSet.SUP_JJ_OPT : 
@@ -720,6 +766,10 @@ public static void writeCKM(TableSet tableSet, boolean AddOrigVal,
               break;
        case TableSet.SUP_UWE :
               out.write( "<h2>Protected with the experimental UWE-software</h2>\n");
+              break;
+       case TableSet.SUP_CKM :
+              out.write("<h2>Protected with the Cell Key Method</h2>\n");
+              out.write("<h3>P-table used from file\n\""+tableSet.cellkeyVar.metadata.getFilePath(tableSet.cellkeyVar.PTableFile)+"\"</h3>\n");
               break;
   }
 //    if (tableSet.inverseWeight){out.write("<h2>Inverse weight procedure has been applied</h2>\n");}
@@ -805,6 +855,7 @@ public static void writeCKM(TableSet tableSet, boolean AddOrigVal,
 
        out.write("<h2>Summary of the table</h2>\n");
        
+       if (!tableSet.ckmProtect){
        int d= tableSet.respVar.nDecimals;
        CellStatusStatistics stat = tableSet.getCellStatusStatistics();
        
@@ -840,7 +891,23 @@ public static void writeCKM(TableSet tableSet, boolean AddOrigVal,
        }
          out.write("</table>\n");
          out.write("<p>\n");
-
+       }
+       else{
+            out.write("<table>\n");
+            out.write("<tr><th width=\"6%\" height=\"11\">&nbsp;</th>\n");
+            out.write("<th width=\"20%\" height=\"11\">Status</th>\n");
+            out.write("<th width=\"10%\" height=\"11\">Number of cells</th>\n");
+            for (i=-tableSet.maxDiff;i<=tableSet.maxDiff;i++){
+                out.write("<tr><td align=\"Right\">"+ Integer.toString(i) + "</td>");
+                out.write("<td>"+Integer.toString(CKMStats.get(i))+"</td></tr>\n");
+            }
+            out.write("<tr><td align=\"Right\"> Empty </td>");
+            out.write("<td>"+Long.toString(nEmpty)+"</td></tr>\n");
+            out.write("<tr><td align=\"Right\"> Total </td>");
+            out.write("<td>"+Integer.toString(tableSet.numberOfCells())+"</td></tr>\n");
+            out.write("</table>\n");
+            out.write("<p>\n");
+       }
   //If SuperCross Then GoTo EINDE
          
        if (tableSet.historyUsed>0) {
@@ -996,7 +1063,12 @@ static void printTableInfo(TableSet tableSet, BufferedWriter out){
 
 
      out.write("<tr><td>Response var:</td>\n");
-     out.write("<td>" +tableSet.respVar.name + "</td><td>&nbsp;</td></tr>\n");
+     if (tableSet.respVar.name == "<freq>"){
+        out.write("<td>&lt;freq&gt;</td><td>&nbsp;</td></tr>\n"); 
+     }
+     else{
+        out.write("<td>" +tableSet.respVar.name + "</td><td>&nbsp;</td></tr>\n");
+     }
      int n = tableSet.expVar.size();
      for (int i = 0; i < n; i++){
          out.write("<tr><td>Explanatory var" + (i+1) + ":</td>\n");

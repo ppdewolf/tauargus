@@ -2046,16 +2046,20 @@ private static void joinRounded(TableSet tableSet, int nPart) {
         // for each i map of pij for which pij > 0
         
         // Currently only reading ptable from file as given in metadata is possible
+        long startTime = new Date().getTime();
         tableSet.maxDiff = tauArgus.SetCellKeyValues(tableSet.index, tableSet.cellkeyVar.metadata.getFilePath(PTableFile)); 
         if (tableSet.maxDiff == -9){
             JOptionPane.showMessageDialog(null, "Error reading ptable file " + tableSet.cellkeyVar.metadata.getFilePath(PTableFile));
             return false;
         }
+        long endTime = new Date().getTime();
+        long diff = (endTime - startTime)/1000;
+        tableSet.processingTime = (int)diff; 
         
         tableSet.suppressINFO = "Cell Key Method has been applied<br>";
         tableSet.suppressed = TableSet.SUP_CKM;
         tableSet.ckmProtect = true;
-        batch.reportProgress("Cell Key Method successfully completed\n");
+        batch.reportProgress("Cell Key Method successfully completed in " + tableSet.processingTime + " seconds\n");
         
         return true;
     }
