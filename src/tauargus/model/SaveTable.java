@@ -46,7 +46,11 @@ import argus.utils.StrUtils;
 //import tauargus.utils.ExecUtils;
 import tauargus.utils.Tokenizer;
 import argus.utils.SystemUtils;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.io.PrintWriter;
 import java.util.TreeMap;
+import static tauargus.model.TableSet.METADATA_FILE_EXTENSION;
 
 /**
  *
@@ -66,14 +70,11 @@ public class SaveTable {
     public static boolean writeCKMDifferences;
     public static boolean writeCKMCellKeys;
     
-    private static TreeMap<Integer,Integer> CKMStats;
-    private static long nEmpty;
-        
     private static String[] HI = {"Individual", "Holding"};
     
     private static TauArgus tauArgus = Application.getTauArgusDll();
     /**
-     * Writes a table in one of the 6 formats
+     * Writes a table in one of the 7 formats
      * @param tableSet
      * @param selectedFormat
      * @throws ArgusException 
@@ -195,46 +196,12 @@ public class SaveTable {
                 writeJJ(tableSet, "", false, false, 0, writeJJRemoveBogus, false);
                 break;
             case TableSet.FILE_FORMAT_CKM:
-                if (Application.isBatch()){
-                    try{
-                        TreeMap<Integer,Integer> CKMStats = new TreeMap<Integer,Integer>();
-                        long nEmpty=0;
-                        tableSet.writeCKM(tableSet, CKMStats, nEmpty, writeCKMOriginalValues, writeCKMDifferences, writeCKMCellKeys, 
-                                writeSupppressEmpty, writeEmbedQuotes, null);
-                        return;  
-                    } catch (IOException ex) {
-                         // logger.log(Level.SEVERE, null, ex);
-                    }                            
-                }
-                else{
-                  final SwingWorker<Void, Void> worker = new ProgressSwingWorker<Void, Void>(ProgressSwingWorker.SINGLE, "Saving table") {
-                    // called in a separate thread...
-                    @Override
-                    protected Void doInBackground() throws Exception {
-                        super.doInBackground();
-                        TreeMap<Integer,Integer> CKMStats = new TreeMap<Integer,Integer>();
-                        long nEmpty=0;
-                        tableSet.writeCKM(tableSet, CKMStats, nEmpty, writeCKMOriginalValues, writeCKMDifferences, writeCKMCellKeys, 
-                                writeSupppressEmpty, writeEmbedQuotes, getPropertyChangeListener());
-                        return null;
-                    }
-
-                    // called on the GUI thread
-                    @Override
-                    public void done() {
-                        super.done();
-                        try {
-                            get();
-                        } catch (InterruptedException ex) {
-                            // logger.log(Level.SEVERE, null, ex);
-                        } catch (ExecutionException ex) {
-                            JOptionPane.showMessageDialog(null, ex.getCause().getMessage());
-                        }
-                    }
-                };
-
-                worker.execute();
-                }
+                try{
+                    tableSet.writeCKM(writeCKMOriginalValues, writeCKMDifferences, writeCKMCellKeys, 
+                                      writeSupppressEmpty, writeEmbedQuotes,null);
+                } catch (IOException ex) {
+                     // logger.log(Level.SEVERE, null, ex);
+                }                            
                 break;                
 // TODO removequotes                        
             }
@@ -648,7 +615,6 @@ public class SaveTable {
     static public void writeReport(TableSet tableSet) {
         String reportfile, hs; double x;
         reportfile = tableSet.safeFileName;
-//        reportfile = "D:\\TauJava\\klad.txt";//
         int i = reportfile.lastIndexOf(".");
         reportfile = reportfile.substring(0, i) + ".html";
         try { BufferedWriter out = new BufferedWriter(new FileWriter(reportfile));
@@ -894,17 +860,16 @@ public class SaveTable {
        }
        else{
             out.write("<table>\n");
-            out.write("<tr><th width=\"6%\" height=\"11\">&nbsp;</th>\n");
-            out.write("<th width=\"20%\" height=\"11\">Status</th>\n");
-            out.write("<th width=\"10%\" height=\"11\">Number of cells</th>\n");
+            out.write("<tr><th width=\"50%\" height=\"11\">Added noise</th>\n");
+            out.write("<th width=\"50%\" height=\"11\">Number of cells</th>\n");
             for (i=-tableSet.maxDiff;i<=tableSet.maxDiff;i++){
                 out.write("<tr><td align=\"Right\">"+ Integer.toString(i) + "</td>");
-                out.write("<td>"+Integer.toString(CKMStats.get(i))+"</td></tr>\n");
+                out.write("<td align=\"Right\">"+Long.toString(tableSet.getCKMStats().get(i))+"</td></tr>\n");
             }
             out.write("<tr><td align=\"Right\"> Empty </td>");
-            out.write("<td>"+Long.toString(nEmpty)+"</td></tr>\n");
+            out.write("<td align=\"Right\">"+Long.toString(tableSet.numberOfEmpty())+"</td></tr>\n");
             out.write("<tr><td align=\"Right\"> Total </td>");
-            out.write("<td>"+Integer.toString(tableSet.numberOfCells())+"</td></tr>\n");
+            out.write("<td align=\"Right\">"+Long.toString(tableSet.numberOfCells())+"</td></tr>\n");
             out.write("</table>\n");
             out.write("<p>\n");
        }
@@ -1047,7 +1012,7 @@ public class SaveTable {
          out.write ("<br>&tau;-ARGUS version: " + Application.getFullVersion()+" (Build " + Application.BUILD + ")");  out.newLine();
          out.write("</body>\n");
          out.write("</html\n");  
-        out.close();
+         out.close();
     }catch (Exception ex) { 
     }
 }
@@ -1148,5 +1113,134 @@ private static String prPQ(int i, TableSet tableSet){
     return hs;
 }
 
+//    public static void writeCKM(TableSet tableSet, boolean addOrig, boolean addDiff, boolean addCellKey, boolean suppressEmpty, 
+//                     boolean EmbedQuotes, PropertyChangeListener propertyChangeListener) throws IOException, ArgusException {
+//        
+//        PropertyChangeSupport propertyChangeSupport = null;
+//        if (!Application.isBatch()){
+//          propertyChangeSupport  = new PropertyChangeSupport(tableSet);
+//          propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);
+//        }  
+//
+//        tableSet.getCKMStats().clear();
+//        for (int i=-tableSet.maxDiff; i<=tableSet.maxDiff; i++){
+//            tableSet.getCKMStats().put(i, 0L);
+//        }
+//        tableSet.setNumberOfEmpty(0L);
+//        
+//        int nExpVar = tableSet.expVar.size();
+//        int[] maxDim = new int[nExpVar];
+//        int[] dimArray = new int[nExpVar];
+//
+//        // including empty cells
+//        int numberOfCells = 1;
+//        for (int i = 0; i < nExpVar; i++) {
+//            dimArray[i] = 0;
+//            maxDim[i] = TauArgusUtils.getNumberOfActiveCodes(tableSet.expVar.get(i).index);
+//            numberOfCells = numberOfCells * maxDim[i];
+//        }
+//
+//        FileWriter fw = null;
+//        BufferedWriter bw = null;
+//        PrintWriter writer = null;
+//        try {
+//            fw = new FileWriter(tableSet.safeFileName);
+//            bw = new BufferedWriter(fw);
+//            writer = new PrintWriter(bw);
+//
+//            VarCode varCode = new VarCode();
+//            int cellIndex = 0;
+//            int nDec = tableSet.respVar.nDecimals;
+//            DecimalFormat mdecimalFormat = new DecimalFormat();
+//            mdecimalFormat.setMinimumFractionDigits(nDec);
+//            mdecimalFormat.setMaximumFractionDigits(nDec);
+//            mdecimalFormat.setGroupingUsed(false);
+//            
+//            DecimalFormat CKdecimalFormat = new DecimalFormat();
+//            CKdecimalFormat.setMinimumFractionDigits(tableSet.cellkeyVar.nDecimals);
+//            CKdecimalFormat.setMaximumFractionDigits(tableSet.cellkeyVar.nDecimals);
+//            CKdecimalFormat.setGroupingUsed(false);
+//            
+//            for (;;) {
+//                Cell cell = tableSet.getCell(dimArray);
+//                if (tableSet.ckmProtect){
+//                    if (cell.status == CellStatus.EMPTY) {
+//                        tableSet.setNumberOfEmpty(tableSet.numberOfEmpty()+1);
+//                    }else{
+//                        long oldval = tableSet.getCKMStats().get((int)(cell.CKMValue-cell.response));
+//                        tableSet.getCKMStats().put((int)(cell.CKMValue-cell.response),oldval+1);
+//                    }
+//                }
+//                
+//                if (cell.status != CellStatus.EMPTY || !suppressEmpty) {
+//                    for (int j = 0; j < tableSet.expVar.size(); j++) {
+//                        Variable variable = tableSet.expVar.get(j);
+//                        varCode.setCode(variable.index, dimArray[j]);
+//                        String codeString = varCode.getCodeString();
+//                        if (codeString.equals("")) {
+//                            codeString = variable.getTotalCode();
+//                        }
+//                        if (EmbedQuotes){
+//                            writer.print(StrUtils.quote(codeString) + ";");
+//                        }
+//                        else{
+//                            writer.print(codeString + ";");
+//                        }
+//                    }
+//                    writer.print(mdecimalFormat.format(cell.CKMValue));
+//                    if (addOrig){
+//                        writer.print(";" + mdecimalFormat.format(cell.response));
+//                    }
+//                    if (addDiff){
+//                        writer.print(";" + mdecimalFormat.format(cell.CKMValue - cell.response));
+//                    }
+//                    if (addCellKey){
+//                        writer.print(";" + CKdecimalFormat.format(cell.cellkey));
+//                    }
+//                    writer.println();
+//                }
+//                cellIndex++;
+//                if (!Application.isBatch()){
+//                  if (cellIndex % 1000 == 0) {
+//                      int percentage = (int)(100L * cellIndex / numberOfCells);
+//                      propertyChangeSupport.firePropertyChange("progressMain", null, percentage);
+//                      propertyChangeSupport.firePropertyChange("activityMain", null, "(" + cellIndex + ")");
+//                  }
+//                }
+//
+//                // dimArray ophogen
+//                int k = nExpVar;
+//                while (k-- > 0) {
+//                    dimArray[k]++;
+//                    if (dimArray[k] < maxDim[k]) {
+//                        break;
+//                    } else {
+//                        dimArray[k] = 0;
+//                    }
+//                }
+//                if (k == -1) {
+//                    break;
+//                }
+//            }
+//        }
+//        finally {
+// //         fw.close();
+// //         bw.close();
+//          writer.close();
+//        }
+//
+//        fw = new FileWriter(StrUtils.replaceExtension(tableSet.safeFileName, ".log"));
+//        bw = new BufferedWriter(fw);
+//        for (int i=-tableSet.maxDiff;i<=tableSet.maxDiff;i++){
+//            bw.write(Integer.toString(i) + ": ");
+//            bw.write(Long.toString(tableSet.getCKMStats().get(i))+"\n");
+//        }
+//        bw.write("Empty: "+Long.toString(tableSet.numberOfEmpty())+"\n");
+//        bw.write("Total: "+Long.toString(tableSet.numberOfCells())+"\n");
+//        bw.close();
+//                
+//        String metadataFileName = StrUtils.replaceExtension(tableSet.safeFileName, METADATA_FILE_EXTENSION);
+//        tableSet.metadata.writeCKMMetadata(metadataFileName, nExpVar, tableSet.expVar.toArray(new Variable[tableSet.expVar.size()]), 
+//                                           tableSet.respVar, addOrig, addDiff, addCellKey);
+//    }
 }
-

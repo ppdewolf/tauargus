@@ -103,11 +103,11 @@ public class TableSet {
     public static final int SUP_CTA = 9;
     public static final int SUP_CKM = 10;
 
-    public static final int CT_RESPONSE = 1;
-    public static final int CT_SHADOW = 2;
-    public static final int CT_COST = 3;
-    public static final int CT_ROUNDEDRESP = 4;
-    public static final int CT_CTA = 5;
+//    public static final int CT_RESPONSE = 1;       //These SRT parameters are never used; Peter-Paul
+//    public static final int CT_SHADOW = 2;
+//    public static final int CT_COST = 3;
+//    public static final int CT_ROUNDEDRESP = 4;
+//    public static final int CT_CTA = 5;
 
     public static final int ADDITIVITY_CHECK = 0;
     public static final int ADDITIVITY_RECOMPUTE = 1;
@@ -127,7 +127,7 @@ public class TableSet {
 
     static BufferedWriter outApriori, outStatus, outCost, outProtL,  outBound;
     
-    private static TauArgus tauArgus = Application.getTauArgusDll();
+    private static final TauArgus tauArgus = Application.getTauArgusDll();
     public Metadata metadata;
 
     public int index;  //mag niet static zijn!!!!!!!!!!!!
@@ -135,7 +135,7 @@ public class TableSet {
     // explanatory variables...
 // Anco 1.6    
 //    public List<Variable> expVar = new ArrayList<>();
-    public List<Variable> expVar = new ArrayList<Variable>();
+    public List<Variable> expVar = new ArrayList<>();
     // result variables...
     public Variable respVar;
 
@@ -289,6 +289,10 @@ public class TableSet {
         }
     }
     int APriory = -1;
+    
+    private TreeMap<Integer,Long> CKMStatistics = new TreeMap<>();
+    private long nEmpty;
+    
     private static String[][] codeList;
     private static int[][] codeListLevel;
     private static int[][] codeListNChild;
@@ -344,6 +348,18 @@ public class TableSet {
         }
     }
 
+    public long numberOfEmpty(){
+        return nEmpty;
+    }
+    
+    public void setNumberOfEmpty(long numberEmpty){
+        nEmpty=numberEmpty;
+    }
+    
+    public TreeMap<Integer, Long> getCKMStats(){
+        return CKMStatistics;
+    }
+    
     public int indexOfResponseVariable() {
         return Application.indexOfVariable(respVar);
     }
@@ -1436,21 +1452,23 @@ if (Application.isProtectCoverTable()){
     }
 
     
-public void writeCKM(TableSet tableSet, TreeMap<Integer, Integer> CKMStatistics, long nEmpty, boolean addOrig, boolean addDiff, boolean addCellKey, 
-                     boolean suppressEmpty, boolean EmbedQuotes, PropertyChangeListener propertyChangeListener) throws IOException, ArgusException {
+    public void writeCKM(boolean addOrig, boolean addDiff, boolean addCellKey, boolean suppressEmpty, 
+                     boolean EmbedQuotes, PropertyChangeListener propertyChangeListener) throws IOException, ArgusException {
         PropertyChangeSupport propertyChangeSupport = null;
         if (!Application.isBatch()){
           propertyChangeSupport  = new PropertyChangeSupport(this);
           propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);
-          }  
+        }  
 
+        this.CKMStatistics.clear();
+        for (int i=-this.maxDiff; i<=this.maxDiff; i++){
+            this.CKMStatistics.put(i, 0L);
+        }
+        this.nEmpty = 0L;
+        
         int nExpVar = expVar.size();
         int[] maxDim = new int[nExpVar];
         int[] dimArray = new int[nExpVar];
-
-        for (int i=-tableSet.maxDiff; i<tableSet.maxDiff; i++){
-            CKMStatistics.put(i,0);
-        }
 
         // including empty cells
         int numberOfCells = 1;
@@ -1464,7 +1482,7 @@ public void writeCKM(TableSet tableSet, TreeMap<Integer, Integer> CKMStatistics,
         BufferedWriter bw = null;
         PrintWriter writer = null;
         try {
-            fw = new FileWriter(tableSet.safeFileName);
+            fw = new FileWriter(safeFileName);
             bw = new BufferedWriter(fw);
             writer = new PrintWriter(bw);
 
@@ -1483,10 +1501,13 @@ public void writeCKM(TableSet tableSet, TreeMap<Integer, Integer> CKMStatistics,
             
             for (;;) {
                 Cell cell = getCell(dimArray);
-                if (cell.status == CellStatus.EMPTY) {
-                    nEmpty++;
-                }else{
-                    CKMStatistics.put((int)(cell.CKMValue-cell.response),CKMStatistics.get((int)(cell.CKMValue-cell.response))+1);
+                if (ckmProtect){
+                    if (cell.status == CellStatus.EMPTY) {
+                        this.nEmpty++;
+                    }else{
+                        long oldval = this.CKMStatistics.get((int)(cell.CKMValue-cell.response));
+                        this.CKMStatistics.put((int)(cell.CKMValue-cell.response),oldval+1);
+                    }
                 }
                 
                 if (cell.status != CellStatus.EMPTY || !suppressEmpty) {
@@ -1546,10 +1567,27 @@ public void writeCKM(TableSet tableSet, TreeMap<Integer, Integer> CKMStatistics,
           writer.close();
         }
 
-        String metadataFileName = StrUtils.replaceExtension(tableSet.safeFileName, METADATA_FILE_EXTENSION);
+        String metadataFileName = StrUtils.replaceExtension(safeFileName, METADATA_FILE_EXTENSION);
         metadata.writeCKMMetadata(metadataFileName, nExpVar, expVar.toArray(new Variable[expVar.size()]), respVar, addOrig, addDiff, addCellKey);
     }    
     
+    public void writeCKMStats(){
+        FileWriter fw = null;
+        BufferedWriter bw = null;
+        try{
+            fw = new FileWriter(StrUtils.replaceExtension(safeFileName, ".log"));
+            bw = new BufferedWriter(fw);
+            for (int i=-this.maxDiff;i<=this.maxDiff;i++){
+                bw.write(Integer.toString(i) + ": ");
+                bw.write(Long.toString(this.getCKMStats().get(i))+"\n");
+            }
+            bw.write("Empty: "+Long.toString(this.numberOfEmpty())+"\n");
+            bw.write("Total: "+Long.toString(this.numberOfCells())+"\n");
+            bw.close();
+        }catch (IOException ex){
+            
+        }
+    }
     
     
     //dubbel op gebruik de TableService

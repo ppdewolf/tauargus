@@ -43,6 +43,7 @@ public class DialogSaveTable extends DialogBase {
 
     public void showDialog(TableSet tableSet){
         this.tableSet = tableSet;
+        this.jRadioCKMFormat.setEnabled(tableSet.ckmProtect);
         setVisible(true);
     };
 
@@ -427,6 +428,7 @@ public class DialogSaveTable extends DialogBase {
         try {
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             SaveTable.writeTable(tableSet, selectedFormat);
+            tableSet.writeCKMStats();
             setCursor(Cursor.getDefaultCursor());
         } catch (ArgusException ex) {
             setCursor(Cursor.getDefaultCursor());
