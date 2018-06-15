@@ -428,7 +428,6 @@ public class DialogSaveTable extends DialogBase {
         try {
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             SaveTable.writeTable(tableSet, selectedFormat);
-            tableSet.writeCKMStats();
             setCursor(Cursor.getDefaultCursor());
         } catch (ArgusException ex) {
             setCursor(Cursor.getDefaultCursor());
