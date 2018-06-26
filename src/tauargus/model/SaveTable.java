@@ -493,20 +493,7 @@ public class SaveTable {
       return rupl;
   }
   
-/*public static void writeCKM(TableSet tableSet, boolean AddOrigVal, 
-                               boolean AddDiff, boolean AddCellKey)throws ArgusException{
-    try{
-        CKMStats = new TreeMap<Integer,Integer>();
-        nEmpty = 0;
-        tableSet.writeCKM(tableSet, CKMStats, nEmpty, AddOrigVal, AddDiff, AddCellKey, writeSupppressEmpty, writeEmbedQuotes, null);
-        return;
-    }
-    catch (Exception ex) {
-        throw new ArgusException ("An error occured when writing the CKM file");
-    }
-}*/
-  
-  
+
  /**
   * Writes the first lines of an HTML file
   * @param tableSet
@@ -617,438 +604,431 @@ public class SaveTable {
         reportfile = tableSet.safeFileName;
         int i = reportfile.lastIndexOf(".");
         reportfile = reportfile.substring(0, i) + ".html";
-        try { BufferedWriter out = new BufferedWriter(new FileWriter(reportfile));
-           writeKopHtml(tableSet, out, false);
+        try { 
+            BufferedWriter out = new BufferedWriter(new FileWriter(reportfile));
+            writeKopHtml(tableSet, out, false);
 
-    if (tableSet.computeTotals){ 
-        out.write("<br>Missing totals have been computed\n");
-    }
-    out.write("<p>\n");
-    out.write("<h2>Sensitivity Rule:</h2><h3>\n");
-    if (tableSet.ckmProtect){
-        out.write("None");
-    }
-    if (tableSet.domRule) {
-        for (i=1;i<4;i++){
-          hs = prDOM(i, tableSet);
-          if (! hs.equals("")) {out.write(hs);}
-        }  
-    }
-    if (tableSet.pqRule) {
-        for (i=1;i<4;i++){
-          hs = prPQ(i, tableSet);
-          if (! hs.equals("")) {out.write(hs);}
-        }  
-    }
-    if(tableSet.frequencyRule){
-        for (i=1;i<=2;i++){
-          if (tableSet.minFreq[i-1] !=0){
-             hs = "Minimun "+HI[i-1];
-             hs = hs + " cell frequency: " + tableSet.minFreq[i-1] + " ;safety margin: " + 
-                       tableSet.frequencyMarge[i-1]+ "%";
-              if (tableSet.minFreq[i-1] == 0 ){hs = hs + "<b>Possible poor protection</b>";}
-          out.write (hs+"<br>\n");                               
-          }
-        }
-    }
+            if (tableSet.computeTotals){ 
+                out.write("<br>Missing totals have been computed\n");
+            }
+            out.write("<p>\n");
+            out.write("<h2>Sensitivity Rule:</h2><h3>\n");
+            if (tableSet.ckmProtect){
+                out.write("None applicable");
+            }
+            if (tableSet.domRule) {
+                for (i=1;i<4;i++){
+                    hs = prDOM(i, tableSet);
+                    if (! hs.equals("")) {out.write(hs);}
+                }  
+            }
+            if (tableSet.pqRule) {
+                for (i=1;i<4;i++){
+                    hs = prPQ(i, tableSet);
+                    if (! hs.equals("")) {out.write(hs);}
+                }  
+            }
+            if(tableSet.frequencyRule){
+                for (i=1;i<=2;i++){
+                    if (tableSet.minFreq[i-1] !=0){
+                        hs = "Minimun "+HI[i-1];
+                        hs = hs + " cell frequency: " + tableSet.minFreq[i-1] + " ;safety margin: " + 
+                                tableSet.frequencyMarge[i-1]+ "%";
+                    if (tableSet.minFreq[i-1] == 0 ){hs = hs + "<b>Possible poor protection</b>";}
+                    out.write (hs+"<br>\n");                               
+                    }
+                }
+            }
 //ToDo    
-  if (tableSet.piepRule[0]){
-      for (i=0;i<tableSet.metadata.variables.size();i++){
-          Variable v = tableSet.metadata.variables.get(i);
-          if (v.requestCode != null){
-              out.write( "Request variable: " + v.name+ "<br>\n");
-              out.write( "&nbsp;&nbsp;codes("+v.requestCode[0]);
-              if (v.requestCode[1] != null) {out.write("," + v.requestCode[1]);}
-              out.write(")<br>\n");              
-          }  
-      }           
-      for (i=1;i<=2;i++){
-        if (tableSet.piepRule[i-1]){
-            out.write("Request-rule on " + HI[i-1] + " level applied <br>\n"); 
-            out.write("&nbsp;&nbsp;percentages: " + tableSet.piepPercentage[0]+ ", " + tableSet.piepPercentage[1]+"<br>\n" ); 
-            out.write("&nbsp;&nbsp;minfreq:     " + tableSet.piepMinFreq[i]+ "<br>\n" ); 
-            out.write("&nbsp;&nbsp;safety margin: " + tableSet.piepMarge[i]+"%<br>\n" ); 
-        }
-      }
-  }  
-  
-  if (tableSet.zeroUnsafe){
-      out.write("Zero-cells with contributors are treated as unsafe; safety margin: "+
-                tableSet.zeroRange+"%<br>\n");
-  }
+            if (tableSet.piepRule[0]){
+                for (i=0;i<tableSet.metadata.variables.size();i++){
+                    Variable v = tableSet.metadata.variables.get(i);
+                    if (v.requestCode != null){
+                        out.write( "Request variable: " + v.name+ "<br>\n");
+                        out.write( "&nbsp;&nbsp;codes("+v.requestCode[0]);
+                        if (v.requestCode[1] != null) {out.write("," + v.requestCode[1]);}
+                        out.write(")<br>\n");              
+                    }  
+                }           
+                for (i=1;i<=2;i++){
+                    if (tableSet.piepRule[i-1]){
+                        out.write("Request-rule on " + HI[i-1] + " level applied <br>\n"); 
+                        out.write("&nbsp;&nbsp;percentages: " + tableSet.piepPercentage[0]+ ", " + tableSet.piepPercentage[1]+"<br>\n" ); 
+                        out.write("&nbsp;&nbsp;minfreq:     " + tableSet.piepMinFreq[i]+ "<br>\n" ); 
+                        out.write("&nbsp;&nbsp;safety margin: " + tableSet.piepMarge[i]+"%<br>\n" ); 
+                    }
+                }
+            }  
+        
+            if (tableSet.zeroUnsafe){
+                out.write("Zero-cells with contributors are treated as unsafe; safety margin: "+
+                            tableSet.zeroRange+"%<br>\n");
+            }
 
-  if (!tableSet.ckmProtect) {
-      out.write("Manual safety margin: " + tableSet.manualMarge + "%<br>\n");
-      out.write("Missing codes have been considered ");
-      if (!tableSet.missingIsSafe){out.write("un");}
-      out.write ("safe<br>\n");
-  }
-  if (tableSet.weighted){out.write("Sample weights have been used<br>\n");}
-  if (tableSet.minTabVal !=0){out.write("Minimum lower bound for each cell " + tableSet.minTabVal + "<br>\n");} 
+            out.write("Manual safety margin: " + tableSet.manualMarge + "%<br>\n");
+            out.write("Missing codes have been considered ");
+            if (!tableSet.missingIsSafe){out.write("un");}
+            out.write ("safe<br>\n");
+            
+            if (tableSet.weighted){out.write("Sample weights have been used<br>\n");}
+            if (tableSet.minTabVal !=0){out.write("Minimum lower bound for each cell " + tableSet.minTabVal + "<br>\n");} 
 
-    out.write("</h3>\n");
+            out.write("</h3>\n");
    
-   switch (tableSet.suppressed) {
-       case TableSet.SUP_JJ_OPT : 
-              out.write("<h2>Optimal Salazar solution</h2>\n");  
-              out.write("<h2>Solver used: "+Application.getSolverName(tableSet.solverUsed) +"</h2>\n");
-              if (tableSet.inverseWeight){out.write("<h2>The inverted weights have been used.</h2>\n");  }
-              out.write("<h6>"+tableSet.suppressINFO+"</h6>\n");
-              break;
-       case TableSet.SUP_GHMITER :
-              out.write("<h2>GHMITER solution</h2>\n");     
-              out.write("<h3>GHMITER range ratio used: " + StrUtils.formatDouble(tableSet.ratio,3)  + " </h3>\n");
-              if (tableSet.ghMiterSize == 0){ out.write ("<h3>GHMITER normal model used</h3>\n");}
-              else if (tableSet.ghMiterSize == 1){ out.write ("<h3>GHMITER large model used</h3>\n");}
-              else {out.write("<h3>GHMITER large (manual specified) model used</h3>\n");}
-              hs = "";
-              if (! tableSet.ghMiterApplySingleton) {hs = " not";}
-              out.write("Singleton protection in GHMiter has" + hs + " been applied\n");              
-              break;
-       case TableSet.SUP_HITAS :     
-              out.write("<h2>Modular (HITAS) Salazar solution</h2>\n");
-              out.write("<h2>Solver used: "+Application.getSolverName(tableSet.solverUsed) +"</h2>\n");
-              out.write("<h6>"+tableSet.suppressINFO+"</h6>\n");
+            switch (tableSet.suppressed) {
+                case TableSet.SUP_JJ_OPT : 
+                    out.write("<h2>Optimal Salazar solution</h2>\n");  
+                    out.write("<h2>Solver used: "+Application.getSolverName(tableSet.solverUsed) +"</h2>\n");
+                    if (tableSet.inverseWeight){out.write("<h2>The inverted weights have been used.</h2>\n");  }
+                    out.write("<h6>"+tableSet.suppressINFO+"</h6>\n");
+                    break;
+                case TableSet.SUP_GHMITER :
+                    out.write("<h2>GHMITER solution</h2>\n");     
+                    out.write("<h3>GHMITER range ratio used: " + StrUtils.formatDouble(tableSet.ratio,3)  + " </h3>\n");
+                    if (tableSet.ghMiterSize == 0){ out.write ("<h3>GHMITER normal model used</h3>\n");}
+                        else if (tableSet.ghMiterSize == 1){ out.write ("<h3>GHMITER large model used</h3>\n");}
+                            else {out.write("<h3>GHMITER large (manual specified) model used</h3>\n");}
+                    hs = "";
+                    if (! tableSet.ghMiterApplySingleton) {hs = " not";}
+                    out.write("Singleton protection in GHMiter has" + hs + " been applied\n");              
+                    break;
+                case TableSet.SUP_HITAS :     
+                    out.write("<h2>Modular (HITAS) Salazar solution</h2>\n");
+                    out.write("<h2>Solver used: "+Application.getSolverName(tableSet.solverUsed) +"</h2>\n");
+                    out.write("<h6>"+tableSet.suppressINFO+"</h6>\n");
 // Print #1, "<h3>(Modular ocx version: " + frmMain.XPhitasOCX.VersionInfo + " used)<br>"
-              out.write("<h3>Max time per subtable: " + tableSet.maxHitasTime + " minutes</h3>\n");
-              break;
-       case TableSet.SUP_ROUNDING : 
-              out.write("<h2>Rounding procedure with "+Application.getSolverName(tableSet.solverUsed) +" applied <BR>rounding base " + tableSet.roundBase + "</h2>");
-              out.write( "&nbsp;&nbsp;&nbsp;&nbsp;Number of steps: " + tableSet.roundJumps + ";  Max distance: " + 
-                      StrUtils.formatDouble(tableSet.roundMaxJump, tableSet.respVar.nDecimals)
-                      +"<br>"); out.newLine();
-              out.write(tableSet.roundedInfo+"\n");
-              break;
-       case TableSet.SUP_CTA :              
-              out.write("<h2>Controlled Tabular Adjustment has been applied</h2>\n");
-              out.write("<h3>" + tableSet.suppressINFO +"</h3>");
-              break;
-       case TableSet.SUP_NETWORK : 
-              out.write("<h2>The network solution has been applied</h2>\n");
-              out.write("<h3>" + tableSet.suppressINFO +"</h3>");
-              break;
-       case TableSet.SUP_NO :
-              out.write( "<h2>Not protected yet</h2>\n");
-              break;
-       case TableSet.SUP_UWE :
-              out.write( "<h2>Protected with the experimental UWE-software</h2>\n");
-              break;
-       case TableSet.SUP_CKM :
-              out.write("<h2>Protected with the Cell Key Method</h2>\n");
-              out.write("<h3>P-table used from file\n\""+tableSet.cellkeyVar.metadata.getFilePath(tableSet.cellkeyVar.PTableFile)+"\"</h3>\n");
-              break;
-  }
+                    out.write("<h3>Max time per subtable: " + tableSet.maxHitasTime + " minutes</h3>\n");
+                    break;
+                case TableSet.SUP_ROUNDING : 
+                    out.write("<h2>Rounding procedure with "+Application.getSolverName(tableSet.solverUsed) +" applied <BR>rounding base " + tableSet.roundBase + "</h2>");
+                    out.write( "&nbsp;&nbsp;&nbsp;&nbsp;Number of steps: " + tableSet.roundJumps + ";  Max distance: " + 
+                                StrUtils.formatDouble(tableSet.roundMaxJump, tableSet.respVar.nDecimals)
+                                +"<br>"); out.newLine();
+                    out.write(tableSet.roundedInfo+"\n");
+                    break;
+                case TableSet.SUP_CTA :              
+                    out.write("<h2>Controlled Tabular Adjustment has been applied</h2>\n");
+                    out.write("<h3>" + tableSet.suppressINFO +"</h3>");
+                    break;
+                case TableSet.SUP_NETWORK : 
+                    out.write("<h2>The network solution has been applied</h2>\n");
+                    out.write("<h3>" + tableSet.suppressINFO +"</h3>");
+                    break;
+                case TableSet.SUP_NO :
+                    out.write( "<h2>Not protected yet</h2>\n");
+                    break;
+                case TableSet.SUP_UWE :
+                    out.write( "<h2>Protected with the experimental UWE-software</h2>\n");
+                    break;
+                case TableSet.SUP_CKM :
+                    out.write("<h2>Protected with the Cell Key Method</h2>\n");
+                    out.write("<h3>P-table used from file\n\""+tableSet.cellkeyVar.metadata.getFilePath(tableSet.cellkeyVar.PTableFile)+"\"</h3>\n");
+                    break;
+            }
 //    if (tableSet.inverseWeight){out.write("<h2>Inverse weight procedure has been applied</h2>\n");}
 
-    if (tableSet.suppressed == TableSet.SUP_HITAS || tableSet.suppressed == TableSet.SUP_JJ_OPT ||
-        tableSet.suppressed == TableSet.SUP_UWE ) {
-        hs = " not "; if ( tableSet.singletonSingletonCheck){hs =" ";}
-        out.write("<h3>Additional Singleton/Singleton option has" + hs + "been used<br>\n");
+            if (tableSet.suppressed == TableSet.SUP_HITAS || tableSet.suppressed == TableSet.SUP_JJ_OPT ||
+                tableSet.suppressed == TableSet.SUP_UWE ) {
+                hs = " not "; if ( tableSet.singletonSingletonCheck){hs =" ";}
+                out.write("<h3>Additional Singleton/Singleton option has" + hs + "been used<br>\n");
     
-        hs = " not "; if ( tableSet.singletonMultipleCheck){hs =" ";}
-        out.write ("Additional Singleton/Multiple option has" + hs + "been used<br>\n");
+                hs = " not "; if ( tableSet.singletonMultipleCheck){hs =" ";}
+                out.write ("Additional Singleton/Multiple option has" + hs + "been used<br>\n");
         
-        hs = " not "; if ( tableSet.minFreqCheck){hs =" ";}
-        out.write ("Additional Min. Frequency option has" + hs + "been used</h3>\n");
-    }
+                hs = " not "; if ( tableSet.minFreqCheck){hs =" ";}
+                out.write ("Additional Min. Frequency option has" + hs + "been used</h3>\n");
+            }
     
 //If .ScalingUsed Then Print #1, "<h3>Scaling procedure has been applied</h3>"
 //
     
-    if (tableSet.suppressed == TableSet.SUP_GHMITER) {
-       int j = 0;
-       for (i=0;i<MAX_GH_MITER_RATIO;i++){j = j + tableSet.ghMiterRatio[i];}
-       if (j > 0) {
-           out.write("<h2>Details on the GHMITER solution</h2>\n");
-           if (!tableSet.ghMiterMessage.equals("")){
-                 out.write(tableSet.ghMiterMessage+ "<br>"); out.newLine();
-              }
+            if (tableSet.suppressed == TableSet.SUP_GHMITER) {
+                int j = 0;
+                for (i=0;i<MAX_GH_MITER_RATIO;i++){j = j + tableSet.ghMiterRatio[i];}
+                if (j > 0) {
+                    out.write("<h2>Details on the GHMITER solution</h2>\n");
+                    if (!tableSet.ghMiterMessage.equals("")){
+                        out.write(tableSet.ghMiterMessage+ "<br>"); out.newLine();
+                    }
 //           out.write("Sliding protection ratio corresponding to safety rule employed: R =" + tableSet.ghMiterRatio[0] + "<br>\n");
-           out.write("Sliding protection ratio corresponding to safety rule employed: R =" + StrUtils.formatDouble(tableSet.ratio, 3) + ".<br>\n");
-           out.write("This ratio had to be reduced in some cases,\n");
-           out.write("because otherwise no feasible solution could be found.<br><br>\n");
-           out.write("Number of cases where sliding protection range was reduced,\n");
-           out.write("by finally confirmed sliding protection ranges:<br>\n");
-       if (j - tableSet.ghMiterRatio[MAX_GH_MITER_RATIO -2] - tableSet.ghMiterRatio[MAX_GH_MITER_RATIO -1] > 0){
-           out.write("<table border=\"1\" width =\"90%\"><tr>\n");
-           out.write("<td width=\"9%\">confirmed protection level</td>\n");
-       for (i=1;i<=10;i++){
-            out.write("<td width=\"9%\">R/" + i + "=" + StrUtils.formatDouble(tableSet.ratio / i, 3) + " </td>\n");
-            }                   
-       out.write("</tr><tr>\n");
-       out.write("<td width=\"9%\">n of cases</td>\n");
-       for (i=0;i<=9;i++){
-          out.write("<td width=\"9%\" align=\"right\">" + tableSet.ghMiterRatio[i] + " </td>\n");
-          }
-       out.write(" </tr></table>\n");
-       out.write("<p>\n");
-       }
-       if ( tableSet.ghMiterRatio[MAX_GH_MITER_RATIO -2] > 0){
-         out.write("In "+ tableSet.ghMiterRatio[MAX_GH_MITER_RATIO -2]+ 
-                   " cases the protection level had to be reduced to an 'infinitely' small (positive) value.<br>\n");
-       }
-       if ( tableSet.ghMiterRatio[MAX_GH_MITER_RATIO -1] > 0){
-       out.write("In "+ tableSet.ghMiterRatio[MAX_GH_MITER_RATIO -1]+ " cases the protection level was reduced to zero, making 'frozen' cells available\n");
-       out.write("for suppression (see the manual for illustration of how to trace these cells).<br> \n");
-       }
-       out.write("Note that the number of cases with range reduction reported by the statistics above is\n");
-       out.write("very likely to exceed the actual number of cells concerned, because cells belonging to\n");
-       out.write("multiple (sub-) tables are counted multiple times.\n");
-       out.write("<p>\n");
-       }
-    }
-    if (tableSet.suppressed != TableSet.SUP_NO){
-       out.write("<h2>Time used to protect the table: " + StrUtils.timeToString(tableSet.processingTime)+"</h2>\n");
-    }
-       if (tableSet.hasBeenAudited) {
-            if((tableSet.auditExactDisclosure+tableSet.auditPartialDisclosure)==0) {
-                out.write("<h2>The audit did not find any disclosure problems</h2>\n");
+                    out.write("Sliding protection ratio corresponding to safety rule employed: R =" + StrUtils.formatDouble(tableSet.ratio, 3) + ".<br>\n");
+                    out.write("This ratio had to be reduced in some cases,\n");
+                    out.write("because otherwise no feasible solution could be found.<br><br>\n");
+                    out.write("Number of cases where sliding protection range was reduced,\n");
+                    out.write("by finally confirmed sliding protection ranges:<br>\n");
+                    if (j - tableSet.ghMiterRatio[MAX_GH_MITER_RATIO -2] - tableSet.ghMiterRatio[MAX_GH_MITER_RATIO -1] > 0){
+                        out.write("<table border=\"1\" width =\"90%\"><tr>\n");
+                        out.write("<td width=\"9%\">confirmed protection level</td>\n");
+                        for (i=1;i<=10;i++){
+                            out.write("<td width=\"9%\">R/" + i + "=" + StrUtils.formatDouble(tableSet.ratio / i, 3) + " </td>\n");
+                        }                   
+                        out.write("</tr><tr>\n");
+                        out.write("<td width=\"9%\">n of cases</td>\n");
+                        for (i=0;i<=9;i++){
+                            out.write("<td width=\"9%\" align=\"right\">" + tableSet.ghMiterRatio[i] + " </td>\n");
+                        }
+                        out.write(" </tr></table>\n");
+                        out.write("<p>\n");
+                    }
+                    if ( tableSet.ghMiterRatio[MAX_GH_MITER_RATIO -2] > 0){
+                        out.write("In "+ tableSet.ghMiterRatio[MAX_GH_MITER_RATIO -2]+ 
+                                    " cases the protection level had to be reduced to an 'infinitely' small (positive) value.<br>\n");
+                    }
+                    if ( tableSet.ghMiterRatio[MAX_GH_MITER_RATIO -1] > 0){
+                        out.write("In "+ tableSet.ghMiterRatio[MAX_GH_MITER_RATIO -1]+ " cases the protection level was reduced to zero, making 'frozen' cells available\n");
+                        out.write("for suppression (see the manual for illustration of how to trace these cells).<br> \n");
+                    }
+                    out.write("Note that the number of cases with range reduction reported by the statistics above is\n");
+                    out.write("very likely to exceed the actual number of cells concerned, because cells belonging to\n");
+                    out.write("multiple (sub-) tables are counted multiple times.\n");
+                    out.write("<p>\n");
+                }
+            }
+            if (tableSet.suppressed != TableSet.SUP_NO){
+                out.write("<h2>Time used to protect the table: " + StrUtils.timeToString(tableSet.processingTime)+"</h2>\n");
+            }
+            if (tableSet.hasBeenAudited) {
+                if((tableSet.auditExactDisclosure+tableSet.auditPartialDisclosure)==0) {
+                    out.write("<h2>The audit did not find any disclosure problems</h2>\n");
+                }
+                else{
+                    try{
+                        BufferedReader audit = new BufferedReader(new FileReader(Application.getTempFile("audit_"+ tableSet.index+".html")));
+                        int status = 0;
+                        while ((hs=audit.readLine()) != null){
+                            if (hs.contains("XXXXXXXX")) status++;
+                            if (status == 1) out.write(hs+"\n");
+                            if (status == 2) break;
+                        }
+                        audit.close();
+                    } 
+                    catch (IOException ex){}
+                }
+            } 
+
+
+            out.write("<h2>Summary of the table</h2>\n");
+       
+            if (!tableSet.ckmProtect){
+                int d= tableSet.respVar.nDecimals;
+                CellStatusStatistics stat = tableSet.getCellStatusStatistics();
+     
+                out.write("<table>\n");
+                out.write("<tr><th width=\"6%\" height=\"11\">&nbsp;</th>\n");
+                out.write("<th width=\"20%\" height=\"11\">Status</th>\n");
+                out.write("<th width=\"10%\" height=\"11\">Number of cells</th>\n");
+                out.write("<th width=\"10%\" height=\"11\">Number of respondents</th>\n");
+                if (tableSet.holding){ out.write("<th width=\"10%\" height=\"11\">Number of holdings freq.</th>\n");}
+                out.write("<th width=\"15%\" height=\"11\">Response value</th>\n");
+                out.write("<th width=\"15%\" height=\"11\">Cost value</th>\n");
+                out.write("</tr>\n");
+// StatLabel (i)
+                for (i=CellStatus.SAFE.getValue();i<=CellStatus.EMPTY.getValue()+1;i++){
+                    if ( (i!=CellStatus.UNSAFE_SINGLETON.getValue()) && (i!=CellStatus.UNSAFE_SINGLETON_MANUAL.getValue()) ){
+                        out.write("<tr><td align=\"Right\">"+ i+ "</td>");
+                        if (i<CellStatus.EMPTY.getValue()+1){
+                        out.write("<td>" + CellStatus.findByValue(i).getDescription()+ "</td>");
+                        } else {
+                            out.write("<td>Total</td>");
+                        }
+                        out.write("<td align=\"Right\">" + stat.freq[i] + "</td>\n");
+                        out.write("<td align=\"Right\">" + stat.cellFreq[i] + "</td>\n");
+                        if (tableSet.holding){out.write("    <td align=\"Right\">" + stat.holdingFreq[i] + "</td>\n");}
+                        x = stat.cellResponse[i];
+                        hs = String.format(Locale.US, "%."+d+"f", x);
+                        out.write("<td align=\"Right\">" + hs+ "</td>\n");
+                        x = stat.cellCost[i];
+                        hs = String.format(Locale.US, "%."+d+"f", x);
+                        out.write("<td align=\"Right\">" + hs + "</td></tr>\n");
+                    }
+                }
+                out.write("</table>\n");
+                out.write("<p>\n");
             }
             else{
-               try{  BufferedReader audit = new BufferedReader(new FileReader(Application.getTempFile("audit_"+ tableSet.index+".html")));
-               int status = 0;
-               while ((hs=audit.readLine()) != null){
-                  if (hs.contains("XXXXXXXX")) status++;
-                  if (status == 1) out.write(hs+"\n");
-                  if (status == 2) break;
-               }
-               audit.close();
-               } 
-               catch (IOException ex){}
+                out.write("<table>\n");
+                out.write("<tr><th width=\"50%\" height=\"11\">Added noise</th>\n");
+                out.write("<th width=\"50%\" height=\"11\">Number of cells</th>\n");
+                for (i=tableSet.minDiff;i<=tableSet.maxDiff;i++){
+                    out.write("<tr><td align=\"Right\">"+ Integer.toString(i) + "</td>");
+                    out.write("<td align=\"Right\">"+Long.toString(tableSet.getCKMStats().get(i))+"</td></tr>\n");
+                }
+                out.write("<tr><td align=\"Right\"> Empty </td>");
+                out.write("<td align=\"Right\">"+Long.toString(tableSet.numberOfEmpty())+"</td></tr>\n");
+                out.write("<tr><td align=\"Right\"> Total </td>");
+                out.write("<td align=\"Right\">"+Long.toString(tableSet.numberOfCells())+"</td></tr>\n");
+                out.write("</table>\n");
+                out.write("<p>\n");
             }
-         } 
-
-
-       out.write("<h2>Summary of the table</h2>\n");
-       
-       if (!tableSet.ckmProtect){
-       int d= tableSet.respVar.nDecimals;
-       CellStatusStatistics stat = tableSet.getCellStatusStatistics();
-       
-     
-       out.write("<table>\n");
-       out.write("<tr><th width=\"6%\" height=\"11\">&nbsp;</th>\n");
-       out.write("<th width=\"20%\" height=\"11\">Status</th>\n");
-       out.write("<th width=\"10%\" height=\"11\">Number of cells</th>\n");
-       out.write("<th width=\"10%\" height=\"11\">Number of respondents</th>\n");
-       if (tableSet.holding){ out.write("<th width=\"10%\" height=\"11\">Number of holdings freq.</th>\n");}
-       out.write("<th width=\"15%\" height=\"11\">Response value</th>\n");
-       out.write("<th width=\"15%\" height=\"11\">Cost value</th>\n");
-       out.write("</tr>\n");
-// StatLabel (i)
-       for (i=CellStatus.SAFE.getValue();i<=CellStatus.EMPTY.getValue()+1;i++){
-         if ( (i!=CellStatus.UNSAFE_SINGLETON.getValue()) && (i!=CellStatus.UNSAFE_SINGLETON_MANUAL.getValue()) ){
-         out.write("<tr><td align=\"Right\">"+ i+ "</td>");
-         if (i<CellStatus.EMPTY.getValue()+1){
-            out.write("<td>" + CellStatus.findByValue(i).getDescription()+ "</td>");
-         } else {
-            out.write("<td>Total</td>");
-         }
-         out.write("<td align=\"Right\">" + stat.freq[i] + "</td>\n");
-         out.write("<td align=\"Right\">" + stat.cellFreq[i] + "</td>\n");
-         if (tableSet.holding){out.write("    <td align=\"Right\">" + stat.holdingFreq[i] + "</td>\n");}
-         x = stat.cellResponse[i];
-         hs = String.format(Locale.US, "%."+d+"f", x);
-         out.write("<td align=\"Right\">" + hs+ "</td>\n");
-         x = stat.cellCost[i];
-         hs = String.format(Locale.US, "%."+d+"f", x);
-         out.write("<td align=\"Right\">" + hs + "</td></tr>\n");
-         }
-       }
-         out.write("</table>\n");
-         out.write("<p>\n");
-       }
-       else{
-            out.write("<table>\n");
-            out.write("<tr><th width=\"50%\" height=\"11\">Added noise</th>\n");
-            out.write("<th width=\"50%\" height=\"11\">Number of cells</th>\n");
-            for (i=-tableSet.maxDiff;i<=tableSet.maxDiff;i++){
-                out.write("<tr><td align=\"Right\">"+ Integer.toString(i) + "</td>");
-                out.write("<td align=\"Right\">"+Long.toString(tableSet.getCKMStats().get(i))+"</td></tr>\n");
-            }
-            out.write("<tr><td align=\"Right\"> Empty </td>");
-            out.write("<td align=\"Right\">"+Long.toString(tableSet.numberOfEmpty())+"</td></tr>\n");
-            out.write("<tr><td align=\"Right\"> Total </td>");
-            out.write("<td align=\"Right\">"+Long.toString(tableSet.numberOfCells())+"</td></tr>\n");
-            out.write("</table>\n");
-            out.write("<p>\n");
-       }
   //If SuperCross Then GoTo EINDE
          
-       if (tableSet.historyUsed>0) {
-         BufferedReader outApriori, outStatus, outCost, outProtL,  outBound;           
-         outApriori = new BufferedReader(new FileReader(Application.getTempFile("Apriori" + tableSet.index + ".htm")));  
-         outStatus  = new BufferedReader(new FileReader(Application.getTempFile("HistStat" + tableSet.index + ".htm")));
-         outCost    = new BufferedReader(new FileReader(Application.getTempFile("HistCost" + tableSet.index + ".htm")));
-         outProtL   = new BufferedReader(new FileReader(Application.getTempFile("HistPL" + tableSet.index + ".htm")));
-         outBound   = new BufferedReader(new FileReader(Application.getTempFile("HistAB" + tableSet.index + ".htm"))); 
-         BufferedWriter outDetail;
-         reportfile = reportfile.substring(0, reportfile.length()-5)+"_apriori.html";
-         outDetail   = new BufferedWriter(new FileWriter(reportfile)); 
-         writeKopHtml(tableSet, outDetail, true);
-         outDetail.write("<h1>&tau;-ARGUS Apriory file Report </h1><p>");outDetail.newLine();
-         int p; boolean readFurther;
-         String okeString="", falseString="";
-         out.write("<p>\n");
-         for(i=0;i<tableSet.historyUsed;i++){
-             hs = outApriori.readLine();
-             out.write("<h2>Summary of the apriory information file: "+(i+1)+"</h2>\n");
-             out.write("<h3>"+hs+"</h3>\n");
-             hs = outApriori.readLine();
-             out.write("<h3>"+hs+"</h3>\n");
-             out.write("<table>\n");
-             out.write("<tr><th width=\"50%\"height=\"11\">&nbsp;</th>\n");
-             out.write("<th width=\"25%\" height=\"11\">Correct</th>\n");
-             out.write("<th width=\"25%\" height=\"11\">Incorrect</th></tr>\n");
-             hs = outApriori.readLine();
-             for(int j=0;j<=4;j++){
-               if (j!=3){  
-                out.write("<tr><td>");
-                out.write(APriori.getStatus(j));
-                out.write("</td><td  align=\"Right\">");
-                p = hs.indexOf(";");
-                if (j==0){okeString = hs.substring(0,p) ;}
-                out.write(hs.substring(0,p));
-                hs = hs.substring(p+1);
-                out.write("</td><td align=\"Right\">");
-                p = hs.indexOf(";");
-                if (j==0){falseString = hs.substring(0,p) ;}
-                out.write(hs.substring(0,p));
-                hs = hs.substring(p+1);
-                out.write("</td></tr>\n");             
-             }   
-             else{
-                p = hs.indexOf(";");
-                hs = hs.substring(p+1);
-                p = hs.indexOf(";");
-                hs = hs.substring(p+1);
-               }
-             }
-             out.write("</table>\n");
-             hs = outStatus.readLine();
-             outDetail.write(hs); outDetail.newLine();
-             outDetail.write("<h2>Number of lines processed</h2>");outDetail.newLine();
-             outDetail.write("<table>");outDetail.newLine();
-             outDetail.write("<tr><td>Feasible lines</td><td align=\"Right\">"+okeString+"</td></tr>");outDetail.newLine();
-             outDetail.write("<tr><td>Infeasible lines</td><td align=\"Right\">"+falseString+ "</td></tr>");outDetail.newLine();
-             outDetail.write("</table>");outDetail.newLine();
-             readFurther = true;
-             while (hs != null && readFurther){
-                 hs = outStatus.readLine();
-                 if (hs != null){
-                   if (hs.length()>6){if (hs.substring(0, 5).equals("<EOF>")){readFurther = false;}}
-                   if (readFurther){ outDetail.write(hs); outDetail.newLine();}
-                 }
-             }
+            if (tableSet.historyUsed>0) {
+                BufferedReader outApriori, outStatus, outCost, outProtL,  outBound;           
+                outApriori = new BufferedReader(new FileReader(Application.getTempFile("Apriori" + tableSet.index + ".htm")));  
+                outStatus  = new BufferedReader(new FileReader(Application.getTempFile("HistStat" + tableSet.index + ".htm")));
+                outCost    = new BufferedReader(new FileReader(Application.getTempFile("HistCost" + tableSet.index + ".htm")));
+                outProtL   = new BufferedReader(new FileReader(Application.getTempFile("HistPL" + tableSet.index + ".htm")));
+                outBound   = new BufferedReader(new FileReader(Application.getTempFile("HistAB" + tableSet.index + ".htm"))); 
+                BufferedWriter outDetail;
+                reportfile = reportfile.substring(0, reportfile.length()-5)+"_apriori.html";
+                outDetail   = new BufferedWriter(new FileWriter(reportfile)); 
+                writeKopHtml(tableSet, outDetail, true);
+                outDetail.write("<h1>&tau;-ARGUS Apriory file Report </h1><p>");outDetail.newLine();
+                int p; boolean readFurther;
+                String okeString="", falseString="";
+                out.write("<p>\n");
+                for(i=0;i<tableSet.historyUsed;i++){
+                    hs = outApriori.readLine();
+                    out.write("<h2>Summary of the apriory information file: "+(i+1)+"</h2>\n");
+                    out.write("<h3>"+hs+"</h3>\n");
+                    hs = outApriori.readLine();
+                    out.write("<h3>"+hs+"</h3>\n");
+                    out.write("<table>\n");
+                    out.write("<tr><th width=\"50%\"height=\"11\">&nbsp;</th>\n");
+                    out.write("<th width=\"25%\" height=\"11\">Correct</th>\n");
+                    out.write("<th width=\"25%\" height=\"11\">Incorrect</th></tr>\n");
+                    hs = outApriori.readLine();
+                    for(int j=0;j<=4;j++){
+                        if (j!=3){  
+                            out.write("<tr><td>");
+                            out.write(APriori.getStatus(j));
+                            out.write("</td><td  align=\"Right\">");
+                            p = hs.indexOf(";");
+                            if (j==0){okeString = hs.substring(0,p) ;}
+                            out.write(hs.substring(0,p));
+                            hs = hs.substring(p+1);
+                            out.write("</td><td align=\"Right\">");
+                            p = hs.indexOf(";");
+                            if (j==0){falseString = hs.substring(0,p) ;}
+                            out.write(hs.substring(0,p));
+                            hs = hs.substring(p+1);
+                            out.write("</td></tr>\n");             
+                        }   
+                        else{
+                            p = hs.indexOf(";");
+                            hs = hs.substring(p+1);
+                            p = hs.indexOf(";");
+                            hs = hs.substring(p+1);
+                        }
+                    }
+                    out.write("</table>\n");
+                    hs = outStatus.readLine();
+                    outDetail.write(hs); outDetail.newLine();
+                    outDetail.write("<h2>Number of lines processed</h2>");outDetail.newLine();
+                    outDetail.write("<table>");outDetail.newLine();
+                    outDetail.write("<tr><td>Feasible lines</td><td align=\"Right\">"+okeString+"</td></tr>");outDetail.newLine();
+                    outDetail.write("<tr><td>Infeasible lines</td><td align=\"Right\">"+falseString+ "</td></tr>");outDetail.newLine();
+                    outDetail.write("</table>");outDetail.newLine();
+                    readFurther = true;
+                    while (hs != null && readFurther){
+                        hs = outStatus.readLine();
+                        if (hs != null){
+                            if (hs.length()>6){if (hs.substring(0, 5).equals("<EOF>")){readFurther = false;}}
+                            if (readFurther){ outDetail.write(hs); outDetail.newLine();}
+                        }   
+                    }
 
-             hs = outCost.readLine();
-             outDetail.write(hs); outDetail.newLine();
-             readFurther = true;
-             while (hs != null && readFurther){
-                 hs = outCost.readLine();
-                 if (hs != null){
-                   if (hs.length()>6){if (hs.substring(0, 5).equals("<EOF>")){readFurther = false;}}
-                   if (readFurther){ outDetail.write(hs); outDetail.newLine();}
-                 }
-             }
+                    hs = outCost.readLine();
+                    outDetail.write(hs); outDetail.newLine();
+                    readFurther = true;
+                    while (hs != null && readFurther){
+                        hs = outCost.readLine();
+                        if (hs != null){
+                            if (hs.length()>6){if (hs.substring(0, 5).equals("<EOF>")){readFurther = false;}}
+                            if (readFurther){ outDetail.write(hs); outDetail.newLine();}
+                        }
+                    }
 
-             hs = outProtL.readLine();
-             outDetail.write(hs); outDetail.newLine();
-             readFurther = true;
-             while (hs != null && readFurther){
-                 hs = outProtL.readLine();
-                 if (hs != null){
-                   if (hs.length()>6){if (hs.substring(0, 5).equals("<EOF>")){readFurther = false;}}
-                   if (readFurther){ outDetail.write(hs); outDetail.newLine();}
-                 }
-             }
-             outDetail.write("<br><br>"); outDetail.newLine();
+                    hs = outProtL.readLine();
+                    outDetail.write(hs); outDetail.newLine();
+                    readFurther = true;
+                    while (hs != null && readFurther){
+                        hs = outProtL.readLine();
+                        if (hs != null){
+                            if (hs.length()>6){if (hs.substring(0, 5).equals("<EOF>")){readFurther = false;}}
+                            if (readFurther){ outDetail.write(hs); outDetail.newLine();}
+                        }
+                    }
+                    outDetail.write("<br><br>"); outDetail.newLine();
              
-         }
-         out.write("</p>\n");          
-         out.write("For more details click<a href=\"file:///"+reportfile+"\"> here</a>"); out.newLine(); 
-         outApriori.close();
-         outDetail.write("<br><a HREF=\"javascript:history.go(-1)\">back</a>"); outDetail.newLine();
-         outDetail.write("</body>"); outDetail.newLine();
-         outDetail.write("</html>"); outDetail.newLine();
-         outDetail.close();         
-       } 
+                }
+                out.write("</p>\n");          
+                out.write("For more details click<a href=\"file:///"+reportfile+"\"> here</a>"); out.newLine(); 
+                outApriori.close();
+                outDetail.write("<br><a HREF=\"javascript:history.go(-1)\">back</a>"); outDetail.newLine();
+                outDetail.write("</body>"); outDetail.newLine();
+                outDetail.write("</html>"); outDetail.newLine();
+                outDetail.close();         
+            } 
 
-         for (i=1;i<=tableSet.expVar.size();i++){
-            int ind = tableSet.expVar.get(i-1).index; int n = 1;
-               String dots = " ..........";
-               if(tableSet.expVar.get(i-1).hierarchical!= Variable.HIER_NONE){
-                  out.write("<h2>Coding tree for variable " +tableSet.expVar.get(i-1).name + "</h2>\n");
-                  if (tableSet.expVar.get(i-1).recoded){out.write("A recoding has been applied<br>"); out.newLine();}
-                  out.write("<table>");out.newLine();
-                  out.write("<tr><th>Codelist</th></tr>");out.newLine();
-                  int[] level = new int[1];
-                  while( n < TauArgusUtils.getNumberOfActiveCodes(ind)  ) {
-                    hs = TauArgusUtils.getCodeLevel(ind, n, level);
-                    out.write("<tr><td>"+dots.substring(0,level[0])+hs+"</td></tr>"); out.newLine();
-                    n++;
-                  }
-                  out.write("</table>"); out.newLine();                 
-                  
-               } else {
-                  out.write("<h2>Codes for variable " + tableSet.expVar.get(i-1).name+ "</h2>\n");
-                  if (tableSet.expVar.get(i-1).recoded){
-                     out.write("A recoding has been applied<br>"); out.newLine();
-                  } 
-                  out.write("<table>");out.newLine();
-                  out.write("<tr><th>Codelist</th></tr>");out.newLine();
-                  while( n < TauArgusUtils.getNumberOfActiveCodes(ind)  ) {
-                    hs = TauArgusUtils.getCode(ind, n);
-                    out.write("<tr><td>"+hs+"</td></tr>"); out.newLine();
-                    n++;
-                  }
-                  out.write("</table>"); out.newLine();
-               }
+            for (i=1;i<=tableSet.expVar.size();i++){
+                int ind = tableSet.expVar.get(i-1).index; int n = 1;
+                String dots = " ..........";
+                if(tableSet.expVar.get(i-1).hierarchical!= Variable.HIER_NONE){
+                    out.write("<h2>Coding tree for variable " +tableSet.expVar.get(i-1).name + "</h2>\n");
+                    if (tableSet.expVar.get(i-1).recoded){out.write("A recoding has been applied<br>"); out.newLine();}
+                    out.write("<table>");out.newLine();
+                    out.write("<tr><th>Codelist</th></tr>");out.newLine();
+                    int[] level = new int[1];
+                    while( n < TauArgusUtils.getNumberOfActiveCodes(ind)  ) {
+                        hs = TauArgusUtils.getCodeLevel(ind, n, level);
+                        out.write("<tr><td>"+dots.substring(0,level[0])+hs+"</td></tr>"); out.newLine();
+                        n++;
+                    }
+                    out.write("</table>"); out.newLine();                 
+                } else {
+                    out.write("<h2>Codes for variable " + tableSet.expVar.get(i-1).name+ "</h2>\n");
+                    if (tableSet.expVar.get(i-1).recoded){
+                        out.write("A recoding has been applied<br>"); out.newLine();
+                    } 
+                    out.write("<table>");out.newLine();
+                    out.write("<tr><th>Codelist</th></tr>");out.newLine();
+                    while( n < TauArgusUtils.getNumberOfActiveCodes(ind)  ) {
+                        hs = TauArgusUtils.getCode(ind, n);
+                        out.write("<tr><td>"+hs+"</td></tr>"); out.newLine();
+                        n++;
+                    }
+                    out.write("</table>"); out.newLine();
+                }
+            }
 
-           }
-
-
-
-         out.write ("<br>&tau;-ARGUS version: " + Application.getFullVersion()+" (Build " + Application.BUILD + ")");  out.newLine();
-         out.write("</body>\n");
-         out.write("</html\n");  
-         out.close();
-    }catch (Exception ex) { 
+            out.write ("<br>&tau;-ARGUS version: " + Application.getFullVersion()+" (Build " + Application.BUILD + ")");  out.newLine();
+            out.write("</body>\n");
+            out.write("</html\n");  
+            out.close();
+        }catch (Exception ex) { 
+        }
     }
-}
 
-static void printTableInfo(TableSet tableSet, BufferedWriter out){
-    int j;
+    static void printTableInfo(TableSet tableSet, BufferedWriter out){
+        int j;
 //Dim Oke As Boolean
-    try{
-     out.write("<table>\n");
-     out.write("<tr><th width=\"40%\" height=\"11\">Function</th>\n");
-     out.write("<th width=\"40%\" height=\"11\">Var</th>\n");
-     out.write("<th width=\"20%\" height=\"11\"># codes</th></tr>\n");
+        try{
+            out.write("<table>\n");
+            out.write("<tr><th width=\"40%\" height=\"11\">Function</th>\n");
+            out.write("<th width=\"40%\" height=\"11\">Var</th>\n");
+            out.write("<th width=\"20%\" height=\"11\"># codes</th></tr>\n");
 
-
-     out.write("<tr><td>Response var:</td>\n");
-     if (tableSet.respVar.name == "<freq>"){
-        out.write("<td>&lt;freq&gt;</td><td>&nbsp;</td></tr>\n"); 
-     }
-     else{
-        out.write("<td>" +tableSet.respVar.name + "</td><td>&nbsp;</td></tr>\n");
-     }
-     int n = tableSet.expVar.size();
-     for (int i = 0; i < n; i++){
-         out.write("<tr><td>Explanatory var" + (i+1) + ":</td>\n");
-         out.write("<td>" + tableSet.expVar.get(i).name + "</td>\n");
-         j = tableSet.expVar.get(i).index;
-         out.write("<td align=\"Right\">" + tauargus.utils.TauArgusUtils.getNumberOfActiveCodes(j) + 
-                 "</td></tr>\n");                  
-     }
-     if (!(tableSet.shadowVar == null))
-     out.write("<tr><td>Shadow variable :</td><td>" + tableSet.shadowVar.name + "</td><td>&nbsp;</td></tr>\n");
-     if (!(tableSet.costVar == null))
-     out.write("<tr><td>Shadow variable :</td><td>" + tableSet.costVar.name + "</td><td>&nbsp;</td></tr>\n");
-     if (tableSet.holding) {
-        out.write("Holding info<br>\n");
-     }
+            out.write("<tr><td>Response var:</td>\n");
+            if (tableSet.respVar.name == "<freq>"){
+                out.write("<td>&lt;freq&gt;</td><td>&nbsp;</td></tr>\n"); 
+            }
+            else{
+                out.write("<td>" +tableSet.respVar.name + "</td><td>&nbsp;</td></tr>\n");
+            }
+            int n = tableSet.expVar.size();
+            for (int i = 0; i < n; i++){
+                out.write("<tr><td>Explanatory var" + (i+1) + ":</td>\n");
+                out.write("<td>" + tableSet.expVar.get(i).name + "</td>\n");
+                j = tableSet.expVar.get(i).index;
+                out.write("<td align=\"Right\">" + tauargus.utils.TauArgusUtils.getNumberOfActiveCodes(j) + 
+                          "</td></tr>\n");                  
+            }
+            if (!(tableSet.shadowVar == null))
+                out.write("<tr><td>Shadow variable :</td><td>" + tableSet.shadowVar.name + "</td><td>&nbsp;</td></tr>\n");
+            if (!(tableSet.costVar == null))
+                out.write("<tr><td>Shadow variable :</td><td>" + tableSet.costVar.name + "</td><td>&nbsp;</td></tr>\n");
+            if (tableSet.holding) out.write("Holding info<br>\n");
 //If .Holding Then
 // j = 0
 // For i = 1 To MetaDataStruct.NVars
@@ -1059,9 +1039,7 @@ static void printTableInfo(TableSet tableSet, BufferedWriter out){
 //  Print #1, "    <td>" + VarName(j) + "</td><td>&nbsp;</td></tr>"
 // End If
 //End If
-     if (tableSet.piepRule[0]){
-         out.write("Request rule info<br>\n");
-     }
+            if (tableSet.piepRule[0]) out.write("Request rule info<br>\n");
 //If .PiepRule(1) Or .PiepRule(2) Then
 // For i = 1 To MetaDataStruct.NVars
 // If MetaDataStruct.Varlist(i).Piep Then
@@ -1079,168 +1057,36 @@ static void printTableInfo(TableSet tableSet, BufferedWriter out){
 // Next i
 //End If
 
-     out.write("</table>\n");
+            out.write("</table>\n");
      
-    }catch (Exception ex) { 
-        
+        }catch (Exception ex) { }
     }
-    
-}
-private static String prDOM(int i, TableSet tableSet){
-    String hs;
-    hs="";
-    if (tableSet.domK[i-1] != 0) {
-      hs = "Dominance rule ";  
-      if (i<=2) {hs = hs + "(Individual level)";} 
-          else {hs = hs + "(Holding level)";}
-     hs = hs + " with n = " + tableSet.domN[i-1]+
-               " and k = " + tableSet.domK[i-1] + "%<br>\n";      
-    }
-    return hs;
-}
 
-private static String prPQ(int i, TableSet tableSet){
-    String hs;
-    hs="";
-    if (tableSet.pqP[i-1] != 0) {
-      hs = "p% rule ";  
-      if (i<=2) {hs = hs + "(Individual level)";} 
-          else {hs = hs + "(Holding level)";}
-     hs = hs + " with p = " + tableSet.pqP[i-1]+"%";
-     if (tableSet.pqQ[i-1] !=100 || Application.isAnco() ) {hs = hs + ", q = " + tableSet.pqQ[i-1] + "%";}
-     hs = hs + " and n = " + tableSet.pqN[i-1] + "<br>\n";      
+    private static String prDOM(int i, TableSet tableSet){
+        String hs;
+        hs="";
+        if (tableSet.domK[i-1] != 0) {
+            hs = "Dominance rule ";  
+            if (i<=2) {hs = hs + "(Individual level)";} 
+            else {hs = hs + "(Holding level)";}
+            hs = hs + " with n = " + tableSet.domN[i-1]+
+                       " and k = " + tableSet.domK[i-1] + "%<br>\n";      
+        }
+        return hs;
     }
-    return hs;
-}
 
-//    public static void writeCKM(TableSet tableSet, boolean addOrig, boolean addDiff, boolean addCellKey, boolean suppressEmpty, 
-//                     boolean EmbedQuotes, PropertyChangeListener propertyChangeListener) throws IOException, ArgusException {
-//        
-//        PropertyChangeSupport propertyChangeSupport = null;
-//        if (!Application.isBatch()){
-//          propertyChangeSupport  = new PropertyChangeSupport(tableSet);
-//          propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);
-//        }  
-//
-//        tableSet.getCKMStats().clear();
-//        for (int i=-tableSet.maxDiff; i<=tableSet.maxDiff; i++){
-//            tableSet.getCKMStats().put(i, 0L);
-//        }
-//        tableSet.setNumberOfEmpty(0L);
-//        
-//        int nExpVar = tableSet.expVar.size();
-//        int[] maxDim = new int[nExpVar];
-//        int[] dimArray = new int[nExpVar];
-//
-//        // including empty cells
-//        int numberOfCells = 1;
-//        for (int i = 0; i < nExpVar; i++) {
-//            dimArray[i] = 0;
-//            maxDim[i] = TauArgusUtils.getNumberOfActiveCodes(tableSet.expVar.get(i).index);
-//            numberOfCells = numberOfCells * maxDim[i];
-//        }
-//
-//        FileWriter fw = null;
-//        BufferedWriter bw = null;
-//        PrintWriter writer = null;
-//        try {
-//            fw = new FileWriter(tableSet.safeFileName);
-//            bw = new BufferedWriter(fw);
-//            writer = new PrintWriter(bw);
-//
-//            VarCode varCode = new VarCode();
-//            int cellIndex = 0;
-//            int nDec = tableSet.respVar.nDecimals;
-//            DecimalFormat mdecimalFormat = new DecimalFormat();
-//            mdecimalFormat.setMinimumFractionDigits(nDec);
-//            mdecimalFormat.setMaximumFractionDigits(nDec);
-//            mdecimalFormat.setGroupingUsed(false);
-//            
-//            DecimalFormat CKdecimalFormat = new DecimalFormat();
-//            CKdecimalFormat.setMinimumFractionDigits(tableSet.cellkeyVar.nDecimals);
-//            CKdecimalFormat.setMaximumFractionDigits(tableSet.cellkeyVar.nDecimals);
-//            CKdecimalFormat.setGroupingUsed(false);
-//            
-//            for (;;) {
-//                Cell cell = tableSet.getCell(dimArray);
-//                if (tableSet.ckmProtect){
-//                    if (cell.status == CellStatus.EMPTY) {
-//                        tableSet.setNumberOfEmpty(tableSet.numberOfEmpty()+1);
-//                    }else{
-//                        long oldval = tableSet.getCKMStats().get((int)(cell.CKMValue-cell.response));
-//                        tableSet.getCKMStats().put((int)(cell.CKMValue-cell.response),oldval+1);
-//                    }
-//                }
-//                
-//                if (cell.status != CellStatus.EMPTY || !suppressEmpty) {
-//                    for (int j = 0; j < tableSet.expVar.size(); j++) {
-//                        Variable variable = tableSet.expVar.get(j);
-//                        varCode.setCode(variable.index, dimArray[j]);
-//                        String codeString = varCode.getCodeString();
-//                        if (codeString.equals("")) {
-//                            codeString = variable.getTotalCode();
-//                        }
-//                        if (EmbedQuotes){
-//                            writer.print(StrUtils.quote(codeString) + ";");
-//                        }
-//                        else{
-//                            writer.print(codeString + ";");
-//                        }
-//                    }
-//                    writer.print(mdecimalFormat.format(cell.CKMValue));
-//                    if (addOrig){
-//                        writer.print(";" + mdecimalFormat.format(cell.response));
-//                    }
-//                    if (addDiff){
-//                        writer.print(";" + mdecimalFormat.format(cell.CKMValue - cell.response));
-//                    }
-//                    if (addCellKey){
-//                        writer.print(";" + CKdecimalFormat.format(cell.cellkey));
-//                    }
-//                    writer.println();
-//                }
-//                cellIndex++;
-//                if (!Application.isBatch()){
-//                  if (cellIndex % 1000 == 0) {
-//                      int percentage = (int)(100L * cellIndex / numberOfCells);
-//                      propertyChangeSupport.firePropertyChange("progressMain", null, percentage);
-//                      propertyChangeSupport.firePropertyChange("activityMain", null, "(" + cellIndex + ")");
-//                  }
-//                }
-//
-//                // dimArray ophogen
-//                int k = nExpVar;
-//                while (k-- > 0) {
-//                    dimArray[k]++;
-//                    if (dimArray[k] < maxDim[k]) {
-//                        break;
-//                    } else {
-//                        dimArray[k] = 0;
-//                    }
-//                }
-//                if (k == -1) {
-//                    break;
-//                }
-//            }
-//        }
-//        finally {
-// //         fw.close();
-// //         bw.close();
-//          writer.close();
-//        }
-//
-//        fw = new FileWriter(StrUtils.replaceExtension(tableSet.safeFileName, ".log"));
-//        bw = new BufferedWriter(fw);
-//        for (int i=-tableSet.maxDiff;i<=tableSet.maxDiff;i++){
-//            bw.write(Integer.toString(i) + ": ");
-//            bw.write(Long.toString(tableSet.getCKMStats().get(i))+"\n");
-//        }
-//        bw.write("Empty: "+Long.toString(tableSet.numberOfEmpty())+"\n");
-//        bw.write("Total: "+Long.toString(tableSet.numberOfCells())+"\n");
-//        bw.close();
-//                
-//        String metadataFileName = StrUtils.replaceExtension(tableSet.safeFileName, METADATA_FILE_EXTENSION);
-//        tableSet.metadata.writeCKMMetadata(metadataFileName, nExpVar, tableSet.expVar.toArray(new Variable[tableSet.expVar.size()]), 
-//                                           tableSet.respVar, addOrig, addDiff, addCellKey);
-//    }
+    private static String prPQ(int i, TableSet tableSet){
+        String hs;
+        hs="";
+        if (tableSet.pqP[i-1] != 0) {
+            hs = "p% rule ";  
+            if (i<=2) {hs = hs + "(Individual level)";} 
+            else {hs = hs + "(Holding level)";}
+            hs = hs + " with p = " + tableSet.pqP[i-1]+"%";
+            if (tableSet.pqQ[i-1] !=100 || Application.isAnco() ) {hs = hs + ", q = " + tableSet.pqQ[i-1] + "%";}
+            hs = hs + " and n = " + tableSet.pqN[i-1] + "<br>\n";      
+        }
+        return hs;
+    }
+
 }

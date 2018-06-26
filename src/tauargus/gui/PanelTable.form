@@ -728,7 +728,7 @@
         </Component>
         <Component class="javax.swing.JButton" name="buttonUndoSuppress">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Undo suppress"/>
+            <Property name="text" type="java.lang.String" value="Undo"/>
             <Property name="nextFocusableComponent" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
               <ComponentRef name="table"/>
             </Property>

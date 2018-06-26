@@ -55,6 +55,7 @@ import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -2047,8 +2048,14 @@ private static void joinRounded(TableSet tableSet, int nPart) {
         
         // Currently only reading ptable from file as given in metadata is possible
         long startTime = new Date().getTime();
-        tableSet.maxDiff = tauArgus.SetCellKeyValues(tableSet.index, tableSet.cellkeyVar.metadata.getFilePath(PTableFile)); 
-        if (tableSet.maxDiff == -9){
+        int getmin[]={0}, getmax[]={0};
+        int result = tauArgus.SetCellKeyValues(tableSet.index, tableSet.cellkeyVar.metadata.getFilePath(PTableFile), getmin, getmax);
+        tableSet.minDiff = getmin[0];
+        tableSet.maxDiff = getmax[0];
+        
+        tableSet.CalculateCKMInfo();
+        
+        if (result == -9){ // error reading ptable file
             JOptionPane.showMessageDialog(null, "Error reading ptable file " + tableSet.cellkeyVar.metadata.getFilePath(PTableFile));
             return false;
         }

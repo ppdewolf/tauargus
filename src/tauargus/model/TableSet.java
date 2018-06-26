@@ -212,7 +212,7 @@ public class TableSet {
     public boolean weighted = false;
     public boolean missingIsSafe = false;
     public boolean holding = false;
-    public boolean UseCellKey = false;
+    public boolean CellKeyAvailable = false;
     ////////////////////////////////////////////
     public boolean singletonUsed = false;
     public int suppressed = SUP_NO;
@@ -271,6 +271,7 @@ public class TableSet {
     boolean scalingUsed = false;
     public double minTabVal = 0;
     public double maxTabVal;
+    public int minDiff = 0;
     public int maxDiff = 0;
     public boolean computeTotals = false;
     public boolean useStatusOnly = false;
@@ -339,12 +340,12 @@ public class TableSet {
                 shadowVar = respVar;
             }
             
-            cellkeyVar = metadata.find(tauargus.model.Type.RECORD_KEY);
-            
             costVar = metadata.find(tauargus.model.Type.COST);
             if (costVar == null) {
                 costVar = respVar;
             }
+        }else{ // there is a record key available in the data
+            CellKeyAvailable = !(metadata.find(tauargus.model.Type.RECORD_KEY)==null);
         }
     }
 
@@ -1461,7 +1462,7 @@ if (Application.isProtectCoverTable()){
         }  
 
         this.CKMStatistics.clear();
-        for (int i=-this.maxDiff; i<=this.maxDiff; i++){
+        for (int i=this.minDiff; i<=this.maxDiff; i++){
             this.CKMStatistics.put(i, 0L);
         }
         this.nEmpty = 0L;
@@ -1577,7 +1578,7 @@ if (Application.isProtectCoverTable()){
         try{
             fw = new FileWriter(StrUtils.replaceExtension(safeFileName, ".log"));
             bw = new BufferedWriter(fw);
-            for (int i=-this.maxDiff;i<=this.maxDiff;i++){
+            for (int i=this.minDiff;i<=this.maxDiff;i++){
                 bw.write(Integer.toString(i) + ": ");
                 bw.write(Long.toString(this.getCKMStats().get(i))+"\n");
             }
@@ -2414,10 +2415,49 @@ if (Application.isProtectCoverTable()){
         return minRoundBase;
     }
     
-        public static void writeJJ(TableSet tableSet, String fileName, boolean forRounding,
+    public static void writeJJ(TableSet tableSet, String fileName, boolean forRounding,
                                boolean singleton, int minFreq, boolean withBogusRemoval)throws ArgusException{
     }
 
+    public void CalculateCKMInfo(){
+        CKMStatistics.clear();
+        for (int i=this.minDiff; i<=this.maxDiff; i++){
+            CKMStatistics.put(i, 0L);
+        }
+        nEmpty = 0L;
+        
+        int nExpVar = expVar.size();
+        int[] maxDim = new int[nExpVar];
+        int[] dimArray = new int[nExpVar];
+
+        // including empty cells
+        for (int i = 0; i < nExpVar; i++) {
+            dimArray[i] = 0;
+            maxDim[i] = TauArgusUtils.getNumberOfActiveCodes(expVar.get(i).index);
+        }        
+        
+        for (;;) {
+            Cell cell = getCell(dimArray);
+            //if (ckmProtect){
+                if (cell.status == CellStatus.EMPTY) {
+                    nEmpty++;
+                }else{
+                    long oldval = CKMStatistics.get((int)(cell.CKMValue-cell.response));
+                    CKMStatistics.put((int)(cell.CKMValue-cell.response),oldval+1);
+                }
+            //}
+ 
+            // dimArray ophogen
+            int k = nExpVar;
+            while (k-- > 0) {
+                dimArray[k]++;
+                if (dimArray[k] < maxDim[k]) { break; }
+                else { dimArray[k] = 0; }
+            }
+            if (k == -1) { break; }
+        }
+                
+    }
 
 }
 

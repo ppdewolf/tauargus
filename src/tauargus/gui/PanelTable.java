@@ -157,11 +157,11 @@ public class PanelTable extends javax.swing.JPanel {
 //                return Color.orange;
 //            }
         } else if (tableSet.ckmProtect){
-            float maxDiff = (float) tableSet.maxDiff;
+            float maxColor = (float) Math.max(Math.abs(tableSet.minDiff), Math.abs(tableSet.maxDiff));
             float diff = (float) Math.abs(cell.CKMValue - cell.response);
-            if (diff >= maxDiff) diff = maxDiff;
+            if (diff >= maxColor) diff = maxColor;
             int R, G, B = 255; // darkest: (85,85,255) brightest: (235,235,255)
-            R = (int) (235 - (235-85)*(diff-1)/(maxDiff-1));
+            R = (int) (235 - (235-85)*(diff-1)/(maxColor-1));
             G = R;
             if (diff > 0){
                 return(new Color(R,G,B));
@@ -495,7 +495,7 @@ public class PanelTable extends javax.swing.JPanel {
 //        createColumnIndices();
 
         Variable RowVar = tableSet.expVar.get(rowExpVarIndex);
-        String hs = RowVar.name;
+        String hs = tableSet.respVar.name + ": " + RowVar.name;
         if (RowVar.recoded) hs += "(R)";
         
         if (!isSingleColumn){
@@ -610,7 +610,7 @@ public class PanelTable extends javax.swing.JPanel {
         
         radioButtonNetwork.setVisible(TauArgusUtils.ExistFile(hs+"/main1H2D.exe")||TauArgusUtils.ExistFile(hs+"/main1H2D")); 
         
-        radioButtonCellKey.setVisible(tableSet.UseCellKey);
+        radioButtonCellKey.setVisible(tableSet.CellKeyAvailable);
         
         for (int i = 0; i < radioButtonSuppress.length; i++) {
             radioButtonSuppress[i].setEnabled(s == TableSet.SUP_NO);
@@ -620,21 +620,17 @@ public class PanelTable extends javax.swing.JPanel {
         checkBoxInverseWeight.setEnabled(radioButtonSuppress[radioSelect]== radioButtonOptimal);
         if (radioSelect == radioButtonSuppress.length-2 || s == TableSet.SUP_ROUNDING){ //Rounder selected
           buttonSuppress.setText("Round");
-          buttonUndoSuppress.setText("Undo round");
         }
         else{
             if (radioButtonCta.isSelected()) {
                 buttonSuppress.setText("CTA");
-                buttonUndoSuppress.setText("Undo CTA");
             }
             else{
                 if (radioButtonCellKey.isSelected()) {
                     buttonSuppress.setText("Cell Key");
-                    buttonUndoSuppress.setText("Undo Cell Key");
                 }
                 else{
                     buttonSuppress.setText("Suppress");
-                    buttonUndoSuppress.setText("Undo suppress");
                 }
             }
         }
@@ -1137,7 +1133,8 @@ public class PanelTable extends javax.swing.JPanel {
             }
         });
 
-        buttonUndoSuppress.setText("Undo suppress");
+        buttonUndoSuppress.setText("Undo");
+        buttonUndoSuppress.setActionCommand("Undo");
         buttonUndoSuppress.setNextFocusableComponent(table);
         buttonUndoSuppress.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1474,7 +1471,7 @@ public class PanelTable extends javax.swing.JPanel {
     private void buttonSetStatusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSetStatusActionPerformed
 // Anco 1.6
 //        Map<javax.swing.JButton, CellStatus> statusMap = new HashMap<>();
-        Map<javax.swing.JButton, CellStatus> statusMap = new HashMap<javax.swing.JButton, CellStatus>();
+        Map<javax.swing.JButton, CellStatus> statusMap = new HashMap<>();
         statusMap.put(buttonSafe, CellStatus.SAFE_MANUAL);
         statusMap.put(buttonUnsafe, CellStatus.UNSAFE_MANUAL);
         statusMap.put(buttonSecondary, CellStatus.SECONDARY_UNSAFE);
@@ -2020,35 +2017,27 @@ public class PanelTable extends javax.swing.JPanel {
                 JOptionPane.showMessageDialog(null,"The marginal method still has to be implemented");
                 break;
             case CELLKEY:
-                //new Thread(){
-                //    @Override public void run(){
-                
-                // Assumes ONE AND ONLY ONE RECORD_KEY variable !
-                        try {
-                            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                            if(OptiSuppress.RunCellKey(tableSet, tableSet.cellkeyVar.PTableFile)){
-                                JOptionPane.showMessageDialog(null, "The Cell Key Method has been applied succesfully in " + tableSet.processingTime + " seconds\n");
-                                ((AbstractTableModel)table.getModel()).fireTableDataChanged();
-                                adjustColumnWidths();
-                                updateSuppressButtons();
-                            }
-                            setCursor(Cursor.getDefaultCursor());
-                        }
-                        catch (ArgusException | IOException ex){
-                            setCursor(Cursor.getDefaultCursor());
-                            JOptionPane.showMessageDialog(null,ex.getMessage());
-                        }
-                    //}
-                //}.start();
+                if (tableSet.respVar.type != Type.FREQUENCY){
+                    JOptionPane.showMessageDialog(null,"Currently Cell Key Method only imlemented for frequency tables","Warning",JOptionPane.WARNING_MESSAGE);
+                    break;
+                }
+                try {
+                    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                    if(OptiSuppress.RunCellKey(tableSet, tableSet.cellkeyVar.PTableFile)){
+                        JOptionPane.showMessageDialog(null, "The Cell Key Method has been applied succesfully in " + tableSet.processingTime + " seconds\n");
+                        ((AbstractTableModel)table.getModel()).fireTableDataChanged();
+                        adjustColumnWidths();
+                        updateSuppressButtons();
+                    }
+                    setCursor(Cursor.getDefaultCursor());
+                }
+                catch (ArgusException | IOException ex){
+                    setCursor(Cursor.getDefaultCursor());
+                    JOptionPane.showMessageDialog(null,ex.getMessage());
+                }
                 break;
         }
-        //updateSuppressButtons(); // Needs to be at each try{} of "done"because it will not wait for finishing of ProcessSwingWorker
-        //        Suppress(tableIndex, false, Soort);
         tableSet.undoAudit();
-
-        // TODO Optimalisation: Only do this if a suppression method has run
-        //((AbstractTableModel)table.getModel()).fireTableDataChanged();
-        //adjustColumnWidths();
     }//GEN-LAST:event_buttonSuppressActionPerformed
 
     private void radioButtonUweActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioButtonUweActionPerformed
@@ -2103,7 +2092,7 @@ public class PanelTable extends javax.swing.JPanel {
     }//GEN-LAST:event_radioButtonCellKeyActionPerformed
 
     private void organiseSafetyButtons(CellStatus status) {
-         if (status.isEmpty()) {
+        if (status.isEmpty()) {
             buttonSafe.setEnabled(false);
             buttonUnsafe.setEnabled(false);
             buttonCost.setEnabled(false);

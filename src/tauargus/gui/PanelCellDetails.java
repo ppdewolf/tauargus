@@ -72,8 +72,13 @@ public class PanelCellDetails extends javax.swing.JPanel {
         }
         else{
             textFieldValue.setText(doubleFormatter.format(cell.response));
-        
-            // Use AdjustedValue to show perturbed value in case of cellkey method?
+            visible = table.domRule || table.pqRule;
+            labelTopN.setVisible(visible);
+            labelTopNValue.setVisible(visible);
+            
+            checkBoxHoldingLevel.setVisible(table.holding);
+            
+            // Use AdjustedValue to show perturbed value in case of cellkey method
             visible = table.rounded || table.ctaProtect || table.ckmProtect;
             labelAdjustedValue.setVisible(visible);
             textFieldAdjustedValue.setVisible(visible);

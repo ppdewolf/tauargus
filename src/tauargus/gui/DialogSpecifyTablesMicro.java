@@ -213,7 +213,7 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         checkBoxRequestRule.setEnabled(metadata.containsRequestVariable());
         checkBoxApplyWeights.setEnabled(metadata.containsWeightVariable());
         checkBoxUseHoldingsInfo.setEnabled(metadata.containsHoldingVariable());
-        checkBoxCellKey.setEnabled(metadata.contains(tauargus.model.Type.RECORD_KEY));
+        checkBoxCellKey.setVisible(false);
                 
         //load(new TableSet(metadata));
         if (TableService.numberOfTables()==0)
@@ -256,7 +256,6 @@ public class DialogSpecifyTablesMicro extends DialogBase {
             textFieldMSC.setText(Double.toString(tableSet.maxScaleCost));
         }
 
-        checkBoxCellKey.setSelected(tableSet.UseCellKey);
         checkBoxApplyWeights.setSelected(tableSet.weighted);
         checkBoxMissingSafe.setSelected(tableSet.missingIsSafe);
         checkBoxUseHoldingsInfo.setSelected(tableSet.holding);
@@ -462,7 +461,6 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         // Set booleans...
         tableSet.holding = checkBoxUseHoldingsInfo.isSelected();
         tableSet.weighted = checkBoxApplyWeights.isSelected();
-        tableSet.UseCellKey = checkBoxCellKey.isSelected();
         tableSet.missingIsSafe = checkBoxMissingSafe.isSelected();
         tableSet.domRule = checkBoxDominanceRule.isSelected();
         tableSet.pqRule = checkBoxPqRule.isSelected();

@@ -17,13 +17,17 @@
 
 package tauargus.gui;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.util.Locale;
+import java.util.TreeMap;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
+import tauargus.model.Cell;
 import tauargus.model.CellStatus;
 import tauargus.model.CellStatusStatistics;
 import tauargus.model.TableSet;
@@ -32,7 +36,7 @@ import tauargus.utils.TableColumnResizer;
 import tauargus.utils.TauArgusUtils;
 
 public class DialogTableSummary extends javax.swing.JDialog {
-    
+
     public DialogTableSummary(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
@@ -123,83 +127,160 @@ public class DialogTableSummary extends javax.swing.JDialog {
             case TableSet.SUP_MARGINAL: labelStatus.setText("Protected by marginal"); break;
             case TableSet.SUP_UWE:      labelStatus.setText("Protected by UWE"); break;
             case TableSet.SUP_CTA:      labelStatus.setText("Protected by CTA"); break;
-            default:                    labelStatus.setText("Unknown"); break; 
-                
+            case TableSet.SUP_CKM:      labelStatus.setText("<html>Protecetd by<br>Cell Key Method</html>");break;
+            default:                    labelStatus.setText("Unknown"); break;
         }
                
-        
-        tableSummary.setModel(new AbstractTableModel() {
+        if (tableSet.suppressed == TableSet.SUP_CKM){
+            tableSummary.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+                @Override
+                public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                    Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                    if (row == table.getModel().getRowCount() - 1) {
+                        comp.setFont(comp.getFont().deriveFont(Font.BOLD));
+                    }
+                    setHorizontalAlignment(SwingConstants.RIGHT);
+                    return comp;                
+                }
+            });
             
-            private CellStatusStatistics statistics = tableSet.getCellStatusStatistics();
-            int d = tableSet.respVar.nDecimals;
-
-            @Override
-            public int getRowCount() {
-                return CellStatus.size();
-            }
-
-            @Override
-            public int getColumnCount() {
-                return 5;
-            }
-
-            @Override
-            public Object getValueAt(int rowIndex, int columnIndex) {
-                double x; String hs;
-                rowIndex++;
-                switch(columnIndex) {
-                    case 0:
-                        if (rowIndex == CellStatus.size()) {
-                            return "Total";
-                        } else {
-                            return CellStatus.findByValue(rowIndex).getDescription();
-                        }
-                    case 1:
-                        return statistics.freq[rowIndex];
-                    case 2:
-                        return statistics.cellFreq[rowIndex];
-                    case 3:
-                        //return statistics.cellResponse[rowIndex];
-                        x = statistics.cellResponse[rowIndex];
-                        hs = String.format(Locale.US, "%."+d+"f", x);
-                        return hs;
-                    case 4:
-                        x = statistics.cellCost[rowIndex];
-                        hs = String.format(Locale.US, "%."+d+"f", x);
-                        return hs;
-                    default:
-                        return "";
+            tableSummary.setModel(new AbstractTableModel() {
+                TreeMap<Integer,Long> CKMInfo = tableSet.getCKMStats();
+                int maxD = tableSet.maxDiff;
+                int minD = tableSet.minDiff;
+                int rangeD = maxD - minD + 1;
+                
+                @Override
+                public int getRowCount() {
+                    return (rangeD + 2);
                 }
-            }
-
-            @Override
-            public String getColumnName(int column) {
-                switch(column) {
-                    case 0:
-                        return "Status";
-                    case 1:
-                        return "Freq";
-                    case 2:
-                        return "#rec";
-                    case 3:
-                        return "Sum resp";
-                    case 4:
-                        return "Sum cost";
-                    default:
-                        return "";
+                
+                @Override
+                public int getColumnCount() {
+                    return 2;
                 }
-            }
+                
+                @Override
+                public Object getValueAt(int rowIndex, int columnIndex) {
+                    switch(columnIndex) {
+                        case 0:
+                            if (rowIndex == rangeD){
+                                return "Empty";
+                            }
+                            if (rowIndex == (rangeD + 1)) {
+                                return "Total";
+                            } else {
+                                return minD + rowIndex;
+                            }
+                        case 1:
+                            if (rowIndex == rangeD) return tableSet.numberOfEmpty();
+                            else if (rowIndex == rangeD + 1) return tableSet.numberOfCells();
+                                 else return Long.toString(CKMInfo.get(minD + rowIndex));
+                        default:
+                            return "";
+                    }
+                }
+                
+                @Override
+                public String getColumnName(int column) {
+                    switch(column) {
+                        case 0:
+                            return "Noise";
+                        case 1:
+                            return "#Cells";
+                        default:
+                            return "";
+                    }
+                }
 
-            @Override
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return false;
-            }
-        });
+                @Override
+                public boolean isCellEditable(int rowIndex, int columnIndex) {
+                    return false;
+                }
+            });
+        }else{
+            tableSummary.setModel(new AbstractTableModel() {
+                private CellStatusStatistics statistics = tableSet.getCellStatusStatistics();
+                int d = tableSet.respVar.nDecimals;
+
+                @Override
+                public int getRowCount() {
+                    return CellStatus.size();
+                }
+
+                @Override
+                public int getColumnCount() {
+                    return 5;
+                }
+
+                @Override
+                public Object getValueAt(int rowIndex, int columnIndex) {
+                    double x; String hs;
+                    rowIndex++;
+                    switch(columnIndex) {
+                        case 0:
+                            if (rowIndex == CellStatus.size()) {
+                                return "Total";
+                            } else {
+                                return CellStatus.findByValue(rowIndex).getDescription();
+                            }
+                        case 1:
+                            return statistics.freq[rowIndex];
+                        case 2:
+                            return statistics.cellFreq[rowIndex];
+                        case 3:
+                            //return statistics.cellResponse[rowIndex];
+                            x = statistics.cellResponse[rowIndex];
+                            hs = String.format(Locale.US, "%."+d+"f", x);
+                            return hs;
+                        case 4:
+                            x = statistics.cellCost[rowIndex];
+                            hs = String.format(Locale.US, "%."+d+"f", x);
+                            return hs;
+                        default:
+                            return "";
+                    }
+                }
+
+                @Override
+                public String getColumnName(int column) {
+                    switch(column) {
+                        case 0:
+                            return "Status";
+                        case 1:
+                            return "#Cells";
+                        case 2:
+                            return "#Rec";
+                        case 3:
+                            return "Sum resp";
+                        case 4:
+                            return "Sum cost";
+                        default:
+                            return "";
+                    }
+                }
+
+                @Override
+                public boolean isCellEditable(int rowIndex, int columnIndex) {
+                    return false;
+                }
+            });
+        }
         
         TableColumnResizer.adjustColumnPreferredWidths(tableExpVars, false);
         TableColumnResizer.adjustColumnPreferredWidths(tableSummary, false);
-        
+
         setVisible(true);
+    }
+    
+    private Color getBackgroundColor(TableSet tableSet, Cell cell) {
+            float maxColor = (float) Math.max(Math.abs(tableSet.minDiff), Math.abs(tableSet.maxDiff));
+            float diff = (float) Math.abs(cell.CKMValue - cell.response);
+            if (diff >= maxColor) diff = maxColor;
+            int R, G, B = 255; // darkest: (85,85,255) brightest: (235,235,255)
+            R = (int) (235 - (235-85)*(diff-1)/(maxColor-1));
+            G = R;
+            return(new Color(R,G,B));
     }
 
     /**
@@ -258,6 +339,8 @@ public class DialogTableSummary extends javax.swing.JDialog {
 
         labelCostVar.setText(" ");
 
+        scrollPaneSummary.setPreferredSize(new java.awt.Dimension(454, 404));
+
         tableSummary.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -269,6 +352,7 @@ public class DialogTableSummary extends javax.swing.JDialog {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tableSummary.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         scrollPaneSummary.setViewportView(tableSummary);
 
         buttonClose.setText("Close");
@@ -306,7 +390,7 @@ public class DialogTableSummary extends javax.swing.JDialog {
                                 .addContainerGap()
                                 .addComponent(labelStatus)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(scrollPaneSummary))
+                        .addComponent(scrollPaneSummary, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(buttonClose)))
