@@ -97,10 +97,10 @@ public class DialogTableSummary extends javax.swing.JDialog {
         }
                
         if (tableSet.suppressed == TableSet.SUP_CKM){
-            setSummaryModelCKM(tableSet);
+            setSummaryCKM(tableSet);
         }
         else{
-            setSummaryModelStandard(tableSet);
+            setSummaryStandard(tableSet);
         }
         
         TableColumnResizer.adjustColumnPreferredWidths(tableExpVars, false);
@@ -122,7 +122,8 @@ public class DialogTableSummary extends javax.swing.JDialog {
         setSize(d);
     }
     
-    private void setSummaryModelCKM(final TableSet tableSet){
+    private void setSummaryCKM(final TableSet tableSet){
+        // Change alignment of columns
         tableSummary.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -131,10 +132,19 @@ public class DialogTableSummary extends javax.swing.JDialog {
                     comp.setFont(comp.getFont().deriveFont(Font.BOLD));
                 }
                 setHorizontalAlignment(SwingConstants.RIGHT);
+                
+                Object cellValue = table.getValueAt(row,column);
+                if (!(cellValue.equals("Empty") || cellValue.equals("Total"))){
+                    if (Integer.parseInt(cellValue.toString()) > 0) setBackground(Color.red);
+                    if (Integer.parseInt(cellValue.toString()) < 0) setBackground(Color.green);
+                }
+                
                 return comp;                
             }
         });
-            
+
+
+        //Set TableModel
         tableSummary.setModel(new AbstractTableModel() {
             TreeMap<Integer,Long> CKMInfo = tableSet.getCKMStats();
             int maxD = tableSet.maxDiff;
@@ -177,7 +187,8 @@ public class DialogTableSummary extends javax.swing.JDialog {
         });
     }    
     
-    private void setSummaryModelStandard(final TableSet tableSet){
+    private void setSummaryStandard(final TableSet tableSet){
+        //Set TableModel
         tableSummary.setModel(new AbstractTableModel() {
             private CellStatusStatistics statistics = tableSet.getCellStatusStatistics();
             int d = tableSet.respVar.nDecimals;
