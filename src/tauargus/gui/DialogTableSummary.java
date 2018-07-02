@@ -26,8 +26,7 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellRenderer;
-import tauargus.model.Cell;
+import javax.swing.table.TableColumn;
 import tauargus.model.CellStatus;
 import tauargus.model.CellStatusStatistics;
 import tauargus.model.TableSet;
@@ -123,27 +122,6 @@ public class DialogTableSummary extends javax.swing.JDialog {
     }
     
     private void setSummaryCKM(final TableSet tableSet){
-        // Change alignment of columns
-        tableSummary.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                if (row == table.getModel().getRowCount() - 1) {
-                    comp.setFont(comp.getFont().deriveFont(Font.BOLD));
-                }
-                setHorizontalAlignment(SwingConstants.RIGHT);
-                
-                Object cellValue = table.getValueAt(row,column);
-                if (!(cellValue.equals("Empty") || cellValue.equals("Total"))){
-                    if (Integer.parseInt(cellValue.toString()) > 0) setBackground(Color.red);
-                    if (Integer.parseInt(cellValue.toString()) < 0) setBackground(Color.green);
-                }
-                
-                return comp;                
-            }
-        });
-
-
         //Set TableModel
         tableSummary.setModel(new AbstractTableModel() {
             TreeMap<Integer,Long> CKMInfo = tableSet.getCKMStats();
@@ -185,6 +163,9 @@ public class DialogTableSummary extends javax.swing.JDialog {
             @Override
             public boolean isCellEditable(int rowIndex, int columnIndex) {return false;}
         });
+        
+        // Change alignment of columns
+        tableSummary.setDefaultRenderer(Object.class, new CKMcellRenderer());
     }    
     
     private void setSummaryStandard(final TableSet tableSet){
@@ -269,6 +250,31 @@ public class DialogTableSummary extends javax.swing.JDialog {
             
         });
     }
+    
+    private class CKMcellRenderer extends DefaultTableCellRenderer{
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                if (row == table.getModel().getRowCount() - 1) {
+                    comp.setFont(comp.getFont().deriveFont(Font.BOLD));
+                }
+                setHorizontalAlignment(SwingConstants.RIGHT);
+                
+                int R, G, B = 255; // darkest: (85,85,255) brightest: (235,235,255)
+                int maxColor = Math.max(Math.abs((Integer) table.getValueAt(0, 0)),
+                                        Math.abs((Integer) table.getValueAt(table.getModel().getRowCount() - 3,0)));
+                if (column==0 & row < table.getModel().getRowCount() - 2 & !value.equals(0)){
+                    R = (int) (235 - (235-85)*(Math.abs((Integer) value) - 1)/(maxColor-1));
+                    G = R;
+                    comp.setBackground(new Color(R,G,B));
+                }
+                else comp.setBackground(Color.white);
+                
+                comp.setForeground(Color.black);
+                
+                return comp;                
+            }
+    }    
     
     /**
      * This method is called from within the constructor to initialize the form.
