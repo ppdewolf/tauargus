@@ -133,16 +133,16 @@ public class DialogTableSummary extends javax.swing.JDialog {
             public int getRowCount() {return (rangeD + 2);}
                 
             @Override
-            public int getColumnCount() {return 2;}
+            public int getColumnCount() {return 3;}
                 
             @Override
             public Object getValueAt(int rowIndex, int columnIndex) {
                 switch(columnIndex) {
-                    case 0:
+                    case 1:
                         if (rowIndex == rangeD){return "Empty";}
                         if (rowIndex == (rangeD + 1)) {return "Total";}
                         else {return minD + rowIndex;}
-                    case 1:
+                    case 2:
                         if (rowIndex == rangeD) return tableSet.numberOfEmpty();
                         else if (rowIndex == rangeD + 1) return tableSet.numberOfCells();
                             else return Long.toString(CKMInfo.get(minD + rowIndex));
@@ -154,8 +154,8 @@ public class DialogTableSummary extends javax.swing.JDialog {
             @Override
             public String getColumnName(int column) {
                 switch(column) {
-                    case 0:  return "Noise";
-                    case 1:  return "#Cells";
+                    case 1:  return "Noise";
+                    case 2:  return "#Cells";
                     default: return "";
                 }
             }
@@ -261,10 +261,12 @@ public class DialogTableSummary extends javax.swing.JDialog {
                 setHorizontalAlignment(SwingConstants.RIGHT);
                 
                 int R, G, B = 255; // darkest: (85,85,255) brightest: (235,235,255)
-                int maxColor = Math.max(Math.abs((Integer) table.getValueAt(0, 0)),
-                                        Math.abs((Integer) table.getValueAt(table.getModel().getRowCount() - 3,0)));
-                if (column==0 & row < table.getModel().getRowCount() - 2 & !value.equals(0)){
-                    R = (int) (235 - (235-85)*(Math.abs((Integer) value) - 1)/(maxColor-1));
+                int maxColor = Math.max(Math.abs((Integer) table.getValueAt(0, 1)),
+                                        Math.abs((Integer) table.getValueAt(table.getModel().getRowCount() - 3,1)));
+                Object colorvalue;
+                colorvalue = table.getValueAt(row,1);
+                if (column==0 & row < table.getModel().getRowCount() - 2 & !colorvalue.equals(0)){
+                    R = (int) (235 - (235-85)*(Math.abs((Integer) colorvalue) - 1)/(maxColor-1));
                     G = R;
                     comp.setBackground(new Color(R,G,B));
                 }
