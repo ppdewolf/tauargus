@@ -1454,19 +1454,13 @@ if (Application.isProtectCoverTable()){
 
     
     public void writeCKM(boolean addOrig, boolean addDiff, boolean addCellKey, boolean suppressEmpty, 
-                     boolean EmbedQuotes, PropertyChangeListener propertyChangeListener) throws IOException, ArgusException {
+                         boolean EmbedQuotes, PropertyChangeListener propertyChangeListener) throws IOException, ArgusException {
         PropertyChangeSupport propertyChangeSupport = null;
         if (!Application.isBatch()){
           propertyChangeSupport  = new PropertyChangeSupport(this);
           propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);
         }  
 
-        this.CKMStatistics.clear();
-        for (int i=this.minDiff; i<=this.maxDiff; i++){
-            this.CKMStatistics.put(i, 0L);
-        }
-        this.nEmpty = 0L;
-        
         int nExpVar = expVar.size();
         int[] maxDim = new int[nExpVar];
         int[] dimArray = new int[nExpVar];
@@ -1502,14 +1496,6 @@ if (Application.isProtectCoverTable()){
             
             for (;;) {
                 Cell cell = getCell(dimArray);
-                if (ckmProtect){
-                    if (cell.status == CellStatus.EMPTY) {
-                        this.nEmpty++;
-                    }else{
-                        long oldval = this.CKMStatistics.get((int)(cell.CKMValue-cell.response));
-                        this.CKMStatistics.put((int)(cell.CKMValue-cell.response),oldval+1);
-                    }
-                }
                 
                 if (cell.status != CellStatus.EMPTY || !suppressEmpty) {
                     for (int j = 0; j < expVar.size(); j++) {
@@ -1526,7 +1512,9 @@ if (Application.isProtectCoverTable()){
                             writer.print(codeString + ";");
                         }
                     }
+
                     writer.print(mdecimalFormat.format(cell.CKMValue));
+                    
                     if (addOrig){
                         writer.print(";" + mdecimalFormat.format(cell.response));
                     }
@@ -2438,14 +2426,12 @@ if (Application.isProtectCoverTable()){
         
         for (;;) {
             Cell cell = getCell(dimArray);
-            //if (ckmProtect){
                 if (cell.status == CellStatus.EMPTY) {
                     nEmpty++;
                 }else{
-                    long oldval = CKMStatistics.get((int)(cell.CKMValue-cell.response));
-                    CKMStatistics.put((int)(cell.CKMValue-cell.response),oldval+1);
+                    int Diff = (int) Math.round(cell.CKMValue-cell.response);
+                    CKMStatistics.put(Diff, CKMStatistics.get(Diff)+1);
                 }
-            //}
  
             // dimArray ophogen
             int k = nExpVar;

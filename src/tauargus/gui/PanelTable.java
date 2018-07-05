@@ -2021,10 +2021,10 @@ public class PanelTable extends javax.swing.JPanel {
                     JOptionPane.showMessageDialog(null,"Sorry, Cell Key Method not available when \"holdings\" are used","Warning",JOptionPane.WARNING_MESSAGE);
                     break;                    
                 }
-                if (tableSet.weighted){
-                    JOptionPane.showMessageDialog(null,"Sorry, currently Cell Key Method not available for weighted tables","Warning",JOptionPane.WARNING_MESSAGE);
-                    break;                    
-                }
+                //if (tableSet.weighted){
+                //    JOptionPane.showMessageDialog(null,"Sorry, currently Cell Key Method not available for weighted tables","Warning",JOptionPane.WARNING_MESSAGE);
+                //    break;                    
+                //}
                 if (tableSet.respVar.type != Type.FREQUENCY){
                     JOptionPane.showMessageDialog(null,"Sorry, currently Cell Key Method only imlemented for frequency tables","Warning",JOptionPane.WARNING_MESSAGE);
                     break;

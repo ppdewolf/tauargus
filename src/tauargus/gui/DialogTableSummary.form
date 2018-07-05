@@ -7,7 +7,6 @@
     <Property name="iconImages" type="java.util.List" editor="org.netbeans.modules.form.ComponentChooserEditor">
       <ComponentRef name="null"/>
     </Property>
-    <Property name="resizable" type="boolean" value="false"/>
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
@@ -34,7 +33,7 @@
           <Group type="102" attributes="0">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
+                      <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="labelStatus" alignment="0" min="-2" pref="135" max="-2" attributes="0"/>
                           <Component id="jLabel1" alignment="0" min="-2" pref="64" max="-2" attributes="0"/>
@@ -42,10 +41,10 @@
                           <Component id="jLabel3" alignment="0" min="-2" pref="64" max="-2" attributes="0"/>
                           <Component id="scrollPaneExpVars" alignment="0" min="-2" pref="135" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="2" attributes="0">
                           <Component id="buttonClose" alignment="2" min="-2" max="-2" attributes="0"/>
-                          <Component id="scrollPaneSummary" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Component id="scrollPaneSummary" alignment="2" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <Group type="102" attributes="0">
@@ -57,7 +56,7 @@
                       </Group>
                   </Group>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -86,11 +85,11 @@
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="labelStatus" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="scrollPaneSummary" min="-2" pref="292" max="-2" attributes="0"/>
+                  <Component id="scrollPaneSummary" pref="292" max="32767" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="buttonClose" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>

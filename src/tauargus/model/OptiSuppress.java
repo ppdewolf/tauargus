@@ -2049,6 +2049,7 @@ private static void joinRounded(TableSet tableSet, int nPart) {
         // Currently only reading ptable from file as given in metadata is possible
         long startTime = new Date().getTime();
         int getmin[]={0}, getmax[]={0};
+        int tmp[]={0};
         int result = tauArgus.SetCellKeyValues(tableSet.index, tableSet.cellkeyVar.metadata.getFilePath(PTableFile), getmin, getmax);
         tableSet.minDiff = getmin[0];
         tableSet.maxDiff = getmax[0];

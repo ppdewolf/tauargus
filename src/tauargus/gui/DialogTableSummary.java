@@ -111,11 +111,14 @@ public class DialogTableSummary extends javax.swing.JDialog {
     }
     
     private void ResizeSummaryDialog(){
-        tableSummary.setPreferredScrollableViewportSize(tableSummary.getPreferredSize());
-        scrollPaneSummary.setPreferredSize(tableSummary.getPreferredSize());
-        scrollPaneSummary.setSize(tableSummary.getPreferredSize());
         java.awt.Dimension d = new java.awt.Dimension(0,0);
-        d.width = (scrollPaneSummary.getWidth() + scrollPaneExpVars.getWidth() + 35);
+        tableSummary.setPreferredScrollableViewportSize(tableSummary.getPreferredSize());
+        d = tableSummary.getPreferredSize();
+        d.width = d.width+10;
+        scrollPaneSummary.setPreferredSize(d);
+        scrollPaneSummary.setSize(d);
+        
+        d.width = (scrollPaneSummary.getWidth() + scrollPaneExpVars.getWidth() + 75);
         d.height = getHeight();
         setPreferredSize(d);
         setSize(d);
@@ -303,7 +306,6 @@ public class DialogTableSummary extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Summary for table no: ");
         setIconImages(null);
-        setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 DialogClosing(evt);
@@ -386,7 +388,7 @@ public class DialogTableSummary extends javax.swing.JDialog {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                             .addComponent(buttonClose)
-                            .addComponent(scrollPaneSummary, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(scrollPaneSummary, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(80, 80, 80)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
@@ -416,7 +418,7 @@ public class DialogTableSummary extends javax.swing.JDialog {
                             .addComponent(labelCostVar))
                         .addGap(18, 18, 18)
                         .addComponent(labelStatus))
-                    .addComponent(scrollPaneSummary, javax.swing.GroupLayout.PREFERRED_SIZE, 292, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(scrollPaneSummary, javax.swing.GroupLayout.DEFAULT_SIZE, 292, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(buttonClose)
                 .addContainerGap())
