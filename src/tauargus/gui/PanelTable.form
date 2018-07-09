@@ -67,7 +67,7 @@
           </Group>
           <Group type="102" alignment="1" attributes="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="scrollPane" pref="484" max="32767" attributes="0"/>
+                  <Component id="scrollPane" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="panelBottomButtons" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
@@ -805,16 +805,19 @@
                           <Component id="comboBoxNrOfVertLevels" min="-2" pref="31" max="-2" attributes="0"/>
                       </Group>
                   </Group>
-                  <EmptySpace min="0" pref="10" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
                           <Component id="labelDecimals" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="comboBoxDecimals" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Component id="checkBoxOutputView" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <Component id="checkBoxThousandSeparator" min="-2" max="-2" attributes="0"/>
+                      <Component id="checkBoxThousandSeparator" alignment="0" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="checkBoxCKMView" min="-2" max="-2" attributes="0"/>
+                      <Component id="checkBoxOutputView" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
               </Group>
@@ -838,6 +841,7 @@
                       <Component id="LabelNrOfVertLevels" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="comboBoxNrOfVertLevels" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="checkBoxThousandSeparator" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="checkBoxCKMView" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
@@ -968,6 +972,14 @@
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="checkBoxThousandSeparatorActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="checkBoxCKMView">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Difference view"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="checkBoxCKMViewActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>
