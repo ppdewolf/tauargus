@@ -274,7 +274,7 @@ public class PanelTable extends javax.swing.JPanel {
             }
 
             setForeground(cell.status.getForegroundColor());
-            if (!(checkBoxCKMView.isEnabled() && checkBoxCKMView.isSelected())){
+            if (!(checkBoxColoredView.isEnabled() && checkBoxColoredView.isSelected())){
                 setBackground(getBackgroundColor(cell, getRowCode(rowIndex)));
             }
             else{
@@ -665,8 +665,8 @@ public class PanelTable extends javax.swing.JPanel {
         }
         
         boolean b = (s == TableSet.SUP_CKM || s == TableSet.SUP_NO);
-        checkBoxCKMView.setEnabled(b);
-        if (!b) checkBoxCKMView.setSelected(false);
+        checkBoxColoredView.setEnabled(b);
+        if (!b) checkBoxColoredView.setSelected(false);
         
         b = (s == TableSet.SUP_ROUNDING)  || (s == TableSet.SUP_CTA) || (s == TableSet.SUP_CKM);
         checkBoxOutputView.setEnabled(!b);
@@ -894,7 +894,7 @@ public class PanelTable extends javax.swing.JPanel {
         comboBoxDecimals = new javax.swing.JComboBox();
         checkBoxOutputView = new javax.swing.JCheckBox();
         checkBoxThousandSeparator = new javax.swing.JCheckBox();
-        checkBoxCKMView = new javax.swing.JCheckBox();
+        checkBoxColoredView = new javax.swing.JCheckBox();
 
         table.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -1330,10 +1330,10 @@ public class PanelTable extends javax.swing.JPanel {
             }
         });
 
-        checkBoxCKMView.setText("Difference view");
-        checkBoxCKMView.addActionListener(new java.awt.event.ActionListener() {
+        checkBoxColoredView.setText("Colored view");
+        checkBoxColoredView.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                checkBoxCKMViewActionPerformed(evt);
+                checkBoxColoredViewActionPerformed(evt);
             }
         });
 
@@ -1357,18 +1357,17 @@ public class PanelTable extends javax.swing.JPanel {
                         .addComponent(LabelNrOfVertLevels)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(comboBoxNrOfVertLevels, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addGroup(panelBottomButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panelBottomButtonsLayout.createSequentialGroup()
-                        .addComponent(labelDecimals)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(comboBoxDecimals, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(panelBottomButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(labelDecimals)
                     .addComponent(checkBoxThousandSeparator))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(comboBoxDecimals, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(panelBottomButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(checkBoxCKMView)
+                    .addComponent(checkBoxColoredView)
                     .addComponent(checkBoxOutputView))
-                .addGap(3, 3, 3))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panelBottomButtonsLayout.setVerticalGroup(
             panelBottomButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1387,7 +1386,7 @@ public class PanelTable extends javax.swing.JPanel {
                     .addComponent(LabelNrOfVertLevels)
                     .addComponent(comboBoxNrOfVertLevels, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(checkBoxThousandSeparator)
-                    .addComponent(checkBoxCKMView))
+                    .addComponent(checkBoxColoredView))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -1434,7 +1433,7 @@ public class PanelTable extends javax.swing.JPanel {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(scrollPane)
-                    .addGroup(layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(panelBottomButtons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addGap(18, 18, 18)
@@ -1487,8 +1486,9 @@ public class PanelTable extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(scrollPane)
-                        .addGap(18, 18, 18)
-                        .addComponent(panelBottomButtons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(panelBottomButtons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(7, 7, 7))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(panelCellInformation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -2143,10 +2143,10 @@ public class PanelTable extends javax.swing.JPanel {
         updateSuppressButtons();
     }//GEN-LAST:event_radioButtonCellKeyActionPerformed
 
-    private void checkBoxCKMViewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxCKMViewActionPerformed
+    private void checkBoxColoredViewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxColoredViewActionPerformed
         ((AbstractTableModel)table.getModel()).fireTableDataChanged();
         adjustColumnWidths();
-    }//GEN-LAST:event_checkBoxCKMViewActionPerformed
+    }//GEN-LAST:event_checkBoxColoredViewActionPerformed
 
     private void organiseSafetyButtons(CellStatus status) {
         if (status.isEmpty()) {
@@ -2218,7 +2218,7 @@ public class PanelTable extends javax.swing.JPanel {
     private javax.swing.JButton buttonTableSummary;
     private javax.swing.JButton buttonUndoSuppress;
     private javax.swing.JButton buttonUnsafe;
-    private javax.swing.JCheckBox checkBoxCKMView;
+    private javax.swing.JCheckBox checkBoxColoredView;
     private javax.swing.JCheckBox checkBoxInverseWeight;
     private javax.swing.JCheckBox checkBoxOutputView;
     private javax.swing.JCheckBox checkBoxThousandSeparator;
