@@ -128,9 +128,8 @@ public class DialogTableSummary extends javax.swing.JDialog {
         //Set TableModel
         tableSummary.setModel(new AbstractTableModel() {
             TreeMap<Integer,Long> CKMInfo = tableSet.getCKMStats();
-            int maxD = tableSet.maxDiff;
-            int minD = tableSet.minDiff;
-            int rangeD = maxD - minD + 1;
+            int rangeD = CKMInfo.size();
+            Integer[] TreeMapKeys = CKMInfo.keySet().toArray(new Integer[rangeD]);
             
             @Override
             public int getRowCount() {return (rangeD + 2);}
@@ -144,11 +143,11 @@ public class DialogTableSummary extends javax.swing.JDialog {
                     case 1:
                         if (rowIndex == rangeD){return "Empty";}
                         if (rowIndex == (rangeD + 1)) {return "Total";}
-                        else {return minD + rowIndex;}
+                        else {return TreeMapKeys[rowIndex];}
                     case 2:
                         if (rowIndex == rangeD) return tableSet.numberOfEmpty();
                         else if (rowIndex == rangeD + 1) return tableSet.numberOfCells();
-                            else return Long.toString(CKMInfo.get(minD + rowIndex));
+                            else return Long.toString(CKMInfo.get(TreeMapKeys[rowIndex]));
                     default:
                         return "";
                 }

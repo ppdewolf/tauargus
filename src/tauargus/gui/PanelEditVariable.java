@@ -122,6 +122,7 @@ public class PanelEditVariable extends javax.swing.JPanel {
         }
         textFieldLeadingString.setText("");
         textFieldHierFileName.setText("");
+        textFieldPTableFileName.setText("");
 
         for (int i=0; i<Variable.MAX_NUMBER_OF_REQUESTS; i++) {
             textFieldRequestCode[i].setText("");
@@ -134,6 +135,7 @@ public class PanelEditVariable extends javax.swing.JPanel {
         checkBoxDistance.setSelected(false);
         buttonGroupCodelist.clearSelection();
         buttonGroupHierType.clearSelection();
+        buttonGroupPTable.clearSelection();
 
         // Set basic attributes...
         textFieldName.setText(variable.name);
@@ -199,8 +201,12 @@ public class PanelEditVariable extends javax.swing.JPanel {
                 textFieldStatusProtect.setText(metadata.protectStatus);
                 break;
             case RECORD_KEY:
-                // TODO: read record key filename
+                // For the time being calculation of p-table not implemented
+                // so radioButtonPTableFile is selected automaticly
+                //radioButtonPTableCalculate.setEnabled(false);
                 radioButtonPTableFile.setEnabled(true);
+                radioButtonPTableFile.setSelected(true);
+                
                 textFieldPTableFileName.setText(variable.PTableFile);
                 if (StringUtils.isBlank(variable.PTableFile)) {
                     radioButtonPTableCalculate.setSelected(true);
@@ -387,9 +393,7 @@ public class PanelEditVariable extends javax.swing.JPanel {
     private void ptablePanelSetEnabled(boolean enabled) {
         containerSetAllEnabled(panelPTable, enabled);
         // For the time being calculation of p-table not implemented
-        // so radioButtonPTableFile is selected automaticly
         radioButtonPTableCalculate.setEnabled(false);
-        radioButtonPTableFile.setSelected(true);
         
         if (enabled) {
             textFieldPTableFileName.setEnabled(radioButtonPTableFile.isSelected());

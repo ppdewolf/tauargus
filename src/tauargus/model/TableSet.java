@@ -51,7 +51,9 @@ import tauargus.utils.Tokenizer;
 import argus.utils.SystemUtils;
 import argus.utils.StrUtils;
 import static java.lang.Math.abs;
+import java.util.Iterator;
 import java.util.TreeMap;
+import java.util.Map;
 import tauargus.gui.DialogErrorApriori;
 
 public class TableSet {
@@ -2442,7 +2444,13 @@ if (Application.isProtectCoverTable()){
             }
             if (k == -1) { break; }
         }
-                
+        
+        // remove info of differences that are not present in the table 
+        // i.e. remove entries with CKMStatistics(Diff) == 0
+        for (Iterator<Map.Entry<Integer,Long>> it = CKMStatistics.entrySet().iterator();it.hasNext();){
+            Map.Entry<Integer,Long> entry = it.next();
+            if (entry.getValue()==0) it.remove();
+        }
     }
 
 }

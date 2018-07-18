@@ -849,9 +849,10 @@ public class SaveTable {
                 out.write("<table>\n");
                 out.write("<tr><th width=\"50%\" height=\"11\">Added noise</th>\n");
                 out.write("<th width=\"50%\" height=\"11\">Number of cells</th>\n");
-                for (i=tableSet.minDiff;i<=tableSet.maxDiff;i++){
-                    out.write("<tr><td align=\"Right\">"+ Integer.toString(i) + "</td>");
-                    out.write("<td align=\"Right\">"+Long.toString(tableSet.getCKMStats().get(i))+"</td></tr>\n");
+                Integer[] TreeMapKeys = tableSet.getCKMStats().keySet().toArray(new Integer[tableSet.getCKMStats().size()]);
+                for (i=0;i<tableSet.getCKMStats().size();i++){
+                    out.write("<tr><td align=\"Right\">"+ Integer.toString(TreeMapKeys[i]) + "</td>");
+                    out.write("<td align=\"Right\">"+Long.toString(tableSet.getCKMStats().get(TreeMapKeys[i]))+"</td></tr>\n");
                 }
                 out.write("<tr><td align=\"Right\"> Empty </td>");
                 out.write("<td align=\"Right\">"+Long.toString(tableSet.numberOfEmpty())+"</td></tr>\n");

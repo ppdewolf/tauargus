@@ -363,7 +363,7 @@ public class Metadata implements Cloneable {
                     case "<RECORDKEY>":
                         hs = tokenizer.nextToken();
                         if (!hs.equals("")) {
-                            throw new ArgusException("Unknown token (" + hs + ") in line " + tokenizer.getLineNumber() + " after keyword <NUMERIC>.");
+                            throw new ArgusException("Unknown token (" + hs + ") in line " + tokenizer.getLineNumber() + " after keyword <RECORDKEY>.");
                         }
                         variable.type = Type.RECORD_KEY;
                         break;
@@ -649,6 +649,13 @@ public class Metadata implements Cloneable {
                 }
                 writer.println();
                 break;
+            case RECORD_KEY:
+                writer.println("    <RECORDKEY>");
+                String hs = variable.PTableFile;
+                if ( hs.indexOf("\\",0)>0 ||hs.indexOf(":",0)>0||hs.indexOf(":",0)>0){}
+                else { hs = variable.metadata.getFilePath(variable.PTableFile);}
+                writer.println("    <PFILE> " + StrUtils.quote(hs));
+                break;
             case SHADOW:
                 writer.println("    <NUMERIC> <SHADOW>");
                 break;
@@ -729,12 +736,16 @@ public class Metadata implements Cloneable {
 
     public void verify() throws ArgusException {
         boolean overlapFound = false; String overlapString = "";  
-          if (variables.isEmpty()) {
+        if (variables.isEmpty()) {
              throw new ArgusException("No variables have been specified.");
         }
 
         if (numberOfExplanatoryVariables() == 0) {
             throw new ArgusException("No explanatory variables found.");
+        }
+        
+        if (count(Type.RECORD_KEY) > 1) {
+            throw new ArgusException("More than one record key variable found.");
         }
         
         if (dataOrigin == DATA_ORIGIN_TABULAR) {

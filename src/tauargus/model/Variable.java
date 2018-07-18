@@ -357,6 +357,10 @@ public class Variable implements Cloneable {
             equal = equal && Arrays.equals(requestCode, variable.requestCode);
         }
         
+        if (variable.type == Type.RECORD_KEY){
+            equal = equal && PTableFile.equals(variable.PTableFile);
+        }
+        
         return equal;
     }
 
@@ -379,6 +383,7 @@ public class Variable implements Cloneable {
         hash = 89 * hash + Objects.hashCode(this.leadingString);
         hash = 89 * hash + Arrays.deepHashCode(this.missing);
         hash = 89 * hash + Objects.hashCode(this.totCode);
+        hash = 89 * hash + Objects.hashCode(this.PTableFile);
         return hash;
     }
 

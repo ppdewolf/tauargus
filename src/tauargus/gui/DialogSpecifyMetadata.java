@@ -523,10 +523,10 @@ public class DialogSpecifyMetadata extends DialogBase {
             buttonMoveDown.setEnabled(false);                      
         } else
         {    
-        buttonRemove.setEnabled(selectedIndex != -1);
-        buttonAdd.setEnabled(true);
-        buttonMoveUp.setEnabled(selectedIndex > 0);
-        buttonMoveDown.setEnabled((selectedIndex != -1) && (selectedIndex < variableListModel.getSize() - 1));
+            buttonRemove.setEnabled(selectedIndex != -1);
+            buttonAdd.setEnabled(true);
+            buttonMoveUp.setEnabled(selectedIndex > 0);
+            buttonMoveDown.setEnabled((selectedIndex != -1) && (selectedIndex < variableListModel.getSize() - 1));
         }
     }
 
