@@ -44,6 +44,12 @@ public class DialogSaveTable extends DialogBase {
     public void showDialog(TableSet tableSet){
         this.tableSet = tableSet;
         this.jRadioCKMFormat.setEnabled(tableSet.ckmProtect);
+        if (tableSet.ckmProtect || tableSet.ctaProtect){
+            this.jRadioIntermediate.setEnabled(false);
+            this.jRadioSBSFormat.setEnabled(false);
+            this.jRadioJJFormat.setEnabled(false);
+        }
+        if (tableSet.rounded) this.jRadioJJFormat.setEnabled(false);
         setVisible(true);
     };
 

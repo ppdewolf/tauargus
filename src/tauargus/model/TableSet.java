@@ -1365,7 +1365,8 @@ if (Application.isProtectCoverTable()){
                             writer.print(codeString + ";");
                         }
                     }
-                    writer.print(mdecimalFormat.format(cell.response) + ";");
+                    if (!rounded) writer.print(mdecimalFormat.format(cell.response) + ";");
+                    if (rounded) writer.print(mdecimalFormat.format(cell.roundedResponse) + ";");
                     // for freq tables no double column resp and freq nor shadow variable
                     if (!isFrequencyTable()){
                      if (!holdinglevel) {

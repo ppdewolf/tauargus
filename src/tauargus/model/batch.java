@@ -462,7 +462,7 @@ public static int runBatchProcess(String batchFile){
         if ( !hs.equals(",") ) {throw new ArgusException(", expected; not a "+ hs + "");}
         hs = nextToken(tail);
         outputType = Integer.parseInt(hs);
-        if (outputType < 1 || outputType > 6) {throw new ArgusException("Unknwon output type ("+ hs + ":");}
+        if (outputType < 1 || outputType > 7) {throw new ArgusException("Unknown output type ("+ hs + ":");}
         outputType--;
         hs = nextChar(tail);
         if ( !hs.equals(",") ) {throw new ArgusException(", expected; not a "+ hs + "");}
@@ -479,7 +479,7 @@ public static int runBatchProcess(String batchFile){
         hs = nextToken(tail).toUpperCase();
         //loop over the different options
         while (! hs.equals("")){
-         if (hs.length()< 2){throw new ArgusException("Unknonn output type ("+ hs + ")");}
+         if (hs.length()< 2){throw new ArgusException("Unknown output type ("+ hs + ")");}
          optString = hs.substring(0,2);
          hs = hs.substring(2).trim();
          plusMin =  hs.substring(0,1);
@@ -510,6 +510,8 @@ public static int runBatchProcess(String batchFile){
             }
         }
         tableSet.safeFileName = hs;
+        if ((tableSet.ckmProtect || tableSet.ctaProtect) && (outputType > 3)) 
+            {throw new ArgusException("Chosen output type is not allowed for this type of protection\n");}
         SaveTable.writeTable (tableSet, outputType);
         SaveTable.writeReport(tableSet);
     }

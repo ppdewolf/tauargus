@@ -92,6 +92,7 @@ public class SaveTable {
         int[] dimSequence = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
         if (tableSet.rounded ){respType = 1;}
         if (tableSet.ctaProtect) {respType = 2;}
+        if (tableSet.ckmProtect) {respType = 3;}
         tableSet.safeFileFormat = selectedFormat;
         hs = "";
         hs = hs + addOption ("HL",SaveTable.writeSBSHierarchicalLevels);
@@ -138,7 +139,7 @@ public class SaveTable {
                             tableSet.safeFileName);
                     }
                 break;
-            case TableSet.FILE_FORMAT_INTERMEDIATE:
+            case TableSet.FILE_FORMAT_INTERMEDIATE: 
                 // The GUI thread (EDT) should not be used for long running tasks, 
                 // so use the SwingWorker class
                 //However  in batch this has been disabled.
