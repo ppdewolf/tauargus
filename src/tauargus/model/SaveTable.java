@@ -227,12 +227,14 @@ public class SaveTable {
             hs = hs + quote + tableSet.expVar.get(i).name + quote +",";
         }
         hs = hs.substring(0, hs.length()-1);
-        if (tableSet.respVar  == Application.getFreqVar()){ hs = hs + ","+ quote + "Freq" + quote + ",";}
-             else {hs = hs + "," + quote + tableSet.respVar.name;
-             if (respType == 1){hs = hs + "_Round";}
-             if (respType == 2){hs = hs + "_CTA";}
-             hs = hs + quote; //"\"";
-//             hs = hs +"\","; 
+        if (tableSet.respVar  == Application.getFreqVar()){ 
+            hs = hs + "," + quote + "Freq" + quote;
+        }
+        else{
+            hs = hs + "," + quote + tableSet.respVar.name;
+            if (respType == 1){hs = hs + "_Round";}
+            if (respType == 2){hs = hs + "_CTA";}
+            hs = hs + quote;
         }
         //TODO CTA and rounded
         if (writeAddStatus){
