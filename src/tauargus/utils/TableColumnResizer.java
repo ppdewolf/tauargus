@@ -49,4 +49,10 @@ public class TableColumnResizer {
             column.setPreferredWidth(maxWidth + 6);
         }
     }
+    
+    public static void FixColumnWidth(TableColumn column, int Width){
+        column.setMinWidth(Width);
+        column.setMaxWidth(Width);
+        column.setPreferredWidth(Width);
+    }
 }

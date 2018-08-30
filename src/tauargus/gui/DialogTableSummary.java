@@ -104,7 +104,10 @@ public class DialogTableSummary extends javax.swing.JDialog {
         
         TableColumnResizer.adjustColumnPreferredWidths(tableExpVars, false);
         TableColumnResizer.adjustColumnPreferredWidths(tableSummary, false);
-        
+        if (tableSet.suppressed == TableSet.SUP_CKM){
+            TableColumnResizer.FixColumnWidth(tableSummary.getColumnModel().getColumn(0), 40);
+        }
+
         ResizeSummaryDialog();
 
         setVisible(true);
