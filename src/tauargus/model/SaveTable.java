@@ -850,17 +850,23 @@ public class SaveTable {
             }
             else{
                 out.write("<table>\n");
-                out.write("<tr><th width=\"50%\" height=\"11\">Added noise</th>\n");
-                out.write("<th width=\"50%\" height=\"11\">Number of cells</th>\n");
+                //out.write("<tr><th width=\"50%\" height=\"11\">Added noise</th>\n");
+                //out.write("<th width=\"50%\" height=\"11\">Number of cells</th>\n");
+                out.write("<tr><th width=\"20%\" height=\"11\">Added noise</th>\n");
+                out.write("<th width=\"10%\" height=\"11\">Number of cells</th>\n");
+                out.write("<th width=\"10%\" height=\"11\">Percentage of cells</th>\n");
                 Integer[] TreeMapKeys = tableSet.getCKMStats().keySet().toArray(new Integer[tableSet.getCKMStats().size()]);
                 for (i=0;i<tableSet.getCKMStats().size();i++){
                     out.write("<tr><td align=\"Right\">"+ Integer.toString(TreeMapKeys[i]) + "</td>");
-                    out.write("<td align=\"Right\">"+Long.toString(tableSet.getCKMStats().get(TreeMapKeys[i]))+"</td></tr>\n");
+                    out.write("<td align=\"Right\">"+Long.toString(tableSet.getCKMStats().get(TreeMapKeys[i]))+"</td>\n");
+                    out.write("<td align=\"Right\">"+String.format("%7.3f",100.0*tableSet.getCKMStats().get(TreeMapKeys[i])/tableSet.numberOfCells())+"%</td></tr>\n");
                 }
                 out.write("<tr><td align=\"Right\"> Empty </td>");
-                out.write("<td align=\"Right\">"+Long.toString(tableSet.numberOfEmpty())+"</td></tr>\n");
+                out.write("<td align=\"Right\">"+Long.toString(tableSet.numberOfEmpty())+"</td>\n");
+                out.write("<td align=\"Right\">"+String.format("%7.3f",100.0*tableSet.numberOfEmpty()/tableSet.numberOfCells())+"%</td></tr>\n");
                 out.write("<tr><td align=\"Right\"> Total </td>");
-                out.write("<td align=\"Right\">"+Long.toString(tableSet.numberOfCells())+"</td></tr>\n");
+                out.write("<td align=\"Right\">"+Long.toString(tableSet.numberOfCells())+"</td>\n");
+                out.write("<td align=\"Right\">"+Long.toString(100)+"%</td></tr>\n");
                 out.write("</table>\n");
                 out.write("<p>\n");
             }

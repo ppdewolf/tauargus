@@ -138,7 +138,7 @@ public class DialogTableSummary extends javax.swing.JDialog {
             public int getRowCount() {return (rangeD + 2);}
                 
             @Override
-            public int getColumnCount() {return 3;}
+            public int getColumnCount() {return 4;}
                 
             @Override
             public Object getValueAt(int rowIndex, int columnIndex) {
@@ -151,6 +151,10 @@ public class DialogTableSummary extends javax.swing.JDialog {
                         if (rowIndex == rangeD) return tableSet.numberOfEmpty();
                         else if (rowIndex == rangeD + 1) return tableSet.numberOfCells();
                             else return Long.toString(CKMInfo.get(TreeMapKeys[rowIndex]));
+                    case 3:
+                        if (rowIndex == rangeD) return String.format("%6.2f",100.0*tableSet.numberOfEmpty()/tableSet.numberOfCells());
+                        else if (rowIndex == rangeD + 1) return "100";
+                            else return String.format("%6.2f",100.0*CKMInfo.get(TreeMapKeys[rowIndex])/tableSet.numberOfCells());
                     default:
                         return "";
                 }
@@ -160,7 +164,8 @@ public class DialogTableSummary extends javax.swing.JDialog {
             public String getColumnName(int column) {
                 switch(column) {
                     case 1:  return "Noise";
-                    case 2:  return "#Cells";
+                    case 2:  return "# Cells";
+                    case 3:  return "% Cells";
                     default: return "";
                 }
             }
