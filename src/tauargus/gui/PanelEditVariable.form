@@ -47,7 +47,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="panelHierarchy" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="panelPTable" min="-2" pref="101" max="-2" attributes="0"/>
+              <Component id="panelPTable" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
@@ -1032,30 +1032,25 @@
                           <Component id="textFieldPTableFileName" pref="550" max="32767" attributes="0"/>
                           <EmptySpace min="-2" max="-2" attributes="0"/>
                           <Component id="buttonPTableFileName" min="-2" pref="33" max="-2" attributes="0"/>
-                          <EmptySpace min="10" pref="10" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
-                          <Group type="103" groupAlignment="1" attributes="0">
-                              <Component id="radioButtonPTableCalculate" alignment="0" max="32767" attributes="0"/>
-                              <Component id="radioButtonPTableFile" alignment="0" max="32767" attributes="0"/>
-                          </Group>
+                          <Component id="radioButtonPTableFile" max="32767" attributes="0"/>
                           <EmptySpace pref="495" max="32767" attributes="0"/>
                       </Group>
                   </Group>
-                  <EmptySpace min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
-                  <Component id="radioButtonPTableCalculate" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="radioButtonPTableFile" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="textFieldPTableFileName" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="buttonPTableFileName" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="buttonPTableFileName" min="-2" max="-2" attributes="0"/>
+                      <Component id="textFieldPTableFileName" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
@@ -1063,17 +1058,6 @@
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JRadioButton" name="radioButtonPTableCalculate">
-          <Properties>
-            <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-              <ComponentRef name="buttonGroupPTable"/>
-            </Property>
-            <Property name="text" type="java.lang.String" value="To be calculated"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="radioButtonPTableActionPerformed"/>
-          </Events>
-        </Component>
         <Component class="javax.swing.JRadioButton" name="radioButtonPTableFile">
           <Properties>
             <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
