@@ -12,3 +12,6 @@ https://joinup.ec.europa.eu/software/page/eupl/licence-eupl
 
 This software is distributed on an "AS IS" basis without 
 warranties or conditions of any kind, either express or implied.
+
+# Getting started
+There is a Getting Started document available in [**ppt-format**](https://github.com/sdcTools/manuals/blob/master/tau-argus/Getting%20started%20with%20TauArgus.ppt) as well as in [**pdf-format**](https://github.com/sdcTools/manuals/blob/master/tau-argus/Getting%20started%20with%20TauArgus.pdf).
