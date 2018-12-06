@@ -15,3 +15,6 @@ warranties or conditions of any kind, either express or implied.
 
 ## Getting started
 There is a Getting Started document available in [**ppt-format**](https://github.com/sdcTools/manuals/blob/master/tau-argus/Getting%20started%20with%20TauArgus.ppt) as well as in [**pdf-format**](https://github.com/sdcTools/manuals/blob/master/tau-argus/Getting%20started%20with%20TauArgus.pdf).
+
+There are also some [**animated gifs**](https://github.com/sdcTools/manuals/blob/master/tau-argus/Tau-Argus%20in%20animated%20gif.zip) illustrating some actions in Tau-Argus.</br>
+These gifs were produced using an older version (3.x) of Tau-Argus. The basics are still the same though.
