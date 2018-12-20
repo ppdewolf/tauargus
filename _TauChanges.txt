@@ -244,4 +244,7 @@ summary    : Fixed use of <FREQ> in batch with microdata input (issue 86)
 above is RELEASED IN 4.1.7
 --------------------------------------------------------------
 date       : Mar 6, 2018
-summary : No longer check for Cplex licence file in Optimal when not using Cplex
+summary    : No longer check for Cplex licence file in Optimal when not using Cplex
+
+date	   : Dec 19, 2018
+summary    : Bug with not initialised MaxCost in tauhitas.dll fixed
