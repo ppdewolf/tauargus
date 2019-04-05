@@ -252,17 +252,18 @@ public class PanelTable extends javax.swing.JPanel {
      * This renderer is used by table cells
      */
     private class CellRenderer extends javax.swing.table.DefaultTableCellRenderer {
-        
+       
         @Override
         public java.awt.Component getTableCellRendererComponent(javax.swing.JTable table, Object value, boolean isSelected,
                 boolean hasFocus, int rowIndex, int vcolIndex) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, rowIndex, vcolIndex);
             Cell cell = (Cell) value;
-
+            
             if (cell.status == CellStatus.EMPTY) {
                 setText("-");
             } else if (checkBoxOutputView.isSelected() && !cell.status.isSafe()) {
                 setText("X");
+                setToolTipText(doubleFormatter.format(cell.response));
             } else if (tableSet.rounded) {
                 setText(doubleFormatter.format(cell.roundedResponse));
             } else if (tableSet.ctaProtect) {
@@ -664,7 +665,8 @@ public class PanelTable extends javax.swing.JPanel {
             }
         }
         
-        boolean b = (s == TableSet.SUP_CKM || s == TableSet.SUP_NO);
+        checkBoxColoredView.setVisible(tableSet.CellKeyAvailable);
+        boolean b = (s == TableSet.SUP_CKM) || (s == TableSet.SUP_NO);
         checkBoxColoredView.setEnabled(b);
         if (!b) checkBoxColoredView.setSelected(false);
         if (s == TableSet.SUP_CKM) checkBoxColoredView.setSelected(true);
@@ -1687,7 +1689,6 @@ public class PanelTable extends javax.swing.JPanel {
     }//GEN-LAST:event_buttonTableSummaryActionPerformed
 
     private void buttonPrioryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPrioryActionPerformed
-        // TODO add your handling code here:
        DialogReadApriori dialog = new DialogReadApriori(null, true);
        dialog.SetAprioyTable(tableSet.index);
        dialog.ShowDialog();  
@@ -1703,8 +1704,6 @@ public class PanelTable extends javax.swing.JPanel {
     }//GEN-LAST:event_buttonPrioryActionPerformed
 
     private void buttonAuditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonAuditActionPerformed
-        // TODO add your handling code here:
-        // JOptionPane.showMessageDialog(this, "Not yet implemented");
         new Thread(){
             @Override public void run(){
                 try {
@@ -1731,7 +1730,6 @@ public class PanelTable extends javax.swing.JPanel {
     }//GEN-LAST:event_buttonAuditActionPerformed
 
     private void buttonUndoSuppressActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonUndoSuppressActionPerformed
-        // TODO add your handling code here:
         TableService.undoSuppress(tableSet.index);
         updateSuppressButtons();
         SystemUtils.writeLogbook("Protection for table: " + tableSet.toString() +  " has been removed");

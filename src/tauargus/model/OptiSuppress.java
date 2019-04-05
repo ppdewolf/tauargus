@@ -287,7 +287,8 @@ public class OptiSuppress {
         try {
         BufferedWriter out = new BufferedWriter(new FileWriter(Application.getTempFile("Anneke.txt")));
         out.write(Application.getTempFile("Anneke.JJ")); out.newLine();
-        out.write ("C:/Lokaler_Datenbereich/xpress/bin/mosel\""); out.newLine();
+        //out.write ("C:/Lokaler_Datenbereich/xpress/bin/mosel"); out.newLine();
+        out.write ("NoLongerNeeded"); out.newLine();
         out.write (Application.getTempFile("Anneke.Out")); out.newLine();
         out.write (Application.getTempFile("Anneke.txt")); out.newLine();
         out.write ("primsec"); out.newLine();
@@ -308,7 +309,7 @@ public class OptiSuppress {
         
         if  (Application.solverSelected == Application.SOLVER_CPLEX) {
             out.write (TauArgusUtils.GetCplexLicenceFile());}
-        else{out.write ("zomaariets");}
+        else{out.write ("NoLicenceSpecified");}
         out.newLine();
 //        out.write ("C:\\Lokaler Datenbereich\\xpress\\bin\\mosel\""); out.newLine();
         out.close();
@@ -658,7 +659,8 @@ public class OptiSuppress {
          hs = hs.substring(i);
          hs = hs.replace (".", "_");
          hs = dots.substring(0, i) + hs;
-         out.write(hs + "\n");
+         out.write(hs);
+         out.newLine();
          }
          out.close();
          in.close();

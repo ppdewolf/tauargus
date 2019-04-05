@@ -415,7 +415,7 @@ public class GHMiter {
         Oke = TauArgusUtils.DeleteFile(Application.getTempFile("proto001"));
         Oke = TauArgusUtils.DeleteFile(Application.getTempFile("proto002"));
         Oke = TauArgusUtils.DeleteFile(Application.getTempFile("proto003"));
-        Oke = TauArgusUtils.DeleteFile(Application.getTempFile("ausgabe"));
+        Oke = TauArgusUtils.DeleteFile(Application.getTempFile("AUSGABE"));
         Oke = TauArgusUtils.DeleteFile(Application.getTempFile("Ft17f001"));
         Oke = TauArgusUtils.DeleteFile(Application.getTempFile("Ft14f001"));
         Oke = TauArgusUtils.DeleteFile(Application.getTempFile("Ft09file"));

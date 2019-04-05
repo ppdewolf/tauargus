@@ -1981,7 +1981,7 @@ public class DialogSpecifyTablesMicro extends DialogBase {
                     JOptionPane.showMessageDialog(this, "When using the Cell Key Method, you should not specify any rule");
                 }
                 else{
-                    JOptionPane.showMessageDialog(this, "When using response variable <freq>, only the frequency rule is allowed");
+                    JOptionPane.showMessageDialog(this, "When using response variable <freq>, dominance rule and p%-rule are not allowed");
                 }
                 return false;
             }

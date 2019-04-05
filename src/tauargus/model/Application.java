@@ -52,7 +52,7 @@ public class Application {
     public static final int MAJOR = 4;
     public static final int MINOR = 1;
     public static final String REVISION = "12_BETA";
-    public static final int BUILD = 1;
+    public static final int BUILD = 2;
     
     // Error codes returned by functions in TauArgusJava dll
     public static final int ERR_CODENOTINCODELIST = 1017;

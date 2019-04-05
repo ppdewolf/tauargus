@@ -24,7 +24,6 @@ import tauargus.model.TableSet;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.commons.io.FilenameUtils;
 import tauargus.model.ArgusException;
-import argus.utils.StrUtils;
 //import tauargus.utils.ExecUtils;
 import argus.utils.SystemUtils;
 import java.awt.Cursor;
@@ -47,7 +46,7 @@ public class DialogSaveTable extends DialogBase {
         if (tableSet.ckmProtect || tableSet.ctaProtect){
             this.jRadioIntermediate.setEnabled(false);
             this.jRadioSBSFormat.setEnabled(false);
-            this.jRadioJJFormat.setEnabled(false);
+            //this.jRadioJJFormat.setEnabled(false);
         }
         if (tableSet.rounded) this.jRadioJJFormat.setEnabled(false);
         setVisible(true);

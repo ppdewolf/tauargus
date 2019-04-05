@@ -264,8 +264,8 @@ public class SaveTable {
      * For the singleton protection in Optimal and UWE artificial cells are added.
      * The combination of two singletons or a sing-mult is added as an extra cell with minimal protection level.
      * This will cause at least an extra suppression the row/column.
-     * This is even more efficient than the method in Modular. In Modular the prot. levels of some cells is increased, 
-     * and this can cause overprotection in the other directions.
+     * This is even more efficient than the old method in Modular. In Modular the prot. levels of some cells was increased, 
+     * and this caused overprotection in the other directions.
      * @param tableSet
      * @param fileName
      * @param minFreq
