@@ -26,7 +26,6 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableColumn;
 import tauargus.model.CellStatus;
 import tauargus.model.CellStatusStatistics;
 import tauargus.model.TableSet;
@@ -96,9 +95,12 @@ public class DialogTableSummary extends javax.swing.JDialog {
         }
                
         if (tableSet.suppressed == TableSet.SUP_CKM){
+            jButtonMoreInfo.setVisible(true);
+            //labelStatus.setText(Double.toString(tableSet.GetCKMInfoLoss().GetPercentiles("AD")[0]));
             setSummaryCKM(tableSet);
         }
         else{
+            jButtonMoreInfo.setVisible(false);
             setSummaryStandard(tableSet);
         }
         
@@ -309,6 +311,7 @@ public class DialogTableSummary extends javax.swing.JDialog {
         tableSummary = new javax.swing.JTable();
         buttonClose = new javax.swing.JButton();
         labelStatus = new javax.swing.JLabel();
+        jButtonMoreInfo = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Summary for table no: ");
@@ -378,6 +381,13 @@ public class DialogTableSummary extends javax.swing.JDialog {
 
         labelStatus.setText(" ");
 
+        jButtonMoreInfo.setText("More Info ...");
+        jButtonMoreInfo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonMoreInfoActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -386,12 +396,15 @@ public class DialogTableSummary extends javax.swing.JDialog {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(labelStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(labelStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE)
                             .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(scrollPaneExpVars, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(scrollPaneExpVars, javax.swing.GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(19, 19, 19)
+                                .addComponent(jButtonMoreInfo)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                             .addComponent(buttonClose)
@@ -424,7 +437,9 @@ public class DialogTableSummary extends javax.swing.JDialog {
                             .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(labelCostVar))
                         .addGap(18, 18, 18)
-                        .addComponent(labelStatus))
+                        .addComponent(labelStatus)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButtonMoreInfo))
                     .addComponent(scrollPaneSummary, javax.swing.GroupLayout.DEFAULT_SIZE, 292, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(buttonClose)
@@ -441,6 +456,11 @@ public class DialogTableSummary extends javax.swing.JDialog {
     private void DialogClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_DialogClosing
         setVisible(false);
     }//GEN-LAST:event_DialogClosing
+
+    private void jButtonMoreInfoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonMoreInfoActionPerformed
+        ShowMoreInfoLoss dialog = new ShowMoreInfoLoss(null, true);
+        dialog.showDialog();
+    }//GEN-LAST:event_jButtonMoreInfoActionPerformed
 
     /**
      * @param args the command line arguments
@@ -485,6 +505,7 @@ public class DialogTableSummary extends javax.swing.JDialog {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonClose;
+    private javax.swing.JButton jButtonMoreInfo;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

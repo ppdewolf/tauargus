@@ -245,6 +245,31 @@ public class SaveTable {
         return hs;
     }
     
+    // Writes table in JJ-format to file to beable to perform audit on CKM-protecetd freq count table
+    // I.e. assumptions: 
+    //      cells are integers
+    //      cells are non-negative
+    //      forRounding = false
+    //      singleton = false
+    //      withBogusRemoval = false
+    //      inverseWeight = false
+    // xmin and xmax are not needed: for each cell aprioribound queals perturbed value +/- maxD
+    public static void writeJJforCKMaudit(TableSet tableSet, String fileName, boolean forRounding, 
+                               boolean singleton, int minFreq, boolean withBogusRemoval, boolean inverseWeight)throws ArgusException{
+        double xMin, xMax;
+        xMin = tableSet.minTabVal;
+        xMax = tableSet.maxTabVal;
+        if (fileName == "") {fileName = tableSet.safeFileName;} 
+        if (!tauArgus.WriteJJFormat(tableSet.index, fileName, xMin, xMax, withBogusRemoval, false, forRounding)){
+         throw new ArgusException("An unexpected error occurred when writing the JJ-file");
+        }
+        //TODO OpschonenJJFormatforKomma.
+        //Extend for singletons
+        if (singleton) {addSingletonToJJ(tableSet, fileName, minFreq);}
+        opschonenJJFileforKomma(fileName, tableSet, inverseWeight);
+       
+    }
+        
     public static void writeJJ(TableSet tableSet, String fileName, boolean forRounding, 
                                boolean singleton, int minFreq, boolean withBogusRemoval, boolean inverseWeight)throws ArgusException{
         double xMin, xMax;

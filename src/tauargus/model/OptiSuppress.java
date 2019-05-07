@@ -17,6 +17,14 @@
 
 package tauargus.model;
 
+/**
+ *
+ * @author ahnl
+ * Class to run modular/Hitas , optimal (FullJJ),Network, CTA and the rounder
+ * They have a lot in common.
+ * 
+ */
+
 import java.io.BufferedWriter;
 import java.io.BufferedReader;
 import java.io.File;
@@ -25,37 +33,21 @@ import java.io.FileReader;
 import java.io.IOException;
 import tauargus.extern.dataengine.TauArgus;
 import tauargus.extern.tauhitas.HiTaSCtrl;
-//import tauargus.extern.rounder.Rounder;
-import tauargus.extern.taurounder.taurounder;
 import java.io.FileNotFoundException;
 import tauargus.utils.TauArgusUtils;
 import tauargus.utils.Tokenizer;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Date;
-//import tauargus.extern.rounder.ActivityListener;
 import tauargus.extern.taurounder.RProgressListener;
 import tauargus.extern.taurounder.RCallback;
 import tauargus.service.TableService;
 import tauargus.utils.ExecUtils;
 import argus.utils.SystemUtils;
 import java.beans.PropertyChangeEvent;
-
-
-  
-/**
- *
- * @author ahnl
- * Class to run modular/Hitas , optimal (FullJJ),Network, CTA and the rounder
- * They have a lot in common.
- * 
- */
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -65,7 +57,6 @@ import tauargus.extern.tauhitas.ICallback;
 import tauargus.extern.tauhitas.IProgressListener;
 import tauargus.extern.taurounder.RounderCtrl;
 import tauargus.gui.DialogStopTime;
-import tauargus.gui.PanelTable;
 import tauargus.utils.StrUtils;
 import static tauargus.utils.TauArgusUtils.ShowWarningMessage;
 
@@ -2057,6 +2048,7 @@ private static void joinRounded(TableSet tableSet, int nPart) {
         tableSet.maxDiff = getmax[0];
         
         tableSet.CalculateCKMInfo();
+        tableSet.CalculateCKMInfoLoss();
         
         if (result == -9){ // error reading ptable file
             JOptionPane.showMessageDialog(null, "Error reading ptable file " + tableSet.cellkeyVar.metadata.getFilePath(PTableFile));

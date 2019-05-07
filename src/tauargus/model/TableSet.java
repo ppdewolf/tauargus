@@ -54,6 +54,7 @@ import static java.lang.Math.abs;
 import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.Map;
+import java.util.stream.DoubleStream;
 import tauargus.gui.DialogErrorApriori;
 
 public class TableSet {
@@ -75,24 +76,6 @@ public class TableSet {
     public static final int COST_VAR = -4; // Not used in communication with dll
     public static final int COST_RESPONSE = -5; // Not used in communication with dll
 
-//    public static final int SRT_GHMITER = 1;  //These SRT parameters are never used; Anco
-//    public static final int SRT_HITAS = 2;
-//    public static final int SRT_NETWORK = 3;
-//    public static final int SRT_OPTIMAL = 4;
-//    public static final int SRT_ROUNDING = 5;
-//    public static final int SRT_MARGINAL = 6;
-//    public static final int SRT_UWE = 7;
-//    public static final int SRT_MAX = 7;
-//    public static final int SRT_CTA = 8;
-
-
-//    public static final int SUP_JJ_OPT_XP = 1;
-//    public static final int SUP_JJ_OPT_CP = 2;
-//    public static final int SUP_HITAS_XP = 4;
-//    public static final int SUP_HITAS_CP = 5;
-//    public static final int SUP_ROUNDING_CP = 8;
-//    public static final int SUP_ROUNDING_XP = 9;
-
     public static final int SUP_NO = 0;
     public static final int SUP_JJ_OPT = 1;
     public static final int SUP_GHMITER = 2;
@@ -104,12 +87,6 @@ public class TableSet {
     public static final int SUP_UWE = 8;
     public static final int SUP_CTA = 9;
     public static final int SUP_CKM = 10;
-
-//    public static final int CT_RESPONSE = 1;       //These SRT parameters are never used; Peter-Paul
-//    public static final int CT_SHADOW = 2;
-//    public static final int CT_COST = 3;
-//    public static final int CT_ROUNDEDRESP = 4;
-//    public static final int CT_CTA = 5;
 
     public static final int ADDITIVITY_CHECK = 0;
     public static final int ADDITIVITY_RECOMPUTE = 1;
@@ -309,6 +286,8 @@ public class TableSet {
     private static int[] level = new int[1];
     private static int[] nChild = new int[1];
     private static String[] code = new String[1];
+    
+    private final CKMInfoLoss InfoLoss = new CKMInfoLoss();
 
 
     public TableSet(Metadata metadata) {
@@ -2453,9 +2432,89 @@ if (Application.isProtectCoverTable()){
             if (entry.getValue()==0) it.remove();
         }
     }
+    
+    // Calculates mean 
+    public void CalculateCKMInfoLoss(){
+        int nExpVar = expVar.size();
+        int[] maxDim = new int[nExpVar];
+        int[] dimArray = new int[nExpVar];
+        
+        double[] AD = new double[this.numberOfCells()];
+        double[] RAD = new double[this.numberOfCells()];
+        double[] DR = new double[this.numberOfCells()];
 
+        // including empty cells
+        for (int i = 0; i < nExpVar; i++) {
+            dimArray[i] = 0;
+            maxDim[i] = TauArgusUtils.getNumberOfActiveCodes(expVar.get(i).index);
+        }        
+        
+        int j=0;
+        for (;;) {
+            Cell cell = getCell(dimArray);
+            AD[j] = Math.abs(cell.CKMValue - cell.response);
+            // If cell has value 0 or is empty, it is not perturbed by default in frequency tables
+            if ((Math.abs(cell.response)<=1e-10)||(cell.status==CellStatus.EMPTY)) RAD[j] = 0;
+            else RAD[j] = Math.abs(cell.CKMValue - cell.response)/cell.response;
+            DR[j] = Math.abs(Math.sqrt(cell.CKMValue) - Math.sqrt(cell.response));
+            j++;
+            // dimArray ophogen
+            int k = nExpVar;
+            while (k-- > 0) {
+                dimArray[k]++;
+                if (dimArray[k] < maxDim[k]) { break; }
+                else { dimArray[k] = 0; }
+            }
+            if (k == -1) { break; }            
+        }
+        
+        // Sort the values
+        Arrays.sort(AD);
+        Arrays.sort(RAD);
+        Arrays.sort(DR);
+
+        this.InfoLoss.SetMean("AD",DoubleStream.of(AD).average().getAsDouble());
+        this.InfoLoss.SetMean("RAD",DoubleStream.of(RAD).average().getAsDouble());
+        this.InfoLoss.SetMean("DR",DoubleStream.of(DR).average().getAsDouble());
+
+        this.InfoLoss.SetMedian("AD",percentiles(AD,0.5)[0]);
+        this.InfoLoss.SetMedian("RAD",percentiles(RAD,0.5)[0]);
+        this.InfoLoss.SetMedian("DR",percentiles(DR,0.5)[0]);
+        
+        this.InfoLoss.SetMaxs("AD",AD[AD.length-1]);
+        this.InfoLoss.SetMaxs("RAD",RAD[RAD.length-1]);
+        this.InfoLoss.SetMaxs("DR",DR[DR.length-1]);
+        
+        this.InfoLoss.SetPercentiles("AD",percentiles(AD,0.6,0.7,0.8,0.9,0.95,0.99));
+        this.InfoLoss.SetPercentiles("RAD",percentiles(RAD,0.8,0.9,0.95,0.99));
+        this.InfoLoss.SetPercentiles("DR",percentiles(DR,0.7,0.8,0.9,0.95,0.99));
+        
+    }
+    
+    public CKMInfoLoss GetCKMInfoLoss(){
+        return this.InfoLoss;
+    }
+    
+    // calculates perc percentile of array data
+    // perc is value between 0 and 1
+    private double[] percentiles(double[] data, double... perc){
+        assert data.length > 0;
+        double pos;
+        double d;
+        double[] values = new double[perc.length];
+        for (int i=0; i<perc.length;i++){
+            pos = perc[i]*(data.length + 1);
+            if ((data.length == 1)||(pos < 1)) values[i] = data[0];
+            else{
+                if (pos >= data.length) values[i] = data[data.length-1];
+                else{
+                    d = pos - Math.floor(pos);
+                    values[i] = (1.0-d)*data[(int)Math.floor(pos)-1] + d*data[(int)Math.floor(pos)];
+                }
+            }
+        }
+        return values;
+    }
 }
-
-
 
 
