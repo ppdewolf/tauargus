@@ -35,20 +35,17 @@
                   <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                          <Component id="labelStatus" alignment="0" pref="135" max="32767" attributes="0"/>
+                          <Component id="labelStatus" alignment="0" max="32767" attributes="0"/>
                           <Component id="jLabel1" alignment="0" min="-2" pref="64" max="-2" attributes="0"/>
                           <Component id="jLabel2" alignment="0" min="-2" pref="64" max="-2" attributes="0"/>
                           <Component id="jLabel3" alignment="0" min="-2" pref="64" max="-2" attributes="0"/>
-                          <Component id="scrollPaneExpVars" alignment="0" pref="135" max="32767" attributes="0"/>
-                          <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
-                              <Component id="jButtonMoreInfo" min="-2" max="-2" attributes="0"/>
-                          </Group>
+                          <Component id="scrollPaneExpVars" alignment="0" pref="0" max="32767" attributes="0"/>
+                          <Component id="jButtonMoreInfo" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="2" attributes="0">
                           <Component id="buttonClose" alignment="2" min="-2" max="-2" attributes="0"/>
-                          <Component id="scrollPaneSummary" alignment="2" max="32767" attributes="0"/>
+                          <Component id="scrollPaneSummary" alignment="2" pref="428" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <Group type="102" attributes="0">
@@ -88,8 +85,8 @@
                       </Group>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="labelStatus" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="32767" attributes="0"/>
-                      <Component id="jButtonMoreInfo" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="jButtonMoreInfo" max="32767" attributes="0"/>
                   </Group>
                   <Component id="scrollPaneSummary" pref="292" max="32767" attributes="0"/>
               </Group>
@@ -242,7 +239,7 @@
     </Component>
     <Component class="javax.swing.JButton" name="jButtonMoreInfo">
       <Properties>
-        <Property name="text" type="java.lang.String" value="More Info ..."/>
+        <Property name="text" type="java.lang.String" value="&lt;html&gt;Information Loss Measures"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonMoreInfoActionPerformed"/>

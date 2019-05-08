@@ -895,6 +895,40 @@ public class SaveTable {
                 out.write("</table>\n");
                 out.write("<p>\n");
             }
+            
+            if (tableSet.ckmProtect){
+                out.write("<h2>Additional information loss measures, calculated over all cells</h2>\n");
+                out.write("<table>\n");
+                out.write("<tr><th align=\"Left\">AD</th><td>Absolute Difference</td><td>|pert - orig|</td></tr>\n");
+                out.write("<tr><th align=\"Left\">RAD</th><td>Relative Absolute Difference</td><td>|pert - orig|/orig</td></tr>\n");
+                out.write("<tr><th align=\"Left\">DR</th><td>Absolute Difference of square Roots</td><td>|sqrt(pert) - sqrt(orig)|</td></tr>\n");
+                out.write("</table>\n");
+                out.write("<p>\n");
+                CKMInfoLoss InfoLoss = tableSet.GetCKMInfoLoss();
+                out.write("<table>\n");
+                out.write("<tr><td></td><th>AD</th><th>RAD</th><th>DR</th></tr>\n");
+                out.write("<tr><td>Mean</td>\n");
+                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMean("AD"))+"</td>\n");
+                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMean("RAD"))+"</td>\n");
+                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMean("DR"))+"</td></tr>\n");
+                out.write("<tr><td>Median</td>\n");
+                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMedian("AD"))+"</td>\n");
+                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMedian("RAD"))+"</td>\n");
+                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMedian("DR"))+"</td></tr>\n");
+                out.write("<tr><td>Max</td>\n");
+                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMaxs("AD"))+"</td>\n");
+                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMaxs("RAD"))+"</td>\n");
+                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMaxs("DR"))+"</td></tr>\n");
+                String[] Percents = {"P60","P70","P80","P90","P95","P99"};
+                for (i=0;i<6;i++){
+                    out.write("<tr><td>"+Percents[i]+"</td>\n");
+                    out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetPercentiles("AD")[i])+"</td>\n");
+                    out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetPercentiles("RAD")[i])+"</td>\n");
+                    out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetPercentiles("DR")[i])+"</td></tr>\n");
+                }
+                out.write("</table>\n");
+                out.write("<p>\n");                
+            }
   //If SuperCross Then GoTo EINDE
          
             if (tableSet.historyUsed>0) {
