@@ -2486,8 +2486,8 @@ if (Application.isProtectCoverTable()){
         this.InfoLoss.SetMaxs("DR",DR[DR.length-1]);
         
         this.InfoLoss.SetPercentiles("AD",percentiles(AD,0.6,0.7,0.8,0.9,0.95,0.99));
-        this.InfoLoss.SetPercentiles("RAD",percentiles(RAD,0.8,0.9,0.95,0.99));
-        this.InfoLoss.SetPercentiles("DR",percentiles(DR,0.7,0.8,0.9,0.95,0.99));
+        this.InfoLoss.SetPercentiles("RAD",percentiles(RAD,0.6,0.7,0.8,0.9,0.95,0.99));
+        this.InfoLoss.SetPercentiles("DR",percentiles(DR,0.6,0.7,0.8,0.9,0.95,0.99));
         
     }
     

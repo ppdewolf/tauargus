@@ -22,10 +22,13 @@ import java.awt.Component;
 import java.awt.Font;
 import java.util.Locale;
 import java.util.TreeMap;
+import javax.swing.JFrame;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
+import tauargus.model.CKMInfoLoss;
 import tauargus.model.CellStatus;
 import tauargus.model.CellStatusStatistics;
 import tauargus.model.TableSet;
@@ -35,6 +38,8 @@ import tauargus.utils.TauArgusUtils;
 
 public class DialogTableSummary extends javax.swing.JDialog {
 
+    public CKMInfoLoss InfoLossMeasures = new CKMInfoLoss();
+    
     public DialogTableSummary(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
@@ -96,8 +101,8 @@ public class DialogTableSummary extends javax.swing.JDialog {
                
         if (tableSet.suppressed == TableSet.SUP_CKM){
             jButtonMoreInfo.setVisible(true);
-            //labelStatus.setText(Double.toString(tableSet.GetCKMInfoLoss().GetPercentiles("AD")[0]));
             setSummaryCKM(tableSet);
+            InfoLossMeasures = tableSet.GetCKMInfoLoss();
         }
         else{
             jButtonMoreInfo.setVisible(false);
@@ -458,8 +463,8 @@ public class DialogTableSummary extends javax.swing.JDialog {
     }//GEN-LAST:event_DialogClosing
 
     private void jButtonMoreInfoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonMoreInfoActionPerformed
-        ShowMoreInfoLoss dialog = new ShowMoreInfoLoss(null, true);
-        dialog.showDialog();
+        ShowMoreInfoLoss infodialog = new ShowMoreInfoLoss((JFrame)SwingUtilities.getAncestorOfClass(JFrame.class, this), true);
+        infodialog.showDialog(InfoLossMeasures);
     }//GEN-LAST:event_jButtonMoreInfoActionPerformed
 
     /**

@@ -65,6 +65,7 @@ import argus.utils.StrUtils;
 //import tauargus.utils.ExecUtils;
 import argus.utils.SystemUtils;
 import java.awt.Cursor;
+import javax.swing.SwingUtilities;
 import tauargus.model.Type;
 
 public class PanelTable extends javax.swing.JPanel {
@@ -1625,8 +1626,8 @@ public class PanelTable extends javax.swing.JPanel {
         }
         // Is eigenlijk onzin !!!!!!!
         table.minTabVal = x;
-        if (xMax[0]<0) {xMax[0] = 0;}
-        table.maxTabVal = 1.5 * xMax[0];
+        //if (xMax[0]<0) {xMax[0] = 0;}
+        //table.maxTabVal = 1.5 * xMax[0];
         return true;
     }
 
@@ -1684,7 +1685,7 @@ public class PanelTable extends javax.swing.JPanel {
     }//GEN-LAST:event_buttonSelectViewActionPerformed
 
     private void buttonTableSummaryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonTableSummaryActionPerformed
-        DialogTableSummary dialog = new DialogTableSummary(null, true);
+        DialogTableSummary dialog = new DialogTableSummary((JFrame)SwingUtilities.getAncestorOfClass(JFrame.class, this), true);
         dialog.showDialog(tableSet);
     }//GEN-LAST:event_buttonTableSummaryActionPerformed
 
