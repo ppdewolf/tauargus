@@ -17,6 +17,7 @@
 package tauargus.gui;
 
 import java.awt.Component;
+import java.awt.Font;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
@@ -38,11 +39,15 @@ public class ShowMoreInfoLoss extends javax.swing.JDialog {
     void showDialog(CKMInfoLoss InfoLoss){
         setTitle("Information loss measures calculated over all cells");
         
+        java.awt.Dimension d = new java.awt.Dimension(0,0);
+        
         SetPart1Model(InfoLoss);
         Part1.setDefaultRenderer(Object.class, new InfoCellRenderer());
-        
+        Part1.getTableHeader().setFont(Part1.getFont().deriveFont(Font.BOLD));
+
         SetPart2Model(InfoLoss);
         Part2.setDefaultRenderer(Object.class, new InfoCellRenderer());
+        Part2.getTableHeader().setFont(Part2.getFont().deriveFont(Font.BOLD));
 
         setVisible(true);
     }
@@ -75,6 +80,7 @@ public class ShowMoreInfoLoss extends javax.swing.JDialog {
             @Override
             public String getColumnName(int column) {
                 switch(column) {
+                    case 0:  return "Descriptives";
                     case 1:  return "AD";
                     case 2:  return "RAD";
                     case 3:  return "DR";
@@ -113,6 +119,7 @@ public class ShowMoreInfoLoss extends javax.swing.JDialog {
             @Override
             public String getColumnName(int column) {
                 switch(column) {
+                    case 0:  return "Percentiles";
                     case 1:  return "AD";
                     case 2:  return "RAD";
                     case 3:  return "DR";
@@ -131,6 +138,7 @@ public class ShowMoreInfoLoss extends javax.swing.JDialog {
                 Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 setHorizontalAlignment(SwingConstants.RIGHT);
                 if (column==0){
+                    comp.setFont(comp.getFont().deriveFont(Font.BOLD));
                     setHorizontalAlignment(SwingConstants.LEFT);
                 }
                 return comp;
@@ -150,12 +158,12 @@ public class ShowMoreInfoLoss extends javax.swing.JDialog {
         Part1 = new javax.swing.JTable();
         jScrollPane2 = new javax.swing.JScrollPane();
         Part2 = new javax.swing.JTable();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        Part1.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+        jScrollPane1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+
         Part1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {"mean", null, null, null},
@@ -163,7 +171,7 @@ public class ShowMoreInfoLoss extends javax.swing.JDialog {
                 {"max", null, null, null}
             },
             new String [] {
-                "", "AD", "RAD", "D_R"
+                "", "AD", "RAD", "DR"
             }
         ) {
             Class[] types = new Class [] {
@@ -181,10 +189,14 @@ public class ShowMoreInfoLoss extends javax.swing.JDialog {
                 return canEdit [columnIndex];
             }
         });
-        Part1.setColumnSelectionAllowed(true);
+        Part1.setRowSelectionAllowed(false);
         Part1.getTableHeader().setResizingAllowed(false);
         Part1.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(Part1);
+
+        jScrollPane2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jScrollPane2.setToolTipText("");
+        jScrollPane2.setEnabled(false);
 
         Part2.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -199,22 +211,27 @@ public class ShowMoreInfoLoss extends javax.swing.JDialog {
                 "", "AD", "RAD", "DR"
             }
         ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.Double.class, java.lang.Double.class, java.lang.Double.class
+            };
             boolean[] canEdit = new boolean [] {
                 false, false, false, false
             };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
             }
         });
-        Part2.setCellSelectionEnabled(true);
+        Part2.setRowSelectionAllowed(false);
         Part2.getTableHeader().setResizingAllowed(false);
         Part2.getTableHeader().setReorderingAllowed(false);
         jScrollPane2.setViewportView(Part2);
 
-        jLabel1.setText("Descriptives");
-
-        jLabel2.setText("Percentiles");
+        jLabel3.setText("<html>\n<table>\n<tr>\n<td><b>AD</b></td>\n<td>Absolute Difference</td>\n<td>| pert - orig | </td>\n</tr>\n<tr>\n<td><b>RAD</b></td>\n<td>Relative Absolute Difference</td>\n<td>( | pert - orig | ) / orig </td>\n</tr>\n<tr>\n<td><b>DR</b></td>\n<td>Absolute Difference of Square Root</td>\n<td>| sqrt(pert) - sqrt(orig) | </td>\n</tr>\n</table>");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -222,25 +239,23 @@ public class ShowMoreInfoLoss extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel2)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 335, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 342, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 342, Short.MAX_VALUE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel2)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -250,8 +265,7 @@ public class ShowMoreInfoLoss extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable Part1;
     private javax.swing.JTable Part2;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     // End of variables declaration//GEN-END:variables
