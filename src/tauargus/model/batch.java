@@ -20,7 +20,6 @@ package tauargus.model;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
-//import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.logging.Level;
 import java.io.IOException;
@@ -29,21 +28,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 import tauargus.extern.dataengine.TauArgus;
 import argus.utils.Tokenizer;
-//import tauargus.model.Metadata;
 import tauargus.service.TableService;
-//import tauargus.gui.ActivityListener;
-//import tauargus.model.GHMiter;
-//import tauargus.model.OptiSuppress;
-//import tauargus.model.ArgusException;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
-//import javax.swing.table.AbstractTableModel;
-//import tauargus.gui.DialogRoundingParameters;
-//import tauargus.gui.FrameMain;
 import tauargus.gui.PanelTable;
-//import tauargus.model.TableSet;
 import tauargus.utils.StrUtils;
-//import tauargus.utils.ExecUtils;
 import tauargus.utils.TauArgusUtils;
 import argus.utils.SystemUtils;
 import java.io.BufferedWriter;
@@ -91,42 +80,43 @@ public class batch {
         }    
     }  
     
-public static void setBatchDataPath (String f){
-    batchDataPath = FilenameUtils.normalizeNoEndSeparator(f);
-    if (!batchDataPath.endsWith("\\")){batchDataPath = batchDataPath + "\\";}
-}
-
-private static boolean checkBatchDataPath (){
-    if ( !batchDataPath.equals("")){
-      File f = new File(batchDataPath);
-        if (!f.isDirectory()) {
-            
-             SystemUtils.writeLogbook("Argus batch data directory ("+batchDataPath+") could not be found");  
-        return false;
-        }
+    public static void setBatchDataPath (String f){
+        batchDataPath = FilenameUtils.normalizeNoEndSeparator(f);
+        if (!batchDataPath.endsWith("\\")){batchDataPath = batchDataPath + "\\";}
     }
-    return true;
-}
-public static String getBatchDataPath(){
-    return batchDataPath;
-}
 
-private static String giveRightFile (String f) throws ArgusException {
-    String hs;
-// If the file name does not contain : or / or \ we assuem that the full path si given.
-//  else we first search in the directory of the arb file and then in the batch data directory (Param 4 when calling TAU)      
-    hs = f;
-    if ( !hs.contains(":") && !hs.contains("\\") && !hs.contains("/")){
-       hs = batchFilePath + f;
-       if (!TauArgusUtils.ExistFile(hs) ) {
-          hs = getBatchDataPath() + f;
-          }
-       }
-    if (!TauArgusUtils.ExistFile(hs)){
-        throw new ArgusException ("file: "+ f + " could not be found.");
-   }
-    return hs;
-}
+    private static boolean checkBatchDataPath (){
+        if ( !batchDataPath.equals("")){
+            File f = new File(batchDataPath);
+            if (!f.isDirectory()) {
+                SystemUtils.writeLogbook("Argus batch data directory ("+batchDataPath+") could not be found");  
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static String getBatchDataPath(){
+        return batchDataPath;
+    }
+
+    private static String giveRightFile (String f) throws ArgusException {
+        String hs;
+        // If the file name does not contain : or / or \ we assuem that the full path si given.
+        //  else we first search in the directory of the arb file and then in the batch data directory (Param 4 when calling TAU)      
+        hs = f;
+        if ( !hs.contains(":") && !hs.contains("\\") && !hs.contains("/")){
+            hs = batchFilePath + f;
+            if (!TauArgusUtils.ExistFile(hs) ) {
+                hs = getBatchDataPath() + f;
+            }
+        }
+        if (!TauArgusUtils.ExistFile(hs)){
+            throw new ArgusException ("file: "+ f + " could not be found.");
+        }
+        return hs;
+    }
+    
 /**
  * The main routine for running the batch version.\n
  * Note: there is a distinction between running from the commandline and from the menu.\n
@@ -136,157 +126,119 @@ private static String giveRightFile (String f) throws ArgusException {
  * @param batchFile name of the batch file
  * @return the result of the batch run. (the BATCH_ parameters specified above)
  */
-public static int runBatchProcess(String batchFile){
-       String token; boolean tabularInput; int status; boolean firstCommand, silent; 
-       String dataFile, metaDataFile, hs; 
-//       String batchFilePath;
-       String currentCommand = "";
-       dataFile = ""; metaDataFile = ""; tabularInput = false;
-       tokenizer = null;
-       token = "";
-       status = 0;
-       if (!checkBatchDataPath()){ return BATCH_NORMAL_ERROR;}
-       batchFilePath = TauArgusUtils.getFilePath(batchFile);
-       firstCommand  = true; silent = false;
-       if (Application.batchType() == Application.BATCH_FROMMENU) {
-           Application.openInfoWindow(true);           
-           Application.windowInfo.addLabel("Progress of the batch proces");
-       }    
-       tauArgus.CleanAll();
-       clearMetadatas();
-       clearVariables();
-       try{
-       tokenizer = new Tokenizer(new BufferedReader(new FileReader(batchFile)));
-       } catch (Exception ex) {
-           if (Application.batchType() == Application.BATCH_FROMMENU){
-            JOptionPane.showMessageDialog(null, "Argus batch file ("+batchFile+") could not be opened");
-           } else{
-             SystemUtils.writeLogbook("Argus batch file ("+batchFile+") could not be opened");  
-           }
-         return BATCH_NORMAL_ERROR;       
-       }
-       SystemUtils.writeLogbook("Start of batch procedure; file: "+ batchFile);
+    public static int runBatchProcess(String batchFile){
+        String token; boolean tabularInput; int status; boolean firstCommand, silent; 
+        String dataFile, metaDataFile, hs; 
+        String currentCommand = "";
+        dataFile = ""; metaDataFile = ""; tabularInput = false;
+        tokenizer = null;
+        token = "";
+        status = 0;
+        if (!checkBatchDataPath()){ return BATCH_NORMAL_ERROR;}
+        batchFilePath = TauArgusUtils.getFilePath(batchFile);
+        firstCommand  = true; silent = false;
+        if (Application.batchType() == Application.BATCH_FROMMENU) {
+            Application.openInfoWindow(true);           
+            Application.windowInfo.addLabel("Progress of the batch proces");
+        }    
+        tauArgus.CleanAll();
+        clearMetadatas();
+        clearVariables();
+        try{
+            tokenizer = new Tokenizer(new BufferedReader(new FileReader(batchFile)));
+        } catch (Exception ex) {
+            if (Application.batchType() == Application.BATCH_FROMMENU){
+                JOptionPane.showMessageDialog(null, "Argus batch file ("+batchFile+") could not be opened");
+            } else{
+                SystemUtils.writeLogbook("Argus batch file ("+batchFile+") could not be opened");  
+            }
+            return BATCH_NORMAL_ERROR;       
+        }
+        SystemUtils.writeLogbook("Start of batch procedure; file: "+ batchFile);
 //status 0 Start
 //       1 Data/Tablefile found
 //       2 Metafile found
 //       3 SpecifyTables found       
 //       4 SafetyRule found
         try{
-        while  (tokenizer.nextLine() != null) {
-          currentCommand = tokenizer.getLine();
-          reportProgress(currentCommand);
-          token = tokenizer.nextToken();  //.toUpperCase() niet nodig
-          if (token.startsWith("\\\\")||token.startsWith("//") ){token="<COMMENT>";}
-          else{//test for first command to be silent
-            if ( firstCommand && !token.equals("<SILENT>")){
-              firstCommand = false; silent = false;  
-             //do sometning to initiate a progress window
-             }  
-          }
-          switch (token) {
-              case "<COMMENT>":break;
-              case "<ANCO>":{ Application.setAnco(true); break;}
-              case ("<JJ>"): //TODO Run a JJ file}
-                       {break;}
-              case ("<OPENMICRODATA>"):{
-                  dataFile =  tokenizer.nextToken();                  
-                  tabularInput = false;
-                  if (status !=0){ throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
-                  status = 1;
-                  dataFile = giveRightFile(dataFile);
-//                  hs = batchFilePath + dataFile;
-//                  if (!TauArgusUtils.ExistFile(dataFile) && TauArgusUtils.ExistFile(hs)){dataFile = hs;}
-//                  if (!TauArgusUtils.ExistFile(dataFile)){
-//                    throw new ArgusException("File "+dataFile+" does not exist");
-//                  }
-                       break;}
-  //Case "<OPENMICRODATA>": NDataFiles = NDataFiles + 1
-//                         If NDataFiles > 1 Then GoTo FOUTEINDE
-//                         DataFileName(NDataFiles) = OntQuote(Staart)
-//                         MicroTabularData = MICRODATAORIGIN
-              case ("<OPENTABLEDATA>"):  {
-                  dataFile =  tokenizer.nextToken();
-                  tabularInput = true;
-                  if (!(status == 0 || status == 4)){ throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
-                  dataFile = giveRightFile(dataFile);
-//                  hs = batchFilePath + dataFile;
-//                  if (!TauArgusUtils.ExistFile(dataFile) && TauArgusUtils.ExistFile(hs)){dataFile = hs;}
-//                  if (!TauArgusUtils.ExistFile(dataFile)){
- //                     throw new ArgusException("File "+dataFile+" does not exist");}
-                  status = 1;    
-                      break;}
-// Case "<OPENTABLEDATA>": NDataFiles = NDataFiles + 1
-//                         'not necessary for linked tables
-//                         'If NDataFiles > 1 Then GoTo FoutEinde
-//                         DataFileName(NDataFiles) = OntQuote(Staart)
-//                         MicroTabularData = TABULARDATAORIGIN
-              case "<OPENMETADATA>":{   
-                   metaDataFile =  tokenizer.nextToken();
-                   if (dataFile.equals("")){ throw new ArgusException ("A data file must be specified first"); }                       
-                   if (status !=1){ throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
-                   status = 2;
-                   metaDataFile = giveRightFile(metaDataFile);
-//                  hs = batchFilePath + metaDataFile;
-//                  if (!TauArgusUtils.ExistFile(metaDataFile) && TauArgusUtils.ExistFile(hs)){metaDataFile = hs;}
-//                   if (!TauArgusUtils.ExistFile(metaDataFile)){
-//                      throw new ArgusException("File "+metaDataFile+" does not exist");}
-                   Metadata.createMetadata(tabularInput, dataFile, metaDataFile);
-                   dataFile = "";
-                   break;}
-// Case "<OPENMETADATA>": MetaDataFileName(NDataFiles) = OntQuote(Staart)
-//                        If MicroTabularData = MICRODATAORIGIN Then
-//                         LeesMetaDataFile
-//                        Else
-//                         If NDataFiles = 1 Then
-//                          frmOpenTable.VerwerkTableDataFiles
-//                         Else
-//                          If Not LeesTableMetaData(NDataFiles) Then GoTo FOUTEINDE
-//                         End If
-//                        End If
-                  case("<SPECIFYTABLE>"): 
-                      {if ( status !=2 && status != 4){ throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
-                       if (! specifyTableBatch ()){ }
-                       status = 3;
-                       break;}
-                  case ("<CLEAR>"):    
-                      {TableService.clearTables();
-                       tauArgus.CleanAll();
-                       clearMetadatas();
-                       clearVariables();
-                       status = 0;
+            while (tokenizer.nextLine() != null) {
+                currentCommand = tokenizer.getLine();
+                reportProgress(currentCommand);
+                token = tokenizer.nextToken();  //.toUpperCase() niet nodig
+                if (token.startsWith("\\\\")||token.startsWith("//") ){token="<COMMENT>";}
+                else{//test for first command to be silent
+                    if ( firstCommand && !token.equals("<SILENT>")){
+                        firstCommand = false; silent = false;  
+                        //do sometning to initiate a progress window
+                    }  
+                }
+                switch (token) {
+                    case "<COMMENT>":break;
+                    case "<ANCO>":{ Application.setAnco(true); break;}
+                    case ("<JJ>"): //TODO Run a JJ file}
+                           {break;}
+                    case ("<OPENMICRODATA>"):{
+                        dataFile =  tokenizer.nextToken();                  
+                        tabularInput = false;
+                        if (status !=0){ throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
+                        status = 1;
+                        dataFile = giveRightFile(dataFile);
                         break;}
-                  case ("<SAFETYRULE>"):    
-                      {if ( status != 3)  { throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
-                      if (! readSafetyRuleBatch()) {}
-                      status = 4;
-                      break;}
-// Case "<SAFETYRULE>": If Not ReadSafetyRule(Staart) Then GoTo FOUTEINDE
-                  case ("<READMICRODATA>"): { 
-                      if ( status != 4) { throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
-                      if (!readMicrodataBatch()) {}
-//                     TableService.readMicrodata(ActivityListener);
-                      reportProgress("Tables from microdata have been read");
-                      break;}
-// Case "<READMICRODATA>": If Not dlgSpecifyTables.ComputeTables Then GoTo FOUTEINDE
-                  case ("<READTABLE>"): {
-                      if (status == 3) { throw new ArgusException ("TODO Add automatic Use Status"); }
-                      if ( status != 4){ throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
-                      token = tokenizer.nextToken();
-                      if (token.equals("")){token = "0";}
-                      if ( !token.equals("0") && !token.equals("1") && !token.equals("2")) { 
-                                   throw new ArgusException ("Illegal parameter ("+token+") for ReadTable");}
-                      int computeTotals = 0;
-                      if ( token.equals("1")){computeTotals = 1;}
-                      if ( token.equals("2")){computeTotals = 2;}
-                      if (!readTablesBatch(computeTotals)) {}
-                      reportProgress("Tables have been read");
-                      break;
-                      }
-
-                  case ("<APRIORY>"): 
-                  case ("<APRIORI>"): 
-                      //“Filename”, TabNo, Separator
-                      { boolean expandBogus = false, ignoreError = true;
+                    case ("<OPENTABLEDATA>"):  {
+                        dataFile =  tokenizer.nextToken();
+                        tabularInput = true;
+                        if (!(status == 0 || status == 4)){ throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
+                        dataFile = giveRightFile(dataFile);
+                        status = 1;    
+                        break;}
+                    case "<OPENMETADATA>":{   
+                        metaDataFile =  tokenizer.nextToken();
+                        if (dataFile.equals("")){ throw new ArgusException ("A data file must be specified first"); }                       
+                        if (status !=1){ throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
+                        status = 2;
+                        metaDataFile = giveRightFile(metaDataFile);
+                        Metadata.createMetadata(tabularInput, dataFile, metaDataFile);
+                        dataFile = "";
+                        break;}
+                    case("<SPECIFYTABLE>"):{
+                        if ( status !=2 && status != 4){ throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
+                        if (! specifyTableBatch ()){ }
+                        status = 3;
+                        break;}
+                    case ("<CLEAR>"):{
+                        TableService.clearTables();
+                        tauArgus.CleanAll();
+                        clearMetadatas();
+                        clearVariables();
+                        status = 0;
+                        break;}
+                    case ("<SAFETYRULE>"):{
+                        if ( status != 3)  { throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
+                        if (! readSafetyRuleBatch()) {}
+                        status = 4;
+                        break;}
+                    case ("<READMICRODATA>"): { 
+                        if ( status != 4) { throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
+                        if (!readMicrodataBatch()) {}
+                        reportProgress("Tables from microdata have been read");
+                        break;}
+                    case ("<READTABLE>"): {
+                        if (status == 3) { throw new ArgusException ("TODO Add automatic Use Status"); }
+                        if (status != 4){ throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
+                        token = tokenizer.nextToken();
+                        if (token.equals("")){token = "0";}
+                        if ( !token.equals("0") && !token.equals("1") && !token.equals("2")) { 
+                            throw new ArgusException ("Illegal parameter ("+token+") for ReadTable");}
+                        int computeTotals = 0;
+                        if ( token.equals("1")){computeTotals = 1;}
+                        if ( token.equals("2")){computeTotals = 2;}
+                        if (!readTablesBatch(computeTotals)) {}
+                        reportProgress("Tables have been read");
+                        break;}
+                    case ("<APRIORY>"): 
+                    case ("<APRIORI>"): {
+                        //“Filename”, TabNo, Separator
+                        boolean expandBogus = false, ignoreError = true;
                         String fName = tokenizer.nextToken();
                         hs = batchFilePath + fName;
                         if (!TauArgusUtils.ExistFile(fName) && TauArgusUtils.ExistFile(hs)){fName = hs;}                        
@@ -298,146 +250,132 @@ public static int runBatchProcess(String batchFile){
                         if ((tabno <= 0) || (tabno > TableService.numberOfTables() ) ){
                             throw new  ArgusException ("Illegal table number found: "+ hs);}
                         tabno = tabno - 1;
-//                        hs = tokenizer.nextChar();
-//                        if (!hs.equals(",")){throw new ArgusException ("a , was expected here");}
                         if (!tokenizer.testNextChar().equals("\"")){
                             throw new ArgusException ("A quote was expected here before the separator");}
                         String sep = tokenizer.nextToken();  
                         if (sep.equals("")){ throw new ArgusException ("No separator was specified");}
                         hs = tokenizer.nextChar();
                         if (!hs.equals("")){
-                         if (!hs.equals(",")) { throw new ArgusException ("A comma was expected here");}
-                         hs = tokenizer.nextField(",");
-                         if(!hs.equals("")){
-                             if (hs.equals("1")){ignoreError=true;}
-                             else if (hs.equals("0")){ignoreError=false;}
-                             else {
-                               throw new ArgusException("Illegal field ("+hs+") for ignore error was specified");
-                             }
-                         }
-                         hs =tokenizer.nextField(",");
-                         if (!hs.equals("")){expandBogus = hs.equals("1");}
+                            if (!hs.equals(",")) { throw new ArgusException ("A comma was expected here");}
+                            hs = tokenizer.nextField(",");
+                            if(!hs.equals("")){
+                                if (hs.equals("1")){ignoreError=true;}
+                                else if (hs.equals("0")){ignoreError=false;}
+                                     else {throw new ArgusException("Illegal field ("+hs+") for ignore error was specified");}
+                            }
+                            hs =tokenizer.nextField(",");
+                            if (!hs.equals("")){expandBogus = hs.equals("1");}
                         }
                         int[][] aPrioryStatus = new int[5][2];
                         try{ TableSet.processAprioryFile(fName, tabno, sep, ignoreError, expandBogus, true, aPrioryStatus);}
                         catch (ArgusException ex ) {
-                          TableSet.CloseAprioriFiles(expandBogus, aPrioryStatus);                            
-                          throw new ArgusException ("An error has occurred when processing apriori file "+fName  );  //+ "\n" + ex.getMessage()
+                            TableSet.CloseAprioriFiles(expandBogus, aPrioryStatus);                            
+                            throw new ArgusException ("An error has occurred when processing apriori file "+fName  );  //+ "\n" + ex.getMessage()
                         }  
                         reportProgress("Apriori file "+fName+" has been read");
                         break;}
-                  case ("<COVER>"):// ProtectCoverTable = True
-                    //Should only be used to protect the cver table  
-                    //When TAU creates a batch sub-process to protect the cover table  
-                    //Not for normal users; not in the manual.  
-                    {Application.setProtectCoverTable(true);
-                    TableSet tableSet = TableService.getTable(0);
-                    tableSet.additivity = TableSet.ADDITIVITY_NOT_REQUIRED;              
-                    break;}
-//Recode is not described in tehmanual, so we skip it here
-//                 case ("<RECODE>"):   
-//                    { break;}
-// Case "<RECODE>": BatchRecode (Staart)
-                  case ("<SUPPRESS>"):   
-                   { suppressBatch();
+                    case ("<COVER>"): {// ProtectCoverTable = True
+                        //Should only be used to protect the cver table  
+                        //When TAU creates a batch sub-process to protect the cover table  
+                        //Not for normal users; not in the manual.  
+                        Application.setProtectCoverTable(true);
+                        TableSet tableSet = TableService.getTable(0);
+                        tableSet.additivity = TableSet.ADDITIVITY_NOT_REQUIRED;              
                         break;}
-
-// Case "<LINKMOD>": If Not BatchLinkedModular Then GoTo FOUTEINDE
-// LINKEDMOD is niet nodog als we tabel 0 kunnen onderdrukken.                      
-                  case ("<WRITETABLE>"):   
-                    { writeTableBatch();
-                    break;}    
-                  case ("<REPORTSTR>"):   
-                    { break;}    
-// Case "<REPORTSTR>": If Not ReportSTR(Staart) Then GoTo FOUTEINDE
-                      // Something special for Space Time Reserach
-                  case ("<RECODE>"):
-                    {
-                      break;                      
+    //Recode is not described in tehmanual, so we skip it here
+    //                 case ("<RECODE>"):   
+    //                    { break;}
+    // Case "<RECODE>": BatchRecode (Staart)
+                    case ("<SUPPRESS>"):  {
+                        suppressBatch();
+                        break;}
+                    
+    // Case "<LINKMOD>": If Not BatchLinkedModular Then GoTo FOUTEINDE
+    // LINKEDMOD is niet nodog als we tabel 0 kunnen onderdrukken.                      
+                    case ("<WRITETABLE>"): {
+                        writeTableBatch();
+                        break;}    
+                    case ("<REPORTSTR>"):   
+                        { break;}    
+    // Case "<REPORTSTR>": If Not ReportSTR(Staart) Then GoTo FOUTEINDE
+                          // Something special for Space Time Reserach
+                    case ("<RECODE>"):
+                        { break; }
+                    case ("<SOLVER>"): {
+                        hs = tokenizer.nextField(",");
+                        if (hs.equalsIgnoreCase("XPRESS")){
+                            Application.solverSelected = Application.SOLVER_XPRESS;  
+                        }
+                        else{
+                            if (hs.equalsIgnoreCase("CPLEX")){
+                                Application.solverSelected = Application.SOLVER_CPLEX;  
+                            }
+                            else
+                                if (hs.equalsIgnoreCase("FREE")){
+                                    Application.solverSelected = Application.SOLVER_SOPLEX;                            
+                                }
+                                else{
+                                    throw new ArgusException("Illegal solver ("+hs+") selected");
+                                }
+                        }
+                        // check for license file
+                        hs = tokenizer.nextField(",");
+                        if (!hs.isEmpty()){
+                            hs = StrUtils.unQuote(hs);
+                            if (!TauArgusUtils.ExistFile(hs)){
+                                throw new ArgusException("Cplex License file ("+hs+") does not exist");                               
+                            }
+                            hs = TauArgusUtils.getFullFileName(hs);
+                            SystemUtils.putRegString("optimal", "cplexlicensefile", hs); 
+                        }
+                        break;
                     }
-                  case ("<SOLVER>"):
-                    { hs = tokenizer.nextField(",");
-                      if (hs.equalsIgnoreCase("XPRESS")){
-                        Application.solverSelected = Application.SOLVER_XPRESS;  
-                      }
-                      else
-                      if (hs.equalsIgnoreCase("CPLEX")){
-                        Application.solverSelected = Application.SOLVER_CPLEX;  
-                      }
-                      else
-                      if (hs.equalsIgnoreCase("FREE")){
-                        Application.solverSelected = Application.SOLVER_SOPLEX;                            
-                      }
-                      else{
-                          throw new ArgusException("Illegal solver ("+hs+") selected");
-                      }
-                      // check for license file
-                      hs = tokenizer.nextField(",");
-                      if (!hs.isEmpty()){
-                          hs = StrUtils.unQuote(hs);
-                          if (!TauArgusUtils.ExistFile(hs)){
-                             throw new ArgusException("Cplex License file ("+hs+") does not exist");                               
-                          }
-                          hs = TauArgusUtils.getFullFileName(hs);
-                          SystemUtils.putRegString("optimal", "cplexlicensefile", hs); 
-                      }
-                      break;
-                    }
-                  case ("<GOINTERACTIVE>"):   
-                    { return 1;
-                  }    
-
-                  case ("<LOGBOOK>"):   
-                    { hs = StrUtils.unQuote(tokenizer.getLine());
-                      SystemUtils.setLogbook(hs);
-                      tokenizer.clearLine();
-                    break;}    
-                  case ("<VERSIONINFO>"):   
-                    { hs = StrUtils.unQuote(tokenizer.getLine());
-                      writeVersionInfo(hs);
-                      tokenizer.clearLine();
-                    break;}                   
-                  default:{
-//                      FrameBatch.dispose();
-                      throw  new ArgusException ("Illegal keyword "+ token);} // {throw { new ArgusException ("Illegal keyword"+ token); }
-               
-                      }   // end switch
+                    case ("<GOINTERACTIVE>"):   
+                        { return 1; }    
+                    case ("<LOGBOOK>"): {
+                        hs = StrUtils.unQuote(tokenizer.getLine());
+                        SystemUtils.setLogbook(hs);
+                        tokenizer.clearLine();
+                        break;}    
+                    case ("<VERSIONINFO>"): {
+                        hs = StrUtils.unQuote(tokenizer.getLine());
+                        writeVersionInfo(hs);
+                        tokenizer.clearLine();
+                        break;}                   
+                    default:{
+                        throw  new ArgusException ("Illegal keyword "+ token);} // {throw { new ArgusException ("Illegal keyword"+ token); }
+                }   // end switch
+            }
+            tokenizer.close();
         }
-        tokenizer.close();
-        }
-              catch (ArgusException ex) {
-                  if (Application.batchType()== Application.BATCH_FROMMENU) {
-                    SystemUtils.writeLogbook("Error in batch file");   
-                    JOptionPane.showMessageDialog(null, "Error in batch file\nCommand: " + currentCommand +"\n"+ex.getMessage());
-                  }
-                  else {
-                    SystemUtils.writeLogbook("Error in batch file");   
-                  }
-                  return BATCH_NORMAL_ERROR;                  
+        catch (ArgusException ex) {
+            if (Application.batchType()== Application.BATCH_FROMMENU) {
+                SystemUtils.writeLogbook("Error in batch file");   
+                JOptionPane.showMessageDialog(null, "Error in batch file\nCommand: " + currentCommand +"\n"+ex.getMessage());
+            }
+            else { SystemUtils.writeLogbook("Error in batch file");}
+            return BATCH_NORMAL_ERROR;                  
         }
         finally {if (Application.batchType()== Application.BATCH_FROMMENU){Application.openInfoWindow(false);}}
  //       if (Application.batchType()== Application.BATCH_FROMMENU){Application.openInfoWindow(false);}  
         return BATCH_OK;
-   
     }
 
 
-   static void writeVersionInfo (String f) throws ArgusException{
-       if (!f.contains(":")&&!f.contains("\\")&&!f.contains("/")){
+    static void writeVersionInfo (String f) throws ArgusException{
+        if (!f.contains(":")&&!f.contains("\\")&&!f.contains("/")){
             if (batchDataPath.equals("")){
                 f = batchFilePath + f;
             } else {
-               f = getBatchDataPath() + f;
+                f = getBatchDataPath() + f;
             }
         }
-       
-              try{
-          BufferedWriter out = new BufferedWriter(new FileWriter(f));
-          out.write("TAU-ARGUS version: " + Application.getFullVersion() + "; build: " + Application.BUILD);
-     
-          out.close();        
-          
-          } catch(IOException ex){throw new ArgusException ("An error occurred when writing the version info file");}          
+        try{
+            BufferedWriter out = new BufferedWriter(new FileWriter(f));
+            out.write("TAU-ARGUS version: " + Application.getFullVersion() + "; build: " + Application.BUILD);
+            out.close();        
+        } 
+        catch(IOException ex){throw new ArgusException ("An error occurred when writing the version info file");}          
     }
    
   
@@ -479,24 +417,24 @@ public static int runBatchProcess(String batchFile){
         hs = nextToken(tail).toUpperCase();
         //loop over the different options
         while (! hs.equals("")){
-         if (hs.length()< 2){throw new ArgusException("Unknown output type ("+ hs + ")");}
-         optString = hs.substring(0,2);
-         hs = hs.substring(2).trim();
-         plusMin =  hs.substring(0,1);
-         hs = hs.substring(1).trim();
-         if (!plusMin.equals("+") &&!plusMin.equals("-") ){throw new ArgusException("+ or - expected; not a "+ plusMin + "");}
-         switch (optString){
-             case "HL": {SaveTable.writeSBSHierarchicalLevels = plusMin.equals("+");break;} //Add Hier level
-             case "SO": {SaveTable.writeIntermediateStatusOnly = plusMin.equals("+");break;} //Status Only
-             case "AR": {SaveTable.writeIntermediateAddAudit = plusMin.equals("+");break;} //Add Audit Results
-             case "HI": {SaveTable.writeIntermediateUseHolding = plusMin.equals("+");break;} //Use Holding info
-             case "AS": {SaveTable.writeAddStatus = plusMin.equals("+");break;} //Add Status
-             case "SE": {SaveTable.writeSupppressEmpty = plusMin.equals("+");break;} //Suppress Empty
-             case "FL": {SaveTable.writeVarnamesOnFirstLine = plusMin.equals("+");break;} //Varnames on First Line
-             case "QU": {SaveTable.writeEmbedQuotes = plusMin.equals("+");break;} //Embed in Quotes YES
-             case "TR": {SaveTable.writeJJRemoveBogus = plusMin.equals("+");break;} //Remove Trivial Levels
-             default: {throw new ArgusException("Unknown output type ("+ optString + ")");}    
-         }
+            if (hs.length()< 2){throw new ArgusException("Unknown output type ("+ hs + ")");}
+            optString = hs.substring(0,2);
+            hs = hs.substring(2).trim();
+            plusMin =  hs.substring(0,1);
+            hs = hs.substring(1).trim();
+            if (!plusMin.equals("+") &&!plusMin.equals("-") ){throw new ArgusException("+ or - expected; not a "+ plusMin + "");}
+            switch (optString){
+                case "HL": {SaveTable.writeSBSHierarchicalLevels = plusMin.equals("+");break;} //Add Hier level
+                case "SO": {SaveTable.writeIntermediateStatusOnly = plusMin.equals("+");break;} //Status Only
+                case "AR": {SaveTable.writeIntermediateAddAudit = plusMin.equals("+");break;} //Add Audit Results
+                case "HI": {SaveTable.writeIntermediateUseHolding = plusMin.equals("+");break;} //Use Holding info
+                case "AS": {SaveTable.writeAddStatus = plusMin.equals("+");break;} //Add Status
+                case "SE": {SaveTable.writeSupppressEmpty = plusMin.equals("+");break;} //Suppress Empty
+                case "FL": {SaveTable.writeVarnamesOnFirstLine = plusMin.equals("+");break;} //Varnames on First Line
+                case "QU": {SaveTable.writeEmbedQuotes = plusMin.equals("+");break;} //Embed in Quotes YES
+                case "TR": {SaveTable.writeJJRemoveBogus = plusMin.equals("+");break;} //Remove Trivial Levels
+                default: {throw new ArgusException("Unknown output type ("+ optString + ")");}    
+            }
         }
         hs = nextChar(tail);
         if ( !hs.equals(",") ) {throw new ArgusException(", expected; not a "+ hs + "");}
@@ -521,10 +459,10 @@ public static int runBatchProcess(String batchFile){
         TableSet tableSet;
         hs = "";
         try{
-        TableService.addAdditivityParamBatch(computeTotals);
-        TableService.readTables(null);}
+            TableService.addAdditivityParamBatch(computeTotals);
+            TableService.readTables(null);}
         catch (IOException ex){
-                throw new ArgusException ("\nError reading table"+hs);}
+            throw new ArgusException ("\nError reading table"+hs);}
         return true;
     }
 
@@ -559,14 +497,15 @@ public static int runBatchProcess(String batchFile){
         if (n < 0 || n > TableService.numberOfTables() ){throw new ArgusException("Wrong table number in Suppression");}
         linked = (n == 0);
         if (linked) {
-          if (!SuppressType.equals("GH") && !SuppressType.equals("MOD")){
-              throw new ArgusException("Linked tables is only possible for Modular or Hypercube");
-          }  
-          for (i=0;i<TableService.numberOfTables();i++){TableService.undoSuppress(i);}
-          tableset = tauargus.service.TableService.getTable(0);
-        } else {
-          tableset = tauargus.service.TableService.getTable(n-1);
-          TableService.undoSuppress(n-1);            
+            if (!SuppressType.equals("GH") && !SuppressType.equals("MOD")){
+                throw new ArgusException("Linked tables is only possible for Modular or Hypercube");
+            }  
+            for (i=0;i<TableService.numberOfTables();i++){TableService.undoSuppress(i);}
+            tableset = tauargus.service.TableService.getTable(0);
+        } 
+        else {
+            tableset = tauargus.service.TableService.getTable(n-1);
+            TableService.undoSuppress(n-1);            
         }
         
         switch (SuppressType){
@@ -597,9 +536,10 @@ public static int runBatchProcess(String batchFile){
                       hs = hs + ts.CountSecondaries()+ " cells have been suppressed in table "+(i+1)+"\n";
                     }
                     hs = hs.substring(0, hs.length()-1);                            
-                } else { 
-                  GHMiter.RunGHMiter(tableset);
-                  hs = tableset.CountSecondaries()+ " cells have been suppressed";
+                } 
+                else { 
+                    GHMiter.RunGHMiter(tableset);
+                    hs = tableset.CountSecondaries()+ " cells have been suppressed";
                 }  
                 reportProgress("The hypercube procedure has been applied\n"+ hs);
                 break;}
@@ -625,67 +565,57 @@ public static int runBatchProcess(String batchFile){
                     
                 }
                 if (linked){
-                  LinkedTables.buildCoverTable();  
-                  LinkedTables.runLinkedModular(null);
-                } else { // single table
-                  if (token.equals(",")){ //MSC specified
-                    token = nextToken(tail);
-                    tableset.maxScaleCost = StrUtils.toDouble(token);
-                    if (tableset.maxScaleCost <= 0){
-                       throw new ArgusException("Illegal Max Scaling Cost: " + token);                        
+                    LinkedTables.buildCoverTable();  
+                    LinkedTables.runLinkedModular(null);
+                } 
+                else { // single table
+                    if (token.equals(",")){ //MSC specified
+                        token = nextToken(tail);
+                        tableset.maxScaleCost = StrUtils.toDouble(token);
+                        if (tableset.maxScaleCost <= 0){
+                            throw new ArgusException("Illegal Max Scaling Cost: " + token);                        
+                        }
                     }
-                  }
-             
-                    
-                   try{ // Make sure that PropertyChanges are not processed in batch-mode by overriding propertyChange to do nothing
-                     if (Application.batchType() == Application.BATCH_COMMANDLINE){  
-                     OptiSuppress.runModular(tableset, new PropertyChangeListener(){
-                                                          @Override
-                                                          public void propertyChange(PropertyChangeEvent evt){
-                                                          }
-                                              });
-                     reportProgressInfo("The modular procedure has been applied\n"+ 
-                         tableset.CountSecondaries()+ " cells have been suppressed");
-                     }
-                     else {
-                final SwingWorker <Integer, Void> worker = new ProgressSwingWorker<Integer, Void>(ProgressSwingWorker.DOUBLE,"Modular approach") {
-                    @Override
-                    protected Integer doInBackground() throws ArgusException, Exception{
-                        super.doInBackground();
-                        OptiSuppress.runModular(tableset, getPropertyChangeListener());
+                    try{ // Make sure that PropertyChanges are not processed in batch-mode by overriding propertyChange to do nothing
+                        if (Application.batchType() == Application.BATCH_COMMANDLINE){  
+                            OptiSuppress.runModular(tableset, new PropertyChangeListener(){
+                                        @Override
+                                        public void propertyChange(PropertyChangeEvent evt){ }});
                         reportProgressInfo("The modular procedure has been applied\n"+ 
-                            tableset.CountSecondaries()+ " cells have been suppressed");
-                        return null;
-                    }
-
-                    @Override
-                    protected void done(){
-                        super.done();
-                        try{
-                            get();
-                            tableset.undoAudit();
-// Wat doet dit? Hoeft niet. Alleen voor GUI                            
-//                            ((AbstractTableModel)table.getModel()).fireTableDataChanged();
+                                            tableset.CountSecondaries()+ " cells have been suppressed");
                         }
-                        catch (InterruptedException ex) {
-                            logger.log(Level.SEVERE, null, ex);
-                        } catch (ExecutionException ex) {
-                            JOptionPane.showMessageDialog(null, ex.getCause().getMessage());
+                        else {
+                            final SwingWorker <Integer, Void> worker = new ProgressSwingWorker<Integer, Void>(ProgressSwingWorker.DOUBLE,"Modular approach") {
+                                @Override
+                                protected Integer doInBackground() throws ArgusException, Exception{
+                                    super.doInBackground();
+                                    OptiSuppress.runModular(tableset, getPropertyChangeListener());
+                                    reportProgressInfo("The modular procedure has been applied\n"+ 
+                                        tableset.CountSecondaries()+ " cells have been suppressed");
+                                    return null;
+                                }
+                                @Override
+                                protected void done(){
+                                    super.done();
+                                    try{
+                                        get();
+                                        tableset.undoAudit();
+                                    }
+                                    catch (InterruptedException ex) {logger.log(Level.SEVERE, null, ex);} 
+                                    catch (ExecutionException ex) {JOptionPane.showMessageDialog(null, ex.getCause().getMessage());}
+                                }
+                            };
+                            worker.execute();
+                            while (!worker.isDone()){
+                                try{Thread.sleep(1000);}
+                                catch (InterruptedException ex) {}
+                            }
                         }
                     }
-                };
-                worker.execute();
-                while (!worker.isDone()){
-                   try{Thread.sleep(1000);}
-                   catch (InterruptedException ex) {}
+                    catch (IOException  ex){
+                        throw new ArgusException("Modular failed\n" + ex.getMessage());
+                    }
                 }
-            }
-                  }
-                  catch (IOException  ex){
-                      throw new ArgusException("Modular failed\n" + ex.getMessage());
-                  }
-                }
-
                 break;}
             case "OPT":{//TabNo, MaxComputingTime
                 if (n==0) {throw new ArgusException("Linked tables is not possible for Optimal");}
@@ -697,60 +627,50 @@ public static int runBatchProcess(String batchFile){
                 }
                 
                 if (Application.batchType() == Application.BATCH_COMMANDLINE){  
-                  try{
-                  OptiSuppress.runOptimal(tableset, new PropertyChangeListener(){
-                                                        @Override
-                                                        public void propertyChange(PropertyChangeEvent evt){
-                                                        }
-                                            }, false, false, 1);
-                  }
-                catch (IOException ex) {}
+                    try{
+                    OptiSuppress.runOptimal(tableset, new PropertyChangeListener(){
+                                    @Override 
+                                    public void propertyChange(PropertyChangeEvent evt){} }, false, false, 1);
+                    }
+                    catch (IOException ex) {}
                 }  
                 else { // From menu with swingworker
                     final SwingWorker <Integer, Void> worker = new ProgressSwingWorker<Integer, Void>(ProgressSwingWorker.DOUBLE,"Modular approach") {
-                    @Override
-                    protected Integer doInBackground() throws ArgusException, Exception{
-                        super.doInBackground(); 
-                       try{
-                         OptiSuppress.runOptimal(tableset, new PropertyChangeListener(){
-                                                        @Override
-                                                        public void propertyChange(PropertyChangeEvent evt){
-                                                        }
-                                            }, false, false, 1);
+                        @Override
+                        protected Integer doInBackground() throws ArgusException, Exception{
+                            super.doInBackground(); 
+                            try{
+                                OptiSuppress.runOptimal(tableset, new PropertyChangeListener(){
+                                            @Override
+                                            public void propertyChange(PropertyChangeEvent evt){} }, false, false, 1);
+                            }
+                            catch (IOException ex) {}                    
+                            return null;
                         }
-                        catch (IOException ex) {}                    
-                        return null;
-                    }
 
-                    @Override
-                    protected void done(){
-                        super.done();
-                        try{
-                            get();
+                        @Override
+                        protected void done(){
+                            super.done();
+                            try{ get(); }
+                            catch (InterruptedException ex) { logger.log(Level.SEVERE, null, ex); } 
+                            catch (ExecutionException ex) { JOptionPane.showMessageDialog(null, ex.getCause().getMessage()); }
                         }
-                        catch (InterruptedException ex) {
-                            logger.log(Level.SEVERE, null, ex);
-                        } catch (ExecutionException ex) {
-                            JOptionPane.showMessageDialog(null, ex.getCause().getMessage());
-                        }
-                    }
-                };
-                worker.execute();
-                while (!worker.isDone()){
-                   try{Thread.sleep(1000);}
-                   catch (InterruptedException ex) {}
-                }  
+                    };
+                    worker.execute();
+                    while (!worker.isDone()){
+                        try{Thread.sleep(1000);}
+                        catch (InterruptedException ex) {}
+                    }  
                 }
 
                 //TODO
                 reportProgressInfo("The optimal procedure has been applied\n"+ 
-                  tableset.CountSecondaries()+ " cells have been suppressed");
-
+                                    tableset.CountSecondaries()+ " cells have been suppressed");
                 break;}
             case "RND":{//TabNo, RoundingBase, Steps, Time, Partitions, StopRule
                         // OK after Roundbase: Default Step = 0 (no step), time = 10, Nopartitions part = 0, stoprule = 2(optimal)
-               if (n==0) {throw new ArgusException("Linked tables is not possible for Rounding");}
-               if (Application.solverSelected == Application.SOLVER_CPLEX)
+                if (n==0) {throw new ArgusException("Linked tables is not possible for Rounding");}
+                if (Application.solverSelected == Application.SOLVER_CPLEX)
                     //{throw new ArgusException("Controlled rounding cannot be used when Cplex is selected as solver");}
                     {reportProgressInfo("Whether controlled rounding can be used when Cplex is selected as solver, depends on your specific license.\n Incorrect license may cause errors.");}
                 token = nextChar(tail);
@@ -759,7 +679,7 @@ public static int runBatchProcess(String batchFile){
                 tableset.roundBase  = Integer.parseInt(token);
                 long mrb = TableSet.computeMinRoundBase(tableset);
                 if (tableset.roundBase < mrb){
-                   throw new ArgusException("The rounding base is too small\n"+
+                    throw new ArgusException("The rounding base is too small\n"+
                                              "A minimum of "+ mrb + " is required");
                 }
                 //set the defaults
@@ -770,38 +690,38 @@ public static int runBatchProcess(String batchFile){
                 token = nextChar(tail); 
                 
                 if (token.equals(",")){ //steps
-                   token = nextToken(tail); 
-                   tableset.roundMaxStep  = StrUtils.toInteger(token); 
-                   token = nextChar(tail); 
+                    token = nextToken(tail); 
+                    tableset.roundMaxStep  = StrUtils.toInteger(token); 
+                    token = nextChar(tail); 
                 }else{
-                  if (!token.equals(")"))throw new ArgusException("a komma(,) or \")\" expected");
+                    if (!token.equals(")"))throw new ArgusException("a komma(,) or \")\" expected");
                 }
 
                 if (token.equals(",")){ //max time
                     token = nextToken(tail);
-                   tableset.roundMaxTime  = Integer.parseInt(token); 
-                   if (tableset.roundMaxTime <= 0){throw new ArgusException("Illegal value for max time: "+tableset.roundMaxTime );}
-                   token = nextChar(tail); 
+                    tableset.roundMaxTime  = Integer.parseInt(token); 
+                    if (tableset.roundMaxTime <= 0){throw new ArgusException("Illegal value for max time: "+tableset.roundMaxTime );}
+                    token = nextChar(tail); 
                 }else{
-                  if (!token.equals(")"))throw new ArgusException("a komma(,) or \")\" expected");
+                    if (!token.equals(")"))throw new ArgusException("a komma(,) or \")\" expected");
                 }
                                 
                 if (token.equals(",")){ //partitions
                     token = nextToken(tail);
                     tableset.roundPartitions  = Integer.parseInt(token); 
-                   if (tableset.roundPartitions < 0||tableset.roundPartitions > 1){throw new ArgusException("Illegal value for partitions: "+tableset.roundPartitions );}
-                   token = nextChar(tail); 
+                    if (tableset.roundPartitions < 0||tableset.roundPartitions > 1){throw new ArgusException("Illegal value for partitions: "+tableset.roundPartitions );}
+                    token = nextChar(tail); 
                 }else{
-                  if (!token.equals(")"))throw new ArgusException("a komma(,) or \")\" expected");
+                    if (!token.equals(")"))throw new ArgusException("a komma(,) or \")\" expected");
                 }
                 
                 if (token.equals(",")){ //Stop rule
                     token = nextToken(tail);
                     tableset.roundStoppingRule  = Integer.parseInt(token); 
-                  if (tableset.roundStoppingRule <= 0||tableset.roundStoppingRule>2){throw new ArgusException("Illegal value for max time: "+tableset.roundStoppingRule );}
-                  token = nextChar(tail); 
+                    if (tableset.roundStoppingRule <= 0||tableset.roundStoppingRule>2){throw new ArgusException("Illegal value for max time: "+tableset.roundStoppingRule );}
+                    token = nextChar(tail); 
                 }else{
-                  if (!token.equals(")"))throw new ArgusException("a komma(,) or \")\" expected");
+                    if (!token.equals(")"))throw new ArgusException("a komma(,) or \")\" expected");
                 }
                 
                 if (token.equals(",")){ //Unit cost function
@@ -814,9 +734,9 @@ public static int runBatchProcess(String batchFile){
                     }
                     else {throw new ArgusException("Illegal value UnitCost parameter: only 0 or 1 allowed" );
                     }
-                  token = nextChar(tail); 
+                    token = nextChar(tail); 
                 }else{
-                  if (!token.equals(")"))throw new ArgusException("a komma(,) or \")\" expected");
+                    if (!token.equals(")"))throw new ArgusException("a komma(,) or \")\" expected");
                 }
                 
                 // all parameters have been handeled. Run the rounder.
@@ -882,9 +802,45 @@ public static int runBatchProcess(String batchFile){
                 
                 OptiSuppress.RunNetwork(tableset);
                 
-              break;}
+              break;
+            }
+            case "CKM":{ // TabNo, ptableFileName (optional)
+                if (!tableset.CellKeyAvailable){
+                    throw new ArgusException("CKM is not available: no recordkey available");
+                }
+                
+                if (tableset.holding){
+                    throw new ArgusException("Sorry, Cell Key Method not available when \"holdings\" are used");
+                }
+                if (tableset.respVar.type != Type.FREQUENCY){
+                    throw new ArgusException("Sorry, currently Cell Key Method only imlemented for frequency tables");
+                }
+                
+                token = nextChar(tail);
+                if (!token.equals(",")){ // If not specified, use ptable from metadata, if available
+                    if (tableset.cellkeyVar.PTableFile != null) hs = tableset.cellkeyVar.PTableFile;
+                    else throw new ArgusException("No ptable file defined");
+                }
+                else{
+                    token = nextToken(tail);
+                    token = StrUtils.unQuote(token);
+                    if (!TauArgusUtils.ExistFile(token)){
+                        throw new ArgusException("ptable file ("+token+") does not exist");                               
+                    }
+                    token = TauArgusUtils.getFullFileName(token);
+                } 
+                try {
+                    if(OptiSuppress.RunCellKey(tableset, token)){
+                        reportProgress("Using ptable file "+token);
+                    }
+                }
+                catch (ArgusException | IOException ex){
+                    throw new ArgusException(ex.getMessage());
+                }
+                break;  
+            }
             default: 
-                throw new ArgusException ("Unknown suppression method ("+SuppressType+") found");                
+                throw new ArgusException ("Unknown suppression method ("+SuppressType+") found");
         }   
 
     }
@@ -1049,7 +1005,7 @@ public static int runBatchProcess(String batchFile){
           for (i=0;i<3;i++){ if (p[i] >=0 && pMin > p[i]){pMin = p[i];};}
           hs = tail[0].substring(0,pMin).trim();
           tail[0]=tail[0].substring(pMin).trim();
-          if (pMin == 100000){throw new ArgusException("No sepraator found in string "+ tail[0]);}
+          if (pMin == 100000){throw new ArgusException("No separator found in string "+ tail[0]);}
         }
         if (hs.startsWith("\"") && hs.endsWith("\"")){hs = hs.substring(1, hs.length()-1);}
         return hs;
@@ -1081,6 +1037,10 @@ public static int runBatchProcess(String batchFile){
        metadata = Application.getMetadata(Application.numberOfMetadatas()-1);
        TableSet tableSet = new TableSet(metadata);
        TableService.addTable(tableSet);
+
+       // If available, set variable that contains recordkey
+       tableSet.cellkeyVar = metadata.find(tauargus.model.Type.RECORD_KEY);
+
        // Exp vars first
 
        do{ hs = tokenizer.nextToken();
