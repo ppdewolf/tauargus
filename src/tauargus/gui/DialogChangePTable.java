@@ -5,7 +5,11 @@
  */
 package tauargus.gui;
 
+import java.io.File;
 import java.util.logging.Logger;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import tauargus.model.TableSet;
+import tauargus.utils.TauArgusUtils;
 
 /**
  *
@@ -14,6 +18,11 @@ import java.util.logging.Logger;
 public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
 
     private static final Logger logger = Logger.getLogger(DialogOpenMicrodata.class.getName());
+    
+    public static final int CANCEL_OPTION = 1;
+    public static final int APPROVE_OPTION = 0;
+    
+    private int returnValue = CANCEL_OPTION;
     
     /**
      * Creates new form DialogChangePTable
@@ -24,7 +33,8 @@ public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
         setLocationRelativeTo(parent);
     }
     
-    public int showDialog() {
+    public int showDialog(TableSet tableSet) {
+        textFieldPTable.setText(tableSet.cellkeyVar.PTableFile);
         setVisible(true);
         return returnValue;
     }
@@ -38,21 +48,42 @@ public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        filechooser = new javax.swing.JFileChooser();
         jLabel1 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        textFieldPTable = new javax.swing.JTextField();
+        buttonPTable = new javax.swing.JButton();
+        buttonOK = new javax.swing.JButton();
+        buttonCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                DialogClosing(evt);
+            }
+        });
 
         jLabel1.setText("ptable file:");
 
-        jButton1.setText("...");
+        buttonPTable.setText("...");
+        buttonPTable.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonPTableActionPerformed(evt);
+            }
+        });
 
-        jButton2.setText("OK");
+        buttonOK.setText("OK");
+        buttonOK.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonOKActionPerformed(evt);
+            }
+        });
 
-        jButton3.setText("Cancel");
+        buttonCancel.setText("Cancel");
+        buttonCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonCancelActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -64,14 +95,14 @@ public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField1)
+                        .addComponent(textFieldPTable)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(buttonPTable, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 416, Short.MAX_VALUE)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(buttonOK, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton3)))
+                        .addComponent(buttonCancel)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -80,17 +111,42 @@ public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1))
+                    .addComponent(textFieldPTable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(buttonPTable))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton2)
-                    .addComponent(jButton3))
+                    .addComponent(buttonOK)
+                    .addComponent(buttonCancel))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void buttonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCancelActionPerformed
+        setVisible(false);
+        returnValue = CANCEL_OPTION;
+    }//GEN-LAST:event_buttonCancelActionPerformed
+
+    private void buttonOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonOKActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_buttonOKActionPerformed
+
+    private void buttonPTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPTableActionPerformed
+        TauArgusUtils.getDataDirFromRegistry(filechooser);
+        filechooser.setDialogTitle("Select ptable File");
+        filechooser.setSelectedFile(new File(""));
+        filechooser.resetChoosableFileFilters();
+        if (filechooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
+            String hs = filechooser.getSelectedFile().toString();
+            textFieldPTable.setText(filechooser.getSelectedFile().toString());
+            TauArgusUtils.putDataDirInRegistry(hs);
+        }
+    }//GEN-LAST:event_buttonPTableActionPerformed
+
+    private void DialogClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_DialogClosing
+        setVisible(false);
+    }//GEN-LAST:event_DialogClosing
 
     /**
      * @param args the command line arguments
@@ -135,10 +191,11 @@ public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
+    private javax.swing.JButton buttonCancel;
+    private javax.swing.JButton buttonOK;
+    private javax.swing.JButton buttonPTable;
+    private javax.swing.JFileChooser filechooser;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField textFieldPTable;
     // End of variables declaration//GEN-END:variables
 }

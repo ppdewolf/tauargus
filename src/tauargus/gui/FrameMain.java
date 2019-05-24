@@ -405,6 +405,11 @@ public class FrameMain extends javax.swing.JFrame {
         buttonOpenMicrodata.setFocusable(false);
         buttonOpenMicrodata.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         buttonOpenMicrodata.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        buttonOpenMicrodata.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonOpenMicrodataActionPerformed(evt);
+            }
+        });
         toolBar.add(buttonOpenMicrodata);
 
         buttonOpenTable.setAction(openTableAction);
@@ -531,7 +536,6 @@ public class FrameMain extends javax.swing.JFrame {
             }
         });
         toolBar.add(buttonAbout);
-        buttonAbout.getAccessibleContext().setAccessibleDescription("About");
 
         jScrollPane1.setMaximumSize(new java.awt.Dimension(0, 0));
 
@@ -958,6 +962,10 @@ public class FrameMain extends javax.swing.JFrame {
             }
         catch (argus.model.ArgusException ex){JOptionPane.showMessageDialog(null, ex.getMessage());}
     }//GEN-LAST:event_menuItemContentActionPerformed
+
+    private void buttonOpenMicrodataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonOpenMicrodataActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_buttonOpenMicrodataActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonAbout;

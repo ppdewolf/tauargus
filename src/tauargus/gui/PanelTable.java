@@ -641,6 +641,8 @@ public class PanelTable extends javax.swing.JPanel {
         
         radioButtonCellKey.setVisible(tableSet.CellKeyAvailable);
         buttonChangePTable.setVisible(tableSet.CellKeyAvailable);
+        if (tableSet.CellKeyAvailable) labelPTable.setText("ptablefile: "+tableSet.cellkeyVar.PTableFile.substring(tableSet.cellkeyVar.PTableFile.lastIndexOf("\\")+1));
+        labelPTable.setVisible(tableSet.CellKeyAvailable);
         
         for (int i = 0; i < radioButtonSuppress.length; i++) {
             radioButtonSuppress[i].setEnabled(s == TableSet.SUP_NO);
@@ -886,6 +888,7 @@ public class PanelTable extends javax.swing.JPanel {
         radioButtonNetwork = new javax.swing.JRadioButton();
         radioButtonCellKey = new javax.swing.JRadioButton();
         buttonChangePTable = new javax.swing.JButton();
+        labelPTable = new javax.swing.JLabel();
         labelRowColVars = new javax.swing.JLabel();
         panelBottomButtons = new javax.swing.JPanel();
         buttonSelectView = new javax.swing.JButton();
@@ -1208,6 +1211,13 @@ public class PanelTable extends javax.swing.JPanel {
         buttonChangePTable.setToolTipText("");
         buttonChangePTable.setPreferredSize(new java.awt.Dimension(57, 23));
         buttonChangePTable.setRequestFocusEnabled(false);
+        buttonChangePTable.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonChangePTableActionPerformed(evt);
+            }
+        });
+
+        labelPTable.setText("ptable");
 
         javax.swing.GroupLayout panelSuppressLayout = new javax.swing.GroupLayout(panelSuppress);
         panelSuppress.setLayout(panelSuppressLayout);
@@ -1216,6 +1226,10 @@ public class PanelTable extends javax.swing.JPanel {
             .addGroup(panelSuppressLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelSuppressLayout.createSequentialGroup()
+                        .addGap(21, 21, 21)
+                        .addComponent(labelPTable, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())
                     .addGroup(panelSuppressLayout.createSequentialGroup()
                         .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(panelSuppressLayout.createSequentialGroup()
@@ -1281,10 +1295,12 @@ public class PanelTable extends javax.swing.JPanel {
                     .addComponent(checkBoxInverseWeight))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(radioButtonRounding)
-                .addGap(0, 0, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(radioButtonCellKey)
-                    .addComponent(buttonChangePTable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(buttonChangePTable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 0, 0)
+                .addComponent(labelPTable, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE))
         );
 
         buttonGroupSuppress.add(radioButtonModular);
@@ -1502,10 +1518,9 @@ public class PanelTable extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(scrollPane)
+                        .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 762, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(panelBottomButtons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(7, 7, 7))
+                        .addComponent(panelBottomButtons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(panelCellInformation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1513,7 +1528,9 @@ public class PanelTable extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(buttonRecode)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(panelSuppress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addComponent(panelSuppress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addGap(7, 7, 7))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -2157,6 +2174,11 @@ public class PanelTable extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_radioButtonHyperCubeComponentAdded
 
+    private void buttonChangePTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonChangePTableActionPerformed
+        DialogChangePTable dialog = new DialogChangePTable(null, true);
+        dialog.showDialog(tableSet);
+    }//GEN-LAST:event_buttonChangePTableActionPerformed
+
     private void organiseSafetyButtons(CellStatus status) {
         if (status.isEmpty()) {
             buttonSafe.setEnabled(false);
@@ -2244,6 +2266,7 @@ public class PanelTable extends javax.swing.JPanel {
     private javax.swing.JComboBox<String> comboBoxSpan6;
     private javax.swing.JComboBox<String> comboBoxSpan7;
     private javax.swing.JLabel labelDecimals;
+    private javax.swing.JLabel labelPTable;
     private javax.swing.JLabel labelRowColVars;
     private javax.swing.JLabel labelSpan0;
     private javax.swing.JLabel labelSpan1;
