@@ -199,7 +199,7 @@ public class SaveTable {
             case TableSet.FILE_FORMAT_CKM:
                 try{
                     tableSet.writeCKM(writeCKMOriginalValues, writeCKMDifferences, writeCKMCellKeys, 
-                                      writeSupppressEmpty, writeEmbedQuotes,null);
+                                      writeSupppressEmpty, writeEmbedQuotes, null);
                 } catch (IOException ex) {
                      // logger.log(Level.SEVERE, null, ex);
                 }                            
@@ -642,7 +642,7 @@ public class SaveTable {
             out.write("<p>\n");
             out.write("<h2>Sensitivity Rule:</h2><h3>\n");
             if (tableSet.ckmProtect){
-                out.write("None applicable");
+                out.write("None used for Noise addition using the Cell Key Method\n");
             }
             if (tableSet.domRule) {
                 for (i=1;i<4;i++){

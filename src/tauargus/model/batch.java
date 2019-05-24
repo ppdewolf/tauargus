@@ -379,12 +379,12 @@ public class batch {
     }
    
   
-    /**
+   /**
    * Writes a table in batch. 
    * Reads the commend and all its parameters.
    * Then performs the actual write process
    * @throws ArgusException 
-   */
+   **/
     static void writeTableBatch()throws ArgusException{
         String[] tail = new String[1];  String hs, optString, plusMin; 
         TableSet tableSet;
@@ -399,8 +399,12 @@ public class batch {
         hs = nextChar(tail);
         if ( !hs.equals(",") ) {throw new ArgusException(", expected; not a "+ hs + "");}
         hs = nextToken(tail);
+        // OutputType as specified (start counting from 1)
+        // 1: CSV, 2: CSV for pivot, 3: Code Value, 4: SBS, 5: Intermediate, 6: JJ, 7: CKM
         outputType = Integer.parseInt(hs);
         if (outputType < 1 || outputType > 7) {throw new ArgusException("Unknown output type ("+ hs + ":");}
+        // OutputType for internal use (start counting from 0)
+        // 0: CSV, 1: CSV for pivot, 2: Code Value, 3: SBS, 4: Intermediate, 5: JJ, 6: CKM
         outputType--;
         hs = nextChar(tail);
         if ( !hs.equals(",") ) {throw new ArgusException(", expected; not a "+ hs + "");}
@@ -414,6 +418,9 @@ public class batch {
         SaveTable.writeIntermediateAddAudit = false;
         SaveTable.writeIntermediateUseHolding = false;
         SaveTable.writeJJRemoveBogus = false;
+        SaveTable.writeCKMOriginalValues = false;
+        SaveTable.writeCKMDifferences = false;
+        SaveTable.writeCKMCellKeys = false;
         hs = nextToken(tail).toUpperCase();
         //loop over the different options
         while (! hs.equals("")){
@@ -433,6 +440,9 @@ public class batch {
                 case "FL": {SaveTable.writeVarnamesOnFirstLine = plusMin.equals("+");break;} //Varnames on First Line
                 case "QU": {SaveTable.writeEmbedQuotes = plusMin.equals("+");break;} //Embed in Quotes YES
                 case "TR": {SaveTable.writeJJRemoveBogus = plusMin.equals("+");break;} //Remove Trivial Levels
+                case "AO": {SaveTable.writeCKMOriginalValues = plusMin.equals("+");break;} //Add original cell values
+                case "AD": {SaveTable.writeCKMDifferences = plusMin.equals("+");break;} //Add difference original perturbed
+                case "AC": {SaveTable.writeCKMCellKeys = plusMin.equals("+");break;} //Add Cellkey
                 default: {throw new ArgusException("Unknown output type ("+ optString + ")");}    
             }
         }
@@ -448,8 +458,9 @@ public class batch {
             }
         }
         tableSet.safeFileName = hs;
-        if ((tableSet.ckmProtect || tableSet.ctaProtect) && (outputType > 3)) 
-            {throw new ArgusException("Chosen output type is not allowed for this type of protection\n");}
+        if (((outputType == 3 || outputType == 4) && (tableSet.ckmProtect || tableSet.ctaProtect)) ||
+            ((outputType == 5) && (tableSet.rounded)) || ((outputType == 6) && (!tableSet.ckmProtect))) 
+            {throw new ArgusException("Chosen output type "+Integer.toString(outputType+1)+" is not allowed for this type of protection\n");}
         SaveTable.writeTable (tableSet, outputType);
         SaveTable.writeReport(tableSet);
     }
@@ -830,7 +841,8 @@ public class batch {
                     token = TauArgusUtils.getFullFileName(token);
                 } 
                 try {
-                    if(OptiSuppress.RunCellKey(tableset, token)){
+                    tableset.cellkeyVar.PTableFile = token;
+                    if(OptiSuppress.RunCellKey(tableset, tableset.cellkeyVar.PTableFile)){
                         reportProgress("Using ptable file "+token);
                     }
                 }

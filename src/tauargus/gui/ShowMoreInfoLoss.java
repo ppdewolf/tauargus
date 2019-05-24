@@ -189,6 +189,7 @@ public class ShowMoreInfoLoss extends javax.swing.JDialog {
                 return canEdit [columnIndex];
             }
         });
+        Part1.setColumnSelectionAllowed(true);
         Part1.setRowSelectionAllowed(false);
         Part1.getTableHeader().setResizingAllowed(false);
         Part1.getTableHeader().setReorderingAllowed(false);
@@ -226,6 +227,7 @@ public class ShowMoreInfoLoss extends javax.swing.JDialog {
                 return canEdit [columnIndex];
             }
         });
+        Part2.setColumnSelectionAllowed(true);
         Part2.setRowSelectionAllowed(false);
         Part2.getTableHeader().setResizingAllowed(false);
         Part2.getTableHeader().setReorderingAllowed(false);
