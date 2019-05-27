@@ -641,6 +641,7 @@ public class PanelTable extends javax.swing.JPanel {
         
         radioButtonCellKey.setVisible(tableSet.CellKeyAvailable);
         buttonChangePTable.setVisible(tableSet.CellKeyAvailable);
+        buttonChangePTable.setEnabled(radioButtonCellKey.isSelected());
         if (tableSet.CellKeyAvailable) labelPTable.setText("ptablefile: "+tableSet.cellkeyVar.PTableFile.substring(tableSet.cellkeyVar.PTableFile.lastIndexOf("\\")+1));
         labelPTable.setVisible(tableSet.CellKeyAvailable);
         
@@ -671,7 +672,10 @@ public class PanelTable extends javax.swing.JPanel {
         boolean b = (s == TableSet.SUP_CKM) || (s == TableSet.SUP_NO);
         checkBoxColoredView.setEnabled(b);
         if (!b) checkBoxColoredView.setSelected(false);
-        if (s == TableSet.SUP_CKM) checkBoxColoredView.setSelected(true);
+        if (s == TableSet.SUP_CKM) {
+            checkBoxColoredView.setSelected(true);
+            buttonChangePTable.setEnabled(false);
+        }
         
         b = (s == TableSet.SUP_ROUNDING)  || (s == TableSet.SUP_CTA) || (s == TableSet.SUP_CKM);
         checkBoxOutputView.setEnabled(!b);
@@ -2176,7 +2180,7 @@ public class PanelTable extends javax.swing.JPanel {
 
     private void buttonChangePTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonChangePTableActionPerformed
         DialogChangePTable dialog = new DialogChangePTable(null, true);
-        dialog.showDialog(tableSet);
+        if (dialog.showDialog(tableSet)==DialogChangePTable.APPROVE_OPTION) labelPTable.setText("ptablefile: "+tableSet.cellkeyVar.PTableFile.substring(tableSet.cellkeyVar.PTableFile.lastIndexOf("\\")+1));
     }//GEN-LAST:event_buttonChangePTableActionPerformed
 
     private void organiseSafetyButtons(CellStatus status) {

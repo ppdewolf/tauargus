@@ -5,8 +5,10 @@
  */
 package tauargus.gui;
 
+import argus.utils.SystemUtils;
 import java.io.File;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import tauargus.model.TableSet;
 import tauargus.utils.TauArgusUtils;
@@ -23,6 +25,7 @@ public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
     public static final int APPROVE_OPTION = 0;
     
     private int returnValue = CANCEL_OPTION;
+    private TableSet tmpTableSet;
     
     /**
      * Creates new form DialogChangePTable
@@ -34,7 +37,9 @@ public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
     }
     
     public int showDialog(TableSet tableSet) {
-        textFieldPTable.setText(tableSet.cellkeyVar.PTableFile);
+        tmpTableSet=tableSet;
+        //textFieldPTable.setText(tableSet.cellkeyVar.PTableFile);
+        textFieldPTable.setText(tmpTableSet.cellkeyVar.PTableFile);
         setVisible(true);
         return returnValue;
     }
@@ -124,12 +129,25 @@ public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCancelActionPerformed
-        setVisible(false);
         returnValue = CANCEL_OPTION;
+        setVisible(false);
     }//GEN-LAST:event_buttonCancelActionPerformed
 
     private void buttonOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonOKActionPerformed
-        // TODO add your handling code here:
+        if (textFieldPTable.getText().trim().equals("")) 
+        {
+            JOptionPane.showMessageDialog(this,"Please specify ptable file.");
+            return;
+        }
+        if (!TauArgusUtils.ExistFile(textFieldPTable.getText()))
+        {
+            JOptionPane.showMessageDialog(this,"Ptable file "+textFieldPTable.getText()+" does not exist.");
+            return;
+        }
+        SystemUtils.writeLogbook("Ptable file: "+textFieldPTable.getText()+" will be used when applying CKM.");
+        
+        returnValue = APPROVE_OPTION;
+        setVisible(false);
     }//GEN-LAST:event_buttonOKActionPerformed
 
     private void buttonPTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPTableActionPerformed
@@ -139,8 +157,9 @@ public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
         filechooser.resetChoosableFileFilters();
         if (filechooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
             String hs = filechooser.getSelectedFile().toString();
-            textFieldPTable.setText(filechooser.getSelectedFile().toString());
+            textFieldPTable.setText(hs);
             TauArgusUtils.putDataDirInRegistry(hs);
+            tmpTableSet.cellkeyVar.PTableFile=hs;
         }
     }//GEN-LAST:event_buttonPTableActionPerformed
 
