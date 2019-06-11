@@ -60,6 +60,7 @@ import tauargus.gui.DialogErrorApriori;
 public class TableSet {
 
     private static final Logger logger = Logger.getLogger(TableSet.class.getName());
+    private static final double EPSILON = 1.0e-10;
 
     public static final int MAX_EXP_VAR = 10;
     public static final int MAX_RESP_VAR = 10;
@@ -2435,6 +2436,11 @@ if (Application.isProtectCoverTable()){
     
     // Calculates mean 
     public void CalculateCKMInfoLoss(){
+        final double[] percs = new double[]{0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95,0.99};
+        final double[] RADbreaks = new double[]{0.0,0.02,0.05,0.1,0.2,0.3,0.4,0.5,1.0};
+        final double[] ADbreaks;
+        int nFalseZeros = 0;
+        int nFalseNonzeros = 0;
         int nExpVar = expVar.size();
         int[] maxDim = new int[nExpVar];
         int[] dimArray = new int[nExpVar];
@@ -2452,10 +2458,18 @@ if (Application.isProtectCoverTable()){
         int j=0;
         for (;;) {
             Cell cell = getCell(dimArray);
+            if ((Math.abs(cell.CKMValue) <= EPSILON) && (Math.abs(cell.response) > EPSILON)) nFalseZeros++;
+            if ((Math.abs(cell.response) <= EPSILON) && (Math.abs(cell.CKMValue) > EPSILON)) nFalseNonzeros++;
+            
             AD[j] = Math.abs(cell.CKMValue - cell.response);
-            // If cell has value 0 or is empty, it is not perturbed by default in frequency tables
-            if ((Math.abs(cell.response)<=1e-10)||(cell.status==CellStatus.EMPTY)) RAD[j] = 0;
-            else RAD[j] = Math.abs(cell.CKMValue - cell.response)/cell.response;
+            // If cell is empty, it is not perturbed by default
+            if (cell.status==CellStatus.EMPTY) RAD[j] = 0;
+            else {
+                if (Math.abs(cell.response) <= EPSILON){ // original cell value is (close to) zero
+                    RAD[j] = Math.abs(cell.CKMValue - cell.response)/EPSILON;
+                }
+                else RAD[j] = Math.abs(cell.CKMValue - cell.response)/cell.response;
+            }
             DR[j] = Math.abs(Math.sqrt(cell.CKMValue) - Math.sqrt(cell.response));
             j++;
             // dimArray ophogen
@@ -2468,26 +2482,50 @@ if (Application.isProtectCoverTable()){
             if (k == -1) { break; }            
         }
         
-        // Sort the values
-        Arrays.sort(AD);
-        Arrays.sort(RAD);
-        Arrays.sort(DR);
-
+        this.InfoLoss.SetNumberOfCells(this.numberOfCells());
+        this.InfoLoss.SetFalseZeros(nFalseZeros);
+        this.InfoLoss.SetFalseNonzeros(nFalseNonzeros);
+       
         this.InfoLoss.SetMean("AD",DoubleStream.of(AD).average().getAsDouble());
         this.InfoLoss.SetMean("RAD",DoubleStream.of(RAD).average().getAsDouble());
         this.InfoLoss.SetMean("DR",DoubleStream.of(DR).average().getAsDouble());
 
-        this.InfoLoss.SetMedian("AD",percentiles(AD,0.5)[0]);
-        this.InfoLoss.SetMedian("RAD",percentiles(RAD,0.5)[0]);
-        this.InfoLoss.SetMedian("DR",percentiles(DR,0.5)[0]);
+        // Sort the values
+        Arrays.sort(AD);
+        Arrays.sort(RAD);
+        Arrays.sort(DR);
+        
+        // Calculations below this line make use of fact that 
+        // AD, RAD and DA are sorted
+        
+        if (this.isFrequencyTable()){
+            int ADbreakssize = Math.max(Math.abs(this.maxDiff),Math.abs(this.minDiff)) + 1;
+            ADbreaks = new double[ADbreakssize];
+            for (int i=0; i<ADbreakssize; i++) ADbreaks[i]=(double)i;
+        }
+        else{
+            ADbreaks = new double[]{0.0,1.0,2.0,3.0,4.0,5.0};
+        }
+        
+        this.InfoLoss.SetECDFcounts("AD", ECDFcounts(AD,ADbreaks));
+        this.InfoLoss.SetECDFcounts("RAD", ECDFcounts(RAD,RADbreaks));
+        this.InfoLoss.SetECDFcounts("DR", ECDFcounts(DR,RADbreaks));
         
         this.InfoLoss.SetMaxs("AD",AD[AD.length-1]);
         this.InfoLoss.SetMaxs("RAD",RAD[RAD.length-1]);
         this.InfoLoss.SetMaxs("DR",DR[DR.length-1]);
+
+        this.InfoLoss.SetMins("AD",AD[0]);
+        this.InfoLoss.SetMins("RAD",RAD[0]);
+        this.InfoLoss.SetMins("DR",DR[0]);
         
-        this.InfoLoss.SetPercentiles("AD",percentiles(AD,0.6,0.7,0.8,0.9,0.95,0.99));
-        this.InfoLoss.SetPercentiles("RAD",percentiles(RAD,0.6,0.7,0.8,0.9,0.95,0.99));
-        this.InfoLoss.SetPercentiles("DR",percentiles(DR,0.6,0.7,0.8,0.9,0.95,0.99));
+        this.InfoLoss.SetMedian("AD",percentiles(AD,0.5)[0]);
+        this.InfoLoss.SetMedian("RAD",percentiles(RAD,0.5)[0]);
+        this.InfoLoss.SetMedian("DR",percentiles(DR,0.5)[0]);
+
+        this.InfoLoss.SetPercentiles("AD",percentiles(AD,percs));
+        this.InfoLoss.SetPercentiles("RAD",percentiles(RAD,percs));
+        this.InfoLoss.SetPercentiles("DR",percentiles(DR,percs));
         
     }
     
@@ -2495,8 +2533,8 @@ if (Application.isProtectCoverTable()){
         return this.InfoLoss;
     }
     
-    // calculates perc percentile of array data
-    // perc is value between 0 and 1
+    // calculates percentiles of sorted double array
+    // perc is vector of values between 0 and 1
     private double[] percentiles(double[] data, double... perc){
         assert data.length > 0;
         double pos;
@@ -2515,6 +2553,62 @@ if (Application.isProtectCoverTable()){
         }
         return values;
     }
+
+    // Returns number of cells <= threshold
+    // breaks is a vector of thresholds
+    // Essentially this returns the Empirical Cumulative Distribution Function counts
+    private ECDF ECDFcounts(double arr[], double... breaks){
+        int[] values = new int[breaks.length];
+        int pos = 0;
+        int ndata = arr.length;
+        int nbreaks = breaks.length;
+        
+        for (int i=0; i<nbreaks; i++){
+            if (pos < (ndata - 1)){
+                pos = last(arr, pos, ndata - 1, breaks[i], ndata);
+                values[i] = pos + 1;
+            }
+            else values[i] = values[i-1];
+        }
+        ECDF ecdf = new ECDF(nbreaks);
+        ecdf.setBreaks(breaks);
+        ecdf.setCounts(values);
+        return ecdf;
+    }
+    
+    // returns the index of LAST occurrence of a value <= x in arr[0..n-1]
+    // between index low and index high
+    private static int last(double arr[], int low, int high, double x, int n) 
+    { 
+        if (high >= low) 
+        { 
+            int mid = low + (high - low)/2; 
+            //if (( mid == n-1 || x < arr[mid+1]) && Math.abs(arr[mid] - x) <= EPSILON) 
+            if (( mid == n-1 || x < arr[mid+1]) && arr[mid]<=x) 
+                 return mid; 
+            else if (x < arr[mid]) 
+                return last(arr, low, (mid -1), x, n); 
+            else
+                return last(arr, (mid + 1), high, x, n); 
+        } 
+    return -1; 
+    } 
+    
+    /* if x is present in arr[] then returns the index of 
+    FIRST occurrence of x in arr[0..n-1], otherwise 
+    returns -1 */
+    private static int first(double arr[], int low, int high, double x, int n) 
+    { 
+        if(high >= low) 
+        { 
+            int mid = low + (high - low)/2; 
+            if( ( mid == 0 || x > arr[mid-1]) && Math.abs(arr[mid] - x) <= EPSILON) 
+                return mid; 
+             else if(x > arr[mid]) 
+                return first(arr, (mid + 1), high, x, n); 
+            else
+                return first(arr, low, (mid -1), x, n); 
+        } 
+    return -1; 
+    } 
 }
-
-

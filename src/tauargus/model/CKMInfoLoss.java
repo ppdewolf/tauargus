@@ -25,22 +25,70 @@ public class CKMInfoLoss{
     private TreeMap<String,Double> Means = new TreeMap<>();
     private TreeMap<String,Double> Medians = new TreeMap<>();
     private TreeMap<String,Double> Maxs = new TreeMap<>();
+    private TreeMap<String,Double> Mins = new TreeMap<>();
     private TreeMap<String,double[]> Percentiles = new TreeMap<>();
+    private TreeMap<String,ECDF> ECDFcounts = new TreeMap<>();
+    
+    private int false_zeros;
+    private int false_nonzeros;
+    private int numberofcells;
     
     private void Initiate(TreeMap<String,Double> SDMap){
         SDMap.put("AD", 0.0);
         SDMap.put("RAD", 0.0);
         SDMap.put("DR", 0.0);
     }
-    
+
     public CKMInfoLoss(){
+        this.false_zeros = 0;
+        this.false_nonzeros = 0;
+        this.numberofcells = 0;
         this.Means.clear();
         this.Medians.clear();
         this.Maxs.clear();
         this.Percentiles.clear();
+        this.ECDFcounts.clear();
         Initiate(this.Means);
         Initiate(this.Medians);
         Initiate(this.Maxs);
+        Initiate(this.Mins);
+    }
+    
+    public void SetNumberOfCells(int n){
+        this.numberofcells = n;
+    }
+    
+    public int GetNumberOfCells(){
+        return this.numberofcells;
+    }
+    
+    /*public void SetECDFcounts(String Name, TreeMap<Double, Integer> values){
+        this.ECDFcounts.put(Name, new TreeMap<Double, Integer>());
+        this.ECDFcounts.put(Name, values);
+    }*/
+    public void SetECDFcounts(String Name, ECDF ecdf){
+        this.ECDFcounts.put(Name, ecdf);
+    }
+    
+    public ECDF GetECDFcounts(String Name){
+        
+        return this.ECDFcounts.get(Name);
+    }    
+    
+    public void SetFalseZeros(int Value){
+        this.false_zeros = Value;
+    }
+    
+    public int GetFalseZeros(){
+        return this.false_zeros;
+    }
+    
+    public void SetFalseNonzeros(int Value){
+        this.false_nonzeros = Value;
+    }
+    
+    public int GetFalseNonzeros(){
+        return this.false_nonzeros;
     }
     
     public void SetMean(String Name, double Value){
@@ -57,6 +105,14 @@ public class CKMInfoLoss{
 
     public double GetMedian(String Name){
         return this.Medians.get(Name);
+    }
+
+    public void SetMins(String Name, double Value){
+        this.Mins.put(Name, Value);
+    }
+
+    public double GetMins(String Name){
+        return this.Mins.get(Name);
     }
     
     public void SetMaxs(String Name, double Value){
