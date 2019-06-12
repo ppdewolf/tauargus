@@ -23,6 +23,7 @@ import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import tauargus.model.CKMInfoLoss;
+import tauargus.utils.TableColumnResizer;
 
 
 public class ShowMoreInfoLoss extends javax.swing.JDialog {
@@ -52,9 +53,21 @@ public class ShowMoreInfoLoss extends javax.swing.JDialog {
         labelNFalseZero.setText(Integer.toString(InfoLoss.GetFalseZeros()));
         labelNFalseNonzero.setText(Integer.toString(InfoLoss.GetFalseNonzeros()));
         
-        SetPart3Model(InfoLoss);
-        Part3.setDefaultRenderer(Object.class, new InfoCellRenderer2());
-        Part3.getTableHeader().setFont(Part3.getFont().deriveFont(Font.BOLD));
+        SetECDFModel(ECDF_AD, InfoLoss, "AD");
+        ECDF_AD.setDefaultRenderer(Object.class, new InfoCellRenderer2());
+        ECDF_AD.getTableHeader().setFont(ECDF_AD.getFont().deriveFont(Font.BOLD));
+
+        SetECDFModel(ECDF_RAD, InfoLoss, "RAD");
+        ECDF_RAD.setDefaultRenderer(Object.class, new InfoCellRenderer2());
+        ECDF_RAD.getTableHeader().setFont(ECDF_RAD.getFont().deriveFont(Font.BOLD));
+
+        SetECDFModel(ECDF_DR, InfoLoss, "DR");
+        ECDF_DR.setDefaultRenderer(Object.class, new InfoCellRenderer2());
+        ECDF_DR.getTableHeader().setFont(ECDF_DR.getFont().deriveFont(Font.BOLD));
+        
+        TableColumnResizer.adjustColumnPreferredWidths(ECDF_AD, false);
+        TableColumnResizer.adjustColumnPreferredWidths(ECDF_RAD, false);
+        TableColumnResizer.adjustColumnPreferredWidths(ECDF_DR, false);
         
         setVisible(true);
     }
@@ -146,27 +159,37 @@ public class ShowMoreInfoLoss extends javax.swing.JDialog {
         );
     }
     
-    private void SetPart3Model(CKMInfoLoss InfoLoss){
-        Part3.setModel(new AbstractTableModel(){
+    private void SetECDFModel(JTable ECDFTable, CKMInfoLoss InfoLoss, String Name){
+        ECDFTable.setModel(new AbstractTableModel(){
             @Override
-            public int getRowCount() {return InfoLoss.GetECDFcounts("AD").getBreaks().length;}
+            public int getRowCount() {return InfoLoss.GetECDFcounts(Name).getBreaks().length + 1;}
             @Override
             public int getColumnCount() {return 3;}
             @Override
             public Object getValueAt(int rowIndex, int columnIndex) {
-                switch(columnIndex) {
-                    case 0: return String.format("%.5f",InfoLoss.GetECDFcounts("AD").getBreaks()[rowIndex]);
-                    case 1: return String.format("%d",InfoLoss.GetECDFcounts("AD").getCounts()[rowIndex]);
-                    case 2: return String.format("%.5f",100.0*((double)InfoLoss.GetECDFcounts("AD").getCounts()[rowIndex]/(double)InfoLoss.GetNumberOfCells()));
-                    default: return "";
+                if (rowIndex == InfoLoss.GetECDFcounts(Name).getBreaks().length){
+                    switch(columnIndex) {
+                        case 0: return "Inf";
+                        case 1: return String.format("%d",InfoLoss.GetNumberOfCells());
+                        case 2: return String.format("%.2f",100.0);
+                        default: return "";
+                    }
+                }
+                else{
+                    switch(columnIndex) {
+                        case 0: return String.format("%.2f",InfoLoss.GetECDFcounts(Name).getBreaks()[rowIndex]);
+                        case 1: return String.format("%d",InfoLoss.GetECDFcounts(Name).getCounts()[rowIndex]);
+                        case 2: return String.format("%.2f",100.0*((double)InfoLoss.GetECDFcounts(Name).getCounts()[rowIndex]/(double)InfoLoss.GetNumberOfCells()));
+                        default: return "";
+                    }
                 }
             }
             @Override
             public String getColumnName(int column) {
                 switch(column) {
                     case 0:  return "Value";
-                    case 1:  return "Count <=";
-                    case 2:  return "Fraction (%) <= ";
+                    case 1:  return "Count";
+                    case 2:  return "Fraction (%)";
                     default: return "";
                 }
             }
@@ -194,9 +217,6 @@ public class ShowMoreInfoLoss extends javax.swing.JDialog {
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 setHorizontalAlignment(SwingConstants.RIGHT);
-                if (column==0){
-                    setHorizontalAlignment(SwingConstants.LEFT);
-                }
                 return comp;
             }
     }
@@ -210,22 +230,43 @@ public class ShowMoreInfoLoss extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel1 = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        labelNFalseNonzero = new javax.swing.JLabel();
+        labelNFalseZero = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         Part1 = new javax.swing.JTable();
         jScrollPane2 = new javax.swing.JScrollPane();
         Part2 = new javax.swing.JTable();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
-        labelNFalseZero = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        labelNFalseNonzero = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
-        Part3 = new javax.swing.JTable();
+        ECDF_AD = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        ECDF_RAD = new javax.swing.JTable();
+        jLabel6 = new javax.swing.JLabel();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        ECDF_DR = new javax.swing.JTable();
+        jLabel7 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jScrollPane1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        jLabel4.setText("<html><b>False non-zero-cells</b> (zero changed to non-zero)</html>");
+
+        jLabel1.setText("<html><b>False zero-cells</b> (non-zero changed to zero)</html>");
+
+        jLabel3.setText("<html> <table> <tr> <td><b>AD</b></td> <td>Absolute Difference</td> <td>| pert - orig | </td> </tr> <tr> <td><b>RAD</b></td> <td>Relative Absolute Difference</td> <td>( | pert - orig | ) / orig </td> </tr> <tr> <td><b>DR</b></td> <td>Absolute Difference of Square Root</td> <td>| sqrt(pert) - sqrt(orig) | </td> </tr> </table>");
+
+        labelNFalseNonzero.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        labelNFalseNonzero.setText("0");
+
+        labelNFalseZero.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        labelNFalseZero.setText("0");
 
         Part1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -258,7 +299,6 @@ public class ShowMoreInfoLoss extends javax.swing.JDialog {
         Part1.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(Part1);
 
-        jScrollPane2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jScrollPane2.setToolTipText("");
         jScrollPane2.setEnabled(false);
 
@@ -300,48 +340,104 @@ public class ShowMoreInfoLoss extends javax.swing.JDialog {
         Part2.getTableHeader().setReorderingAllowed(false);
         jScrollPane2.setViewportView(Part2);
 
-        jLabel3.setText("<html> <table> <tr> <td><b>AD</b></td> <td>Absolute Difference</td> <td>| pert - orig | </td> </tr> <tr> <td><b>RAD</b></td> <td>Relative Absolute Difference</td> <td>( | pert - orig | ) / orig </td> </tr> <tr> <td><b>DR</b></td> <td>Absolute Difference of Square Root</td> <td>| sqrt(pert) - sqrt(orig) | </td> </tr> </table>");
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 360, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(labelNFalseNonzero, javax.swing.GroupLayout.DEFAULT_SIZE, 97, Short.MAX_VALUE)
+                                    .addComponent(labelNFalseZero, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 342, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(labelNFalseNonzero))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(labelNFalseZero))
+                .addContainerGap())
+        );
 
-        jLabel1.setText("False zero-cells (non-zero changed to zero)");
+        jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        labelNFalseZero.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        labelNFalseZero.setText("0");
+        jScrollPane3.setViewportView(ECDF_AD);
 
-        jLabel4.setText("False non-zero-cells (zero changed to non-zero)");
+        jLabel2.setText("<html> <b>ECDF</b> (Empirical Cumulative Distribution Function) <br><br> Number and fraction of cells with Difference less than or equal to Value</html>");
 
-        labelNFalseNonzero.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        labelNFalseNonzero.setText("0");
+        jLabel5.setText("<html><b>AD</b></html>");
 
-        Part3.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
-            },
-            new String [] {
-                "Value", "Count <=", "Fraction (%) <="
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.Integer.class, java.lang.Double.class
-            };
-            boolean[] canEdit = new boolean [] {
-                false, false, false
-            };
+        jScrollPane4.setViewportView(ECDF_RAD);
 
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
+        jLabel6.setText("<html><b>RAD</b></html>");
 
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        Part3.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
-        jScrollPane3.setViewportView(Part3);
+        jScrollPane5.setViewportView(ECDF_DR);
 
-        jLabel2.setText("<html> <b>ECDF</b> <br> Empirical Cumulative Distribution Function </html>");
+        jLabel7.setText("<html><b>DR</b></html>");
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel2)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(6, 6, 6)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap())))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(20, 20, 20)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 360, Short.MAX_VALUE)
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -349,47 +445,18 @@ public class ShowMoreInfoLoss extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 342, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(labelNFalseNonzero, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(labelNFalseZero, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
-                            .addComponent(jLabel4))
-                        .addGap(26, 26, 26)))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 224, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(80, Short.MAX_VALUE))
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(41, 41, 41)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel4)
-                            .addComponent(labelNFalseNonzero))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel1)
-                            .addComponent(labelNFalseZero)))
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 380, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -398,16 +465,25 @@ public class ShowMoreInfoLoss extends javax.swing.JDialog {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTable ECDF_AD;
+    private javax.swing.JTable ECDF_DR;
+    private javax.swing.JTable ECDF_RAD;
     private javax.swing.JTable Part1;
     private javax.swing.JTable Part2;
-    private javax.swing.JTable Part3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JLabel labelNFalseNonzero;
     private javax.swing.JLabel labelNFalseZero;
     // End of variables declaration//GEN-END:variables

@@ -838,12 +838,12 @@ public class batch {
                     if (!TauArgusUtils.ExistFile(token)){
                         throw new ArgusException("ptable file ("+token+") does not exist");                               
                     }
-                    token = TauArgusUtils.getFullFileName(token);
+                    hs = TauArgusUtils.getFullFileName(token);
                 } 
                 try {
-                    tableset.cellkeyVar.PTableFile = token;
+                    tableset.cellkeyVar.PTableFile = hs;
                     if(OptiSuppress.RunCellKey(tableset, tableset.cellkeyVar.PTableFile)){
-                        reportProgress("Using ptable file "+token);
+                        reportProgress("Using ptable file "+hs);
                     }
                 }
                 catch (ArgusException | IOException ex){

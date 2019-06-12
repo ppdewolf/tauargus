@@ -2504,7 +2504,7 @@ if (Application.isProtectCoverTable()){
             for (int i=0; i<ADbreakssize; i++) ADbreaks[i]=(double)i;
         }
         else{
-            ADbreaks = new double[]{0.0,1.0,2.0,3.0,4.0,5.0};
+            ADbreaks = new double[]{0.0,1.0,2.0,3.0,4.0,5.0};// Possibly different in case of continuous variables?
         }
         
         this.InfoLoss.SetECDFcounts("AD", ECDFcounts(AD,ADbreaks));
