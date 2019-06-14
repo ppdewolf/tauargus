@@ -28,6 +28,7 @@ public class CKMInfoLoss{
     private TreeMap<String,Double> Mins = new TreeMap<>();
     private TreeMap<String,double[]> Percentiles = new TreeMap<>();
     private TreeMap<String,ECDF> ECDFcounts = new TreeMap<>();
+    private TreeMap<String,double[]> Diffs = new TreeMap<>();
     
     private int false_zeros;
     private int false_nonzeros;
@@ -48,10 +49,20 @@ public class CKMInfoLoss{
         this.Maxs.clear();
         this.Percentiles.clear();
         this.ECDFcounts.clear();
+        this.Diffs.clear();
+        
         Initiate(this.Means);
         Initiate(this.Medians);
         Initiate(this.Maxs);
         Initiate(this.Mins);
+    }
+    
+    public void setDiffs(String Name, double[] diffs){
+        this.Diffs.put(Name,diffs);
+    }
+    
+    public double[] GetDiffs(String Name){
+        return this.Diffs.get(Name);
     }
     
     public void SetNumberOfCells(int n){
@@ -62,16 +73,11 @@ public class CKMInfoLoss{
         return this.numberofcells;
     }
     
-    /*public void SetECDFcounts(String Name, TreeMap<Double, Integer> values){
-        this.ECDFcounts.put(Name, new TreeMap<Double, Integer>());
-        this.ECDFcounts.put(Name, values);
-    }*/
     public void SetECDFcounts(String Name, ECDF ecdf){
         this.ECDFcounts.put(Name, ecdf);
     }
     
     public ECDF GetECDFcounts(String Name){
-        
         return this.ECDFcounts.get(Name);
     }    
     

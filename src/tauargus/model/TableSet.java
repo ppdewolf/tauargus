@@ -2494,6 +2494,9 @@ if (Application.isProtectCoverTable()){
         Arrays.sort(AD);
         Arrays.sort(RAD);
         Arrays.sort(DR);
+        InfoLoss.setDiffs("AD", AD);
+        InfoLoss.setDiffs("RAD", RAD);
+        InfoLoss.setDiffs("DR", DR);
         
         // Calculations below this line make use of fact that 
         // AD, RAD and DA are sorted

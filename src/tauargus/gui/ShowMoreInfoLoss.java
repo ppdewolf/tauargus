@@ -18,16 +18,20 @@ package tauargus.gui;
 
 import java.awt.Component;
 import java.awt.Font;
+import javax.swing.JFrame;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import tauargus.model.CKMInfoLoss;
+import tauargus.model.ECDFGraphBuilder;
 import tauargus.utils.TableColumnResizer;
 
 
 public class ShowMoreInfoLoss extends javax.swing.JDialog {
 
+    CKMInfoLoss InfoLoss;
     /**
      * Creates new form ShowMoreInfoLoss
      */
@@ -38,30 +42,31 @@ public class ShowMoreInfoLoss extends javax.swing.JDialog {
     }
     
     void showDialog(CKMInfoLoss InfoLoss){
+        this.InfoLoss = InfoLoss;
         setTitle("Information loss measures calculated over all cells");
         
         java.awt.Dimension d = new java.awt.Dimension(0,0);
         
-        SetPart1Model(InfoLoss);
+        SetPart1Model();
         Part1.setDefaultRenderer(Object.class, new InfoCellRenderer());
         Part1.getTableHeader().setFont(Part1.getFont().deriveFont(Font.BOLD));
 
-        SetPart2Model(InfoLoss);
+        SetPart2Model();
         Part2.setDefaultRenderer(Object.class, new InfoCellRenderer());
         Part2.getTableHeader().setFont(Part2.getFont().deriveFont(Font.BOLD));
 
         labelNFalseZero.setText(Integer.toString(InfoLoss.GetFalseZeros()));
         labelNFalseNonzero.setText(Integer.toString(InfoLoss.GetFalseNonzeros()));
         
-        SetECDFModel(ECDF_AD, InfoLoss, "AD");
+        SetECDFModel(ECDF_AD, "AD");
         ECDF_AD.setDefaultRenderer(Object.class, new InfoCellRenderer2());
         ECDF_AD.getTableHeader().setFont(ECDF_AD.getFont().deriveFont(Font.BOLD));
 
-        SetECDFModel(ECDF_RAD, InfoLoss, "RAD");
+        SetECDFModel(ECDF_RAD, "RAD");
         ECDF_RAD.setDefaultRenderer(Object.class, new InfoCellRenderer2());
         ECDF_RAD.getTableHeader().setFont(ECDF_RAD.getFont().deriveFont(Font.BOLD));
 
-        SetECDFModel(ECDF_DR, InfoLoss, "DR");
+        SetECDFModel(ECDF_DR, "DR");
         ECDF_DR.setDefaultRenderer(Object.class, new InfoCellRenderer2());
         ECDF_DR.getTableHeader().setFont(ECDF_DR.getFont().deriveFont(Font.BOLD));
         
@@ -72,7 +77,7 @@ public class ShowMoreInfoLoss extends javax.swing.JDialog {
         setVisible(true);
     }
     
-    private void SetPart1Model(CKMInfoLoss InfoLoss){
+    private void SetPart1Model(){
         Part1.setModel(new AbstractTableModel(){
             @Override
             public int getRowCount() {return 4;}
@@ -115,7 +120,7 @@ public class ShowMoreInfoLoss extends javax.swing.JDialog {
         );
     }
     
-    private void SetPart2Model(CKMInfoLoss InfoLoss){
+    private void SetPart2Model(){
         Part2.setModel(new AbstractTableModel(){
             @Override
             public int getRowCount() {return 11;}
@@ -159,7 +164,7 @@ public class ShowMoreInfoLoss extends javax.swing.JDialog {
         );
     }
     
-    private void SetECDFModel(JTable ECDFTable, CKMInfoLoss InfoLoss, String Name){
+    private void SetECDFModel(JTable ECDFTable, String Name){
         ECDFTable.setModel(new AbstractTableModel(){
             @Override
             public int getRowCount() {return InfoLoss.GetECDFcounts(Name).getBreaks().length + 1;}
@@ -251,6 +256,9 @@ public class ShowMoreInfoLoss extends javax.swing.JDialog {
         jScrollPane5 = new javax.swing.JScrollPane();
         ECDF_DR = new javax.swing.JTable();
         jLabel7 = new javax.swing.JLabel();
+        jButtonADgraph = new javax.swing.JButton();
+        jButtonRADgraph = new javax.swing.JButton();
+        jButtonDRgraph = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -399,6 +407,27 @@ public class ShowMoreInfoLoss extends javax.swing.JDialog {
 
         jLabel7.setText("<html><b>DR</b></html>");
 
+        jButtonADgraph.setText("Show graphic");
+        jButtonADgraph.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonADgraphActionPerformed(evt);
+            }
+        });
+
+        jButtonRADgraph.setText("Show graphic");
+        jButtonRADgraph.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonRADgraphActionPerformed(evt);
+            }
+        });
+
+        jButtonDRgraph.setText("Show graphic");
+        jButtonDRgraph.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonDRgraphActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -406,24 +435,34 @@ public class ShowMoreInfoLoss extends javax.swing.JDialog {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                            .addComponent(jButtonADgraph)
                             .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(6, 6, 6)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                             .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap())))
+                            .addComponent(jButtonRADgraph)))
+                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(206, 206, 206)
+                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.CENTER, jPanel2Layout.createSequentialGroup()
+                .addGap(473, 473, 473)
+                .addComponent(jButtonDRgraph)
+                .addGap(62, 62, 62))
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addComponent(jLabel2))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+            .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(20, 20, 20)
@@ -432,11 +471,16 @@ public class ShowMoreInfoLoss extends javax.swing.JDialog {
                     .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 360, Short.MAX_VALUE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButtonADgraph)
+                    .addComponent(jButtonRADgraph)
+                    .addComponent(jButtonDRgraph))
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -463,6 +507,24 @@ public class ShowMoreInfoLoss extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jButtonADgraphActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonADgraphActionPerformed
+        ShowECDFGraph ECDFChart = new ShowECDFGraph((JFrame)SwingUtilities.getAncestorOfClass(JFrame.class, this), true);
+        ECDFChart.showChart("AD",InfoLoss.GetDiffs("AD"),InfoLoss.GetNumberOfCells());
+        ECDFChart.setVisible(true);
+    }//GEN-LAST:event_jButtonADgraphActionPerformed
+
+    private void jButtonRADgraphActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRADgraphActionPerformed
+        ShowECDFGraph ECDFChart = new ShowECDFGraph((JFrame)SwingUtilities.getAncestorOfClass(JFrame.class, this), true);
+        ECDFChart.showChart("RAD",InfoLoss.GetDiffs("RAD"),InfoLoss.GetNumberOfCells());
+        ECDFChart.setVisible(true);
+    }//GEN-LAST:event_jButtonRADgraphActionPerformed
+
+    private void jButtonDRgraphActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDRgraphActionPerformed
+        ShowECDFGraph ECDFChart = new ShowECDFGraph((JFrame)SwingUtilities.getAncestorOfClass(JFrame.class, this), true);
+        ECDFChart.showChart("DR",InfoLoss.GetDiffs("DR"),InfoLoss.GetNumberOfCells());
+        ECDFChart.setVisible(true);
+    }//GEN-LAST:event_jButtonDRgraphActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable ECDF_AD;
@@ -470,6 +532,9 @@ public class ShowMoreInfoLoss extends javax.swing.JDialog {
     private javax.swing.JTable ECDF_RAD;
     private javax.swing.JTable Part1;
     private javax.swing.JTable Part2;
+    private javax.swing.JButton jButtonADgraph;
+    private javax.swing.JButton jButtonDRgraph;
+    private javax.swing.JButton jButtonRADgraph;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
