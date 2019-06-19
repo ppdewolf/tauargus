@@ -575,7 +575,7 @@ public class SaveTable {
          out.write("<h2>Table has been suppressed with the linked table procedure</h2>"); out.newLine();
          out.write("The other tables:<br>"); out.newLine();
          for (i=0;i<TableService.numberOfTables();i++){
-           if (i!=tableSet.index) { printTableInfo(TableService.getTable(i), out);}
+           if (i!=tableSet.index) { printTableInfo(TableService.getTable(i), out); }
          }
        }       
 
@@ -645,30 +645,30 @@ public class SaveTable {
                 out.write("None used for Noise addition using the Cell Key Method<br>\n");
             }
             if (tableSet.domRule) {
-                for (i=1;i<4;i++){
+                for (i=0;i<4;i++){
                     hs = prDOM(i, tableSet);
                     if (! hs.equals("")) {out.write(hs);}
                 }  
             }
             if (tableSet.pqRule) {
-                for (i=1;i<4;i++){
+                for (i=0;i<4;i++){
                     hs = prPQ(i, tableSet);
                     if (! hs.equals("")) {out.write(hs);}
                 }  
             }
             if(tableSet.frequencyRule){
-                for (i=1;i<=2;i++){
-                    if (tableSet.minFreq[i-1] !=0){
-                        hs = "Minimun "+HI[i-1];
-                        hs = hs + " cell frequency: " + tableSet.minFreq[i-1] + " ;safety margin: " + 
-                                tableSet.frequencyMarge[i-1]+ "%";
-                    if (tableSet.minFreq[i-1] == 0 ){hs = hs + "<b>Possible poor protection</b>";}
+                for (i=0;i<2;i++){
+                    if (tableSet.minFreq[i] !=0){
+                        hs = "Minimun "+HI[i];
+                        hs = hs + " cell frequency: " + tableSet.minFreq[i] + " ;safety margin: " + 
+                                tableSet.frequencyMarge[i]+ "%";
+                    if (tableSet.minFreq[i] == 0 ){hs = hs + "<b>Possible poor protection</b>";}
                     out.write (hs+"<br>\n");                               
                     }
                 }
             }
 //ToDo    
-            if (tableSet.piepRule[0]){
+            if (tableSet.piepRule[0] || tableSet.piepRule[1]){
                 for (i=0;i<tableSet.metadata.variables.size();i++){
                     Variable v = tableSet.metadata.variables.get(i);
                     if (v.requestCode != null){
@@ -678,12 +678,12 @@ public class SaveTable {
                         out.write(")<br>\n");              
                     }  
                 }           
-                for (i=1;i<=2;i++){
-                    if (tableSet.piepRule[i-1]){
-                        out.write("Request-rule on " + HI[i-1] + " level applied <br>\n"); 
-                        out.write("&nbsp;&nbsp;percentages: " + tableSet.piepPercentage[0]+ ", " + tableSet.piepPercentage[1]+"<br>\n" ); 
-                        out.write("&nbsp;&nbsp;minfreq:     " + tableSet.piepMinFreq[i]+ "<br>\n" ); 
-                        out.write("&nbsp;&nbsp;safety margin: " + tableSet.piepMarge[i]+"%<br>\n" ); 
+                for (i=0;i<2;i++){
+                    if (tableSet.piepRule[i]){
+                        out.write("Request-rule on " + HI[i] + " level applied <br>\n"); 
+                        out.write("&nbsp;&nbsp;percentages: " + tableSet.piepPercentage[2*i] + ", " + tableSet.piepPercentage[2*i+1]+"<br>\n" ); 
+                        out.write("&nbsp;&nbsp;minfreq:     " + tableSet.piepMinFreq[i] + "<br>\n" ); 
+                        out.write("&nbsp;&nbsp;safety margin: " + tableSet.piepMarge[i] + "%<br>\n" ); 
                     }
                 }
             }  
@@ -759,13 +759,13 @@ public class SaveTable {
 
             if (tableSet.suppressed == TableSet.SUP_HITAS || tableSet.suppressed == TableSet.SUP_JJ_OPT ||
                 tableSet.suppressed == TableSet.SUP_UWE ) {
-                hs = " not "; if ( tableSet.singletonSingletonCheck){hs =" ";}
+                hs = tableSet.singletonSingletonCheck ? " " : " not ";
                 out.write("<h3>Additional Singleton/Singleton option has" + hs + "been used<br>\n");
-    
-                hs = " not "; if ( tableSet.singletonMultipleCheck){hs =" ";}
+                
+                hs = tableSet.singletonMultipleCheck ? " " : " not ";
                 out.write ("Additional Singleton/Multiple option has" + hs + "been used<br>\n");
         
-                hs = " not "; if ( tableSet.minFreqCheck){hs =" ";}
+                hs = tableSet.minFreqCheck ? " " : " not ";
                 out.write ("Additional Min. Frequency option has" + hs + "been used</h3>\n");
             }
     
@@ -1123,7 +1123,7 @@ public class SaveTable {
 //Dim Oke As Boolean
         try{
             out.write("<table>\n");
-            out.write("<tr><th width=\"40%\" height=\"11\">Function</th>\n");
+            out.write("<tr><th width=\"40%\" height=\"11\">Type</th>\n");
             out.write("<th width=\"40%\" height=\"11\">Var</th>\n");
             out.write("<th width=\"20%\" height=\"11\"># codes</th></tr>\n");
 
@@ -1146,7 +1146,7 @@ public class SaveTable {
                 out.write("<tr><td>Shadow variable :</td><td>" + tableSet.shadowVar.name + "</td><td>&nbsp;</td></tr>\n");
             if (!(tableSet.costVar == null))
                 out.write("<tr><td>Shadow variable :</td><td>" + tableSet.costVar.name + "</td><td>&nbsp;</td></tr>\n");
-            if (tableSet.holding) out.write("Holding info<br>\n");
+            if (tableSet.holding) out.write("Used holding info<br>\n");
 //If .Holding Then
 // j = 0
 // For i = 1 To MetaDataStruct.NVars
@@ -1157,7 +1157,7 @@ public class SaveTable {
 //  Print #1, "    <td>" + VarName(j) + "</td><td>&nbsp;</td></tr>"
 // End If
 //End If
-            if (tableSet.piepRule[0]) out.write("Request rule info<br>\n");
+            //if (tableSet.piepRule[0]) out.write("Request rule info<br>\n"); Is already mentioned under used safety rule
 //If .PiepRule(1) Or .PiepRule(2) Then
 // For i = 1 To MetaDataStruct.NVars
 // If MetaDataStruct.Varlist(i).Piep Then
@@ -1183,12 +1183,12 @@ public class SaveTable {
     private static String prDOM(int i, TableSet tableSet){
         String hs;
         hs="";
-        if (tableSet.domK[i-1] != 0) {
+        if (tableSet.domK[i] != 0) {
             hs = "Dominance rule ";  
-            if (i<=2) {hs = hs + "(Individual level)";} 
+            if (i<2) {hs = hs + "(Individual level)";} 
             else {hs = hs + "(Holding level)";}
-            hs = hs + " with n = " + tableSet.domN[i-1]+
-                       " and k = " + tableSet.domK[i-1] + "%<br>\n";      
+            hs = hs + " with n = " + tableSet.domN[i]+
+                       " and k = " + tableSet.domK[i] + "%<br>\n";      
         }
         return hs;
     }
@@ -1196,13 +1196,13 @@ public class SaveTable {
     private static String prPQ(int i, TableSet tableSet){
         String hs;
         hs="";
-        if (tableSet.pqP[i-1] != 0) {
+        if (tableSet.pqP[i] != 0) {
             hs = "p% rule ";  
-            if (i<=2) {hs = hs + "(Individual level)";} 
+            if (i<2) {hs = hs + "(Individual level)";} 
             else {hs = hs + "(Holding level)";}
-            hs = hs + " with p = " + tableSet.pqP[i-1]+"%";
-            if (tableSet.pqQ[i-1] !=100 || Application.isAnco() ) {hs = hs + ", q = " + tableSet.pqQ[i-1] + "%";}
-            hs = hs + " and n = " + tableSet.pqN[i-1] + "<br>\n";      
+            hs = hs + " with p = " + tableSet.pqP[i]+"%";
+            if (tableSet.pqQ[i] !=100 || Application.isAnco() ) {hs = hs + ", q = " + tableSet.pqQ[i] + "%";}
+            hs = hs + " and n = " + tableSet.pqN[i] + "<br>\n";      
         }
         return hs;
     }

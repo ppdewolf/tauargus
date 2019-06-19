@@ -341,6 +341,7 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         boolean b = checkBoxRequestRule.isSelected();
         tabbedPaneRules.setEnabledAt(2, b);
         labelReqSafetyRange.setEnabled(b);
+        labelReqSafetyRangeHolding.setEnabled(b && checkBoxUseHoldingsInfo.isSelected());
         for (int i=0; i<4; i++) {
             if (i==2) {
                 b = b && checkBoxUseHoldingsInfo.isSelected();
