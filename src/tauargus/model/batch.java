@@ -964,7 +964,7 @@ public class batch {
               token = nextToken (tail); ;
               tableset.piepMarge[nPiepRule] = Integer.parseInt(token);   
               
-              if ((nPiepRule > 2) && (tableset.piepPercentage[2*nPiepRule] > 0))
+              if ((nPiepRule > 0) && (tableset.piepPercentage[2*nPiepRule] > 0))
                   tableset.holding = true;
               nPiepRule++;
               token = nextChar(tail);
