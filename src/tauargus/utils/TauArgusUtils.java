@@ -17,23 +17,20 @@
 
 package tauargus.utils;
 
+import argus.utils.SystemUtils;
 import java.io.BufferedWriter;
 import java.io.File;
-//import java.io.FileFilter;
 import java.io.FileWriter;
-//import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.List;
 import java.util.regex.Pattern;
+import javax.swing.JOptionPane;
 import org.apache.commons.io.FilenameUtils;
 import tauargus.extern.dataengine.TauArgus;
 import tauargus.model.Application;
 import tauargus.model.ArgusException;
 import tauargus.model.Metadata;
 import tauargus.model.Variable;
-import argus.utils.SystemUtils;
-import tauargus.utils.TauArgusUtils;
-import java.util.List;
-import javax.swing.JOptionPane;
 
 public class TauArgusUtils {
     private static TauArgus tauArgus = Application.getTauArgusDll();
@@ -161,7 +158,7 @@ public class TauArgusUtils {
         try{
             hs = f1.getCanonicalPath();
         }
-        catch (IOException ex) {};
+        catch (IOException ex) {}
         return hs;
     }
     
@@ -260,7 +257,7 @@ public class TauArgusUtils {
         out.write("pause"); out.newLine();
         out.close();
         }
-        catch (IOException ex){};   
+        catch (IOException ex){}   
       }
     }
     public static void writeBatchFileForExec(String fn, List<String> command){
@@ -275,7 +272,7 @@ public class TauArgusUtils {
         out.write("pause"); out.newLine();
         out.close();        
        }
-        catch (IOException ex){}; 
+        catch (IOException ex){} 
       }   
     }
     
@@ -337,7 +334,7 @@ public class TauArgusUtils {
             try{
           hs = SystemUtils.getApplicationDirectory(Application.class).getCanonicalPath()+  "\\" + hs ; 
             }
-           catch (IOException ex){};
+           catch (IOException ex){}
         }
        if (!TauArgusUtils.ExistFile(hs)){ throw new ArgusException("Cplex licence file: "+ hs + " could not be found");}
        return hs;

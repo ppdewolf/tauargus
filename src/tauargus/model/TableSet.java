@@ -17,6 +17,8 @@
 
 package tauargus.model;
 
+import argus.utils.StrUtils;
+import argus.utils.SystemUtils;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.BufferedReader;
@@ -29,33 +31,25 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import static java.lang.Math.abs;
 import java.nio.channels.FileChannel;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
+import java.util.TreeMap;
 import java.util.logging.Logger;
-//import javax.swing.JOptionPane;
-//import org.apache.commons.lang3.StringUtils;
+import java.util.stream.DoubleStream;
 import tauargus.extern.dataengine.TauArgus;
-//import tauargus.gui.ActivityListener;
+import tauargus.gui.DialogErrorApriori;
 import tauargus.service.TableService;
-//import argus.utils.StrUtils;
-//import tauargus.utils.ExecUtils;
 import tauargus.utils.TauArgusUtils;
 import tauargus.utils.Tokenizer;
-//import tauargus.model.CellStatus;
-import argus.utils.SystemUtils;
-import argus.utils.StrUtils;
-import static java.lang.Math.abs;
-import java.util.Iterator;
-import java.util.TreeMap;
-import java.util.Map;
-import java.util.stream.DoubleStream;
-import tauargus.gui.DialogErrorApriori;
 
 public class TableSet {
 
@@ -2285,7 +2279,7 @@ if (Application.isProtectCoverTable()){
        deci = tableSet.respVar.nDecimals;
        try{
        SaveTable.writeJJ(tableSet, Application.getTempFile("AddErr.JJ"), false, false, 1, false, false);
-       }catch (ArgusException ex){};
+       }catch (ArgusException ex){}
        
        try{
         BufferedWriter out = new BufferedWriter(new FileWriter(Application.getTempFile("AdditErr.txt")));
@@ -2367,7 +2361,7 @@ if (Application.isProtectCoverTable()){
 // anco 1.6       
 //       catch (ArgusException | IOException ex){};
 //       catch (ArgusException ex){;}
-       catch (IOException ex){;}
+       catch (IOException ex){}
  }
 
 

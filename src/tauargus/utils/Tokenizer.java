@@ -41,7 +41,7 @@ public class Tokenizer {
         try{
             this.reader.close();
         }
-        catch (Exception ex) {};
+        catch (Exception ex) {}
     }
     
     public String nextLine() {

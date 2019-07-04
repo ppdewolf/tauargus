@@ -9,7 +9,6 @@ import argus.utils.SystemUtils;
 import java.io.File;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import tauargus.model.TableSet;
 import tauargus.utils.TauArgusUtils;
 

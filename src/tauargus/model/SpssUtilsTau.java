@@ -23,30 +23,21 @@ package tauargus.model;;
 //import argus.utils.StrUtils;
 //import argus.utils.Tokenizer;
 //import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-//import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-//import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-//import javax.swing.JOptionPane;
-//import muargus.model.MetadataMu;
 import argus.model.SpssVariable;
 import com.ibm.statistics.plugin.Case;
 import com.ibm.statistics.plugin.Cursor;
 import com.ibm.statistics.plugin.DataUtil;
-//import com.ibm.statistics.plugin.NumericMissingValueType;
 import com.ibm.statistics.plugin.StatsException;
 import com.ibm.statistics.plugin.StatsUtil;
-//import com.ibm.statistics.plugin.Variable;
-//import com.ibm.statistics.plugin.VariableFormat;
 import java.awt.Frame;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
-//import muargus.model.VariableMu;
-
 /**
  *
  * @author pibd05
@@ -111,12 +102,12 @@ public class SpssUtilsTau {
 
     public static SpssVariable getSPSSVar (int i){
       SpssVariable hVar = null;
-      if (i<spssVariables.size()){hVar = spssVariables.get(i);};
+      if (i<spssVariables.size()){hVar = spssVariables.get(i);}
       return hVar;              
     }
     
        
-    public static  int SpssVariableCount(){;
+    public static  int SpssVariableCount(){
       return spssVariables.size()+1;
     }
     

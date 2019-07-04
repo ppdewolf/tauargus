@@ -18,18 +18,15 @@
 package tauargus.gui;
 
 //import argus.model.SpssVariable;
+import argus.utils.SystemUtils;
 import java.io.File;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.commons.io.FilenameUtils;
-import tauargus.model.DataFilePair;
-//import tauargus.utils.ExecUtils;
-import argus.utils.SystemUtils;
-//import java.util.List;
 import tauargus.model.Application;
 import tauargus.model.ArgusException;
-//import tauargus.model.SpssUtilsTau;
+import tauargus.model.DataFilePair;
 import tauargus.utils.TauArgusUtils;
 
 public class DialogOpenMicrodata extends DialogBase{ //javax.swing.JDialog {

@@ -17,6 +17,7 @@
 
 package tauargus.gui;
 
+import argus.utils.StrUtils;
 import java.awt.Component;
 import java.awt.Container;
 import java.io.File;
@@ -30,7 +31,6 @@ import tauargus.model.ArgusException;
 import tauargus.model.Metadata;
 import tauargus.model.Type;
 import tauargus.model.Variable;
-import argus.utils.StrUtils;
 import tauargus.utils.SwingUtils;
 import tauargus.utils.TauArgusUtils;
 

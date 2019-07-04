@@ -17,19 +17,18 @@
 
 package tauargus.model;
 
+import argus.utils.SystemUtils;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.util.ArrayList;
 import java.util.Date;
-//import javax.swing.JOptionPane;
-import tauargus.service.TableService;
-import tauargus.utils.TauArgusUtils;
 import tauargus.extern.dataengine.TauArgus;
 import tauargus.gui.DialogLinkedTables;
+import tauargus.service.TableService;
 import tauargus.utils.ExecUtils;
-import argus.utils.SystemUtils;
-import java.util.ArrayList;
+import tauargus.utils.TauArgusUtils;
 
 /**
  *
@@ -160,7 +159,7 @@ public class LinkedTables {
       for (int i=0;i<TableService.numberOfTables();i++){
         tableSet = TableService.getTable(i); 
         tableSet.suppressINFO = OptiSuppress.ReadHitasINFO("hitas.log");
-        tableSet.solverUsed = Application.solverSelected;;
+        tableSet.solverUsed = Application.solverSelected;
         int[][] aPrioryStatus = new int[5][2];
         if (TableSet.processAprioryFile(Application.getTempFile("temp"+i+".hst"), i, ";", true, false, false, aPrioryStatus)!=0){
              TableService.undoSuppress(i);

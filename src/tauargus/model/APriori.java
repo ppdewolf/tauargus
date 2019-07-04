@@ -17,29 +17,20 @@
 
 package tauargus.model;
 
+import argus.utils.StrUtils;
+import argus.utils.SystemUtils;
 import java.io.*;
-//import java.text.DecimalFormat;
-//import java.text.DecimalFormatSymbols;
-//import java.text.ParseException;
 import java.util.ArrayList;
-//import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
-import java.util.regex.*;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.*;
 import tauargus.extern.dataengine.TauArgus;
-
-//import tauargus.utils.WinRegistry;
-import argus.utils.SystemUtils; 
 import tauargus.service.TableService;
-//import tauargus.model.CodeList;
 import tauargus.utils.TauArgusUtils;
-//import tauargus.model.VarCode;
-//import tauargus.model.VarCodeProperties;
-import argus.utils.StrUtils;
 import tauargus.utils.Tokenizer;
 
 

@@ -25,40 +25,40 @@ package tauargus.model;
  * 
  */
 
-import java.io.BufferedWriter;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.FileReader;
-import java.io.IOException;
-import tauargus.extern.dataengine.TauArgus;
-import tauargus.extern.tauhitas.HiTaSCtrl;
-import java.io.FileNotFoundException;
-import tauargus.utils.TauArgusUtils;
-import tauargus.utils.Tokenizer;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Date;
-import tauargus.extern.taurounder.RProgressListener;
-import tauargus.extern.taurounder.RCallback;
-import tauargus.service.TableService;
-import tauargus.utils.ExecUtils;
 import argus.utils.SystemUtils;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
+import tauargus.extern.dataengine.TauArgus;
+import tauargus.extern.tauhitas.HiTaSCtrl;
 import tauargus.extern.tauhitas.ICallback;
 import tauargus.extern.tauhitas.IProgressListener;
+import tauargus.extern.taurounder.RCallback;
+import tauargus.extern.taurounder.RProgressListener;
 import tauargus.extern.taurounder.RounderCtrl;
 import tauargus.gui.DialogStopTime;
+import tauargus.service.TableService;
+import tauargus.utils.ExecUtils;
 import tauargus.utils.StrUtils;
+import tauargus.utils.TauArgusUtils;
 import static tauargus.utils.TauArgusUtils.ShowWarningMessage;
+import tauargus.utils.Tokenizer;
 
 public class OptiSuppress {
 //TODO    Keuze moet noguit het options scherm/registry kommen
@@ -208,7 +208,7 @@ public class OptiSuppress {
         if (!tauArgus.WriteHierarchicalTableInAMPLFormat(Application.getTempFile("NetInH.tmp"), temp, tableSet.index, ms, errorCode)){
             throw new ArgusException("Error preparing intermediate file\n" + 
                                      "for the hierarchical network solution (" + errorCode[0] + ")");
-        };
+        }
        try {
          hs = SystemUtils.getApplicationDirectory(OptiSuppress.class).getCanonicalPath();
          } 
@@ -543,7 +543,7 @@ public class OptiSuppress {
         tableSet.processingTime = (int) diff;
         
         tableSet.ctaProtect = true; 
-        tableSet.suppressed = TableSet.SUP_CTA;;
+        tableSet.suppressed = TableSet.SUP_CTA;
         i = tableSet.CountSecondaries();
         tableSet.nSecond = tableSet.nSecond+ i;  //eigenijk onzin
      // .Inverseweight = (ChkInverseWeight.Value = vbChecked)
@@ -898,7 +898,7 @@ public class OptiSuppress {
     tokenizer = null;
     try{
        tokenizer = new Tokenizer(new BufferedReader(new FileReader(Application.getTempFile("Hitastab.kld"))));
-       } catch (Exception ex) {};
+       } catch (Exception ex) {}
     
     // Get number of characters of largest value, not necessary the total general
     // This value is only used to write HitasTab a bit more readable   
@@ -1337,12 +1337,12 @@ public class OptiSuppress {
        if (!append) {TauArgusUtils.DeleteFile(Application.getTempFile("JJ"+ hs + ".IN"));}
 //   }
        try{ out  = new BufferedWriter(new FileWriter(Application.getTempFile("JJ"+ hs + ".IN"), true));}            
-       catch (IOException ex){};
+       catch (IOException ex){}
    }
    
     private static void closeOut(){
        try{ out.close();}
-       catch (IOException ex){};
+       catch (IOException ex){}
    }
    
    

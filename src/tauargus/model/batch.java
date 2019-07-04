@@ -17,31 +17,31 @@
 
 package tauargus.model;
 
+import argus.utils.SystemUtils;
+import argus.utils.Tokenizer;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
-import java.util.logging.Level;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-import tauargus.extern.dataengine.TauArgus;
-import argus.utils.Tokenizer;
-import tauargus.service.TableService;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
-import tauargus.gui.PanelTable;
-import tauargus.utils.StrUtils;
-import tauargus.utils.TauArgusUtils;
-import argus.utils.SystemUtils;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import org.apache.commons.io.FilenameUtils;
+import tauargus.extern.dataengine.TauArgus;
+import tauargus.gui.PanelTable;
 import static tauargus.model.Application.clearMetadatas;
 import static tauargus.model.Application.clearVariables;
 import static tauargus.model.Metadata.DATA_ORIGIN_MICRO;
+import tauargus.service.TableService;
+import tauargus.utils.StrUtils;
+import tauargus.utils.TauArgusUtils;
    
 
 /**
@@ -961,7 +961,7 @@ public class batch {
               tableset.piepMinFreq[nPiepRule] = Integer.parseInt(token);                 
               token = nextChar(tail);
               if ( !token.equals(",") ) { throw new ArgusException ("A \",\" is expected here"); }
-              token = nextToken (tail); ;
+              token = nextToken (tail);
               tableset.piepMarge[nPiepRule] = Integer.parseInt(token);   
               
               if ((nPiepRule > 0) && (tableset.piepPercentage[2*nPiepRule] > 0))
@@ -1014,7 +1014,7 @@ public class batch {
           p[2] = tail[0].indexOf(")");
           p[3] = tail[0].indexOf("|");
           pMin = 100000;
-          for (i=0;i<3;i++){ if (p[i] >=0 && pMin > p[i]){pMin = p[i];};}
+          for (i=0;i<3;i++){ if (p[i] >=0 && pMin > p[i]){pMin = p[i];}}
           hs = tail[0].substring(0,pMin).trim();
           tail[0]=tail[0].substring(pMin).trim();
           if (pMin == 100000){throw new ArgusException("No separator found in string "+ tail[0]);}

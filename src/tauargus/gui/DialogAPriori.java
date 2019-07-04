@@ -17,37 +17,32 @@
 
 package tauargus.gui;
 
+import argus.utils.SystemUtils;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
-//import java.awt.font.GlyphMetrics;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.AbstractCellEditor;
 import javax.swing.JComboBox;
-import javax.swing.JRadioButton;
-import javax.swing.JTable;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-//import javax.swing.event.TableModelEvent;
-//import javax.swing.event.TableModelListener;
+import javax.swing.JRadioButton;
+import javax.swing.JTable;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import tauargus.model.APriori;
+import tauargus.model.APriori.Mapping;
+import tauargus.model.ArgusException;
 import tauargus.model.CellStatus;
 import tauargus.utils.TableColumnResizer;
-
-import tauargus.model.APriori.Mapping;
-import tauargus.model.APriori;
-//import tauargus.model.APrioriCell;
-import tauargus.model.ArgusException;
-import argus.utils.SystemUtils;
 import tauargus.utils.TauArgusUtils;
-import java.awt.Cursor;
 
 
 /*!

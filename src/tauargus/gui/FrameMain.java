@@ -17,17 +17,17 @@
 
 package tauargus.gui;
 
+import argus.utils.StrUtils;
+import argus.utils.SystemUtils;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-//import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-//import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -39,14 +39,10 @@ import tauargus.model.ArgusException;
 import tauargus.model.DataFilePair;
 import tauargus.model.LinkedTables;
 import tauargus.model.Metadata;
+import tauargus.model.SpssUtilsTau;
 import tauargus.model.TableSet;
 import tauargus.model.batch;
 import tauargus.service.TableService;
-import argus.utils.StrUtils;
-//import tauargus.gui.PanelTable;
-//import tauargus.utils.ExecUtils;
-import argus.utils.SystemUtils;
-import tauargus.model.SpssUtilsTau;
 import tauargus.utils.TauArgusUtils;
 
 public class FrameMain extends javax.swing.JFrame {
@@ -833,7 +829,7 @@ public class FrameMain extends javax.swing.JFrame {
         String hs="";
         DialogHtmlViewer dialog = new DialogHtmlViewer(FrameMain.this, true);
         try{hs = SystemUtils.getApplicationDirectory(FrameMain.class).getCanonicalPath();}
-        catch (IOException ex){};
+        catch (IOException ex){}
         hs = hs +"/tauNews.html";
         if (TauArgusUtils.ExistFile(hs)){
         dialog.showDialog("News","file:////"+  hs);

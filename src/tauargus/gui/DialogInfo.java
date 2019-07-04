@@ -19,10 +19,8 @@ package tauargus.gui;
 
 //import java.awt.Container;
 import java.io.BufferedReader;
-//import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-//import javax.swing.JFrame;
 import tauargus.model.ArgusException;
 import tauargus.utils.TauArgusUtils;
 

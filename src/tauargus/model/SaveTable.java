@@ -17,13 +17,13 @@
 
 package tauargus.model;
 
+import argus.utils.StrUtils;
+import argus.utils.SystemUtils;
 import java.io.BufferedReader;
-//import tauargus.model.Application;
 import java.io.BufferedWriter;
 import java.io.File;
-//import java.io.FilenameFilter;
-import java.io.FileWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -32,25 +32,11 @@ import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
-//import tauargus.model.DataFilePair;
-//import tauargus.model.Metadata;
-//import tauargus.model.Variable;
-//import tauargus.model.APriori;
-import tauargus.utils.TauArgusUtils; 
 import tauargus.extern.dataengine.TauArgus;
-//import tauargus.gui.ActivityListener;
-//import tauargus.model.Metadata;
 import static tauargus.model.TableSet.MAX_GH_MITER_RATIO;
 import tauargus.service.TableService;
-import argus.utils.StrUtils;
-//import tauargus.utils.ExecUtils;
+import tauargus.utils.TauArgusUtils;
 import tauargus.utils.Tokenizer;
-import argus.utils.SystemUtils;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.io.PrintWriter;
-import java.util.TreeMap;
-import static tauargus.model.TableSet.METADATA_FILE_EXTENSION;
 
 /**
  *
@@ -320,7 +306,7 @@ public class SaveTable {
          try{
              BufferedReader bf = new BufferedReader(new FileReader(Application.getTempFile("klad.jj")));
              JJKlad = new Tokenizer(bf);
-          } catch (Exception ex) {};
+          } catch (Exception ex) {}
          
          try{
            BufferedReader JJFreq = new BufferedReader(new FileReader(fileName + ".frq"));
@@ -451,7 +437,7 @@ public class SaveTable {
         try{
              BufferedReader bf = new BufferedReader(new FileReader(Application.getTempFile("JJklad.jj")));
              JJKlad = new Tokenizer(bf);
-          } catch (Exception ex) {};
+          } catch (Exception ex) {}
          
          try{
            BufferedWriter JJFile = new BufferedWriter(new FileWriter(fileName));

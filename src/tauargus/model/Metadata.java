@@ -18,6 +18,9 @@
 package tauargus.model;
 
 //import argus.model.SpssVariable;
+import argus.utils.StrUtils;
+import argus.utils.SystemUtils;
+import argus.utils.Tokenizer;
 import java.beans.PropertyChangeSupport;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -35,12 +38,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-//import tauargus.utils.StrUtils;
-import argus.utils.StrUtils;
-//import tauargus.utils.ExecUtils;
-import argus.utils.SystemUtils;
-//import tauargus.utils.Tokenizer;
-import argus.utils.Tokenizer;
 import static tauargus.utils.TauArgusUtils.ShowWarningMessage;
 
 public class Metadata implements Cloneable {

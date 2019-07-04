@@ -709,7 +709,7 @@ public class DialogSpecifyTablesTabular extends DialogBase {
                      Info.addLabel("Overview of the additivity errors");
                      try{
                        Info.addTextFile(Application.getTempFile("additerr.txt"));}
-                     catch (ArgusException ex1){};
+                     catch (ArgusException ex1){}
                      Info.setVisible(true);
                     }
                     

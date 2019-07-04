@@ -17,17 +17,16 @@
 
 package tauargus.gui;
 
+import argus.utils.SystemUtils;
+import java.awt.Cursor;
 import java.io.File;
 import javax.swing.JOptionPane;
-import tauargus.model.SaveTable;
-import tauargus.model.TableSet;
+import static javax.swing.JOptionPane.YES_OPTION;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.commons.io.FilenameUtils;
 import tauargus.model.ArgusException;
-//import tauargus.utils.ExecUtils;
-import argus.utils.SystemUtils;
-import java.awt.Cursor;
-import static javax.swing.JOptionPane.YES_OPTION;
+import tauargus.model.SaveTable;
+import tauargus.model.TableSet;
 import tauargus.utils.TauArgusUtils;
 
 public class DialogSaveTable extends DialogBase {

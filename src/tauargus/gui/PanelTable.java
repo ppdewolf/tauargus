@@ -17,10 +17,12 @@
 
 package tauargus.gui;
 
-import tauargus.utils.TableColumnResizer;
+import argus.utils.StrUtils;
+import argus.utils.SystemUtils;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.FileNotFoundException;
@@ -37,35 +39,33 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
-import org.apache.commons.lang3.StringUtils;
 import javax.swing.table.TableCellRenderer;
+import org.apache.commons.lang3.StringUtils;
 import tauargus.extern.dataengine.TauArgus;
 import tauargus.model.Application;
 import tauargus.model.ArgusException;
 import tauargus.model.Cell;
 import tauargus.model.CellStatus;
 import tauargus.model.CellStatusStatistics;
+import tauargus.model.GHMiter;
 import tauargus.model.Metadata;
+import tauargus.model.OptiSuppress;
+import tauargus.model.ProgressSwingWorker;
 import tauargus.model.SuppressionMethod;
+import static tauargus.model.SuppressionMethod.OPTIMAL;
 import tauargus.model.TableSet;
+import tauargus.model.Type;
 import tauargus.model.VarCode;
 import tauargus.model.Variable;
-import tauargus.utils.TauArgusUtils;
-import tauargus.model.GHMiter;
-import tauargus.model.OptiSuppress;
-import javax.swing.SwingWorker;
-import tauargus.model.ProgressSwingWorker;
-import static tauargus.model.SuppressionMethod.OPTIMAL;
 import tauargus.service.TableService;
-import argus.utils.StrUtils;
-import argus.utils.SystemUtils;
-import java.awt.Cursor;
-import javax.swing.SwingUtilities;
-import tauargus.model.Type;
+import tauargus.utils.TableColumnResizer;
+import tauargus.utils.TauArgusUtils;
 
 public class PanelTable extends javax.swing.JPanel {
 
@@ -1956,7 +1956,7 @@ public class PanelTable extends javax.swing.JPanel {
                                     Info.addLabel("Overview of the frozen cells");
                                     try{
                                         Info.addTextFile(Application.getTempFile("frozen.txt"));}
-                                    catch (ArgusException ex1){};
+                                    catch (ArgusException ex1){}
                                     Info.setVisible(true);
                                 }
                                 ((AbstractTableModel)table.getModel()).fireTableDataChanged();
@@ -1973,7 +1973,7 @@ public class PanelTable extends javax.swing.JPanel {
                                     Info.setLocationRelativeTo(null);
                                     try{
                                         Info.addTextFile(Application.getTempFile("PROTO002"));}
-                                    catch (ArgusException ex1){};
+                                    catch (ArgusException ex1){}
                                     Info.setVisible(true);
                                 }
                             }

@@ -25,7 +25,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import tauargus.model.CKMInfoLoss;
-import tauargus.model.ECDFGraphBuilder;
 import tauargus.utils.TableColumnResizer;
 
 

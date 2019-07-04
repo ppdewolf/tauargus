@@ -17,10 +17,7 @@
 
 package tauargus.gui;
 
-import tauargus.utils.DoubleInputVerifier;
-import tauargus.utils.IntegerInputVerifier;
-import tauargus.utils.MouseJListDoubleClickedListener;
-import tauargus.utils.SingleListSelectionModel;
+import argus.utils.SystemUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -40,11 +37,11 @@ import tauargus.model.ProgressSwingWorker;
 import tauargus.model.TableSet;
 import tauargus.model.Variable;
 import tauargus.service.TableService;
+import tauargus.utils.DoubleInputVerifier;
+import tauargus.utils.IntegerInputVerifier;
+import tauargus.utils.MouseJListDoubleClickedListener;
+import tauargus.utils.SingleListSelectionModel;
 import tauargus.utils.SwingUtils;
-//import tauargus.utils.ExecUtils;
-import argus.utils.SystemUtils;
-//import tauargus.utils.TauArgusUtils;
-
 
 public class DialogSpecifyTablesMicro extends DialogBase {
 

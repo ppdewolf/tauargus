@@ -17,7 +17,9 @@
 
 package tauargus.gui;
 
-import tauargus.utils.SingleListSelectionModel;
+import argus.model.SpssVariable;
+import argus.utils.SystemUtils;
+import argus.view.SpssSelectVariablesView;
 import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,12 +31,9 @@ import org.apache.commons.io.FilenameUtils;
 import tauargus.model.Application;
 import tauargus.model.ArgusException;
 import tauargus.model.Metadata;
-import tauargus.model.Variable;
-//import tauargus.utils.ExecUtils;
-import argus.utils.SystemUtils;
-import argus.model.SpssVariable;
-import argus.view.SpssSelectVariablesView;
 import tauargus.model.SpssUtilsTau;
+import tauargus.model.Variable;
+import tauargus.utils.SingleListSelectionModel;
 import tauargus.utils.TauArgusUtils;
 
 public class DialogSpecifyMetadata extends DialogBase {
