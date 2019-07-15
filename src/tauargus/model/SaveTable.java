@@ -22,16 +22,22 @@ import argus.utils.SystemUtils;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.JFreeChart;
 import tauargus.extern.dataengine.TauArgus;
 import static tauargus.model.TableSet.MAX_GH_MITER_RATIO;
 import tauargus.service.TableService;
@@ -830,13 +836,13 @@ public class SaveTable {
                 CellStatusStatistics stat = tableSet.getCellStatusStatistics();
      
                 out.write("<table>\n");
-                out.write("<tr><th width=\"6%\" height=\"11\">&nbsp;</th>\n");
-                out.write("<th width=\"20%\" height=\"11\">Status</th>\n");
-                out.write("<th width=\"10%\" height=\"11\">Number of cells</th>\n");
-                out.write("<th width=\"10%\" height=\"11\">Number of respondents</th>\n");
-                if (tableSet.holding){ out.write("<th width=\"10%\" height=\"11\">Number of holdings freq.</th>\n");}
-                out.write("<th width=\"15%\" height=\"11\">Response value</th>\n");
-                out.write("<th width=\"15%\" height=\"11\">Cost value</th>\n");
+                out.write("<tr><th height=\"11\">&nbsp;</th>\n");
+                out.write("<th height=\"11\">Status</th>\n");
+                out.write("<th height=\"11\">Number of cells</th>\n");
+                out.write("<th height=\"11\">Number of respondents</th>\n");
+                if (tableSet.holding){ out.write("<th height=\"11\">Number of holdings freq.</th>\n");}
+                out.write("<th height=\"11\">Response value</th>\n");
+                out.write("<th height=\"11\">Cost value</th>\n");
                 out.write("</tr>\n");
 // StatLabel (i)
                 for (i=CellStatus.SAFE.getValue();i<=CellStatus.EMPTY.getValue()+1;i++){
@@ -863,106 +869,47 @@ public class SaveTable {
             }
             else{
                 out.write("<table>\n");
-                //out.write("<tr><th width=\"50%\" height=\"11\">Added noise</th>\n");
-                //out.write("<th width=\"50%\" height=\"11\">Number of cells</th>\n");
-                out.write("<tr><th width=\"20%\" height=\"11\">Added noise</th>\n");
-                out.write("<th width=\"10%\" height=\"11\">Number of cells</th>\n");
-                out.write("<th width=\"10%\" height=\"11\">Percentage of cells</th>\n");
+                out.write("<tr><th height=\"11\">Added noise</th>");
+                out.write("<th height=\"11\">Number of cells</th>");
+                out.write("<th height=\"11\">Relative to non-empty cells</th>");
+                out.write("<th height=\"11\">Relative to all cells</th></tr>\n");
                 Integer[] TreeMapKeys = tableSet.getCKMStats().keySet().toArray(new Integer[tableSet.getCKMStats().size()]);
                 for (i=0;i<tableSet.getCKMStats().size();i++){
                     out.write("<tr><td align=\"Right\">"+ Integer.toString(TreeMapKeys[i]) + "</td>");
-                    out.write("<td align=\"Right\">"+Long.toString(tableSet.getCKMStats().get(TreeMapKeys[i]))+"</td>\n");
+                    out.write("<td align=\"Right\">"+Long.toString(tableSet.getCKMStats().get(TreeMapKeys[i]))+"</td>");
+                    out.write("<td align=\"Right\">"+String.format("%7.3f",100.0*tableSet.getCKMStats().get(TreeMapKeys[i])/(tableSet.numberOfCells()-tableSet.numberOfEmpty()))+"%</td>");
                     out.write("<td align=\"Right\">"+String.format("%7.3f",100.0*tableSet.getCKMStats().get(TreeMapKeys[i])/tableSet.numberOfCells())+"%</td></tr>\n");
                 }
                 out.write("<tr><td align=\"Right\"> Empty </td>");
-                out.write("<td align=\"Right\">"+Long.toString(tableSet.numberOfEmpty())+"</td>\n");
+                out.write("<td align=\"Right\">"+Long.toString(tableSet.numberOfEmpty())+"</td>");
+                out.write("<td align=\"Right\"> --</td>");
                 out.write("<td align=\"Right\">"+String.format("%7.3f",100.0*tableSet.numberOfEmpty()/tableSet.numberOfCells())+"%</td></tr>\n");
+
+                out.write("<tr><td align=\"Right\"> Non-Empty </td>");
+                out.write("<td align=\"Right\">"+Long.toString(tableSet.numberOfCells()-tableSet.numberOfEmpty())+"</td>");
+                out.write("<td align=\"Right\">"+Long.toString(100)+"%</td>");
+                out.write("<td align=\"Right\">"+String.format("%7.3f",100.0*(1.0 - 1.0*tableSet.numberOfEmpty()/tableSet.numberOfCells()))+"%</td></tr>\n");
+
                 out.write("<tr><td align=\"Right\"> Total </td>");
-                out.write("<td align=\"Right\">"+Long.toString(tableSet.numberOfCells())+"</td>\n");
+                out.write("<td align=\"Right\">"+Long.toString(tableSet.numberOfCells())+"</td>");
+                out.write("<td align=\"Right\"> --</td>");
                 out.write("<td align=\"Right\">"+Long.toString(100)+"%</td></tr>\n");
+                out.write("</table><br>\n");
+
+                out.write("<table>\n");
+                out.write("<tr><td><b>False non-zero-cells</b> (zero changed to non-zero)</td>");
+                out.write("<td>"+tableSet.GetCKMInfoLoss().GetFalseNonzeros()+"</td></tr>\n");
+                out.write("<tr><td><b>False zero-cells</b> (non-zero changed to zero)</td>");
+                out.write("<td>"+tableSet.GetCKMInfoLoss().GetFalseZeros()+"</td></tr>\n");
                 out.write("</table>\n");
                 out.write("<p>\n");
             }
             
             if (tableSet.ckmProtect){
-                out.write("<h2><b>Additional information loss measures, calculated over all cells</b></h2>\n");
-                out.write("<table>\n");
-                out.write("<tr><th align=\"Left\">AD</th><td>Absolute Difference</td><td>|pert - orig|</td></tr>\n");
-                out.write("<tr><th align=\"Left\">RAD</th><td>Relative Absolute Difference</td><td>|pert - orig|/orig</td></tr>\n");
-                out.write("<tr><th align=\"Left\">DR</th><td>Absolute Difference of square Roots</td><td>|sqrt(pert) - sqrt(orig)|</td></tr>\n");
-                out.write("</table>\n");
-                out.write("<p>\n");
-                
-                CKMInfoLoss InfoLoss = tableSet.GetCKMInfoLoss();
-                out.write("<b>Descriptives</b><br>\n");
-                out.write("<table>\n");
-                out.write("<tr><td></td><th>AD</th><th>RAD</th><th>DR</th></tr>\n");
-                out.write("<tr><td>Mean</td>\n");
-                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMean("AD"))+"</td>\n");
-                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMean("RAD"))+"</td>\n");
-                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMean("DR"))+"</td></tr>\n");
-                out.write("<tr><td>Median</td>\n");
-                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMedian("AD"))+"</td>\n");
-                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMedian("RAD"))+"</td>\n");
-                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMedian("DR"))+"</td></tr>\n");
-                out.write("<tr><td>Max</td>\n");
-                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMaxs("AD"))+"</td>\n");
-                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMaxs("RAD"))+"</td>\n");
-                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMaxs("DR"))+"</td></tr>\n");
-                out.write("</table><br>\n");
-                
-                out.write("<b>Percentiles</b><br>\n");
-                String[] Percents = {"P10","P20","P30","P40","P50","P60","P70","P80","P90","P95","P99"};
-                out.write("<table>\n");
-                out.write("<tr><td></td><th>AD</th><th>RAD</th><th>DR</th></tr>\n");
-                for (i=0;i<Percents.length;i++){
-                    out.write("<tr><td>"+Percents[i]+"</td>\n");
-                    out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetPercentiles("AD")[i])+"</td>\n");
-                    out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetPercentiles("RAD")[i])+"</td>\n");
-                    out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetPercentiles("DR")[i])+"</td></tr>\n");
-                }
-                out.write("</table>\n");
-                out.write("<p>\n");
-                
-                out.write("<b>Empirical Cumulative Distribution Functions (ECDF)</b><br>\n");
-                out.write("Number and fraction of cells with Difference less than or equal to Value<br>\n");
-                out.write("<table>\n");
-                out.write("<tr><th colspan=\"3\" algn=\"Left\"><b>AD</b></th></tr>\n");
-                out.write("<tr><td>Value</td><td>Count</td><td>Fraction (%)</td></tr>\n");
-                for (i=0;i<InfoLoss.GetECDFcounts("AD").getBreaks().length;i++){
-                    out.write("<tr><td align=\"Right\">"+String.format("%.2f",InfoLoss.GetECDFcounts("AD").getBreaks()[i])+"</td>\n");
-                    out.write("<td align=\"Right\">"+String.format("%d",InfoLoss.GetECDFcounts("AD").getCounts()[i])+"</td>\n");
-                    out.write("<td align=\"Right\">"+String.format("%.2f",100.0*((double)InfoLoss.GetECDFcounts("AD").getCounts()[i]/(double)InfoLoss.GetNumberOfCells()))+"</td></tr>\n");
-                }
-                out.write("<tr><td align=\"Right\">Inf</td>");
-                out.write("<td align=\"Right\">"+String.format("%d",InfoLoss.GetNumberOfCells())+"</td>\n");
-                out.write("<td align=\"Right\">"+String.format("%.2f",100.0)+"</td></tr>\n");
-                out.write("</table><br>\n");
-                out.write("<table>\n");
-                out.write("<tr><th colspan=\"3\" algn=\"Left\"><b>RAD</b></th></tr>\n");
-                out.write("<tr><td>Value</td><td>Count</td><td>Fraction (%)</td></tr>\n");
-                for (i=0;i<InfoLoss.GetECDFcounts("RAD").getBreaks().length;i++){
-                    out.write("<tr><td align=\"Right\">"+String.format("%.2f",InfoLoss.GetECDFcounts("RAD").getBreaks()[i])+"</td>\n");
-                    out.write("<td align=\"Right\">"+String.format("%d",InfoLoss.GetECDFcounts("RAD").getCounts()[i])+"</td>\n");
-                    out.write("<td align=\"Right\">"+String.format("%.2f",100.0*((double)InfoLoss.GetECDFcounts("RAD").getCounts()[i]/(double)InfoLoss.GetNumberOfCells()))+"</td></tr>\n");
-                }
-                out.write("<tr><td align=\"Right\">Inf</td>");
-                out.write("<td align=\"Right\">"+String.format("%d",InfoLoss.GetNumberOfCells())+"</td>\n");
-                out.write("<td align=\"Right\">"+String.format("%.2f",100.0)+"</td></tr>\n");
-                out.write("</table><br>\n");
-                out.write("<table>\n");
-                out.write("<tr><th colspan=\"3\" algn=\"Left\"><b>DR</b></th></tr>\n");
-                out.write("<tr><td>Value</td><td>Count</td><td>Fraction (%)</td></tr>\n");
-                for (i=0;i<InfoLoss.GetECDFcounts("DR").getBreaks().length;i++){
-                    out.write("<tr><td align=\"Right\">"+String.format("%.2f",InfoLoss.GetECDFcounts("DR").getBreaks()[i])+"</td>\n");
-                    out.write("<td align=\"Right\">"+String.format("%d",InfoLoss.GetECDFcounts("DR").getCounts()[i])+"</td>\n");
-                    out.write("<td align=\"Right\">"+String.format("%.2f",100.0*((double)InfoLoss.GetECDFcounts("DR").getCounts()[i]/(double)InfoLoss.GetNumberOfCells()))+"</td></tr>\n");
-                }
-                out.write("<tr><td align=\"Right\">Inf</td>");
-                out.write("<td align=\"Right\">"+String.format("%d",InfoLoss.GetNumberOfCells())+"</td>\n");
-                out.write("<td align=\"Right\">"+String.format("%.2f",100.0)+"</td></tr>\n");                
-                out.write("</table>\n");
-                out.write("<p>\n");
+                // Print InformationLoss calculated over NON_EMPTY cells: UseEmpty = false
+                WriteAdditionalInfoLoss(out,tableSet.GetCKMInfoLoss(),reportfile,false);
+                // Print InformationLoss calculated over ALL cells: UseEmpty = true
+                WriteAdditionalInfoLoss(out,tableSet.GetCKMInfoLoss(),reportfile,true);
             }
   //If SuperCross Then GoTo EINDE
          
@@ -1100,7 +1047,7 @@ public class SaveTable {
             out.write("</body>\n");
             out.write("</html\n");  
             out.close();
-        }catch (Exception ex) { 
+        }catch (Exception ex) { JOptionPane.showMessageDialog(null, ex.getMessage());
         }
     }
 
@@ -1193,4 +1140,143 @@ public class SaveTable {
         return hs;
     }
 
+    private static void WriteAdditionalInfoLoss(BufferedWriter out, CKMInfoLoss InfoLoss, String report, boolean UseEmpty){
+        String hs;
+        String AD, RAD, DR;
+        int i, counts, totalcount;
+        if (UseEmpty){ // All cells
+            AD = "AD";
+            RAD= "RAD";
+            DR = "DR";
+        }
+        else{ // Non-empty cells
+            AD = "ADnonempty";
+            RAD = "RADnonempty";
+            DR = "DRnonempty";
+        }
+        try{
+                if (UseEmpty) out.write("<h2><b>Additional information loss measures, calculated over all cells</b></h2>\n");
+                else out.write("<h2><b>Additional information loss measures, calculated over non-empty cells</b></h2>\n");
+                
+                out.write("<table>\n");
+                out.write("<tr><th align=\"Left\">AD</th><td>Absolute Difference</td><td>|pert - orig|</td></tr>\n");
+                out.write("<tr><th align=\"Left\">RAD</th><td>Relative Absolute Difference</td><td>|pert - orig|/orig</td></tr>\n");
+                out.write("<tr><th align=\"Left\">DR</th><td>Absolute Difference of square Roots</td><td>|sqrt(pert) - sqrt(orig)|</td></tr>\n");
+                out.write("</table>\n");
+                out.write("<p>\n");
+                
+                out.write("<b>Descriptives</b><br>\n");
+                out.write("<table>\n");
+                out.write("<tr><td></td><th>AD</th><th>RAD</th><th>DR</th></tr>\n");
+                out.write("<tr><td>Mean</td>\n");
+                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMean(AD))+"</td>");
+                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMean(RAD))+"</td>");
+                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMean(DR))+"</td></tr>\n");
+                out.write("<tr><td>Median</td>\n");
+                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMedian(AD))+"</td>");
+                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMedian(RAD))+"</td>");
+                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMedian(DR))+"</td></tr>\n");
+                out.write("<tr><td>Max</td>\n");
+                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMaxs(AD))+"</td>");
+                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMaxs(RAD))+"</td>");
+                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMaxs(DR))+"</td></tr>\n");
+                out.write("</table><br>\n");
+                
+                out.write("<b>Percentiles</b><br>\n");
+                String[] Percents = {"P10","P20","P30","P40","P50","P60","P70","P80","P90","P95","P99"};
+                out.write("<table>\n");
+                out.write("<tr><td></td><th>AD</th><th>RAD</th><th>DR</th></tr>\n");
+                for (i=0;i<Percents.length;i++){
+                    out.write("<tr><td>"+Percents[i]+"</td>");
+                    out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetPercentiles(AD)[i])+"</td>");
+                    out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetPercentiles(RAD)[i])+"</td>");
+                    out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetPercentiles(DR)[i])+"</td></tr>\n");
+                }
+                out.write("</table>\n");
+                out.write("<p>\n");
+                
+                hs = report.substring(0, report.length()-5);
+                double step = UseEmpty ? 1.0/InfoLoss.GetNumberOfCells() : 1.0/(InfoLoss.GetNumberOfCells() - InfoLoss.GetNumberOfEmpty());
+                
+                ECDFGraphBuilder builder = new ECDFGraphBuilder();
+                ChartPanel cp = UseEmpty ? builder.CreateChart("AD", InfoLoss.GetDiffs("AD"), step) :
+                                    builder.CreateChart("AD", Arrays.copyOfRange(InfoLoss.GetDiffs("AD"),InfoLoss.GetNumberOfEmpty(),InfoLoss.GetDiffs("AD").length), step);
+                ChartUtilities.saveChartAsPNG(new File(hs+"_ECDF_"+AD+".png"), cp.getChart(), 600, 300);
+                
+                cp = UseEmpty ? builder.CreateChart("RAD", InfoLoss.GetDiffs("RAD"), step) :
+                                    builder.CreateChart("RAD", Arrays.copyOfRange(InfoLoss.GetDiffs("RAD"),InfoLoss.GetNumberOfEmpty(),InfoLoss.GetDiffs("AD").length), step);
+                ChartUtilities.saveChartAsPNG(new File(hs+"_ECDF_"+RAD+".png"),cp.getChart(), 600, 300);
+                
+                cp = UseEmpty ? builder.CreateChart("DR", InfoLoss.GetDiffs("DR"), step) :
+                                    builder.CreateChart("DR", Arrays.copyOfRange(InfoLoss.GetDiffs("DR"),InfoLoss.GetNumberOfEmpty(),InfoLoss.GetDiffs("AD").length), step);
+                ChartUtilities.saveChartAsPNG(new File(hs+"_ECDF_"+DR+".png"),cp.getChart(), 600, 300);
+                
+                hs = hs.substring(hs.lastIndexOf("\\")+1,hs.length());
+                
+                out.write("<b>Empirical Cumulative Distribution Functions (ECDF)</b><br>\n");
+                out.write("Number and fraction of cells with Difference less than or equal to Value<br>\n");
+                out.write("<div>\n<div style=\"float:left\">\n");
+                out.write("<table>\n");
+                out.write("<tr><th colspan=\"3\" algn=\"Left\"><b>AD</b></th></tr>\n");
+                out.write("<tr><td>Value</td><td>Count</td><td>Fraction (%)</td></tr>\n");
+
+                totalcount = UseEmpty ? InfoLoss.GetNumberOfCells() : InfoLoss.GetNumberOfCells() - InfoLoss.GetNumberOfEmpty();
+                
+                for (i=0;i<InfoLoss.GetECDFcounts("AD").getBreaks().length;i++){
+                    out.write("<tr><td align=\"Right\">"+String.format("%.2f",InfoLoss.GetECDFcounts("AD").getBreaks()[i])+"</td>");
+                    counts = UseEmpty ? InfoLoss.GetECDFcounts("AD").getCounts()[i] : InfoLoss.GetECDFcounts("AD").getCounts()[i] - InfoLoss.GetNumberOfEmpty();
+                    out.write("<td align=\"Right\">"+String.format("%d", counts) + "</td>");
+                    out.write("<td align=\"Right\">"+String.format("%.2f",100.0*((double)counts/(double)totalcount))+"</td></tr>\n");
+                }
+                out.write("<tr><td align=\"Right\">Inf</td>");
+                out.write("<td align=\"Right\">"+String.format("%d",totalcount)+"</td>");
+                out.write("<td align=\"Right\">"+String.format("%.2f",100.0)+"</td></tr>\n");
+                out.write("</table>\n");
+                out.write("</div>\n");
+                out.write("<div>\n");
+                out.write("<img border=\"0\" src=\""+hs+"_ECDF_"+AD+".png\" width=\"600\" height=\"300\"/>\n");
+                out.write("</div></div><br><br>\n");
+                
+                out.write("<div>\n<div style=\"float:left\">\n");                
+                out.write("<table>\n");
+                out.write("<tr><th colspan=\"3\" algn=\"Left\"><b>RAD</b></th></tr>\n");
+                out.write("<tr><td>Value</td><td>Count</td><td>Fraction (%)</td></tr>\n");
+                for (i=0;i<InfoLoss.GetECDFcounts("RAD").getBreaks().length;i++){
+                    out.write("<tr><td align=\"Right\">"+String.format("%.2f",InfoLoss.GetECDFcounts("RAD").getBreaks()[i])+"</td>");
+                    counts = UseEmpty ? InfoLoss.GetECDFcounts("RAD").getCounts()[i] : InfoLoss.GetECDFcounts("RAD").getCounts()[i] - InfoLoss.GetNumberOfEmpty();
+                    out.write("<td align=\"Right\">"+String.format("%d",counts)+"</td>");
+                    out.write("<td align=\"Right\">"+String.format("%.2f",100.0*((double)counts/(double)totalcount))+"</td></tr>\n");
+                }
+                out.write("<tr><td align=\"Right\">Inf</td>");
+                out.write("<td align=\"Right\">"+String.format("%d",totalcount)+"</td>");
+                out.write("<td align=\"Right\">"+String.format("%.2f",100.0)+"</td></tr>\n");
+                out.write("</table>\n");
+                out.write("</div>\n");
+                out.write("<div>\n");
+                out.write("<img border=\"0\" src=\""+hs+"_ECDF_"+RAD+".png\" width=\"600\" height=\"300\"/>\n");
+                out.write("</div></div><br><br>\n");
+                
+                out.write("<div>\n<div style=\"float:left\">\n");                
+                out.write("<table>\n");
+                out.write("<tr><th colspan=\"3\" algn=\"Left\"><b>DR</b></th></tr>\n");
+                out.write("<tr><td>Value</td><td>Count</td><td>Fraction (%)</td></tr>\n");
+                for (i=0;i<InfoLoss.GetECDFcounts("DR").getBreaks().length;i++){
+                    out.write("<tr><td align=\"Right\">"+String.format("%.2f",InfoLoss.GetECDFcounts("DR").getBreaks()[i])+"</td>");
+                    counts = UseEmpty ? InfoLoss.GetECDFcounts("DR").getCounts()[i] : InfoLoss.GetECDFcounts("DR").getCounts()[i] - InfoLoss.GetNumberOfEmpty();
+                    out.write("<td align=\"Right\">"+String.format("%d",counts)+"</td>");
+                    out.write("<td align=\"Right\">"+String.format("%.2f",100.0*((double)counts/(double)totalcount))+"</td></tr>\n");
+                }
+                out.write("<tr><td align=\"Right\">Inf</td>");
+                out.write("<td align=\"Right\">"+String.format("%d",totalcount)+"</td>");
+                out.write("<td align=\"Right\">"+String.format("%.2f",100.0)+"</td></tr>\n");                
+                out.write("</table>\n");
+                out.write("</div>\n");
+                out.write("<div>\n");
+                out.write("<img border=\"0\" src=\""+hs+"_ECDF_"+DR+".png\" width=\"600\" height=\"300\"/>\n");
+                out.write("</div></div><br><br>\n");
+                out.write("<p>\n");
+        }
+        catch(Exception ex){}
+    }
+    
 }

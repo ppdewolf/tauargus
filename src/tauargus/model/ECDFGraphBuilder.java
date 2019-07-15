@@ -37,7 +37,7 @@ public class ECDFGraphBuilder {
     int numberXsteps = 10;
     
     public ChartPanel CreateChart(String Name, double[] X, double increment){
-     
+        
         JFreeChart chart = ChartFactory.createXYLineChart(
                             "ECDF of " + Name, //chartTitle
                             "",                //xAxisLabel

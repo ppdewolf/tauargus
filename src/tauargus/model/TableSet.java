@@ -2431,7 +2431,7 @@ if (Application.isProtectCoverTable()){
     // Calculates mean 
     public void CalculateCKMInfoLoss(){
         final double[] percs = new double[]{0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95,0.99};
-        final double[] RADbreaks = new double[]{0.0,0.02,0.05,0.1,0.2,0.3,0.4,0.5,1.0};
+        final double[] RADDRbreaks = new double[]{0.0,0.02,0.05,0.1,0.2,0.3,0.4,0.5,1.0};
         final double[] ADbreaks;
         int nFalseZeros = 0;
         int nFalseNonzeros = 0;
@@ -2442,7 +2442,7 @@ if (Application.isProtectCoverTable()){
         double[] AD = new double[this.numberOfCells()];
         double[] RAD = new double[this.numberOfCells()];
         double[] DR = new double[this.numberOfCells()];
-
+        
         // including empty cells
         for (int i = 0; i < nExpVar; i++) {
             dimArray[i] = 0;
@@ -2456,7 +2456,7 @@ if (Application.isProtectCoverTable()){
             if ((Math.abs(cell.response) <= EPSILON) && (Math.abs(cell.CKMValue) > EPSILON)) nFalseNonzeros++;
             
             AD[j] = Math.abs(cell.CKMValue - cell.response);
-            // If cell is empty, it is not perturbed by default
+            // If cell is empty, it is not perturbed by default in frequency count tables, using standard CKM
             if (cell.status==CellStatus.EMPTY) RAD[j] = 0;
             else {
                 if (Math.abs(cell.response) <= EPSILON){ // original cell value is (close to) zero
@@ -2477,12 +2477,18 @@ if (Application.isProtectCoverTable()){
         }
         
         this.InfoLoss.SetNumberOfCells(this.numberOfCells());
+        this.InfoLoss.SetNumberOfEmpty((int) this.numberOfEmpty());
         this.InfoLoss.SetFalseZeros(nFalseZeros);
         this.InfoLoss.SetFalseNonzeros(nFalseNonzeros);
        
         this.InfoLoss.SetMean("AD",DoubleStream.of(AD).average().getAsDouble());
         this.InfoLoss.SetMean("RAD",DoubleStream.of(RAD).average().getAsDouble());
         this.InfoLoss.SetMean("DR",DoubleStream.of(DR).average().getAsDouble());
+        
+        double multiplier = ((double) this.numberOfCells())/(this.numberOfCells() - this.numberOfEmpty());
+        this.InfoLoss.SetMean("ADnonempty",this.InfoLoss.GetMean("AD")*multiplier);
+        this.InfoLoss.SetMean("RADnonempty",this.InfoLoss.GetMean("RAD")*multiplier);
+        this.InfoLoss.SetMean("DRnonempty",this.InfoLoss.GetMean("DR")*multiplier);
 
         // Sort the values
         Arrays.sort(AD);
@@ -2505,24 +2511,37 @@ if (Application.isProtectCoverTable()){
         }
         
         this.InfoLoss.SetECDFcounts("AD", ECDFcounts(AD,ADbreaks));
-        this.InfoLoss.SetECDFcounts("RAD", ECDFcounts(RAD,RADbreaks));
-        this.InfoLoss.SetECDFcounts("DR", ECDFcounts(DR,RADbreaks));
+        this.InfoLoss.SetECDFcounts("RAD", ECDFcounts(RAD,RADDRbreaks));
+        this.InfoLoss.SetECDFcounts("DR", ECDFcounts(DR,RADDRbreaks));
         
         this.InfoLoss.SetMaxs("AD",AD[AD.length-1]);
         this.InfoLoss.SetMaxs("RAD",RAD[RAD.length-1]);
         this.InfoLoss.SetMaxs("DR",DR[DR.length-1]);
+        this.InfoLoss.SetMaxs("ADnonempty",AD[AD.length-1]);
+        this.InfoLoss.SetMaxs("RADnonempty",RAD[RAD.length-1]);
+        this.InfoLoss.SetMaxs("DRnonempty",DR[DR.length-1]);
 
         this.InfoLoss.SetMins("AD",AD[0]);
         this.InfoLoss.SetMins("RAD",RAD[0]);
         this.InfoLoss.SetMins("DR",DR[0]);
+        // First this.numberOfEmpty() values are zero because of empty cells
+        this.InfoLoss.SetMins("ADnonempty",AD[(int) this.numberOfEmpty()]);
+        this.InfoLoss.SetMins("RADnonempty",RAD[(int) this.numberOfEmpty()]);
+        this.InfoLoss.SetMins("DRnonempty",DR[(int) this.numberOfEmpty()]);
         
         this.InfoLoss.SetMedian("AD",percentiles(AD,0.5)[0]);
         this.InfoLoss.SetMedian("RAD",percentiles(RAD,0.5)[0]);
         this.InfoLoss.SetMedian("DR",percentiles(DR,0.5)[0]);
-
+        this.InfoLoss.SetMedian("ADnonempty",percentiles(Arrays.copyOfRange(AD, (int) this.numberOfEmpty(), AD.length),0.5)[0]);
+        this.InfoLoss.SetMedian("RADnonempty",percentiles(Arrays.copyOfRange(RAD, (int) this.numberOfEmpty(), AD.length),0.5)[0]);
+        this.InfoLoss.SetMedian("DRnonempty",percentiles(Arrays.copyOfRange(DR, (int) this.numberOfEmpty(), AD.length),0.5)[0]);
+        
         this.InfoLoss.SetPercentiles("AD",percentiles(AD,percs));
         this.InfoLoss.SetPercentiles("RAD",percentiles(RAD,percs));
         this.InfoLoss.SetPercentiles("DR",percentiles(DR,percs));
+        this.InfoLoss.SetPercentiles("ADnonempty",percentiles(Arrays.copyOfRange(AD, (int) this.numberOfEmpty(), AD.length),percs));
+        this.InfoLoss.SetPercentiles("RADnonempty",percentiles(Arrays.copyOfRange(RAD, (int) this.numberOfEmpty(), AD.length),percs));
+        this.InfoLoss.SetPercentiles("DRnonempty",percentiles(Arrays.copyOfRange(DR, (int) this.numberOfEmpty(), AD.length),percs));
         
     }
     
@@ -2552,6 +2571,7 @@ if (Application.isProtectCoverTable()){
     }
 
     // Returns number of cells <= threshold
+    // arr[] is sorted array of data
     // breaks is a vector of thresholds
     // Essentially this returns the Empirical Cumulative Distribution Function counts
     private ECDF ECDFcounts(double arr[], double... breaks){

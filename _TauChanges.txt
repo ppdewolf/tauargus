@@ -279,9 +279,20 @@ summary    : Now possible to change ptable in GUI suppress-view
 above released up to version 4.1.14_BETA
 --------------------------------------------------------------
 date       : June 14, 2019
-summary    : Information loss measures added for CKM protecetd tables
+summary    : Information loss measures added for CKM protected tables
 
 above released up to version 4.1.15_BETA
 --------------------------------------------------------------
 date       : June 19, 2019
 summary    : Fixed bug that using request rule in batch mode did not detect use of holdings
+
+date	   : July 4, 2019
+summary    : Some refactoring
+
+date       : July 15, 2019
+summary	   : Fixed bug that shadow variabel and record key could not be first variable in microdata
+	     Added Information Loss over non-empty cells to report file
+	     Added Graphics of ECDF to report file
+
+above released up to version 4.1.16_BETA
+--------------------------------------------------------------

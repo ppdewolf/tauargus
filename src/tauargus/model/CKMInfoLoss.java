@@ -33,11 +33,15 @@ public class CKMInfoLoss{
     private int false_zeros;
     private int false_nonzeros;
     private int numberofcells;
+    private int numberofempty;
     
     private void Initiate(TreeMap<String,Double> SDMap){
         SDMap.put("AD", 0.0);
         SDMap.put("RAD", 0.0);
         SDMap.put("DR", 0.0);
+        SDMap.put("ADnonempty",0.0);
+        SDMap.put("RADnonempty",0.0);
+        SDMap.put("DRnonempty",0.0);
     }
 
     public CKMInfoLoss(){
@@ -71,6 +75,14 @@ public class CKMInfoLoss{
     
     public int GetNumberOfCells(){
         return this.numberofcells;
+    }
+
+    public void SetNumberOfEmpty(int n){
+        this.numberofempty = n;
+    }
+    
+    public int GetNumberOfEmpty(){
+        return this.numberofempty;
     }
     
     public void SetECDFcounts(String Name, ECDF ecdf){
