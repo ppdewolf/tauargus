@@ -87,21 +87,21 @@ public class ECDFGraphBuilder {
     
     private XYDataset createDataset(double[] X, double increment) {
         int nX = X.length-1;
-        int start_i = last(X, 0, nX, 0.0, nX + 1);
+        int start_i = last(X, 0, nX, 0.0, nX + 1); // index of last occurence of value 0.0
+                                                   // i.e., number of occurrences of 0.0 is (start_i + 1)
         
         XYSeriesCollection dataset = new XYSeriesCollection();
         XYSeries series = new XYSeries("1");
         
         series.add(0.0,0.0);
-        series.add(0.0,start_i*increment);
-        for (int i=start_i;i<nX-1;i++){
+        for (int i=start_i;i<nX;i++){
             if (X[i]<X[i+1]){
-                series.add(X[i], i*increment);
-                series.add(X[i+1], i*increment);
+                series.add(X[i], (i + 1)*increment);
+                series.add(X[i+1], (i + 1)*increment);
             }
         }
-        series.add(X[nX],nX*increment);
-        series.add(X[nX]+(X[nX]-X[0])/(2*numberXsteps),nX*increment);
+        series.add(X[nX],(nX + 1)*increment);
+        series.add(X[nX]+(X[nX]-X[0])/(2*numberXsteps),(nX + 1)*increment);
       
         dataset.addSeries(series);
       
