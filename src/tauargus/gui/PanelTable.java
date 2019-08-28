@@ -2110,6 +2110,12 @@ public class PanelTable extends javax.swing.JPanel {
                 JOptionPane.showMessageDialog(null,"The marginal method still has to be implemented");
                 break;
                 case CELLKEY:
+                
+                try{
+                    OptiSuppress.RunCellKeyCont(tableSet, tableSet.cellkeyVar.PTableFileCont);
+                }   
+                catch (Exception ex){};
+                
                 if (tableSet.holding){
                     JOptionPane.showMessageDialog(null,"Sorry, Cell Key Method not available when \"holdings\" are used","Warning",JOptionPane.WARNING_MESSAGE);
                     break;

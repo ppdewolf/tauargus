@@ -66,13 +66,31 @@ public class Variable implements Cloneable {
     public boolean hasDistanceFunction;
     public int[] distanceFunction;
     public String codeListFile = "";
-    public String PTableFile = "";
     public int hierarchical;
     public int hierLevelsSum;
     public int[] hierLevels;
     public String hierFileName = "";
     public String leadingString = ".";
 
+    // Only used by variable of type 'RecordKey'
+    public String PTableFile = "";      // For CKM on count tables
+    public String PTableFileCont = "";  // For CKM on magnitude tables
+    public String PTableFileSep = "";   // For CKM on magnitude tables
+    
+    // Used for CKM
+    public boolean zerosincellkey = false; // default: false
+    public boolean apply_even_odd = false; // default: false
+    public String CKMType = "N";           // default: not allowed to apply CKM
+    public int CKMTopK = 1;                // default: only largest observation used, topK = T = 1
+    public boolean CKMseparation = false;  // default: small values not treated differently
+    public double CKMm1squared = 0;        // default: no variance for small values
+    public String CKMscaling = "N";        // default: no flexfucntion approach
+    public double CKMsigma0 = 1;           // default for parameters sigma0, sigma1, xstar, q, epsilon2, epsilon3, ..., epsilonT
+    public double CKMsigma1 = 1;           // default for parameters sigma0, sigma1, xstar, q, epsilon2, epsilon3, ..., epsilonT
+    public double CKMxstar = 25;
+    public double CKMq = 3;
+    public double[] CKMepsilon;
+            
     // Only used by variables of type 'Request'
     public String[] requestCode;
 

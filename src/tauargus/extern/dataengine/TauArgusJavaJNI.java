@@ -84,6 +84,7 @@ public class TauArgusJavaJNI {
   public final static native double TauArgus_GetMinimumCellValue(long jarg1, TauArgus jarg1_, int jarg2, double[] jarg3);
   public final static native boolean TauArgus_SetProtectionLevelsForResponseTable(long jarg1, TauArgus jarg1_, int jarg2, int[] jarg3, double jarg4, double jarg5);
   public final static native String TauArgus_GetErrorString(long jarg1, TauArgus jarg1_, int jarg2);
+  public final static native int TauArgus_SetCellKeyValuesFreq(long jarg1, TauArgus jarg1_, int jarg2, String jarg3, int[] jarg4, int[] jarg5);
   public final static native int TauArgus_SetCellKeyValues(long jarg1, TauArgus jarg1_, int jarg2, String jarg3, int[] jarg4, int[] jarg5);
 
   public static void SwigDirector_IProgressListener_UpdateProgress(IProgressListener jself, int Perc) {

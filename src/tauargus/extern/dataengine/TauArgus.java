@@ -311,6 +311,10 @@ public class TauArgus {
     return TauArgusJavaJNI.TauArgus_GetErrorString(swigCPtr, this, ErrorNumber);
   }
 
+  public int SetCellKeyValuesFreq(int TabNo, String PTableFile, int[] MinDiff, int[] MaxDiff) {
+    return TauArgusJavaJNI.TauArgus_SetCellKeyValuesFreq(swigCPtr, this, TabNo, PTableFile, MinDiff, MaxDiff);
+  }
+
   public int SetCellKeyValues(int TabNo, String PTableFile, int[] MinDiff, int[] MaxDiff) {
     return TauArgusJavaJNI.TauArgus_SetCellKeyValues(swigCPtr, this, TabNo, PTableFile, MinDiff, MaxDiff);
   }

@@ -1697,7 +1697,14 @@ public class OptiSuppress {
                                                   "The problem might be infeasible"); }
     }
 
-    public static boolean RunCellKey (TableSet tableSet, String PTableFile) throws ArgusException, FileNotFoundException, IOException{
+    
+    public static boolean RunCellKeyCont(TableSet tableSet, String PTableFile)throws ArgusException, FileNotFoundException, IOException{
+        int getmin[]={0}, getmax[]={0};
+        int result2 = tauArgus.SetCellKeyValues(tableSet.index,tableSet.cellkeyVar.metadata.getFilePath(PTableFile),getmin,getmax);
+        return true;
+    }
+    
+    public static boolean RunCellKey(TableSet tableSet, String PTableFile) throws ArgusException, FileNotFoundException, IOException{
         // Assumptions on format of p-table:
         // i runs from 0 to maxNi
         // for each i map of pij for which pij > 0
@@ -1706,7 +1713,7 @@ public class OptiSuppress {
         long startTime = new Date().getTime();
         int getmin[]={0}, getmax[]={0};
         int tmp[]={0};
-        int result = tauArgus.SetCellKeyValues(tableSet.index, tableSet.cellkeyVar.metadata.getFilePath(PTableFile), getmin, getmax);
+        int result = tauArgus.SetCellKeyValuesFreq(tableSet.index, tableSet.cellkeyVar.metadata.getFilePath(PTableFile), getmin, getmax);
         tableSet.minDiff = getmin[0];
         tableSet.maxDiff = getmax[0];
         
@@ -1714,7 +1721,7 @@ public class OptiSuppress {
         tableSet.CalculateCKMInfoLoss();
         
         if (result == -9 || result == -1){ // error 
-            throw new ArgusException("Some error in call of SetCellKeyValues(...)");
+            throw new ArgusException("Some error in call of SetCellKeyValuesFreq(...)");
         }
         long endTime = new Date().getTime();
         long diff = (endTime - startTime)/1000;

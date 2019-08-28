@@ -364,8 +364,124 @@ public class Metadata implements Cloneable {
                         }
                         variable.type = Type.RECORD_KEY;
                         break;
+                    case "<PFILE_FREQ>":
                     case "<PFILE>":
                         variable.PTableFile = tokenizer.nextToken();
+                        break;
+                    case "<PFILE_CONT>":
+                        variable.PTableFileCont = tokenizer.nextToken();
+                        break;
+                    case "<PFILE_SEP>":
+                        variable.PTableFileSep = tokenizer.nextToken();
+                        break;
+                    case "<CKM>":
+                        if (!variable.isNumeric()) throw new ArgusException("<CKM> tag only allowed for numeric variables.");
+                        
+                        hs = tokenizer.nextField("(").toUpperCase();
+                        switch(hs){
+                            case "N":
+                            case "M":
+                            case "D":
+                            case "V":
+                                variable.CKMType=hs;
+                                break;
+                            case "T":
+                                variable.CKMType=hs;
+                                try{
+                                    variable.CKMTopK = Integer.parseInt(tokenizer.nextField(")"));
+                                }
+                                catch (NumberFormatException ex){
+                                    throw new ArgusException("topK in <CKM> T(topK) should be integer\n" + ex.getMessage());
+                                }
+                                break;
+                            default:
+                                throw new ArgusException("Unknown type <CKM> " + hs + " for variable " + variable.name);
+                        }
+                        break;
+                    case "<INCLUDEZEROS>":
+                        if (variable.isNumeric()) {
+                                variable.zerosincellkey = tokenizer.nextToken().equals("Y");
+                        }
+                        else{
+                            throw new ArgusException("<INCLUDEZEROS> only allowed for numeric variables.");
+                        }
+                        break;
+                    case "<PARITY>":
+                        if (variable.isNumeric()) {
+                                variable.apply_even_odd = ("Y".equals(tokenizer.nextToken()));
+                        }
+                        else{
+                            throw new ArgusException("<INCLUDEZEROS> only allowed for numeric variables.");
+                        }
+                        break;
+                    case "<SCALING>": // Can much nicer and needs exception cheking!
+                        if (!variable.isNumeric()) throw new ArgusException("<SCALING> tag only allowed for numeric variables.");
+                        hs = tokenizer.nextField("(").toUpperCase();
+                        if (!(hs.equals("N") || hs.equals("F"))){
+                            throw new ArgusException("Unknown type <SCALING> " + hs + " for variable " + variable.name);
+                        }
+                        else{
+                            try{  
+                                variable.CKMscaling = hs;
+                                int T = variable.CKMTopK;
+                                variable.CKMepsilon = new double[T];
+                                variable.CKMepsilon[0] = 1.0;
+                                if (variable.CKMscaling.equals("F")){
+                                    hs = tokenizer.nextField(",");
+                                    variable.CKMsigma0 = Double.parseDouble(hs);
+                                    hs = tokenizer.nextField(",");
+                                    variable.CKMsigma1 = Double.parseDouble(hs);
+                                    hs = tokenizer.nextField(",");
+                                    variable.CKMxstar = Double.parseDouble(hs);
+                                    if (T>=2){
+                                        hs = tokenizer.nextField(",");
+                                        variable.CKMq = Double.parseDouble(hs);
+                                        for (int i=2; i<T;i++){
+                                            hs = tokenizer.nextField(",");
+                                            variable.CKMepsilon[i-1] = Double.parseDouble(hs);
+                                        }
+                                        hs = tokenizer.nextField(")");
+                                        variable.CKMepsilon[T-1] = Double.parseDouble(hs);
+                                    }
+                                    else{
+                                        hs = tokenizer.nextField(")");
+                                        variable.CKMq = Double.parseDouble(hs);
+                                    }
+                                }
+                                if (variable.CKMscaling.equals("N")){
+                                    if (T>=2){
+                                        hs = tokenizer.nextField(",");
+                                        variable.CKMsigma1 = Double.parseDouble(hs);
+                                        for (int i=2; i<T;i++){
+                                            hs = tokenizer.nextField(",");
+                                            variable.CKMepsilon[i-1] = Double.parseDouble(hs);
+                                        }   
+                                        hs = tokenizer.nextField(")");
+                                        variable.CKMepsilon[T-1] = Double.parseDouble(hs);
+                                    }
+                                    else{
+                                        hs = tokenizer.nextField(")");
+                                        variable.CKMsigma1 = Double.parseDouble(hs);
+                                    }
+                                }
+                            }
+                            catch(Exception ex){
+                                throw new ArgusException("Exception when reading <SCALING> parameters:\n"+ex.getMessage());
+                            }
+                        }
+                        break;
+                    case "<SEPARATION>":
+                        if (!variable.isNumeric()) throw new ArgusException("<SEPARATION> tag only allowed for numeric variables.");
+                        hs = tokenizer.nextField("(").toUpperCase();
+                        variable.CKMseparation = hs.equals("Y");
+                        if (variable.CKMseparation){
+                            try{
+                                variable.CKMm1squared = Double.parseDouble(tokenizer.nextField(")"));
+                            }
+                            catch (NumberFormatException ex){
+                                throw new ArgusException("value in <SEPARATION> Y(value) should be double\n" + ex.getMessage());
+                            }
+                        }
                         break;
                     default:
                         throw new ArgusException("Unknown keyword (" + token + ") in line " + tokenizer.getLineNumber());
