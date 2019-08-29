@@ -923,6 +923,7 @@ public class TableSet {
 
         if (!tauArgus.SetTable(index, varlist.length, varlist, isFrequencyTable(), 
                                 indexOfResponseVariable(), indexOfShadowVariable(), indexOfCostVariable(), indexOfCellKeyVariable(), 
+                                respVar.CKMType, respVar.CKMTopK,
                                 lambda, maxScaleCost, 0, missingIsSafe)) {
             throw new ArgusException("Error in specifying table " + index);
         }

@@ -89,7 +89,7 @@ public class Variable implements Cloneable {
     public double CKMsigma1 = 1;           // default for parameters sigma0, sigma1, xstar, q, epsilon2, epsilon3, ..., epsilonT
     public double CKMxstar = 25;
     public double CKMq = 3;
-    public double[] CKMepsilon;
+    public double[] CKMepsilon = {1};      // default epsilon1 = 1, epsilon2, ..., epsilonT are set by user
             
     // Only used by variables of type 'Request'
     public String[] requestCode;
@@ -402,6 +402,15 @@ public class Variable implements Cloneable {
         hash = 89 * hash + Arrays.deepHashCode(this.missing);
         hash = 89 * hash + Objects.hashCode(this.totCode);
         hash = 89 * hash + Objects.hashCode(this.PTableFile);
+        hash = 89 * hash + Objects.hashCode(this.PTableFileCont);
+        hash = 89 * hash + Objects.hashCode(this.PTableFileSep);
+        hash = 89 * hash + (this.zerosincellkey ? 1 : 0);
+        hash = 89 * hash + (this.apply_even_odd ? 1 : 0);
+        hash = 89 * hash + Objects.hashCode(this.CKMType);
+        hash = 89 * hash + this.CKMTopK;
+        hash = 89 * hash + (this.CKMseparation ? 1 : 0);
+        hash = 89 * hash + Objects.hashCode(this.CKMscaling);
+
         return hash;
     }
 
@@ -420,6 +429,9 @@ public class Variable implements Cloneable {
         }
         if (missing != null) {
             variable.missing = (String[])missing.clone();
+        }
+        if (CKMepsilon != null){
+            variable.CKMepsilon = (double[])CKMepsilon.clone();
         }
         variable.originalVariable = this;
         return variable;

@@ -1697,10 +1697,28 @@ public class OptiSuppress {
                                                   "The problem might be infeasible"); }
     }
 
-    
-    public static boolean RunCellKeyCont(TableSet tableSet, String PTableFile)throws ArgusException, FileNotFoundException, IOException{
+    public static boolean RunCellKeyCont(TableSet tableSet, String PTableFileCont, String PTableFileSep, Variable var)throws ArgusException, FileNotFoundException, IOException{
+        long startTime = new Date().getTime();
         int getmin[]={0}, getmax[]={0};
-        int result2 = tauArgus.SetCellKeyValues(tableSet.index,tableSet.cellkeyVar.metadata.getFilePath(PTableFile),getmin,getmax);
+
+        int result = tauArgus.SetCellKeyValuesCont(tableSet.index, tableSet.cellkeyVar.metadata.getFilePath(PTableFileCont), 
+                        tableSet.cellkeyVar.metadata.getFilePath(PTableFileSep), var.CKMType, var.CKMTopK,
+                        var.zerosincellkey, var.apply_even_odd, var.CKMseparation, var.CKMm1squared, var.CKMscaling,
+                        var.CKMsigma0, var.CKMsigma1, var.CKMxstar, var.CKMq, var.CKMepsilon);
+
+        if (result == -9 || result == -1){ // error 
+            throw new ArgusException("Some error in call of SetCellKeyValuesCont(...)");
+        }
+
+        long endTime = new Date().getTime();
+        long diff = (endTime - startTime)/1000;
+        tableSet.processingTime = (int)diff; 
+        
+        tableSet.suppressINFO = "Cell Key Method has been applied<br>";
+        tableSet.suppressed = TableSet.SUP_CKM;
+        tableSet.ckmProtect = true;
+        batch.reportProgress("The Cell Key Method successfully completed in " + tableSet.processingTime + " seconds");
+        
         return true;
     }
     

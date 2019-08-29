@@ -1839,7 +1839,7 @@ public class PanelTable extends javax.swing.JPanel {
         }
 
         switch(Soort) {
-            case ROUNDING:
+        case ROUNDING:
             if (Application.solverSelected == Application.SOLVER_CPLEX){
                 JOptionPane.showMessageDialog(null, "Whether controlled rounding can be used when Cplex is selected as solver, depends on your specific license",
                     "", JOptionPane.ERROR_MESSAGE);
@@ -1897,7 +1897,7 @@ public class PanelTable extends javax.swing.JPanel {
                     }*/
                 }
                 break;
-                case CTA:  //do CTA
+            case CTA:  //do CTA
                 final int i=JOptionPane.showConfirmDialog(parentFrame, "Do you prefer to use the expert version?", "Select CTA version", JOptionPane.YES_NO_CANCEL_OPTION);
                 if ((i == JOptionPane.YES_OPTION)||(i == JOptionPane.NO_OPTION) ){
                     new Thread(){
@@ -1918,7 +1918,7 @@ public class PanelTable extends javax.swing.JPanel {
                     }.start();
                 }
                 break;
-                case UWE:
+            case UWE:
                 DialogModularParameters uweParams = new DialogModularParameters(parentFrame, tableSet, false, true);
                 if (uweParams.showDialog() == DialogModularParameters.APPROVE_OPTION){
                     new Thread(){
@@ -1940,7 +1940,7 @@ public class PanelTable extends javax.swing.JPanel {
                     }.start();
                 }
                 break;
-                case GHMITER:
+            case GHMITER:
                 DialogHypercubeParameters paramsG = new DialogHypercubeParameters(parentFrame, true);
                 if (paramsG.showDialog(tableSet) == DialogHypercubeParameters.APPROVE_OPTION) {
                     new Thread(){
@@ -1996,7 +1996,7 @@ public class PanelTable extends javax.swing.JPanel {
                 }
                 break;
                 */
-                case HITAS:
+            case HITAS:
                 DialogModularParameters params = new DialogModularParameters(parentFrame, tableSet, false, true);
                 if (params.showDialog() == DialogModularParameters.APPROVE_OPTION){
                     final SwingWorker <Integer, Void> worker = new ProgressSwingWorker<Integer, Void>(ProgressSwingWorker.DOUBLE,"Modular approach") {
@@ -2030,7 +2030,7 @@ public class PanelTable extends javax.swing.JPanel {
                     worker.execute();
                 }
                 break;
-                case OPTIMAL:
+            case OPTIMAL:
                 /*               params = new DialogModularParameters(parentFrame, tableSet, true, true);
                 params.showDialog();
                 try{
@@ -2080,7 +2080,7 @@ public class PanelTable extends javax.swing.JPanel {
                     worker.execute();
                 }
                 break;
-                case NETWORK:
+            case NETWORK:
                 try { OptiSuppress.TestNetwork(tableSet);
                 }
                 catch (ArgusException ex){
@@ -2106,31 +2106,35 @@ public class PanelTable extends javax.swing.JPanel {
                     }.start();
                 }
                 break;
-                case MARGINAL:
+            case MARGINAL:
                 JOptionPane.showMessageDialog(null,"The marginal method still has to be implemented");
                 break;
-                case CELLKEY:
-                
-                try{
-                    OptiSuppress.RunCellKeyCont(tableSet, tableSet.cellkeyVar.PTableFileCont);
-                }   
-                catch (Exception ex){};
-                
+            case CELLKEY:
                 if (tableSet.holding){
                     JOptionPane.showMessageDialog(null,"Sorry, Cell Key Method not available when \"holdings\" are used","Warning",JOptionPane.WARNING_MESSAGE);
                     break;
                 }
-                if (tableSet.respVar.type != Type.FREQUENCY){
-                    JOptionPane.showMessageDialog(null,"Sorry, currently Cell Key Method only imlemented for frequency tables","Warning",JOptionPane.WARNING_MESSAGE);
-                    break;
-                }
+//                if (tableSet.respVar.type != Type.FREQUENCY){
+//                    JOptionPane.showMessageDialog(null,"Sorry, currently Cell Key Method only imlemented for frequency tables","Warning",JOptionPane.WARNING_MESSAGE);
+//                    break;
+//                }
                 try {
                     setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                    if(OptiSuppress.RunCellKey(tableSet, tableSet.cellkeyVar.PTableFile)){
-                        JOptionPane.showMessageDialog(null, "The Cell Key Method has been applied succesfully in " + tableSet.processingTime + " seconds\n");
-                        ((AbstractTableModel)table.getModel()).fireTableDataChanged();
-                        adjustColumnWidths();
-                        updateSuppressButtons();
+                    if (tableSet.respVar.type == Type.FREQUENCY){
+                        if(OptiSuppress.RunCellKey(tableSet, tableSet.cellkeyVar.PTableFile)){
+                            JOptionPane.showMessageDialog(null, "The Cell Key Method has been applied succesfully in " + tableSet.processingTime + " seconds\n");
+                            ((AbstractTableModel)table.getModel()).fireTableDataChanged();
+                            adjustColumnWidths();
+                            updateSuppressButtons();
+                        }
+                    }
+                    else{
+                        if(OptiSuppress.RunCellKeyCont(tableSet, tableSet.cellkeyVar.PTableFileCont, tableSet.cellkeyVar.PTableFileSep, tableSet.respVar)){
+                            JOptionPane.showMessageDialog(null, "The Cell Key Method has been applied succesfully in " + tableSet.processingTime + " seconds\n");
+                            ((AbstractTableModel)table.getModel()).fireTableDataChanged();
+                            adjustColumnWidths();
+                            updateSuppressButtons();
+                        }
                     }
                     setCursor(Cursor.getDefaultCursor());
                 }

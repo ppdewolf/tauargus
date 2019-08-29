@@ -275,7 +275,8 @@ public class TableService {
             int[] expVar = table.indicesOfExplanatoryVariables();
             int requestVariableIndex = metadata.indexOf(Type.REQUEST);
             if (!tauArgus.SetTable(i, expVar.length, expVar, isFreq, table.indexOfResponseVariable(), ish, table.indexOfCostVariable(), 
-                                        table.indexOfCellKeyVariable(), table.lambda, table.maxScaleCost, requestVariableIndex, table.missingIsSafe)) {
+                                        table.indexOfCellKeyVariable(), table.respVar.CKMType, table.respVar.CKMTopK,
+                                        table.lambda, table.maxScaleCost, requestVariableIndex, table.missingIsSafe)) {
                 throw new ArgusException("SetTable went wrong for table" + (i + 1));
             }
             boolean isPiep = table.piepRule[0] || table.piepRule[1];
