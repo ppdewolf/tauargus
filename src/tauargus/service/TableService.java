@@ -218,7 +218,12 @@ public class TableService {
                 variable.inTable = true;
             }
         }
-        tauArgus.CleanAll();
+        try{
+            tauArgus.CleanAll();
+        }
+        catch(Exception ex){
+            throw new ArgusException("Something wrong:\n"+ex.getMessage());
+        }
         IProgressListener progressListener = new IProgressListener() {
             @Override
             public void UpdateProgress(final int percentage) {

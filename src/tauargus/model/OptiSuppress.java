@@ -1702,7 +1702,7 @@ public class OptiSuppress {
         int getmin[]={0}, getmax[]={0};
 
         JOptionPane.showMessageDialog(null,"variable "+var.name+" CKMType "+var.CKMType+" CKMTopK "+var.CKMTopK);
-        
+
         int result = tauArgus.SetCellKeyValuesCont(tableSet.index, tableSet.cellkeyVar.metadata.getFilePath(PTableFileCont), 
                         tableSet.cellkeyVar.metadata.getFilePath(PTableFileSep), var.CKMType, var.CKMTopK,
                         var.zerosincellkey, var.apply_even_odd, var.CKMseparation, var.CKMm1squared, var.CKMscaling,
