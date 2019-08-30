@@ -87,9 +87,9 @@ public class Variable implements Cloneable {
     public String CKMscaling = "N";        // default: no flexfucntion approach
     public double CKMsigma0 = 1;           // default for parameters sigma0, sigma1, xstar, q, epsilon2, epsilon3, ..., epsilonT
     public double CKMsigma1 = 1;           // default for parameters sigma0, sigma1, xstar, q, epsilon2, epsilon3, ..., epsilonT
-    public double CKMxstar = 25;
-    public double CKMq = 3;
-    public double[] CKMepsilon = {1};      // default epsilon1 = 1, epsilon2, ..., epsilonT are set by user
+    public double CKMxstar = 25;           // default for parameters sigma0, sigma1, xstar, q, epsilon2, epsilon3, ..., epsilonT
+    public double CKMq = 3;                // default for parameters sigma0, sigma1, xstar, q, epsilon2, epsilon3, ..., epsilonT
+    public double[] CKMepsilon;            // default for parameters sigma0, sigma1, xstar, q, epsilon2, epsilon3, ..., epsilonT
             
     // Only used by variables of type 'Request'
     public String[] requestCode;
@@ -401,7 +401,7 @@ public class Variable implements Cloneable {
         hash = 89 * hash + Objects.hashCode(this.leadingString);
         hash = 89 * hash + Arrays.deepHashCode(this.missing);
         hash = 89 * hash + Objects.hashCode(this.totCode);
-        hash = 89 * hash + Objects.hashCode(this.PTableFile);
+/*        hash = 89 * hash + Objects.hashCode(this.PTableFile);
         hash = 89 * hash + Objects.hashCode(this.PTableFileCont);
         hash = 89 * hash + Objects.hashCode(this.PTableFileSep);
         hash = 89 * hash + (this.zerosincellkey ? 1 : 0);
@@ -410,7 +410,7 @@ public class Variable implements Cloneable {
         hash = 89 * hash + this.CKMTopK;
         hash = 89 * hash + (this.CKMseparation ? 1 : 0);
         hash = 89 * hash + Objects.hashCode(this.CKMscaling);
-
+*/
         return hash;
     }
 

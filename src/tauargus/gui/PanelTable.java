@@ -2118,30 +2118,32 @@ public class PanelTable extends javax.swing.JPanel {
 //                    JOptionPane.showMessageDialog(null,"Sorry, currently Cell Key Method only imlemented for frequency tables","Warning",JOptionPane.WARNING_MESSAGE);
 //                    break;
 //                }
-                try {
-                    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                    if (tableSet.respVar.type == Type.FREQUENCY){
-                        if(OptiSuppress.RunCellKey(tableSet, tableSet.cellkeyVar.PTableFile)){
-                            JOptionPane.showMessageDialog(null, "The Cell Key Method has been applied succesfully in " + tableSet.processingTime + " seconds\n");
-                            ((AbstractTableModel)table.getModel()).fireTableDataChanged();
-                            adjustColumnWidths();
-                            updateSuppressButtons();
+                new Thread(){
+                    @Override public void run(){
+                        try {
+                            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                            if (tableSet.respVar.type == Type.FREQUENCY){
+                                if(OptiSuppress.RunCellKey(tableSet, tableSet.cellkeyVar.PTableFile)){
+                                    JOptionPane.showMessageDialog(null, "The Cell Key Method has been applied succesfully in " + tableSet.processingTime + " seconds\n");
+                                }
+                            }
+                            else{
+                                if(OptiSuppress.RunCellKeyCont(tableSet, tableSet.cellkeyVar.PTableFileCont, tableSet.cellkeyVar.PTableFileSep, tableSet.respVar)){
+                                    JOptionPane.showMessageDialog(null, "The Cell Key Method has been applied succesfully in " + tableSet.processingTime + " seconds\n");
+                                }
+                            }
+                            setCursor(Cursor.getDefaultCursor());
                         }
-                    }
-                    else{
-                        if(OptiSuppress.RunCellKeyCont(tableSet, tableSet.cellkeyVar.PTableFileCont, tableSet.cellkeyVar.PTableFileSep, tableSet.respVar)){
-                            JOptionPane.showMessageDialog(null, "The Cell Key Method has been applied succesfully in " + tableSet.processingTime + " seconds\n");
-                            ((AbstractTableModel)table.getModel()).fireTableDataChanged();
-                            adjustColumnWidths();
-                            updateSuppressButtons();
+                        catch (ArgusException | IOException ex){
+                            setCursor(Cursor.getDefaultCursor());
+                            JOptionPane.showMessageDialog(null,ex.getMessage());
                         }
+                        ((AbstractTableModel)table.getModel()).fireTableDataChanged();
+                        adjustColumnWidths();
+                        updateSuppressButtons();
                     }
-                    setCursor(Cursor.getDefaultCursor());
-                }
-                catch (ArgusException | IOException ex){
-                    setCursor(Cursor.getDefaultCursor());
-                    JOptionPane.showMessageDialog(null,ex.getMessage());
-                }
+                }.start();
+
                 break;
             }
             tableSet.undoAudit();

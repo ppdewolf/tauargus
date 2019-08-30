@@ -1701,6 +1701,8 @@ public class OptiSuppress {
         long startTime = new Date().getTime();
         int getmin[]={0}, getmax[]={0};
 
+        JOptionPane.showMessageDialog(null,"variable "+var.name+" CKMType "+var.CKMType+" CKMTopK "+var.CKMTopK);
+        
         int result = tauArgus.SetCellKeyValuesCont(tableSet.index, tableSet.cellkeyVar.metadata.getFilePath(PTableFileCont), 
                         tableSet.cellkeyVar.metadata.getFilePath(PTableFileSep), var.CKMType, var.CKMTopK,
                         var.zerosincellkey, var.apply_even_odd, var.CKMseparation, var.CKMm1squared, var.CKMscaling,
@@ -1730,7 +1732,6 @@ public class OptiSuppress {
         // Currently only reading ptable from file as given in metadata is possible
         long startTime = new Date().getTime();
         int getmin[]={0}, getmax[]={0};
-        int tmp[]={0};
         int result = tauArgus.SetCellKeyValuesFreq(tableSet.index, tableSet.cellkeyVar.metadata.getFilePath(PTableFile), getmin, getmax);
         tableSet.minDiff = getmin[0];
         tableSet.maxDiff = getmax[0];

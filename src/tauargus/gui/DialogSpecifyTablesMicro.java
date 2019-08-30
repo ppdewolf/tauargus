@@ -210,7 +210,6 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         checkBoxRequestRule.setEnabled(metadata.containsRequestVariable());
         checkBoxApplyWeights.setEnabled(metadata.containsWeightVariable());
         checkBoxUseHoldingsInfo.setEnabled(metadata.containsHoldingVariable());
-        checkBoxCellKey.setVisible(false);
                 
         //load(new TableSet(metadata));
         if (TableService.numberOfTables()==0)
@@ -748,7 +747,6 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         labelManualSafetyRange = new javax.swing.JLabel();
         textFieldManualSafetyRange = new javax.swing.JTextField();
         labelManualSafetyRangePercentage = new javax.swing.JLabel();
-        checkBoxCellKey = new javax.swing.JCheckBox();
         buttonDeleteTable = new javax.swing.JButton();
         buttonAddTable = new javax.swing.JButton();
         scrollPaneTables = new javax.swing.JScrollPane();
@@ -1526,8 +1524,6 @@ public class DialogSpecifyTablesMicro extends DialogBase {
 
         labelManualSafetyRangePercentage.setText("%");
 
-        checkBoxCellKey.setText("Use Cell-Key");
-
         javax.swing.GroupLayout panelParametersLayout = new javax.swing.GroupLayout(panelParameters);
         panelParameters.setLayout(panelParametersLayout);
         panelParametersLayout.setHorizontalGroup(
@@ -1554,12 +1550,10 @@ public class DialogSpecifyTablesMicro extends DialogBase {
                     .addGroup(panelParametersLayout.createSequentialGroup()
                         .addComponent(panelMinimumFrequency, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(checkBoxMissingSafe, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(checkBoxUseHoldingsInfo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(checkBoxApplyWeights, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addComponent(checkBoxCellKey))))
+                        .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(checkBoxMissingSafe, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(checkBoxUseHoldingsInfo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(checkBoxApplyWeights, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panelParametersLayout.setVerticalGroup(
@@ -1584,9 +1578,7 @@ public class DialogSpecifyTablesMicro extends DialogBase {
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(checkBoxMissingSafe)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(checkBoxUseHoldingsInfo)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(checkBoxCellKey)))
+                                        .addComponent(checkBoxUseHoldingsInfo)))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(panelZero, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1957,30 +1949,11 @@ public class DialogSpecifyTablesMicro extends DialogBase {
             return false;
         }
         
-        if (checkBoxCellKey.isSelected() && checkBoxCellKey.isEnabled())
-        {
-            if (responseVariable != freqVar){
-                JOptionPane.showMessageDialog(this,"Cell Key method currently only available for response variable <freq>");
-                return false;
-            }
-        }
-        
-        if (checkBoxMinimumFrequency.isSelected() && checkBoxCellKey.isEnabled()){
-            if (checkBoxCellKey.isSelected()){
-                JOptionPane.showMessageDialog(this, "When using the Cell Key Method, you should not specify any rule");
-                return false;
-            }
-        }
-        
+       
         // Alleen de freq-regel bij freq-tabellen!!!!
         if (checkBoxDominanceRule.isSelected() || checkBoxPqRule.isSelected() || checkBoxRequestRule.isSelected() || checkBoxZeroUnsafe.isSelected()) {
             if (responseVariable == freqVar) {
-                if (checkBoxCellKey.isSelected() && checkBoxCellKey.isEnabled()){
-                    JOptionPane.showMessageDialog(this, "When using the Cell Key Method, you should not specify any rule");
-                }
-                else{
-                    JOptionPane.showMessageDialog(this, "When using response variable <freq>, dominance rule and p%-rule are not allowed");
-                }
+                JOptionPane.showMessageDialog(this, "When using response variable <freq>, dominance rule and p%-rule are not allowed");
                 return false;
             }
         }
@@ -2166,7 +2139,6 @@ public class DialogSpecifyTablesMicro extends DialogBase {
     private javax.swing.JButton buttonShadowAdd;
     private javax.swing.JButton buttonShadowDelete;
     private javax.swing.JCheckBox checkBoxApplyWeights;
-    private javax.swing.JCheckBox checkBoxCellKey;
     private javax.swing.JCheckBox checkBoxDominanceRule;
     private javax.swing.JCheckBox checkBoxMinimumFrequency;
     private javax.swing.JCheckBox checkBoxMissingSafe;
