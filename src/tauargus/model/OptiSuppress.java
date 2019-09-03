@@ -1701,7 +1701,7 @@ public class OptiSuppress {
         long startTime = new Date().getTime();
         int getmin[]={0}, getmax[]={0};
 
-        JOptionPane.showMessageDialog(null,"variable "+var.name+" CKMType "+var.CKMType+" CKMTopK "+var.CKMTopK);
+        //JOptionPane.showMessageDialog(null,"variable "+var.name+" CKMType "+var.CKMType+" CKMTopK "+var.CKMTopK);
 
         int result = tauArgus.SetCellKeyValuesCont(tableSet.index, tableSet.cellkeyVar.metadata.getFilePath(PTableFileCont), 
                         tableSet.cellkeyVar.metadata.getFilePath(PTableFileSep), var.CKMType, var.CKMTopK,

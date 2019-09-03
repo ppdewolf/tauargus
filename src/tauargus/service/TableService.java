@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import org.apache.commons.lang3.StringUtils;
 import tauargus.extern.dataengine.IProgressListener;
 import tauargus.extern.dataengine.TauArgus;
@@ -297,7 +298,10 @@ public class TableService {
             if (frequencyMarge[0] < frequencyMarge[1] && table.holding && table.minFreq[1] > 0) {
                 frequencyMarge[0] = frequencyMarge[1];
             }
-            if (!tauArgus.SetTableSafety(i, table.domRule, table.domN, table.domK, table.pqRule, table.pqP, table.pqQ, table.pqN, minFreq, table.piepPercentage, table.piepMarge, table.piepMinFreq, isPiep, table.weighted, table.weighted, table.holding, table.zeroUnsafe, false, 10, table.zeroRange, table.manualMarge, frequencyMarge)) {
+            if (!tauArgus.SetTableSafety(i, table.domRule, table.domN, table.domK, table.pqRule, table.pqP, table.pqQ, table.pqN, 
+                                         minFreq, table.piepPercentage, table.piepMarge, table.piepMinFreq, isPiep, table.weighted, 
+                                         table.weighted, table.holding, table.zeroUnsafe, false, 10, table.zeroRange, table.manualMarge, 
+                                         frequencyMarge)) {
                 throw new ArgusException("SetTableSafety went wrong for table" + (i + 1));
             }
         }
