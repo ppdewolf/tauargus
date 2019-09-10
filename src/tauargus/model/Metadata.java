@@ -416,7 +416,7 @@ public class Metadata implements Cloneable {
                     case "<PARITY>":
                         if (!CKMspecified) throw new ArgusException("<PARITY> only allowed after <CKM> is specified.");
                         if (variable.isNumeric()) {
-                                variable.apply_even_odd = ("Y".equals(tokenizer.nextToken()));
+                                variable.CKMapply_even_odd = ("Y".equals(tokenizer.nextToken()));
                         }
                         else{
                             throw new ArgusException("<INCLUDEZEROS> only allowed for numeric variables.");

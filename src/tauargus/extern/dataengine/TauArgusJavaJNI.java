@@ -85,7 +85,7 @@ public class TauArgusJavaJNI {
   public final static native boolean TauArgus_SetProtectionLevelsForResponseTable(long jarg1, TauArgus jarg1_, int jarg2, int[] jarg3, double jarg4, double jarg5);
   public final static native String TauArgus_GetErrorString(long jarg1, TauArgus jarg1_, int jarg2);
   public final static native int TauArgus_SetCellKeyValuesFreq(long jarg1, TauArgus jarg1_, int jarg2, String jarg3, int[] jarg4, int[] jarg5);
-  public final static native int TauArgus_SetCellKeyValuesCont(long jarg1, TauArgus jarg1_, int jarg2, String jarg3, String jarg4, String jarg5, int jarg6, boolean jarg7, boolean jarg8, boolean jarg9, double jarg10, String jarg11, double jarg12, double jarg13, double jarg14, double jarg15, double[] jarg16);
+  public final static native int TauArgus_SetCellKeyValuesCont(long jarg1, TauArgus jarg1_, int jarg2, String jarg3, String jarg4, String jarg5, int jarg6, boolean jarg7, boolean jarg8, boolean jarg9, double jarg10, String jarg11, double jarg12, double jarg13, double jarg14, double jarg15, double[] jarg16, double jarg17);
 
   public static void SwigDirector_IProgressListener_UpdateProgress(IProgressListener jself, int Perc) {
     jself.UpdateProgress(Perc);

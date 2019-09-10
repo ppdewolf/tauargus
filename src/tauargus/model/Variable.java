@@ -79,7 +79,7 @@ public class Variable implements Cloneable {
     
     // Used for CKM
     public boolean zerosincellkey = false; // default: false
-    public boolean apply_even_odd = false; // default: false
+    public boolean CKMapply_even_odd = false; // default: false
     public String CKMType = "N";           // default: not allowed to apply CKM
     public int CKMTopK = 1;                // default: only largest observation used, topK = T = 1
     public boolean CKMseparation = false;  // default: small values not treated differently
@@ -90,6 +90,7 @@ public class Variable implements Cloneable {
     public double CKMxstar = 25;           // default for parameters sigma0, sigma1, xstar, q, epsilon2, epsilon3, ..., epsilonT
     public double CKMq = 3;                // default for parameters sigma0, sigma1, xstar, q, epsilon2, epsilon3, ..., epsilonT
     public double[] CKMepsilon;            // default for parameters sigma0, sigma1, xstar, q, epsilon2, epsilon3, ..., epsilonT
+    public double muC = 0;                 // default: no additional perturbation for sensitivecells
             
     // Only used by variables of type 'Request'
     public String[] requestCode;
