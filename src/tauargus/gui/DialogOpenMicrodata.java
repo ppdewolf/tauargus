@@ -200,8 +200,8 @@ public class DialogOpenMicrodata extends DialogBase{ //javax.swing.JDialog {
         fileChooser.setSelectedFile(new File(""));
         fileChooser.resetChoosableFileFilters();
         // filters are shown in order of declaration, setFileFilter sets the default filter
-        fileChooser.setFileFilter(new FileNameExtensionFilter("Microdata (*.asc)", "asc"));
-        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Microdata (*.dat)", "dat"));
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Microdata (*.asc, *.dat, *.csv)", "asc", "dat", "csv"));
+        //fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Microdata (*.dat, *.csv)", "dat", "csv"));
         fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("SPSS system file (*.sav)", "sav"));
         if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
             String hs = fileChooser.getSelectedFile().toString();

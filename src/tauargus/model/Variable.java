@@ -84,7 +84,7 @@ public class Variable implements Cloneable {
     public int CKMTopK = 1;                // default: only largest observation used, topK = T = 1
     public boolean CKMseparation = false;  // default: small values not treated differently
     public double CKMm1squared = 0;        // default: no variance for small values
-    public String CKMscaling = "N";        // default: no flexfucntion approach
+    public String CKMscaling = "";         // default: there is no default. Needs to specificied when using CKM with magnitude table
     public double CKMsigma0 = 1;           // default for parameters sigma0, sigma1, xstar, q, epsilon2, epsilon3, ..., epsilonT
     public double CKMsigma1 = 1;           // default for parameters sigma0, sigma1, xstar, q, epsilon2, epsilon3, ..., epsilonT
     public double CKMxstar = 25;           // default for parameters sigma0, sigma1, xstar, q, epsilon2, epsilon3, ..., epsilonT

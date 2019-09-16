@@ -376,7 +376,7 @@ public class Metadata implements Cloneable {
                         variable.PTableFileSep = tokenizer.nextToken();
                         break;
                     case "<CKM>":
-                        if (!variable.isNumeric()) throw new ArgusException("<CKM> tag only allowed for numeric variables.");
+                        if (!variable.isResponse()) throw new ArgusException("<CKM> tag only allowed for numeric variables.");
                         hs = tokenizer.nextField("(").toUpperCase();
                         CKMspecified = true;
                         switch(hs){
@@ -406,7 +406,7 @@ public class Metadata implements Cloneable {
                         break;
                     case "<INCLUDEZEROS>":
                         if (!CKMspecified) throw new ArgusException("<INCLUDEZEROS> only allowed after <CKM> is specified.");
-                        if (variable.isNumeric()) {
+                        if (variable.isResponse()) {
                                 variable.zerosincellkey = tokenizer.nextToken().equals("Y");
                         }
                         else{
@@ -415,7 +415,7 @@ public class Metadata implements Cloneable {
                         break;
                     case "<PARITY>":
                         if (!CKMspecified) throw new ArgusException("<PARITY> only allowed after <CKM> is specified.");
-                        if (variable.isNumeric()) {
+                        if (variable.isResponse()) {
                                 variable.CKMapply_even_odd = ("Y".equals(tokenizer.nextToken()));
                         }
                         else{
@@ -424,7 +424,7 @@ public class Metadata implements Cloneable {
                         break;
                     case "<SCALING>": // Can much nicer and needs exception cheking!
                         if (!CKMspecified) throw new ArgusException("<SCALING> only allowed after <CKM> is specified.");
-                        if (!variable.isNumeric()) throw new ArgusException("<SCALING> tag only allowed for numeric variables.");
+                        if (!variable.isResponse()) throw new ArgusException("<SCALING> tag only allowed for numeric variables.");
                         hs = tokenizer.nextField("(").toUpperCase();
                         if (!(hs.equals("N") || hs.equals("F"))){
                             throw new ArgusException("Unknown type <SCALING> " + hs + " for variable " + variable.name);
@@ -474,13 +474,14 @@ public class Metadata implements Cloneable {
                                 }
                             }
                             catch(Exception ex){
-                                throw new ArgusException("Exception when reading <SCALING> parameters:\n"+ex.getMessage());
+                                throw new ArgusException("Exception when reading <SCALING> parameters:\n"+ex.getMessage()+
+                                        "\nCheck number of parameters\nCheck number of epsilons related to TopK\nCheck format double/integer");
                             }
                         }
                         break;
                     case "<SEPARATION>":
                         if (!CKMspecified) throw new ArgusException("<SEPARATION> only allowed after <CKM> is specified.");
-                        if (!variable.isNumeric()) throw new ArgusException("<SEPARATION> tag only allowed for numeric variables.");
+                        if (!variable.isResponse()) throw new ArgusException("<SEPARATION> tag only allowed for numeric variables.");
                         hs = tokenizer.nextField("(").toUpperCase();
                         variable.CKMseparation = hs.equals("Y");
                         if (variable.CKMseparation){

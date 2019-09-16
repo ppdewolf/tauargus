@@ -37,7 +37,6 @@ public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
     
     public int showDialog(TableSet tableSet) {
         tmpTableSet=tableSet;
-        //textFieldPTable.setText(tableSet.cellkeyVar.PTableFile);
         textFieldPTable.setText(tmpTableSet.cellkeyVar.PTableFile);
         setVisible(true);
         return returnValue;

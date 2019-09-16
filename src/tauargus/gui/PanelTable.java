@@ -641,8 +641,16 @@ public class PanelTable extends javax.swing.JPanel {
         
         radioButtonCellKey.setVisible(tableSet.CellKeyAvailable);
         buttonChangePTable.setVisible(tableSet.CellKeyAvailable);
-        buttonChangePTable.setEnabled(radioButtonCellKey.isSelected());
-        if (tableSet.CellKeyAvailable) labelPTable.setText("ptablefile: "+tableSet.cellkeyVar.PTableFile.substring(tableSet.cellkeyVar.PTableFile.lastIndexOf("\\")+1));
+        // For now not possible to change the ptablefile for magnitude tables, only for frequency tables
+        buttonChangePTable.setEnabled(radioButtonCellKey.isSelected() && !tableSet.respVar.isResponse());
+        if (tableSet.CellKeyAvailable){
+            if (tableSet.respVar.isResponse()){
+                labelPTable.setText("ptablefileCont: "+tableSet.cellkeyVar.PTableFileCont.substring(tableSet.cellkeyVar.PTableFileCont.lastIndexOf("\\")+1));
+            }
+            else{
+                labelPTable.setText("ptablefile: "+tableSet.cellkeyVar.PTableFile.substring(tableSet.cellkeyVar.PTableFile.lastIndexOf("\\")+1));
+            }
+        }
         labelPTable.setVisible(tableSet.CellKeyAvailable);
         
         for (int i = 0; i < radioButtonSuppress.length; i++) {
@@ -670,6 +678,8 @@ public class PanelTable extends javax.swing.JPanel {
         
         checkBoxColoredView.setVisible(tableSet.CellKeyAvailable);
         boolean b = (s == TableSet.SUP_CKM) || (s == TableSet.SUP_NO);
+        if (tableSet.respVar.isResponse()){ b=false;} // For now no colored view for magnitude tables
+                
         checkBoxColoredView.setEnabled(b);
         if (!b) checkBoxColoredView.setSelected(false);
         if (s == TableSet.SUP_CKM) {
@@ -1212,7 +1222,7 @@ public class PanelTable extends javax.swing.JPanel {
         });
 
         buttonChangePTable.setText("Change ptable");
-        buttonChangePTable.setToolTipText("");
+        buttonChangePTable.setToolTipText("Currently only available for frequency count tables");
         buttonChangePTable.setPreferredSize(new java.awt.Dimension(57, 23));
         buttonChangePTable.setRequestFocusEnabled(false);
         buttonChangePTable.addActionListener(new java.awt.event.ActionListener() {
@@ -1368,6 +1378,7 @@ public class PanelTable extends javax.swing.JPanel {
         });
 
         checkBoxColoredView.setText("Colored view");
+        checkBoxColoredView.setToolTipText("Currently only available for frequency count tables");
         checkBoxColoredView.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 checkBoxColoredViewActionPerformed(evt);
@@ -2118,6 +2129,25 @@ public class PanelTable extends javax.swing.JPanel {
 //                    JOptionPane.showMessageDialog(null,"Sorry, currently Cell Key Method only imlemented for frequency tables","Warning",JOptionPane.WARNING_MESSAGE);
 //                    break;
 //                }
+                String message="";
+                if (tableSet.respVar.isResponse()){ // magnitude table
+                    if (tableSet.respVar.CKMType.equals("N")) message = "No cell key method specified for this variable";
+                    if (tableSet.respVar.CKMscaling.isEmpty()) message += "\n<SCALING> is not specified but mandatory in .rda-file for variable "+tableSet.respVar.name;
+                    if (tableSet.respVar.CKMType.equals("T") && (tableSet.respVar.CKMTopK>1) && tableSet.respVar.CKMapply_even_odd) message += "\n<PARITY>=Y is not allowed when <CKM>=T(TopK) with TopK > 1"; 
+                    if ((tableSet.respVar.CKMseparation) && (tableSet.cellkeyVar.PTableFileSep==null)) message += "\nWith <SEPARATION>=Y you need to specify a separate ptable for small values";
+                }
+                if (!message.isEmpty()){
+                    JOptionPane.showMessageDialog(null,message,"Warning",JOptionPane.WARNING_MESSAGE);
+                    break;
+                }
+ 
+                if (tableSet.respVar.isResponse()){
+                    DialogMuC GetmuC = new DialogMuC(parentFrame, tableSet, true);
+                    if (tableSet.domRule || tableSet.frequencyRule || tableSet.pqRule || tableSet.piepRule[0] || tableSet.piepRule[1]) {
+                        GetmuC.showDialog(); // returns DialogMuC.APPROVE_OPTION or DialogMuC.CANCEL_OPTION but return value is not (yet) used
+                    }
+                }
+                
                 new Thread(){
                     @Override public void run(){
                         try {
@@ -2192,7 +2222,14 @@ public class PanelTable extends javax.swing.JPanel {
 
     private void buttonChangePTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonChangePTableActionPerformed
         DialogChangePTable dialog = new DialogChangePTable(null, true);
-        if (dialog.showDialog(tableSet)==DialogChangePTable.APPROVE_OPTION) labelPTable.setText("ptablefile: "+tableSet.cellkeyVar.PTableFile.substring(tableSet.cellkeyVar.PTableFile.lastIndexOf("\\")+1));
+        if (dialog.showDialog(tableSet)==DialogChangePTable.APPROVE_OPTION) {
+            if (tableSet.respVar.isResponse()){
+                labelPTable.setText("ptablefileCont: "+tableSet.cellkeyVar.PTableFileCont.substring(tableSet.cellkeyVar.PTableFileCont.lastIndexOf("\\")+1));
+            }
+            else{
+                labelPTable.setText("ptablefile: "+tableSet.cellkeyVar.PTableFile.substring(tableSet.cellkeyVar.PTableFile.lastIndexOf("\\")+1));                
+            }
+        }
     }//GEN-LAST:event_buttonChangePTableActionPerformed
 
     private void organiseSafetyButtons(CellStatus status) {

@@ -744,7 +744,13 @@ public class SaveTable {
                     break;
                 case TableSet.SUP_CKM :
                     out.write("<h2>Protected with the Cell Key Method</h2>\n");
-                    out.write("<h3>P-table used from file\n\""+tableSet.cellkeyVar.metadata.getFilePath(tableSet.cellkeyVar.PTableFile)+"\"</h3>\n");
+                    if (tableSet.respVar.isResponse()){
+                        out.write("<h3>P-table used from files<br>\n\""+tableSet.cellkeyVar.metadata.getFilePath(tableSet.cellkeyVar.PTableFileCont)+"\"<br>\""+
+                                tableSet.cellkeyVar.metadata.getFilePath(tableSet.cellkeyVar.PTableFileSep)+"\"</h3>\n");
+                    }
+                    else{
+                        out.write("<h3>P-table used from file\n\""+tableSet.cellkeyVar.metadata.getFilePath(tableSet.cellkeyVar.PTableFile)+"\"</h3>\n");
+                    }
                     break;
             }
 //    if (tableSet.inverseWeight){out.write("<h2>Inverse weight procedure has been applied</h2>\n");}
@@ -868,48 +874,48 @@ public class SaveTable {
                 out.write("<p>\n");
             }
             else{
-                out.write("<table>\n");
-                out.write("<tr><th height=\"11\">Added noise</th>");
-                out.write("<th height=\"11\">Number of cells</th>");
-                out.write("<th height=\"11\">Relative to non-empty cells</th>");
-                out.write("<th height=\"11\">Relative to all cells</th></tr>\n");
-                Integer[] TreeMapKeys = tableSet.getCKMStats().keySet().toArray(new Integer[tableSet.getCKMStats().size()]);
-                for (i=0;i<tableSet.getCKMStats().size();i++){
-                    out.write("<tr><td align=\"Right\">"+ Integer.toString(TreeMapKeys[i]) + "</td>");
-                    out.write("<td align=\"Right\">"+Long.toString(tableSet.getCKMStats().get(TreeMapKeys[i]))+"</td>");
-                    out.write("<td align=\"Right\">"+String.format("%7.3f",100.0*tableSet.getCKMStats().get(TreeMapKeys[i])/(tableSet.numberOfCells()-tableSet.numberOfEmpty()))+"%</td>");
-                    out.write("<td align=\"Right\">"+String.format("%7.3f",100.0*tableSet.getCKMStats().get(TreeMapKeys[i])/tableSet.numberOfCells())+"%</td></tr>\n");
+                if (!tableSet.respVar.isResponse()){ // for time being only in case of frequency count tables
+                    out.write("<table>\n");
+                    out.write("<tr><th height=\"11\">Added noise</th>");
+                    out.write("<th height=\"11\">Number of cells</th>");
+                    out.write("<th height=\"11\">Relative to non-empty cells</th>");
+                    out.write("<th height=\"11\">Relative to all cells</th></tr>\n");
+                    Integer[] TreeMapKeys = tableSet.getCKMStats().keySet().toArray(new Integer[tableSet.getCKMStats().size()]);
+                    for (i=0;i<tableSet.getCKMStats().size();i++){
+                        out.write("<tr><td align=\"Right\">"+ Integer.toString(TreeMapKeys[i]) + "</td>");
+                        out.write("<td align=\"Right\">"+Long.toString(tableSet.getCKMStats().get(TreeMapKeys[i]))+"</td>");
+                        out.write("<td align=\"Right\">"+String.format("%7.3f",100.0*tableSet.getCKMStats().get(TreeMapKeys[i])/(tableSet.numberOfCells()-tableSet.numberOfEmpty()))+"%</td>");
+                        out.write("<td align=\"Right\">"+String.format("%7.3f",100.0*tableSet.getCKMStats().get(TreeMapKeys[i])/tableSet.numberOfCells())+"%</td></tr>\n");
+                    }
+                    out.write("<tr><td align=\"Right\"> Empty </td>");
+                    out.write("<td align=\"Right\">"+Long.toString(tableSet.numberOfEmpty())+"</td>");
+                    out.write("<td align=\"Right\"> --</td>");
+                    out.write("<td align=\"Right\">"+String.format("%7.3f",100.0*tableSet.numberOfEmpty()/tableSet.numberOfCells())+"%</td></tr>\n");
+
+                    out.write("<tr><td align=\"Right\"> Non-Empty </td>");
+                    out.write("<td align=\"Right\">"+Long.toString(tableSet.numberOfCells()-tableSet.numberOfEmpty())+"</td>");
+                    out.write("<td align=\"Right\">"+Long.toString(100)+"%</td>");
+                    out.write("<td align=\"Right\">"+String.format("%7.3f",100.0*(1.0 - 1.0*tableSet.numberOfEmpty()/tableSet.numberOfCells()))+"%</td></tr>\n");
+
+                    out.write("<tr><td align=\"Right\"> Total </td>");
+                    out.write("<td align=\"Right\">"+Long.toString(tableSet.numberOfCells())+"</td>");
+                    out.write("<td align=\"Right\"> --</td>");
+                    out.write("<td align=\"Right\">"+Long.toString(100)+"%</td></tr>\n");
+                    out.write("</table><br>\n");
+
+                    out.write("<table>\n");
+                    out.write("<tr><td><b>False non-zero-cells</b> (zero changed to non-zero)</td>");
+                    out.write("<td>"+tableSet.GetCKMInfoLoss().GetFalseNonzeros()+"</td></tr>\n");
+                    out.write("<tr><td><b>False zero-cells</b> (non-zero changed to zero)</td>");
+                    out.write("<td>"+tableSet.GetCKMInfoLoss().GetFalseZeros()+"</td></tr>\n");
+                    out.write("</table>\n");
+                    out.write("<p>\n");
+                    // Print InformationLoss calculated over NON_EMPTY cells: UseEmpty = false
+                    WriteAdditionalInfoLoss(out,tableSet.GetCKMInfoLoss(),reportfile,false);
+                    // Print InformationLoss calculated over ALL cells: UseEmpty = true
+                    WriteAdditionalInfoLoss(out,tableSet.GetCKMInfoLoss(),reportfile,true);
                 }
-                out.write("<tr><td align=\"Right\"> Empty </td>");
-                out.write("<td align=\"Right\">"+Long.toString(tableSet.numberOfEmpty())+"</td>");
-                out.write("<td align=\"Right\"> --</td>");
-                out.write("<td align=\"Right\">"+String.format("%7.3f",100.0*tableSet.numberOfEmpty()/tableSet.numberOfCells())+"%</td></tr>\n");
-
-                out.write("<tr><td align=\"Right\"> Non-Empty </td>");
-                out.write("<td align=\"Right\">"+Long.toString(tableSet.numberOfCells()-tableSet.numberOfEmpty())+"</td>");
-                out.write("<td align=\"Right\">"+Long.toString(100)+"%</td>");
-                out.write("<td align=\"Right\">"+String.format("%7.3f",100.0*(1.0 - 1.0*tableSet.numberOfEmpty()/tableSet.numberOfCells()))+"%</td></tr>\n");
-
-                out.write("<tr><td align=\"Right\"> Total </td>");
-                out.write("<td align=\"Right\">"+Long.toString(tableSet.numberOfCells())+"</td>");
-                out.write("<td align=\"Right\"> --</td>");
-                out.write("<td align=\"Right\">"+Long.toString(100)+"%</td></tr>\n");
-                out.write("</table><br>\n");
-
-                out.write("<table>\n");
-                out.write("<tr><td><b>False non-zero-cells</b> (zero changed to non-zero)</td>");
-                out.write("<td>"+tableSet.GetCKMInfoLoss().GetFalseNonzeros()+"</td></tr>\n");
-                out.write("<tr><td><b>False zero-cells</b> (non-zero changed to zero)</td>");
-                out.write("<td>"+tableSet.GetCKMInfoLoss().GetFalseZeros()+"</td></tr>\n");
-                out.write("</table>\n");
-                out.write("<p>\n");
-            }
-            
-            if (tableSet.ckmProtect){
-                // Print InformationLoss calculated over NON_EMPTY cells: UseEmpty = false
-                WriteAdditionalInfoLoss(out,tableSet.GetCKMInfoLoss(),reportfile,false);
-                // Print InformationLoss calculated over ALL cells: UseEmpty = true
-                WriteAdditionalInfoLoss(out,tableSet.GetCKMInfoLoss(),reportfile,true);
+                else out.write("<h3>To be implemented</h3>\n");
             }
   //If SuperCross Then GoTo EINDE
          

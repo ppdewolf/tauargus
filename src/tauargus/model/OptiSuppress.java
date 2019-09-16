@@ -1700,18 +1700,16 @@ public class OptiSuppress {
     public static boolean RunCellKeyCont(TableSet tableSet, String PTableFileCont, String PTableFileSep, Variable var)throws ArgusException, FileNotFoundException, IOException{
         long startTime = new Date().getTime();
         int getmin[]={0}, getmax[]={0};
-        String message;
 
         //JOptionPane.showMessageDialog(null,"variable "+var.name+" CKMType "+var.CKMType+" CKMTopK "+var.CKMTopK);
-        if (var.CKMType.equals("T") && (var.CKMTopK>1) && var.CKMapply_even_odd) message = "<PARITY>=N is not allowed when <CKM>=F and TopK > 1"; 
-        
+                
         int result = tauArgus.SetCellKeyValuesCont(tableSet.index, tableSet.cellkeyVar.metadata.getFilePath(PTableFileCont), 
                         tableSet.cellkeyVar.metadata.getFilePath(PTableFileSep), var.CKMType, var.CKMTopK,
                         var.zerosincellkey, var.CKMapply_even_odd, var.CKMseparation, var.CKMm1squared, var.CKMscaling,
                         var.CKMsigma0, var.CKMsigma1, var.CKMxstar, var.CKMq, var.CKMepsilon, var.muC);
 
-        if (result == -9 || result == -1){ // error 
-            throw new ArgusException("Some error in call of SetCellKeyValuesCont(...)");
+        if (result == -9 || result == -1 || result == -91 || result == -92){ // error 
+            throw new ArgusException("Some error in call of SetCellKeyValuesCont(...) result = "+result);
         }
 
         long endTime = new Date().getTime();
