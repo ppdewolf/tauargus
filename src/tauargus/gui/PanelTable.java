@@ -2132,7 +2132,7 @@ public class PanelTable extends javax.swing.JPanel {
                 String message="";
                 if (tableSet.respVar.isResponse()){ // magnitude table
                     if (tableSet.respVar.CKMType.equals("N")) message = "No cell key method specified for this variable";
-                    if (tableSet.respVar.CKMscaling.isEmpty()) message += "\n<SCALING> is not specified but mandatory in .rda-file for variable "+tableSet.respVar.name;
+                    if (tableSet.respVar.CKMscaling.isEmpty()) message += "\n<SCALING> is not specified but is mandatory in .rda-file for variable "+tableSet.respVar.name;
                     if (tableSet.respVar.CKMType.equals("T") && (tableSet.respVar.CKMTopK>1) && tableSet.respVar.CKMapply_even_odd) message += "\n<PARITY>=Y is not allowed when <CKM>=T(TopK) with TopK > 1"; 
                     if ((tableSet.respVar.CKMseparation) && (tableSet.cellkeyVar.PTableFileSep==null)) message += "\nWith <SEPARATION>=Y you need to specify a separate ptable for small values";
                 }

@@ -482,16 +482,17 @@ public class Metadata implements Cloneable {
                     case "<SEPARATION>":
                         if (!CKMspecified) throw new ArgusException("<SEPARATION> only allowed after <CKM> is specified.");
                         if (!variable.isResponse()) throw new ArgusException("<SEPARATION> tag only allowed for numeric variables.");
-                        hs = tokenizer.nextField("(").toUpperCase();
-                        variable.CKMseparation = hs.equals("Y");
-                        if (variable.CKMseparation){
-                            try{
-                                variable.CKMm1squared = Double.parseDouble(tokenizer.nextField(")"));
-                            }
-                            catch (NumberFormatException ex){
-                                throw new ArgusException("value in <SEPARATION> Y(value) should be double\n" + ex.getMessage());
-                            }
-                        }
+                        //hs = tokenizer.nextField("(").toUpperCase();
+                        //variable.CKMseparation = hs.equals("Y");
+                        //if (variable.CKMseparation){
+                        //  try{
+                        //        variable.CKMm1squared = Double.parseDouble(tokenizer.nextField(")"));
+                        //    }
+                        //    catch (NumberFormatException ex){
+                        //        throw new ArgusException("value in <SEPARATION> Y(value) should be double\n" + ex.getMessage());
+                        //    }
+                        //}
+                        variable.CKMseparation = tokenizer.nextToken().equals("Y");
                         break;
                     default:
                         throw new ArgusException("Unknown keyword (" + token + ") in line " + tokenizer.getLineNumber());

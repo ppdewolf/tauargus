@@ -1708,7 +1708,7 @@ public class OptiSuppress {
                         var.zerosincellkey, var.CKMapply_even_odd, var.CKMseparation, var.CKMm1squared, var.CKMscaling,
                         var.CKMsigma0, var.CKMsigma1, var.CKMxstar, var.CKMq, var.CKMepsilon, var.muC);
 
-        if (result == -9 || result == -1 || result == -91 || result == -92){ // error 
+        if (result <= -90){ // error 
             throw new ArgusException("Some error in call of SetCellKeyValuesCont(...) result = "+result);
         }
 
