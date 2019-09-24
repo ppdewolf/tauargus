@@ -315,8 +315,8 @@ public class TauArgus {
     return TauArgusJavaJNI.TauArgus_SetCellKeyValuesFreq(swigCPtr, this, TabNo, PTableFile, MinDiff, MaxDiff);
   }
 
-  public int SetCellKeyValuesCont(int TabNo, String PTableFileCont, String PTableFileSep, String CKMType, int topK, boolean IncludeZeros, boolean Parity, boolean Separation, double m1sqr, String Scaling, double s0, double s1, double xstar, double q, double[] epsilon, double muC) {
-    return TauArgusJavaJNI.TauArgus_SetCellKeyValuesCont(swigCPtr, this, TabNo, PTableFileCont, PTableFileSep, CKMType, topK, IncludeZeros, Parity, Separation, m1sqr, Scaling, s0, s1, xstar, q, epsilon, muC);
+  public int SetCellKeyValuesCont(int TabNo, String PTableFileCont, String PTableFileSep, String CKMType, int topK, boolean IncludeZeros, boolean Parity, boolean Separation, double m1sqr, String Scaling, double s0, double s1, double z_f, double q, double[] epsilon, double muC) {
+    return TauArgusJavaJNI.TauArgus_SetCellKeyValuesCont(swigCPtr, this, TabNo, PTableFileCont, PTableFileSep, CKMType, topK, IncludeZeros, Parity, Separation, m1sqr, Scaling, s0, s1, z_f, q, epsilon, muC);
   }
 
 }

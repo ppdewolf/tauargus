@@ -745,8 +745,10 @@ public class SaveTable {
                 case TableSet.SUP_CKM :
                     out.write("<h2>Protected with the Cell Key Method</h2>\n");
                     if (tableSet.respVar.isResponse()){
-                        out.write("<h3>P-table used from files<br>\n\""+tableSet.cellkeyVar.metadata.getFilePath(tableSet.cellkeyVar.PTableFileCont)+"\"<br>\""+
-                                tableSet.cellkeyVar.metadata.getFilePath(tableSet.cellkeyVar.PTableFileSep)+"\"</h3>\n");
+                        out.write("<h3>P-table used from files<br>\n\""+tableSet.cellkeyVar.metadata.getFilePath(tableSet.cellkeyVar.PTableFileCont)+"\"<br>");
+                        if (tableSet.respVar.CKMseparation)
+                               out.write("\""+tableSet.cellkeyVar.metadata.getFilePath(tableSet.cellkeyVar.PTableFileSep)+"\"");
+                        out.write("</h3>\n");
                     }
                     else{
                         out.write("<h3>P-table used from file\n\""+tableSet.cellkeyVar.metadata.getFilePath(tableSet.cellkeyVar.PTableFile)+"\"</h3>\n");

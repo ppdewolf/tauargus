@@ -1699,14 +1699,20 @@ public class OptiSuppress {
 
     public static boolean RunCellKeyCont(TableSet tableSet, String PTableFileCont, String PTableFileSep, Variable var)throws ArgusException, FileNotFoundException, IOException{
         long startTime = new Date().getTime();
-        int getmin[]={0}, getmax[]={0};
+        int result;
 
         //JOptionPane.showMessageDialog(null,"variable "+var.name+" CKMType "+var.CKMType+" CKMTopK "+var.CKMTopK);
-                
-        int result = tauArgus.SetCellKeyValuesCont(tableSet.index, tableSet.cellkeyVar.metadata.getFilePath(PTableFileCont), 
+        if (var.CKMseparation){ 
+            result = tauArgus.SetCellKeyValuesCont(tableSet.index, tableSet.cellkeyVar.metadata.getFilePath(PTableFileCont), 
                         tableSet.cellkeyVar.metadata.getFilePath(PTableFileSep), var.CKMType, var.CKMTopK,
                         var.zerosincellkey, var.CKMapply_even_odd, var.CKMseparation, var.CKMm1squared, var.CKMscaling,
                         var.CKMsigma0, var.CKMsigma1, var.CKMxstar, var.CKMq, var.CKMepsilon, var.muC);
+        }
+        else{
+            result = tauArgus.SetCellKeyValuesCont(tableSet.index, tableSet.cellkeyVar.metadata.getFilePath(PTableFileCont), 
+                        "", var.CKMType, var.CKMTopK, var.zerosincellkey, var.CKMapply_even_odd, var.CKMseparation, 
+                        var.CKMm1squared, var.CKMscaling, var.CKMsigma0, var.CKMsigma1, var.CKMxstar, var.CKMq, var.CKMepsilon, var.muC);
+        }
 
         if (result <= -90){ // error 
             throw new ArgusException("Some error in call of SetCellKeyValuesCont(...) result = "+result);
