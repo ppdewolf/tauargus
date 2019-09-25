@@ -34,6 +34,7 @@ public class Cell {
     public double shadow; 
     public double cost; 
     public double cellkey;
+    public double cellkeynozeros;
     public int freq;
     public CellStatus status;
     public boolean auditOk;

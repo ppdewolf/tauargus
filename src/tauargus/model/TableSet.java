@@ -387,6 +387,7 @@ public class TableSet {
         double[] shadow = {0.0};
         double[] cost = {0.0};
         double[] cellkey = {0.0};
+        double[] cellkeynozeros = {0.0};
         int[] freq = {0};
         int[] status = {0};
         int[] holdingFreq = {0};
@@ -399,7 +400,7 @@ public class TableSet {
         double[] realizedLower = {0.0};
         double[] realizedUpper = {0.0};
         Cell cell = new Cell();
-        if (!tauArgus.GetTableCell(index, dimIndex, response, roundedResponse, CTAValue, CKMValue, shadow, cost, cellkey, freq, status, cell.maxScore, cell.maxScoreWeight, holdingFreq, cell.holdingMaxScore, cell.holdingNrPerMaxScore, peepCell, peepHolding, peepSortCell, peepSortHolding, lower, upper, realizedLower, realizedUpper)) {
+        if (!tauArgus.GetTableCell(index, dimIndex, response, roundedResponse, CTAValue, CKMValue, shadow, cost, cellkey, cellkeynozeros, freq, status, cell.maxScore, cell.maxScoreWeight, holdingFreq, cell.holdingMaxScore, cell.holdingNrPerMaxScore, peepCell, peepHolding, peepSortCell, peepSortHolding, lower, upper, realizedLower, realizedUpper)) {
             return null;
         }
         cell.response = response[0];
@@ -409,6 +410,7 @@ public class TableSet {
         cell.shadow = shadow[0];
         cell.cost = cost[0];
         cell.cellkey = cellkey[0];
+        cell.cellkeynozeros = cellkeynozeros[0];
         cell.freq = freq[0];
         cell.setStatusAndAuditByValue(status[0]);
         cell.holdingFreq = holdingFreq[0];
@@ -760,7 +762,9 @@ public class TableSet {
         }
     }
 
-    private static boolean getTableCell (int tabNo, int[] dimIndex, double[] CellResp, int[] CellStatus, double[] CellLower, double[] CellUpper, double[] CellCost, double[] CellKey){
+    private static boolean getTableCell (int tabNo, int[] dimIndex, double[] CellResp, int[] CellStatus, 
+                                         double[] CellLower, double[] CellUpper, double[] CellCost, 
+                                         double[] CellKey, double[] CellKeyNoZeros){
       double[] CR = new double[1];
       double[] Lower = new double[1];
       double[] Upper = new double[1];
@@ -773,6 +777,7 @@ public class TableSet {
       double[] x8 = new double[1];
       double[] x9 = new double[1];
       double[] x10 = new double[1]; //CellKey
+      double[] x11 = new double[1]; //CellKeyNoZeros      
       double[] xcta = new double[1];
       double[] xckm = new double[1];
       double[] hms = new double[MAX_TOP_N_VAR];
@@ -789,7 +794,7 @@ public class TableSet {
         boolean oke;       
         oke = tauArgus.GetTableCell(tabNo, dimIndex, CR, ix, xcta,
                                     xckm,
-                                    x2, x3, x10, cf, Status, x4,
+                                    x2, x3, x10, x11, cf, Status, x4,
                                     x5, cfh,   hms, holdnr,
                                     peep, peephold, peepsrt,  peepsrthold,  Lower,
                                     Upper, x8, x9);
@@ -800,6 +805,7 @@ public class TableSet {
       CellUpper[0] = Upper[0];
       CellCost[0] = x3[0];
       CellKey[0] = x10[0];
+      CellKeyNoZeros[0] = x11[0];
       return oke;
     //public boolean GetTableCell(int TableIndex, int[] DimIndex, double[] CellResponse, int[] CellRoundedResp,
     //        double[] CellCTAResp, double[] CellShadow, double[] CellCost, int[] CellFreq,
@@ -1500,7 +1506,7 @@ if (Application.isProtectCoverTable()){
                         writer.print(";" + mdecimalFormat.format(cell.CKMValue - cell.response));
                     }
                     if (addCellKey){
-                        writer.print(";" + CKdecimalFormat.format(cell.cellkey));
+                            writer.print(";" + CKdecimalFormat.format(respVar.zerosincellkey ? cell.cellkey : cell.cellkeynozeros));
                     }
                     writer.println();
                 }
@@ -1824,6 +1830,7 @@ if (Application.isProtectCoverTable()){
         double[] x8 = new double[1];
         double[] x9 = new double[1];
         double[] x10 = new double[1];
+        double[] x11 = new double[1];
         double[] xcta = new double[1];
         double[] xckm = new double[1];
         double[] hms = new double[MAX_TOP_N_VAR];
@@ -1839,7 +1846,7 @@ if (Application.isProtectCoverTable()){
         int[] peepsrthold = new int[1];
         oke = tauArgus.GetTableCell(tableSet.index, dimArray, x, ix, xcta,
                                     xckm,
-                                    x2, x3, x10, cf, cellStatus, x4,
+                                    x2, x3, x10, x11, cf, cellStatus, x4,
                                     x5, cfh,   hms, holdnr,
                                     peep, peephold, peepsrt,  peepsrthold,  x6,
                                     x7, x8, x9);
@@ -1901,6 +1908,7 @@ if (Application.isProtectCoverTable()){
      double[] CellUpper = new double[1];
      double[] CellCost = new double[1];
      double[] CellKey = new double[1];
+     double[] CellKeyNoZeros = new double[1];
      TableSet tableSet = TableService.getTable(tableNumber);
      String[] codes = new String[tableSet.expVar.size()]; String codesString;
      int[] dimIndex = new int[tableSet.expVar.size()];
@@ -2126,7 +2134,7 @@ if (Application.isProtectCoverTable()){
              if(x1==0){x1=1;} //zero is a silly value
              oke = (x1 > 0);
              if (oke) {
-                 getTableCell (tableNumber, dimIndex, CellResp, CellStat, CellLower, CellUpper, CellCost, CellKey);
+                 getTableCell (tableNumber, dimIndex, CellResp, CellStat, CellLower, CellUpper, CellCost, CellKey, CellKeyNoZeros);
                  oke =tauArgus.SetTableCellCost(tableSet.index, dimIndex, x1);}
              if ( oke) { aPrioryStatus[2][0]++; }
              else      { aPrioryStatus[2][1]++;
@@ -2158,7 +2166,7 @@ if (Application.isProtectCoverTable()){
              }
              if (oke){
                oldStatus = getCellStatus(tableSet, dimIndex);
-               getTableCell (tableNumber, dimIndex, CellResp, CellStat, CellLower, CellUpper, CellCost, CellKey);
+               getTableCell (tableNumber, dimIndex, CellResp, CellStat, CellLower, CellUpper, CellCost, CellKey, CellKeyNoZeros);
                if ( (oldStatus < CellStatus.UNSAFE_RULE.getValue())||(oldStatus > CellStatus.UNSAFE_MANUAL.getValue()) ){
                  oke = false; 
                  hs = "Protection levels can only be changed for unsafe cells"; 
