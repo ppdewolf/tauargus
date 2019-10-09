@@ -48,10 +48,9 @@ public class DialogSpecifyMetadata extends DialogBase {
     public DialogSpecifyMetadata(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        setLocationRelativeTo(parent);
         listVariables.setSelectionModel(new SingleListSelectionModel());
         listVariables.setCellRenderer(new VariableNameCellRenderer());
-        
+        setLocationRelativeTo(parent);
     }
 
     public int showDialog(Metadata metadata) {
@@ -69,11 +68,7 @@ public class DialogSpecifyMetadata extends DialogBase {
          case Metadata.DATA_FILE_TYPE_SPSS: i=2; break; 
         }
         comboBoxFormat.setSelectedIndex(i);
-        
-//        comboBoxFormat.setSelectedIndex(metadata.dataFileType == Metadata.DATA_FILE_TYPE_FIXED ? 0 : 1);
         textFieldSeparator.setText(metadata.fieldSeparator);
-// Anco 1.6        
-//        variableListModel = new DefaultListModel<>();
         variableListModel = new DefaultListModel<Variable>();
         previousSelectedVariable = null;
         for (Variable variable : metadata.variables) {
@@ -86,9 +81,11 @@ public class DialogSpecifyMetadata extends DialogBase {
         }
         calculateButtonStates();
         panelEditVariable.setMetadata(metadata);
-        pack();
         panelEditVariable.setDataType(metadata.dataFileType);
+        panelEditVariable.setDataOrigin(metadata.dataOrigin);
+        panelEditVariable.setRecordKeyOn(metadata.containsRecordKey());
         panelEditVariable.panelSetEnabled(listVariables.getSelectedValue() != null);
+        pack();
         setVisible(true);
         return returnValue;
     }
@@ -125,7 +122,6 @@ public class DialogSpecifyMetadata extends DialogBase {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Specify Metadata");
-        setResizable(false);
 
         comboBoxFormat.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Fixed format", "Free format", "SPSS" }));
         comboBoxFormat.addActionListener(new java.awt.event.ActionListener() {
@@ -208,15 +204,14 @@ public class DialogSpecifyMetadata extends DialogBase {
                     .addComponent(panelSeparator, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(comboBoxFormat, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(scrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panelEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(buttonMoveUp, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(buttonMoveDown, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(buttonRemove, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(buttonAdd, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(jButtonGetSPSSMeta))
-                .addContainerGap())
+                .addGap(6, 6, 6)
+                .addGroup(panelEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(buttonMoveUp, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(buttonMoveDown, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(buttonRemove, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(buttonAdd, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButtonGetSPSSMeta, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(2, 2, 2))
         );
         panelEditLayout.setVerticalGroup(
             panelEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -234,11 +229,18 @@ public class DialogSpecifyMetadata extends DialogBase {
                         .addComponent(buttonMoveUp)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(buttonMoveDown)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButtonGetSPSSMeta))
+                        .addGap(18, 18, 18)
+                        .addComponent(jButtonGetSPSSMeta)
+                        .addGap(0, 612, Short.MAX_VALUE))
                     .addComponent(scrollPane))
                 .addContainerGap())
         );
+
+        panelEditVariable.setMaximumSize(new java.awt.Dimension(32769, 32769));
+        panelEditVariable.setMinimumSize(new java.awt.Dimension(0, 0));
+        panelEditVariable.setName(""); // NOI18N
+        panelEditVariable.setPreferredSize(new java.awt.Dimension(621, 938));
+        panelEditVariable.setRecordKeyOn(false);
 
         buttonOK.setText("OK");
         buttonOK.addActionListener(new java.awt.event.ActionListener() {
@@ -261,30 +263,34 @@ public class DialogSpecifyMetadata extends DialogBase {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(panelEdit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(panelEditVariable, javax.swing.GroupLayout.DEFAULT_SIZE, 630, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(buttonOK)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(buttonCancel)))
-                .addContainerGap())
+                        .addGap(18, 18, 18)
+                        .addComponent(buttonCancel)
+                        .addGap(19, 19, 19))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(2, 2, 2)
+                        .addComponent(panelEditVariable, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())))
         );
 
         layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {buttonCancel, buttonOK});
 
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(panelEdit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
-                .addComponent(panelEditVariable, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(buttonOK)
-                    .addComponent(buttonCancel))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(panelEditVariable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(buttonCancel)
+                            .addComponent(buttonOK)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(panelEdit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
 
@@ -470,6 +476,7 @@ public class DialogSpecifyMetadata extends DialogBase {
         calculateButtonStates();
         panelEditVariable.panelSetEnabled(selectedVariable != null);
         panelEditVariable.enableForSPSS(comboBoxFormat.getSelectedIndex()==2);
+        pack();
     }//GEN-LAST:event_listVariablesValueChanged
 
     private void jButtonGetSPSSMetaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonGetSPSSMetaActionPerformed

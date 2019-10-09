@@ -161,6 +161,10 @@ public class Metadata implements Cloneable {
     public boolean containsStatusVariable() {
         return contains(Type.STATUS);
     }
+    
+    public boolean containsRecordKey(){
+        return contains(Type.RECORD_KEY);
+    }
 
     public boolean containsDistanceFunction() {
         for (Variable variable : variables) {
@@ -941,6 +945,14 @@ public class Metadata implements Cloneable {
                 if (variable.hierarchical == Variable.HIER_LEVELS) {
                     if (variable.hierLevelsSum == 0) {
                         throw new ArgusException("Sum of number of digits of hierarchical levels may not be zero for variable " + variable.name + ".");
+                    }
+                }
+            }
+            
+            if (variable.isResponse()){
+                if (!variable.CKMType.equals("N")){
+                    if (!(variable.CKMscaling.equals("F") || variable.CKMscaling.equals("N"))){
+                        throw new ArgusException("Scaling should be set for variable " + variable.name + " when CKM is allowed.");
                     }
                 }
             }
