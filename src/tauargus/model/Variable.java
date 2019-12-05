@@ -85,11 +85,11 @@ public class Variable implements Cloneable {
     public boolean CKMseparation = false;  // default: small values not treated differently
     public double CKMm1squared = 0;        // default: no variance for small values
     public String CKMscaling = "";         // default: there is no default. Needs to specificied when using CKM with magnitude table
-    public double CKMsigma0 = 1;           // default for parameters sigma0, sigma1, xstar, q, epsilon2, epsilon3, ..., epsilonT
-    public double CKMsigma1 = 1;           // default for parameters sigma0, sigma1, xstar, q, epsilon2, epsilon3, ..., epsilonT
-    public double CKMxstar = 25;           // default for parameters sigma0, sigma1, xstar, q, epsilon2, epsilon3, ..., epsilonT
-    public double CKMq = 3;                // default for parameters sigma0, sigma1, xstar, q, epsilon2, epsilon3, ..., epsilonT
-    public double[] CKMepsilon;            // default for parameters sigma0, sigma1, xstar, q, epsilon2, epsilon3, ..., epsilonT
+    public double CKMsigma0 = -1;          // default "unknown" for parameters sigma0, sigma1, xstar, q
+    public double CKMsigma1 = -1;          // default "unknown" for parameters sigma0, sigma1, xstar, q
+    public double CKMxstar = -1;           // default "unknown" for parameters sigma0, sigma1, xstar, q
+    public double CKMq = -1;               // default "unknown" for parameters sigma0, sigma1, xstar, q
+    public double[] CKMepsilon;            // for parameters epsilon2, epsilon3, ..., epsilonT
     public double muC = 0;                 // default: no additional perturbation for sensitivecells
             
     // Only used by variables of type 'Request'

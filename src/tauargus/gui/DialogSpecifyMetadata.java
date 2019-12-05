@@ -85,6 +85,7 @@ public class DialogSpecifyMetadata extends DialogBase {
         panelEditVariable.setDataOrigin(metadata.dataOrigin);
         panelEditVariable.setRecordKeyOn(metadata.containsRecordKey());
         panelEditVariable.panelSetEnabled(listVariables.getSelectedValue() != null);
+        panelEditVariable.setVisible(listVariables.getSelectedValue() != null);
         pack();
         setVisible(true);
         return returnValue;
@@ -122,11 +123,11 @@ public class DialogSpecifyMetadata extends DialogBase {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Specify Metadata");
+        setPreferredSize(null);
         setResizable(false);
 
         panelEditVariable.setMaximumSize(new java.awt.Dimension(32769, 32769));
         panelEditVariable.setMinimumSize(new java.awt.Dimension(0, 0));
-        panelEditVariable.setName(""); // NOI18N
         panelEditVariable.setPreferredSize(null);
         panelEditVariable.setRecordKeyOn(false);
 
@@ -218,7 +219,7 @@ public class DialogSpecifyMetadata extends DialogBase {
                     .addComponent(buttonRemove, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(buttonAdd, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jButtonGetSPSSMeta, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(2, 2, 2))
+                .addGap(8, 8, 8))
         );
         panelEditLayout.setVerticalGroup(
             panelEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -270,7 +271,7 @@ public class DialogSpecifyMetadata extends DialogBase {
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(panelEdit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGap(0, 0, 0)
                         .addComponent(panelEditVariable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
@@ -472,6 +473,7 @@ public class DialogSpecifyMetadata extends DialogBase {
         previousSelectedVariable = selectedVariable;
         calculateButtonStates();
         panelEditVariable.panelSetEnabled(selectedVariable != null);
+        panelEditVariable.setVisible(selectedVariable != null);
         panelEditVariable.enableForSPSS(comboBoxFormat.getSelectedIndex()==2);
         pack();
     }//GEN-LAST:event_listVariablesValueChanged
