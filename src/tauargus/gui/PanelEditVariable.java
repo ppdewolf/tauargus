@@ -263,20 +263,13 @@ public class PanelEditVariable extends javax.swing.JPanel {
                 if (!variable.CKMType.equals("N")){
                     switch (variable.CKMscaling){
                         case "F": radioButtonFlex.setSelected(true);
-                                  tableScaleParams.setValueAt(variable.CKMsigma0,1,0);
-                                  tableScaleParams.setValueAt(variable.CKMsigma1,1,1);
-                                  tableScaleParams.setValueAt(variable.CKMxstar,1,2);
-                                  tableScaleParams.setValueAt(variable.CKMq,1,3);
                             break;
                         case "N": radioButtonSimple.setSelected(true);
-                                  tableScaleParams.setValueAt(variable.CKMsigma1,1,0);
-                                  tableScaleParams.setValueAt("",1,1);
-                                  tableScaleParams.setValueAt("",1,2);
-                                  tableScaleParams.setValueAt("",1,3);
+                            break;
+                        default: radioButtonSimple.setSelected(true);
                             break;
                     }
-                    for (int i=1;i<variable.CKMTopK;i++){ tableScaleParams.setValueAt(variable.CKMepsilon[i],3,i-1); }
-                }                
+                }
                 break;
                 
             case RECORD_KEY:
@@ -1778,14 +1771,32 @@ public class PanelEditVariable extends javax.swing.JPanel {
 
    
     private void setScaleTable(JTable Tab, String Type, int NumEps){
-        Tab.setValueAt((Type.equals("F")) ? "<html>&sigma;<sub>0</sub></html>" : "<html>&sigma;<sub>1</sub></html>", 0, 0);
-        Tab.setValueAt((Type.equals("F")) ? "<html>&sigma;<sub>1</sub></html>" : "", 0, 1);
-        Tab.setValueAt((Type.equals("F")) ? "<html>x*</html>" : "", 0, 2);
-        Tab.setValueAt((Type.equals("F")) ? "<html>q</html>" : "", 0, 3);
-        Tab.setValueAt((1 < NumEps) ? "<html>&epsilon;<sub>2</sub></html>" : "", 2, 0);
-        Tab.setValueAt((2 < NumEps) ? "<html>&epsilon;<sub>3</sub></html>" : "", 2, 1);
-        Tab.setValueAt((3 < NumEps) ? "<html>&epsilon;<sub>4</sub></html>" : "", 2, 2);
-        Tab.setValueAt((4 < NumEps) ? "<html>&epsilon;<sub>5</sub></html>" : "", 2, 3);
+        Tab.setValueAt((Type.equals("F")) ? "<html><b>&sigma;<sub>0</sub></b></html>" : "<html><b>&sigma;<sub>1</sub></b></html>", 0, 0);
+        Tab.setValueAt((Type.equals("F")) ? "<html><b>&sigma;<sub>1</sub></b></html>" : "", 0, 1);
+        Tab.setValueAt((Type.equals("F")) ? "<html><b>x*</b></html>" : "", 0, 2);
+        Tab.setValueAt((Type.equals("F")) ? "<html><b>q</b></html>" : "", 0, 3);
+        Tab.setValueAt((1 < NumEps) ? "<html><b>&epsilon;<sub>2</sub></b></html>" : "", 2, 0);
+        Tab.setValueAt((2 < NumEps) ? "<html><b>&epsilon;<sub>3</sub></b></html>" : "", 2, 1);
+        Tab.setValueAt((3 < NumEps) ? "<html><b>&epsilon;<sub>4</sub></b></html>" : "", 2, 2);
+        Tab.setValueAt((4 < NumEps) ? "<html><b>&epsilon;<sub>5</sub></b></html>" : "", 2, 3);
+        
+        switch (Type){
+            case "F": radioButtonFlex.setSelected(true);
+                      tableScaleParams.setValueAt(currentVariable.CKMsigma0,1,0);
+                      tableScaleParams.setValueAt(currentVariable.CKMsigma1,1,1);
+                      tableScaleParams.setValueAt(currentVariable.CKMxstar,1,2);
+                      tableScaleParams.setValueAt(currentVariable.CKMq,1,3);
+                      break;
+            case "N": radioButtonSimple.setSelected(true);
+                      tableScaleParams.setValueAt(currentVariable.CKMsigma1,1,0);
+                      tableScaleParams.setValueAt("",1,1);
+                      tableScaleParams.setValueAt("",1,2);
+                      tableScaleParams.setValueAt("",1,3);
+                      break;
+            }
+            int maxEps = min(NumEps,currentVariable.CKMTopK);
+            for (int i=1;i<NumEps;i++){ tableScaleParams.setValueAt(currentVariable.CKMepsilon[i],3,i-1); }
+            for (int i=NumEps; i<5;i++) tableScaleParams.setValueAt("",3,i-1);
     }
     
     public void setScaleTableModel(){

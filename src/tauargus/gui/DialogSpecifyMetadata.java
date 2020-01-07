@@ -84,7 +84,7 @@ public class DialogSpecifyMetadata extends DialogBase {
         panelEditVariable.setDataType(metadata.dataFileType);
         panelEditVariable.setDataOrigin(metadata.dataOrigin);
         panelEditVariable.setRecordKeyOn(metadata.containsRecordKey());
-        panelEditVariable.panelSetEnabled(listVariables.getSelectedValue() != null);
+        //panelEditVariable.panelSetEnabled(listVariables.getSelectedValue() != null);
         panelEditVariable.setVisible(listVariables.getSelectedValue() != null);
         pack();
         setVisible(true);
