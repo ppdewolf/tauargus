@@ -461,6 +461,7 @@ public class DialogSpecifyMetadata extends DialogBase {
                         variableListModel.set(index, variable);
                     } catch (ArgusException ex) {
                         JOptionPane.showMessageDialog(null, ex.getMessage());
+                        return;
 //                        logger.log(Level.SEVERE, null, ex);
                     }
                 }
@@ -472,7 +473,7 @@ public class DialogSpecifyMetadata extends DialogBase {
 
         previousSelectedVariable = selectedVariable;
         calculateButtonStates();
-        panelEditVariable.panelSetEnabled(selectedVariable != null);
+        //panelEditVariable.panelSetEnabled(selectedVariable != null);
         panelEditVariable.setVisible(selectedVariable != null);
         panelEditVariable.enableForSPSS(comboBoxFormat.getSelectedIndex()==2);
         pack();

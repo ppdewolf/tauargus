@@ -22,10 +22,12 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.ItemEvent;
 import java.io.File;
+import static java.lang.Integer.min;
 import java.text.NumberFormat;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
@@ -390,8 +392,24 @@ public class PanelEditVariable extends javax.swing.JPanel {
         if (variable.isResponse()){
             variable.CKMType = buttonToCKMType(SwingUtils.getSelectedButton(buttonGroupCKM), CKMMap);
             if (variable.CKMType.equals("T")) {
-                variable.CKMTopK = Integer.parseInt(textFieldCKMTopK.getText());
+                try{
+                    int TopK = Integer.parseInt(textFieldCKMTopK.getText());
+                    if (TopK < 0 || TopK > 5){
+                        //throw new NumberFormatException();
+                        textFieldCKMTopK.setText("");
+                        textFieldCKMTopK.requestFocusInWindow();
+                        throw new ArgusException("TopK should be integer in [0,...,5]");
+                    }
+                    variable.CKMTopK = TopK;
+                }
+                catch (NumberFormatException e){
+                    //JOptionPane.showMessageDialog(null, "TopK should be integer", null, JOptionPane.ERROR_MESSAGE);
+                    textFieldCKMTopK.setText("");
+                    textFieldCKMTopK.requestFocusInWindow();
+                    throw new ArgusException("TopK should be integer in [0,...,5]");
+                }
             }
+            else variable.CKMTopK = 1;
             
             variable.zerosincellkey = checkBoxIncludeZeros.isSelected();
             variable.CKMapply_even_odd = checkBoxParity.isSelected();
@@ -1128,6 +1146,11 @@ public class PanelEditVariable extends javax.swing.JPanel {
 
         textFieldCKMTopK.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         textFieldCKMTopK.setText("1");
+        textFieldCKMTopK.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                textFieldCKMTopKFocusLost(evt);
+            }
+        });
 
         javax.swing.GroupLayout panelCKMTypeLayout = new javax.swing.GroupLayout(panelCKMType);
         panelCKMType.setLayout(panelCKMTypeLayout);
@@ -1169,14 +1192,19 @@ public class PanelEditVariable extends javax.swing.JPanel {
         buttonGroupScaling.add(radioButtonFlex);
         radioButtonFlex.setSelected(true);
         radioButtonFlex.setText("Flex function");
-        radioButtonFlex.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                radioButtonFlexItemStateChanged(evt);
+        radioButtonFlex.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                radioButtonFlexActionPerformed(evt);
             }
         });
 
         buttonGroupScaling.add(radioButtonSimple);
         radioButtonSimple.setText("Simple");
+        radioButtonSimple.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                radioButtonSimpleActionPerformed(evt);
+            }
+        });
 
         tableScaleParams.setBackground(new java.awt.Color(240, 240, 240));
         tableScaleParams.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(200, 200, 200)));
@@ -1762,12 +1790,53 @@ public class PanelEditVariable extends javax.swing.JPanel {
         SwingUtilities.getWindowAncestor(this).pack();
     }//GEN-LAST:event_radioButtonNoCKMItemStateChanged
 
-    private void radioButtonFlexItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_radioButtonFlexItemStateChanged
-        if (evt.getStateChange() == ItemEvent.SELECTED)
+    private void radioButtonFlexActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioButtonFlexActionPerformed
+        int TopK;
+        try{
+            TopK = Integer.parseInt(textFieldCKMTopK.getText());
+            if (TopK < 0 || TopK > 5){
+                throw new NumberFormatException();
+            }
             setScaleTable(tableScaleParams,"F",Integer.parseInt(textFieldCKMTopK.getText()));
-        else
+        }
+        catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "TopK should be integer in [0,...,5]", null, JOptionPane.ERROR_MESSAGE);
+            textFieldCKMTopK.setText("");
+            textFieldCKMTopK.requestFocusInWindow();
+        }
+    }//GEN-LAST:event_radioButtonFlexActionPerformed
+
+    private void radioButtonSimpleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioButtonSimpleActionPerformed
+        int TopK;
+        try{
+            TopK = Integer.parseInt(textFieldCKMTopK.getText());
+            if (TopK < 0 || TopK > 5){
+                throw new NumberFormatException();
+            }
             setScaleTable(tableScaleParams,"N",Integer.parseInt(textFieldCKMTopK.getText()));
-    }//GEN-LAST:event_radioButtonFlexItemStateChanged
+        }
+        catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "TopK should be integer in [0,...,5]", null, JOptionPane.ERROR_MESSAGE);
+            textFieldCKMTopK.setText("");
+            textFieldCKMTopK.requestFocusInWindow();
+        }
+    }//GEN-LAST:event_radioButtonSimpleActionPerformed
+
+    private void textFieldCKMTopKFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_textFieldCKMTopKFocusLost
+        int TopK;
+        try{
+            TopK = Integer.parseInt(textFieldCKMTopK.getText());
+            if (TopK < 0 || TopK > 5){
+                throw new NumberFormatException();
+            }
+            setScaleTable(tableScaleParams,currentVariable.CKMType,Integer.parseInt(textFieldCKMTopK.getText()));
+        }
+        catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "TopK should be integer in [0,...,5]", null, JOptionPane.ERROR_MESSAGE);
+            textFieldCKMTopK.setText("");
+            textFieldCKMTopK.requestFocusInWindow();
+        }
+    }//GEN-LAST:event_textFieldCKMTopKFocusLost
 
    
     private void setScaleTable(JTable Tab, String Type, int NumEps){
@@ -1795,7 +1864,8 @@ public class PanelEditVariable extends javax.swing.JPanel {
                       break;
             }
             int maxEps = min(NumEps,currentVariable.CKMTopK);
-            for (int i=1;i<NumEps;i++){ tableScaleParams.setValueAt(currentVariable.CKMepsilon[i],3,i-1); }
+            for (int i=1;i<maxEps;i++) tableScaleParams.setValueAt(currentVariable.CKMepsilon[i],3,i-1); 
+            for (int i=maxEps; i<NumEps; i++) tableScaleParams.setValueAt("-1.0",3,i-1); 
             for (int i=NumEps; i<5;i++) tableScaleParams.setValueAt("",3,i-1);
     }
     
