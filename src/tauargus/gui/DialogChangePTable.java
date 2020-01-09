@@ -9,6 +9,7 @@ import argus.utils.SystemUtils;
 import java.io.File;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import tauargus.model.ArgusException;
 import tauargus.model.TableSet;
 import tauargus.utils.TauArgusUtils;
 
@@ -35,9 +36,33 @@ public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
         setLocationRelativeTo(parent);
     }
     
-    public int showDialog(TableSet tableSet) {
+    public int showDialog(TableSet tableSet){
         tmpTableSet=tableSet;
-        textFieldPTable.setText(tmpTableSet.cellkeyVar.PTableFile);
+        
+        try{ 
+            String hs = tmpTableSet.cellkeyVar.PTableFile;
+            if ( hs.indexOf("\\",0)>0 ||hs.indexOf(":",0)>0||hs.indexOf(":",0)>0){}
+            else { hs = tmpTableSet.cellkeyVar.metadata.getFilePath(tmpTableSet.cellkeyVar.PTableFile);}
+            textFieldPTable.setText(hs);
+        
+            hs = tmpTableSet.cellkeyVar.PTableFileCont;
+            if ( hs.indexOf("\\",0)>0 ||hs.indexOf(":",0)>0||hs.indexOf(":",0)>0){}
+            else { hs = tmpTableSet.cellkeyVar.metadata.getFilePath(tmpTableSet.cellkeyVar.PTableFileCont);}
+            textFieldPTableCont.setText(hs);
+        
+            hs = tmpTableSet.cellkeyVar.PTableFileSep;
+            if ( hs.indexOf("\\",0)>0 ||hs.indexOf(":",0)>0||hs.indexOf(":",0)>0){}
+            else { hs = tmpTableSet.cellkeyVar.metadata.getFilePath(tmpTableSet.cellkeyVar.PTableFileSep);}
+            textFieldPTableSep.setText(hs);
+        
+            jLabelpTableCont.setVisible(tmpTableSet.respVar.isResponse());
+            jLabelpTableSep.setVisible(tmpTableSet.respVar.isResponse() && tmpTableSet.respVar.CKMseparation);
+            textFieldPTableCont.setVisible(tmpTableSet.respVar.isResponse());
+            textFieldPTableSep.setVisible(tmpTableSet.respVar.isResponse() && tmpTableSet.respVar.CKMseparation);
+        }
+        catch (ArgusException ex){
+            JOptionPane.showMessageDialog(null, ex.getMessage());
+        }
         setVisible(true);
         return returnValue;
     }
@@ -52,11 +77,17 @@ public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
     private void initComponents() {
 
         filechooser = new javax.swing.JFileChooser();
-        jLabel1 = new javax.swing.JLabel();
+        jLabelpTable = new javax.swing.JLabel();
         textFieldPTable = new javax.swing.JTextField();
         buttonPTable = new javax.swing.JButton();
         buttonOK = new javax.swing.JButton();
         buttonCancel = new javax.swing.JButton();
+        jLabelpTableCont = new javax.swing.JLabel();
+        jLabelpTableSep = new javax.swing.JLabel();
+        textFieldPTableCont = new javax.swing.JTextField();
+        textFieldPTableSep = new javax.swing.JTextField();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -65,7 +96,7 @@ public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
             }
         });
 
-        jLabel1.setText("ptable file:");
+        jLabelpTable.setText("FREQ ptable file:");
 
         buttonPTable.setText("...");
         buttonPTable.addActionListener(new java.awt.event.ActionListener() {
@@ -88,24 +119,50 @@ public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
             }
         });
 
+        jLabelpTableCont.setText("CONT ptable file:");
+
+        jLabelpTableSep.setText("SEP ptable file:");
+
+        jButton1.setText("...");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jButton2.setText("...");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(textFieldPTable)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(buttonPTable, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 416, Short.MAX_VALUE)
                         .addComponent(buttonOK, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(buttonCancel)))
+                        .addComponent(buttonCancel))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabelpTableSep, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabelpTableCont, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabelpTable, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(textFieldPTable)
+                            .addComponent(textFieldPTableCont, javax.swing.GroupLayout.DEFAULT_SIZE, 406, Short.MAX_VALUE)
+                            .addComponent(textFieldPTableSep))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(buttonPTable, javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)
+                            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -113,10 +170,20 @@ public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
+                    .addComponent(jLabelpTable)
                     .addComponent(textFieldPTable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(buttonPTable))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabelpTableCont)
+                    .addComponent(textFieldPTableCont, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabelpTableSep)
+                    .addComponent(textFieldPTableSep, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(buttonOK)
                     .addComponent(buttonCancel))
@@ -150,7 +217,7 @@ public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
 
     private void buttonPTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPTableActionPerformed
         TauArgusUtils.getDataDirFromRegistry(filechooser);
-        filechooser.setDialogTitle("Select ptable File");
+        filechooser.setDialogTitle("Select ptable file for frequency variable");
         filechooser.setSelectedFile(new File(""));
         filechooser.resetChoosableFileFilters();
         if (filechooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
@@ -164,6 +231,32 @@ public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
     private void DialogClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_DialogClosing
         setVisible(false);
     }//GEN-LAST:event_DialogClosing
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        TauArgusUtils.getDataDirFromRegistry(filechooser);
+        filechooser.setDialogTitle("Select ptable file for continuous variable");
+        filechooser.setSelectedFile(new File(""));
+        filechooser.resetChoosableFileFilters();
+        if (filechooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
+            String hs = filechooser.getSelectedFile().toString();
+            textFieldPTableCont.setText(hs);
+            TauArgusUtils.putDataDirInRegistry(hs);
+            tmpTableSet.cellkeyVar.PTableFileCont=hs;
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        TauArgusUtils.getDataDirFromRegistry(filechooser);
+        filechooser.setDialogTitle("Select ptable file for continuous variable, small values");
+        filechooser.setSelectedFile(new File(""));
+        filechooser.resetChoosableFileFilters();
+        if (filechooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
+            String hs = filechooser.getSelectedFile().toString();
+            textFieldPTableSep.setText(hs);
+            TauArgusUtils.putDataDirInRegistry(hs);
+            tmpTableSet.cellkeyVar.PTableFileSep=hs;
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -212,7 +305,13 @@ public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
     private javax.swing.JButton buttonOK;
     private javax.swing.JButton buttonPTable;
     private javax.swing.JFileChooser filechooser;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JLabel jLabelpTable;
+    private javax.swing.JLabel jLabelpTableCont;
+    private javax.swing.JLabel jLabelpTableSep;
     private javax.swing.JTextField textFieldPTable;
+    private javax.swing.JTextField textFieldPTableCont;
+    private javax.swing.JTextField textFieldPTableSep;
     // End of variables declaration//GEN-END:variables
 }

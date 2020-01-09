@@ -763,6 +763,38 @@ public class Metadata implements Cloneable {
                 }
             case RESPONSE:
                 writer.println("    <NUMERIC>");
+                if (!variable.CKMType.equals("N")){ // This means that CKM information for magnitude tables should/could be available
+                    writer.print("    <CKM> " + variable.CKMType);
+                    if (variable.CKMType.equals("T"))
+                        writer.println("("+variable.CKMTopK+")");
+                    writer.println("    <INCLUDEZEROS> " + (variable.zerosincellkey ? "Y" : "N"));
+                    writer.println("    <PARITY> " + (variable.CKMapply_even_odd ? "Y" : "N"));
+                    writer.print("    <SCALING> ");
+                    String hs;
+                    switch (variable.CKMscaling){
+                        case "F": hs = "F(";
+                                  hs += Double.toString(variable.CKMsigma0) + ",";
+                                  hs += Double.toString(variable.CKMsigma1) + ",";
+                                  hs += Double.toString(variable.CKMxstar) + ",";
+                                  hs += Double.toString(variable.CKMq);
+                                  for (int i=1; i<variable.CKMTopK; i++){
+                                      hs += "," + variable.CKMepsilon[i];
+                                  }
+                                  hs += ")";
+                                  writer.println(hs);
+                                  break;
+                        case "N": hs = "N(";
+                                  hs += Double.toString(variable.CKMsigma1) + ",";
+                                  for (int i=1; i<variable.CKMTopK; i++){
+                                      hs += "," + variable.CKMepsilon[i];
+                                  }
+                                  hs += ")";
+                                  writer.println(hs);
+                                  break;
+                        default: break;
+                    }
+                    writer.println("    <SEPARATION> " + (variable.CKMseparation ? "Y" : "N"));
+                }
                 break;
             case WEIGHT:
                 writer.println("    <WEIGHT>");
@@ -782,7 +814,15 @@ public class Metadata implements Cloneable {
                 String hs = variable.PTableFile;
                 if ( hs.indexOf("\\",0)>0 ||hs.indexOf(":",0)>0||hs.indexOf(":",0)>0){}
                 else { hs = variable.metadata.getFilePath(variable.PTableFile);}
-                writer.println("    <PFILE> " + StrUtils.quote(hs));
+                writer.println("    <PFILE_FREQ> " + StrUtils.quote(hs));
+                hs = variable.PTableFileCont;
+                if ( hs.indexOf("\\",0)>0 ||hs.indexOf(":",0)>0||hs.indexOf(":",0)>0){}
+                else { hs = variable.metadata.getFilePath(variable.PTableFileCont);}
+                writer.println("    <PFILE_CONT> " + StrUtils.quote(hs));
+                hs = variable.PTableFileSep;
+                if ( hs.indexOf("\\",0)>0 ||hs.indexOf(":",0)>0||hs.indexOf(":",0)>0){}
+                else { hs = variable.metadata.getFilePath(variable.PTableFileSep);}
+                writer.println("    <PFILE_SEP> " + StrUtils.quote(hs));
                 break;
             case SHADOW:
                 writer.println("    <NUMERIC> <SHADOW>");

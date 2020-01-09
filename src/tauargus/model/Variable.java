@@ -353,7 +353,6 @@ public class Variable implements Cloneable {
                 && type == variable.type
                 && bPos == variable.bPos
                 && varLen == variable.varLen;
-//                && truncatable == variable.truncatable // only needed fot MuArgus
 
         if (variable.isCategorical()) {
             equal = equal
@@ -380,6 +379,23 @@ public class Variable implements Cloneable {
             equal = equal && PTableFile.equals(variable.PTableFile);
         }
         
+        if (variable.type == Type.RESPONSE){
+            equal = equal 
+                    && Arrays.equals(CKMepsilon, variable.CKMepsilon)
+                    && CKMType.equals(variable.CKMType)
+                    && CKMTopK == variable.CKMTopK
+                    && CKMseparation == variable.CKMseparation
+                    && zerosincellkey == variable.zerosincellkey
+                    && CKMapply_even_odd == variable.CKMapply_even_odd
+                    && CKMm1squared == variable.CKMm1squared
+                    && CKMscaling.equals(variable.CKMscaling)
+                    && CKMsigma0 == variable.CKMsigma0
+                    && CKMsigma1 == variable.CKMsigma1
+                    && CKMxstar == variable.CKMxstar
+                    && CKMq == variable.CKMq
+                    && muC == variable.muC;
+        }
+        
         return equal;
     }
 
@@ -402,16 +418,16 @@ public class Variable implements Cloneable {
         hash = 89 * hash + Objects.hashCode(this.leadingString);
         hash = 89 * hash + Arrays.deepHashCode(this.missing);
         hash = 89 * hash + Objects.hashCode(this.totCode);
-/*        hash = 89 * hash + Objects.hashCode(this.PTableFile);
+        hash = 89 * hash + Objects.hashCode(this.PTableFile);
         hash = 89 * hash + Objects.hashCode(this.PTableFileCont);
         hash = 89 * hash + Objects.hashCode(this.PTableFileSep);
         hash = 89 * hash + (this.zerosincellkey ? 1 : 0);
-        hash = 89 * hash + (this.apply_even_odd ? 1 : 0);
+        hash = 89 * hash + (this.CKMapply_even_odd ? 1 : 0);
         hash = 89 * hash + Objects.hashCode(this.CKMType);
         hash = 89 * hash + this.CKMTopK;
         hash = 89 * hash + (this.CKMseparation ? 1 : 0);
         hash = 89 * hash + Objects.hashCode(this.CKMscaling);
-*/
+
         return hash;
     }
 

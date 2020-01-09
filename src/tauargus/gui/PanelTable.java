@@ -628,6 +628,7 @@ public class PanelTable extends javax.swing.JPanel {
     public void updateSuppressButtons() {
         int s = tableSet.suppressed; 
         int radioSelect = 0; 
+        boolean CKMpossible = false;
         String hs = "";
         try {
            hs = SystemUtils.getApplicationDirectory(PanelTable.class).getCanonicalPath();
@@ -639,11 +640,13 @@ public class PanelTable extends javax.swing.JPanel {
         
         radioButtonNetwork.setVisible(TauArgusUtils.ExistFile(hs+"/main1H2D.exe")||TauArgusUtils.ExistFile(hs+"/main1H2D")); 
         
-        radioButtonCellKey.setVisible(tableSet.CellKeyAvailable);
-        buttonChangePTable.setVisible(tableSet.CellKeyAvailable);
+        CKMpossible = tableSet.CellKeyAvailable && (!tableSet.respVar.CKMType.equals("N") || tableSet.respVar.type.equals(Type.FREQUENCY));
+        
+        radioButtonCellKey.setVisible(CKMpossible);
+        buttonChangePTable.setVisible(CKMpossible);
         // For now not possible to change the ptablefile for magnitude tables, only for frequency tables
-        buttonChangePTable.setEnabled(radioButtonCellKey.isSelected() && !tableSet.respVar.isResponse());
-        if (tableSet.CellKeyAvailable){
+        buttonChangePTable.setEnabled(radioButtonCellKey.isSelected());// && !tableSet.respVar.isResponse());
+        if (CKMpossible){
             if (tableSet.respVar.isResponse()){
                 labelPTable.setText("ptablefileCont: "+tableSet.cellkeyVar.PTableFileCont.substring(tableSet.cellkeyVar.PTableFileCont.lastIndexOf("\\")+1));
             }
@@ -651,7 +654,7 @@ public class PanelTable extends javax.swing.JPanel {
                 labelPTable.setText("ptablefile: "+tableSet.cellkeyVar.PTableFile.substring(tableSet.cellkeyVar.PTableFile.lastIndexOf("\\")+1));
             }
         }
-        labelPTable.setVisible(tableSet.CellKeyAvailable);
+        labelPTable.setVisible(CKMpossible);
         
         for (int i = 0; i < radioButtonSuppress.length; i++) {
             radioButtonSuppress[i].setEnabled(s == TableSet.SUP_NO);
@@ -676,7 +679,7 @@ public class PanelTable extends javax.swing.JPanel {
             }
         }
         
-        checkBoxColoredView.setVisible(tableSet.CellKeyAvailable);
+        checkBoxColoredView.setVisible(CKMpossible);
         boolean b = (s == TableSet.SUP_CKM) || (s == TableSet.SUP_NO);
         if (tableSet.respVar.isResponse()){ b=false;} // For now no colored view for magnitude tables
                 
@@ -1004,7 +1007,7 @@ public class PanelTable extends javax.swing.JPanel {
 
         panelCellInformation.setBorder(javax.swing.BorderFactory.createTitledBorder("Cell Information"));
         panelCellInformation.setMinimumSize(new java.awt.Dimension(273, 368));
-        panelCellInformation.setPreferredSize(new java.awt.Dimension(273, 368));
+        panelCellInformation.setPreferredSize(null);
 
         panelStatus.setBorder(javax.swing.BorderFactory.createTitledBorder("Change status"));
         panelStatus.setToolTipText("");
@@ -1077,7 +1080,7 @@ public class PanelTable extends javax.swing.JPanel {
                     .addComponent(buttonSafe, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(19, 19, 19)
                 .addGroup(panelStatusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(buttonSecondary, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(buttonSecondary, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 111, Short.MAX_VALUE)
                     .addComponent(buttonNonStructEmpty, javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(buttonPriory, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
@@ -1110,7 +1113,7 @@ public class PanelTable extends javax.swing.JPanel {
             }
         });
 
-        panelSuppress.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Suppress"));
+        panelSuppress.setBorder(javax.swing.BorderFactory.createTitledBorder("Suppress"));
 
         buttonGroupSuppress.add(radioButtonHyperCube);
         radioButtonHyperCube.setSelected(true);

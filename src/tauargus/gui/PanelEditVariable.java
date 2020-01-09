@@ -33,6 +33,8 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
@@ -418,19 +420,20 @@ public class PanelEditVariable extends javax.swing.JPanel {
             if (!variable.CKMType.equals("N")){
                 switch (variable.CKMscaling){
                     case "F":
-                        variable.CKMsigma0 = (Double) tableScaleParams.getValueAt(1,0);
-                        variable.CKMsigma1 = (Double) tableScaleParams.getValueAt(1,1);
-                        variable.CKMxstar = (Double) tableScaleParams.getValueAt(1,2);
-                        variable.CKMq = (Double) tableScaleParams.getValueAt(1,3);
+                        variable.CKMsigma0 = Double.parseDouble(tableScaleParams.getValueAt(1,0).toString());
+                        variable.CKMsigma1 = Double.parseDouble(tableScaleParams.getValueAt(1,1).toString());
+                        variable.CKMxstar = Double.parseDouble(tableScaleParams.getValueAt(1,2).toString());
+                        variable.CKMq = Double.parseDouble(tableScaleParams.getValueAt(1,3).toString());
                         variable.CKMepsilon = new double[variable.CKMTopK];
                         variable.CKMepsilon[0] = 1.0;
-                        for (int i=1; i<variable.CKMTopK;i++) variable.CKMepsilon[i] = (Double) tableScaleParams.getValueAt(3,i-1);
+                        for (int i=1; i<variable.CKMTopK;i++) 
+                            variable.CKMepsilon[i] = Double.parseDouble(tableScaleParams.getValueAt(3,i-1).toString());
                         break;
                     case "N":
-                        variable.CKMsigma1 = (Double) tableScaleParams.getValueAt(1,1);                        
+                        variable.CKMsigma1 = Double.parseDouble(tableScaleParams.getValueAt(1,1).toString());
                         variable.CKMepsilon = new double[variable.CKMTopK];
                         variable.CKMepsilon[0] = 1.0;
-                        for (int i=1; i<variable.CKMTopK;i++) variable.CKMepsilon[i] = (Double) tableScaleParams.getValueAt(3,i-1);
+                        for (int i=1; i<variable.CKMTopK;i++) variable.CKMepsilon[i] = Double.parseDouble(tableScaleParams.getValueAt(3,i-1).toString());
                         break;
                 }
             }
@@ -1791,65 +1794,44 @@ public class PanelEditVariable extends javax.swing.JPanel {
     }//GEN-LAST:event_radioButtonNoCKMItemStateChanged
 
     private void radioButtonFlexActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioButtonFlexActionPerformed
-        int TopK;
-        try{
-            TopK = Integer.parseInt(textFieldCKMTopK.getText());
-            if (TopK < 0 || TopK > 5){
-                throw new NumberFormatException();
-            }
-            setScaleTable(tableScaleParams,"F",Integer.parseInt(textFieldCKMTopK.getText()));
-        }
-        catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "TopK should be integer in [0,...,5]", null, JOptionPane.ERROR_MESSAGE);
-            textFieldCKMTopK.setText("");
-            textFieldCKMTopK.requestFocusInWindow();
-        }
+        displayScaling("F");
     }//GEN-LAST:event_radioButtonFlexActionPerformed
 
     private void radioButtonSimpleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioButtonSimpleActionPerformed
-        int TopK;
-        try{
-            TopK = Integer.parseInt(textFieldCKMTopK.getText());
-            if (TopK < 0 || TopK > 5){
-                throw new NumberFormatException();
-            }
-            setScaleTable(tableScaleParams,"N",Integer.parseInt(textFieldCKMTopK.getText()));
-        }
-        catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "TopK should be integer in [0,...,5]", null, JOptionPane.ERROR_MESSAGE);
-            textFieldCKMTopK.setText("");
-            textFieldCKMTopK.requestFocusInWindow();
-        }
+        displayScaling("N");
     }//GEN-LAST:event_radioButtonSimpleActionPerformed
 
     private void textFieldCKMTopKFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_textFieldCKMTopKFocusLost
+        displayScaling(currentVariable.CKMscaling);
+    }//GEN-LAST:event_textFieldCKMTopKFocusLost
+
+    private void displayScaling(String ScalingType){
         int TopK;
         try{
             TopK = Integer.parseInt(textFieldCKMTopK.getText());
             if (TopK < 0 || TopK > 5){
                 throw new NumberFormatException();
             }
-            setScaleTable(tableScaleParams,currentVariable.CKMType,Integer.parseInt(textFieldCKMTopK.getText()));
+            setScaleTable(tableScaleParams,ScalingType,Integer.parseInt(textFieldCKMTopK.getText()));
         }
         catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "TopK should be integer in [0,...,5]", null, JOptionPane.ERROR_MESSAGE);
             textFieldCKMTopK.setText("");
             textFieldCKMTopK.requestFocusInWindow();
         }
-    }//GEN-LAST:event_textFieldCKMTopKFocusLost
-
+    }
    
-    private void setScaleTable(JTable Tab, String Type, int NumEps){
-        Tab.setValueAt((Type.equals("F")) ? "<html><b>&sigma;<sub>0</sub></b></html>" : "<html><b>&sigma;<sub>1</sub></b></html>", 0, 0);
-        Tab.setValueAt((Type.equals("F")) ? "<html><b>&sigma;<sub>1</sub></b></html>" : "", 0, 1);
-        Tab.setValueAt((Type.equals("F")) ? "<html><b>x*</b></html>" : "", 0, 2);
-        Tab.setValueAt((Type.equals("F")) ? "<html><b>q</b></html>" : "", 0, 3);
+    private void setScaleTable(JTable Tab, String ScalingType, int NumEps){
+        Tab.setValueAt((ScalingType.equals("F")) ? "<html><b>&sigma;<sub>0</sub></b></html>" : "<html><b>&sigma;<sub>1</sub></b></html>", 0, 0);
+        Tab.setValueAt((ScalingType.equals("F")) ? "<html><b>&sigma;<sub>1</sub></b></html>" : "", 0, 1);
+        Tab.setValueAt((ScalingType.equals("F")) ? "<html><b>x*</b></html>" : "", 0, 2);
+        Tab.setValueAt((ScalingType.equals("F")) ? "<html><b>q</b></html>" : "", 0, 3);
         Tab.setValueAt((1 < NumEps) ? "<html><b>&epsilon;<sub>2</sub></b></html>" : "", 2, 0);
         Tab.setValueAt((2 < NumEps) ? "<html><b>&epsilon;<sub>3</sub></b></html>" : "", 2, 1);
         Tab.setValueAt((3 < NumEps) ? "<html><b>&epsilon;<sub>4</sub></b></html>" : "", 2, 2);
         Tab.setValueAt((4 < NumEps) ? "<html><b>&epsilon;<sub>5</sub></b></html>" : "", 2, 3);
         
-        switch (Type){
+        switch (ScalingType){
             case "F": radioButtonFlex.setSelected(true);
                       tableScaleParams.setValueAt(currentVariable.CKMsigma0,1,0);
                       tableScaleParams.setValueAt(currentVariable.CKMsigma1,1,1);

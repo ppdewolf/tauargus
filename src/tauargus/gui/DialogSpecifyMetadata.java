@@ -474,7 +474,7 @@ public class DialogSpecifyMetadata extends DialogBase {
         previousSelectedVariable = selectedVariable;
         calculateButtonStates();
         //panelEditVariable.panelSetEnabled(selectedVariable != null);
-        panelEditVariable.setVisible(selectedVariable != null);
+        //panelEditVariable.setVisible(selectedVariable != null);
         panelEditVariable.enableForSPSS(comboBoxFormat.getSelectedIndex()==2);
         pack();
     }//GEN-LAST:event_listVariablesValueChanged

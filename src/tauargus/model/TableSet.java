@@ -320,7 +320,7 @@ public class TableSet {
             if (costVar == null) {
                 costVar = respVar;
             }
-        }else{ // there is a record key available in the data
+        }else{ // find out if a record key is available in the data
             CellKeyAvailable = !(metadata.find(tauargus.model.Type.RECORD_KEY)==null);
         }
     }
