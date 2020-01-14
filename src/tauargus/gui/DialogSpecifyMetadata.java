@@ -50,7 +50,6 @@ public class DialogSpecifyMetadata extends DialogBase {
         initComponents();
         listVariables.setSelectionModel(new SingleListSelectionModel());
         listVariables.setCellRenderer(new VariableNameCellRenderer());
-        setLocationRelativeTo(parent);
     }
 
     public int showDialog(Metadata metadata) {
@@ -86,7 +85,9 @@ public class DialogSpecifyMetadata extends DialogBase {
         panelEditVariable.setRecordKeyOn(metadata.containsRecordKey());
         //panelEditVariable.panelSetEnabled(listVariables.getSelectedValue() != null);
         panelEditVariable.setVisible(listVariables.getSelectedValue() != null);
+        panelEditVariable.setCountRecordKeys(metadata.count(tauargus.model.Type.RECORD_KEY));
         pack();
+        setLocationRelativeTo(this.getParent());
         setVisible(true);
         return returnValue;
     }
@@ -123,6 +124,7 @@ public class DialogSpecifyMetadata extends DialogBase {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Specify Metadata");
+        setModalityType(java.awt.Dialog.ModalityType.APPLICATION_MODAL);
         setPreferredSize(null);
         setResizable(false);
 
@@ -459,6 +461,10 @@ public class DialogSpecifyMetadata extends DialogBase {
                     try {
                         panelEditVariable.save(variable);
                         variableListModel.set(index, variable);
+                        if ((previousSelectedVariable.type == tauargus.model.Type.RECORD_KEY) && (variable.type != tauargus.model.Type.RECORD_KEY))
+                            panelEditVariable.setCountRecordKeys(panelEditVariable.getCountRecordKeys() - 1);
+                        if ((previousSelectedVariable.type != tauargus.model.Type.RECORD_KEY) && (variable.type == tauargus.model.Type.RECORD_KEY))
+                            panelEditVariable.setCountRecordKeys(panelEditVariable.getCountRecordKeys() + 1);
                     } catch (ArgusException ex) {
                         JOptionPane.showMessageDialog(null, ex.getMessage());
                         return;

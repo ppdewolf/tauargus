@@ -133,19 +133,23 @@ public class PanelCellDetails extends javax.swing.JPanel {
         labelProtectionInterval.setVisible(visible);
         textFieldProtectionLower.setVisible(visible);
         textFieldProtectionUpper.setVisible(visible);
-        textFieldProtectionLower.setText(doubleFormatter.format(cell.response - cell.lower)); 
-        textFieldProtectionUpper.setText(doubleFormatter.format(cell.response + cell.upper)); 
-        textFieldProtectionLower.setToolTipText(getToolTipText(true, cell.lower, cell.response));
-        textFieldProtectionUpper.setToolTipText(getToolTipText(false, cell.upper, cell.response));
+        if (visible){
+            textFieldProtectionLower.setText(doubleFormatter.format(cell.response - cell.lower)); 
+            textFieldProtectionUpper.setText(doubleFormatter.format(cell.response + cell.upper)); 
+            textFieldProtectionLower.setToolTipText(getToolTipText(true, cell.lower, cell.response));
+            textFieldProtectionUpper.setToolTipText(getToolTipText(false, cell.upper, cell.response));
+        }
 
         visible = table.hasBeenAudited && !cell.status.isSafe();
         textFieldRealizedLower.setVisible(visible);
         textFieldRealizedUpper.setVisible(visible);
         labelAuditInterval.setVisible(visible);
-        textFieldRealizedLower.setText(doubleFormatter.format(cell.realizedLower));
-        textFieldRealizedUpper.setText(doubleFormatter.format(cell.realizedUpper));
-        textFieldRealizedLower.setToolTipText(getToolTipText(true, cell.response - cell.realizedLower, cell.response));
-        textFieldRealizedUpper.setToolTipText(getToolTipText(false, cell.realizedUpper - cell.response, cell.response));
+        if (visible){
+            textFieldRealizedLower.setText(doubleFormatter.format(cell.realizedLower));
+            textFieldRealizedUpper.setText(doubleFormatter.format(cell.realizedUpper));
+            textFieldRealizedLower.setToolTipText(getToolTipText(true, cell.response - cell.realizedLower, cell.response));
+            textFieldRealizedUpper.setToolTipText(getToolTipText(false, cell.realizedUpper - cell.response, cell.response));
+        }
     }
 
     /**
@@ -180,6 +184,8 @@ public class PanelCellDetails extends javax.swing.JPanel {
         labelTopN = new javax.swing.JLabel();
         labelContributions = new javax.swing.JLabel();
         labelCost = new javax.swing.JLabel();
+
+        setName(""); // NOI18N
 
         labelValue.setText("Value");
 
@@ -256,10 +262,6 @@ public class PanelCellDetails extends javax.swing.JPanel {
                     .addComponent(labelAuditInterval, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(labelProtectionInterval, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(textFieldProtectionLower, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(textFieldProtectionUpper, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
                         .addComponent(textFieldRealizedLower, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(textFieldRealizedUpper, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -285,7 +287,11 @@ public class PanelCellDetails extends javax.swing.JPanel {
                             .addComponent(textFieldValue, javax.swing.GroupLayout.Alignment.TRAILING)))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(checkBoxHoldingLevel, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(textFieldProtectionLower, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(textFieldProtectionUpper, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -316,7 +322,7 @@ public class PanelCellDetails extends javax.swing.JPanel {
                     .addComponent(labelContributions)
                     .addComponent(textFieldContributions, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(labelTopN)
                     .addComponent(labelTopNValue))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)

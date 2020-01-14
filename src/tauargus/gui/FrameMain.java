@@ -141,8 +141,8 @@ public class FrameMain extends javax.swing.JFrame {
     private final Action specifyMetadataAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            DialogSpecifyMetadata dialog = new DialogSpecifyMetadata(FrameMain.this, true);
             Metadata metadata = Application.getMetadata(0);
+            DialogSpecifyMetadata dialog = new DialogSpecifyMetadata(FrameMain.this, true);
             if (dialog.showDialog(metadata) == DialogSpecifyMetadata.APPROVE_OPTION) {
                 organise();
             }
@@ -543,11 +543,6 @@ public class FrameMain extends javax.swing.JFrame {
         menuItemOpenMicrodata.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/OpenMicrodata.png"))); // NOI18N
         menuItemOpenMicrodata.setMnemonic('M');
         menuItemOpenMicrodata.setText("Open Microdata...");
-        menuItemOpenMicrodata.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuItemOpenMicrodataActionPerformed(evt);
-            }
-        });
         menuFile.add(menuItemOpenMicrodata);
 
         menuItemOpenTable.setAction(openTableAction);
@@ -555,11 +550,6 @@ public class FrameMain extends javax.swing.JFrame {
         menuItemOpenTable.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/OpenTable.png"))); // NOI18N
         menuItemOpenTable.setMnemonic('T');
         menuItemOpenTable.setText("Open Table...");
-        menuItemOpenTable.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuItemOpenTableActionPerformed(evt);
-            }
-        });
         menuFile.add(menuItemOpenTable);
 
         menuItemOpenTableSet.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/OpenTableSet.png"))); // NOI18N
@@ -880,10 +870,6 @@ public class FrameMain extends javax.swing.JFrame {
         // TODO add your handling code here:*/
     }//GEN-LAST:event_menuItemLinkedTablesActionPerformed
 
-    private void menuItemOpenMicrodataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemOpenMicrodataActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_menuItemOpenMicrodataActionPerformed
-
     private void menuItemOpenBatchProcessActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemOpenBatchProcessActionPerformed
         // TODO add your handling code here:
 //        String hs = SystemUtils.getRegString("general", "datadir", "");
@@ -919,10 +905,6 @@ public class FrameMain extends javax.swing.JFrame {
              }.start();     
         }           
     }//GEN-LAST:event_menuItemOpenBatchProcessActionPerformed
-
-    private void menuItemOpenTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemOpenTableActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_menuItemOpenTableActionPerformed
 
     private void menuItemSolverOptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemSolverOptionsActionPerformed
         // TODO add your handling code here:

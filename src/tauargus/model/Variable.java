@@ -376,7 +376,9 @@ public class Variable implements Cloneable {
         }
         
         if (variable.type == Type.RECORD_KEY){
-            equal = equal && PTableFile.equals(variable.PTableFile);
+            equal = equal && PTableFile.equals(variable.PTableFile)
+                    && PTableFileCont.equals(variable.PTableFileCont)
+                    && PTableFileSep.equals(variable.PTableFileSep);
         }
         
         if (variable.type == Type.RESPONSE){

@@ -57,11 +57,9 @@ public class Metadata implements Cloneable {
     public int dataFileType = DATA_FILE_TYPE_FIXED;
     public String metaFile = "";
     public String dataFile = "";
-    public String mataPath = "";
+    //public String mataPath = ""; // Never used????
     public String fieldSeparator = ";";
 
-// Anco 1.6
-//    public List<Variable> variables = new ArrayList<>();
     public List<Variable> variables = new ArrayList<>();
     public String safeStatus = "S";
     public String unSafeStatus = "U";
@@ -81,7 +79,7 @@ public class Metadata implements Cloneable {
         }
         return false;
     }
-
+    
     public int count(Type type) {
         int n = 0;
         for (Variable variable : variables) {
@@ -363,6 +361,9 @@ public class Metadata implements Cloneable {
                         variable.truncatable = true;
                         break;
                     case "<RECORDKEY>":
+                        if (this.containsRecordKey()){
+                            throw new ArgusException("Only one <RECORDKEY> variable is allowed. Please check your .rda-file.");
+                        }
                         hs = tokenizer.nextToken();
                         if (!hs.equals("")) {
                             throw new ArgusException("Unknown token (" + hs + ") in line " + tokenizer.getLineNumber() + " after keyword <RECORDKEY>.");
@@ -991,6 +992,9 @@ public class Metadata implements Cloneable {
             
             if (variable.isResponse()){
                 if (!variable.CKMType.equals("N")){
+                    if (this.find(Type.RECORD_KEY).PTableFileCont.equals("")){
+                        throw new ArgusException("CKM specified for continuous variable, without specification of ptable for continuous CKM.");
+                    }
                     if (!(variable.CKMscaling.equals("F") || variable.CKMscaling.equals("N"))){
                         throw new ArgusException("Scaling should be set for variable " + variable.name + " when CKM is allowed.");
                     }

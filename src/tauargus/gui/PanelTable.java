@@ -399,23 +399,11 @@ public class PanelTable extends javax.swing.JPanel {
         initComponentArrays();
         initTableRenderers();
         initTableSelectionListeners();
-        //show the UWE radio button only if the software is available and Anco option is enabled
-/*        if (Application.isAnco()){
-            try {
-                hs = SystemUtils.getApplicationDirectory(PanelTable.class).getCanonicalPath();
-            } catch (Exception ex) {}
-        
-            radioButtonUwe.setVisible(TauArgusUtils.ExistFile(hs+"/EXP_ExternalUnpickerOnJJ.exe"));
-        }*/
         radioButtonUwe.setVisible(false);
         radioButtonMarginal.setVisible(false);
         checkBoxInverseWeight.setVisible(false);
-//        radioButtonUwe.setVisible(TauArgusUtils.ExistFile(hs+"/EXP_ExternalUnpickerOnJJ.exe"));        
-//        radioButtonNetwork.setVisible(TauArgusUtils.ExistFile(hs+"/main1H2D.exe"));
-//        moved to updateSuppressButtons        
+      
         // disable reordering of columns
-
-        
         table.getTableHeader().setReorderingAllowed(false);        
     }
     
@@ -643,23 +631,30 @@ public class PanelTable extends javax.swing.JPanel {
         CKMpossible = tableSet.CellKeyAvailable && (!tableSet.respVar.CKMType.equals("N") || tableSet.respVar.type.equals(Type.FREQUENCY));
         
         radioButtonCellKey.setVisible(CKMpossible);
-        buttonChangePTable.setVisible(CKMpossible);
-        // For now not possible to change the ptablefile for magnitude tables, only for frequency tables
+        buttonChangePTable.setVisible(CKMpossible && radioButtonCellKey.isSelected());
         buttonChangePTable.setEnabled(radioButtonCellKey.isSelected());// && !tableSet.respVar.isResponse());
         if (CKMpossible){
             if (tableSet.respVar.isResponse()){
                 labelPTable.setText("ptablefileCont: "+tableSet.cellkeyVar.PTableFileCont.substring(tableSet.cellkeyVar.PTableFileCont.lastIndexOf("\\")+1));
+                if (tableSet.respVar.CKMseparation){
+                    labelPTableSep.setText("ptablefileSep: "+tableSet.cellkeyVar.PTableFileSep.substring(tableSet.cellkeyVar.PTableFileSep.lastIndexOf("\\")+1));
+                }
+                else labelPTableSep.setText("");
             }
             else{
                 labelPTable.setText("ptablefile: "+tableSet.cellkeyVar.PTableFile.substring(tableSet.cellkeyVar.PTableFile.lastIndexOf("\\")+1));
+                labelPTableSep.setText("");
             }
         }
-        labelPTable.setVisible(CKMpossible);
+        labelPTable.setVisible(CKMpossible && radioButtonCellKey.isSelected());
+        labelPTableSep.setVisible(CKMpossible && radioButtonCellKey.isSelected());
         
         for (int i = 0; i < radioButtonSuppress.length; i++) {
             radioButtonSuppress[i].setEnabled(s == TableSet.SUP_NO);
             if (radioButtonSuppress[i].isSelected()){radioSelect = i;}
         }
+        labelPTable.setEnabled(s == TableSet.SUP_NO);
+        labelPTableSep.setEnabled(s == TableSet.SUP_NO);
         
         checkBoxInverseWeight.setEnabled(radioButtonSuppress[radioSelect]== radioButtonOptimal);
         if (radioSelect == radioButtonSuppress.length-2 || s == TableSet.SUP_ROUNDING){ //Rounder selected
@@ -682,7 +677,6 @@ public class PanelTable extends javax.swing.JPanel {
         checkBoxColoredView.setVisible(CKMpossible);
         boolean b = (s == TableSet.SUP_CKM) || (s == TableSet.SUP_NO);
         if (tableSet.respVar.isResponse()){ b=false;} // For now no colored view for magnitude tables
-                
         checkBoxColoredView.setEnabled(b);
         if (!b) checkBoxColoredView.setSelected(false);
         if (s == TableSet.SUP_CKM) {
@@ -906,6 +900,7 @@ public class PanelTable extends javax.swing.JPanel {
         radioButtonCellKey = new javax.swing.JRadioButton();
         buttonChangePTable = new javax.swing.JButton();
         labelPTable = new javax.swing.JLabel();
+        labelPTableSep = new javax.swing.JLabel();
         labelRowColVars = new javax.swing.JLabel();
         panelBottomButtons = new javax.swing.JPanel();
         buttonSelectView = new javax.swing.JButton();
@@ -1005,13 +1000,13 @@ public class PanelTable extends javax.swing.JPanel {
             }
         });
 
-        panelCellInformation.setBorder(javax.swing.BorderFactory.createTitledBorder("Cell Information"));
-        panelCellInformation.setMinimumSize(new java.awt.Dimension(273, 368));
+        panelCellInformation.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Cell Information"));
+        panelCellInformation.setMinimumSize(null);
+        panelCellInformation.setName(""); // NOI18N
         panelCellInformation.setPreferredSize(null);
 
-        panelStatus.setBorder(javax.swing.BorderFactory.createTitledBorder("Change status"));
+        panelStatus.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Change status"));
         panelStatus.setToolTipText("");
-        panelStatus.setPreferredSize(new java.awt.Dimension(273, 155));
 
         buttonSecondary.setText("Set to second.");
         buttonSecondary.setNextFocusableComponent(table);
@@ -1080,15 +1075,15 @@ public class PanelTable extends javax.swing.JPanel {
                     .addComponent(buttonSafe, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(19, 19, 19)
                 .addGroup(panelStatusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(buttonSecondary, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 111, Short.MAX_VALUE)
-                    .addComponent(buttonNonStructEmpty, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(buttonPriory, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(buttonSecondary, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(buttonNonStructEmpty, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(buttonPriory, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
         panelStatusLayout.setVerticalGroup(
             panelStatusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelStatusLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(12, Short.MAX_VALUE)
                 .addGroup(panelStatusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(buttonSafe)
                     .addComponent(buttonSecondary))
@@ -1107,22 +1102,18 @@ public class PanelTable extends javax.swing.JPanel {
         );
 
         buttonRecode.setText("Recode");
+        buttonRecode.setPreferredSize(null);
         buttonRecode.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonRecodeActionPerformed(evt);
             }
         });
 
-        panelSuppress.setBorder(javax.swing.BorderFactory.createTitledBorder("Suppress"));
+        panelSuppress.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Suppress"));
 
         buttonGroupSuppress.add(radioButtonHyperCube);
         radioButtonHyperCube.setSelected(true);
         radioButtonHyperCube.setText("Hypercube");
-        radioButtonHyperCube.addContainerListener(new java.awt.event.ContainerAdapter() {
-            public void componentAdded(java.awt.event.ContainerEvent evt) {
-                radioButtonHyperCubeComponentAdded(evt);
-            }
-        });
         radioButtonHyperCube.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 radioButtonHyperCubeActionPerformed(evt);
@@ -1225,7 +1216,7 @@ public class PanelTable extends javax.swing.JPanel {
         });
 
         buttonChangePTable.setText("Change ptable");
-        buttonChangePTable.setToolTipText("Currently only available for frequency count tables");
+        buttonChangePTable.setToolTipText("");
         buttonChangePTable.setPreferredSize(new java.awt.Dimension(57, 23));
         buttonChangePTable.setRequestFocusEnabled(false);
         buttonChangePTable.addActionListener(new java.awt.event.ActionListener() {
@@ -1235,6 +1226,11 @@ public class PanelTable extends javax.swing.JPanel {
         });
 
         labelPTable.setText("ptable");
+        labelPTable.setMaximumSize(new java.awt.Dimension(34, 14));
+        labelPTable.setMinimumSize(new java.awt.Dimension(34, 14));
+        labelPTable.setPreferredSize(new java.awt.Dimension(34, 14));
+
+        labelPTableSep.setText("ptableSEP");
 
         javax.swing.GroupLayout panelSuppressLayout = new javax.swing.GroupLayout(panelSuppress);
         panelSuppress.setLayout(panelSuppressLayout);
@@ -1242,47 +1238,39 @@ public class PanelTable extends javax.swing.JPanel {
             panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelSuppressLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelSuppressLayout.createSequentialGroup()
-                        .addGap(21, 21, 21)
-                        .addComponent(labelPTable, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addContainerGap())
+                .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(panelSuppressLayout.createSequentialGroup()
                         .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(panelSuppressLayout.createSequentialGroup()
-                                .addComponent(radioButtonModular)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(buttonUndoSuppress, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelSuppressLayout.createSequentialGroup()
                                 .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(radioButtonOptimal)
-                                    .addComponent(radioButtonHyperCube)
-                                    .addComponent(radioButtonNetwork))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(buttonSuppress, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(buttonAudit, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addContainerGap())
+                                    .addComponent(radioButtonCellKey, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addComponent(radioButtonHyperCube, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(radioButtonModular, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(radioButtonOptimal, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(radioButtonNetwork, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(radioButtonRounding, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(radioButtonCta, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 115, Short.MAX_VALUE)))
+                                .addGap(31, 31, 31)
+                                .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(buttonSuppress, javax.swing.GroupLayout.DEFAULT_SIZE, 103, Short.MAX_VALUE)
+                                        .addComponent(buttonAudit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(buttonUndoSuppress, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addComponent(buttonChangePTable, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(panelSuppressLayout.createSequentialGroup()
+                                .addGap(21, 21, 21)
+                                .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(labelPTableSep, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(labelPTable, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGap(10, 10, 10))
                     .addGroup(panelSuppressLayout.createSequentialGroup()
-                        .addComponent(radioButtonRounding)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(panelSuppressLayout.createSequentialGroup()
-                        .addComponent(radioButtonCta)
+                        .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(radioButtonUwe, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(radioButtonMarginal, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(checkBoxInverseWeight, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(20, 20, 20))
-                    .addGroup(panelSuppressLayout.createSequentialGroup()
-                        .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(panelSuppressLayout.createSequentialGroup()
-                                .addComponent(radioButtonCellKey)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(buttonChangePTable, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(panelSuppressLayout.createSequentialGroup()
-                                .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(radioButtonUwe)
-                                    .addComponent(radioButtonMarginal))
-                                .addGap(0, 0, Short.MAX_VALUE)))
-                        .addContainerGap())))
+                        .addComponent(checkBoxInverseWeight)
+                        .addGap(20, 20, 20))))
         );
         panelSuppressLayout.setVerticalGroup(
             panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1301,23 +1289,25 @@ public class PanelTable extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(radioButtonOptimal)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(radioButtonNetwork)))
+                        .addComponent(radioButtonNetwork, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(radioButtonUwe)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(radioButtonMarginal)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(radioButtonCta)
-                    .addComponent(checkBoxInverseWeight))
+                .addComponent(radioButtonCta)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(radioButtonRounding)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(radioButtonCellKey)
                     .addComponent(buttonChangePTable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 0, 0)
-                .addComponent(labelPTable, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(labelPTable, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(labelPTableSep)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(radioButtonUwe)
+                    .addComponent(checkBoxInverseWeight))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(radioButtonMarginal)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         buttonGroupSuppress.add(radioButtonModular);
@@ -1489,10 +1479,10 @@ public class PanelTable extends javax.swing.JPanel {
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(panelSuppress, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(panelStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(panelCellInformation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(buttonRecode, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(buttonRecode, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(panelSuppress, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(10, 10, 10))
         );
         layout.setVerticalGroup(
@@ -1536,7 +1526,7 @@ public class PanelTable extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 762, Short.MAX_VALUE)
+                        .addComponent(scrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 796, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(panelBottomButtons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
@@ -1544,11 +1534,10 @@ public class PanelTable extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(panelStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(buttonRecode)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(panelSuppress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addGap(7, 7, 7))
+                        .addComponent(buttonRecode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(panelSuppress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -2219,12 +2208,8 @@ public class PanelTable extends javax.swing.JPanel {
         updateSuppressButtons();
     }//GEN-LAST:event_radioButtonHyperCubeActionPerformed
 
-    private void radioButtonHyperCubeComponentAdded(java.awt.event.ContainerEvent evt) {//GEN-FIRST:event_radioButtonHyperCubeComponentAdded
-        // TODO add your handling code here:
-    }//GEN-LAST:event_radioButtonHyperCubeComponentAdded
-
     private void buttonChangePTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonChangePTableActionPerformed
-        DialogChangePTable dialog = new DialogChangePTable(null, true);
+        DialogChangePTable dialog = new DialogChangePTable(this.getParentFrame(), true);
         if (dialog.showDialog(tableSet)==DialogChangePTable.APPROVE_OPTION) {
             if (tableSet.respVar.isResponse()){
                 labelPTable.setText("ptablefileCont: "+tableSet.cellkeyVar.PTableFileCont.substring(tableSet.cellkeyVar.PTableFileCont.lastIndexOf("\\")+1));
@@ -2323,6 +2308,7 @@ public class PanelTable extends javax.swing.JPanel {
     private javax.swing.JComboBox<String> comboBoxSpan7;
     private javax.swing.JLabel labelDecimals;
     private javax.swing.JLabel labelPTable;
+    private javax.swing.JLabel labelPTableSep;
     private javax.swing.JLabel labelRowColVars;
     private javax.swing.JLabel labelSpan0;
     private javax.swing.JLabel labelSpan1;
