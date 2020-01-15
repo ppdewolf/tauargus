@@ -1002,7 +1002,6 @@ public class PanelTable extends javax.swing.JPanel {
 
         panelCellInformation.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Cell Information"));
         panelCellInformation.setMinimumSize(null);
-        panelCellInformation.setName(""); // NOI18N
         panelCellInformation.setPreferredSize(null);
 
         panelStatus.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Change status"));
@@ -1302,9 +1301,9 @@ public class PanelTable extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(labelPTableSep)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(radioButtonUwe)
-                    .addComponent(checkBoxInverseWeight))
+                .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(checkBoxInverseWeight)
+                    .addComponent(radioButtonUwe))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(radioButtonMarginal)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -1845,7 +1844,7 @@ public class PanelTable extends javax.swing.JPanel {
         case ROUNDING:
             if (Application.solverSelected == Application.SOLVER_CPLEX){
                 JOptionPane.showMessageDialog(null, "Whether controlled rounding can be used when Cplex is selected as solver, depends on your specific license",
-                    "", JOptionPane.ERROR_MESSAGE);
+                    "", JOptionPane.INFORMATION_MESSAGE);
             }
             //else
             DialogRoundingParameters paramsR = new DialogRoundingParameters(parentFrame, true);

@@ -51,8 +51,6 @@ public class PanelEditVariable extends javax.swing.JPanel {
     Metadata metadata;
     int dataType;
     int dataOrigin;
-    boolean metadataHasRecordKey;
-    private int countRecordKeys;
     
     final Map<Type, javax.swing.JRadioButton> buttonMap;
     final Map<String, javax.swing.JRadioButton> CKMMap;
@@ -92,15 +90,7 @@ public class PanelEditVariable extends javax.swing.JPanel {
         ScalingMap.put("F",radioButtonFlex);
         ScalingMap.put("N",radioButtonSimple);
     }
-    
-    public void setCountRecordKeys(int value){
-        this.countRecordKeys = value;
-    }
-    
-    public int getCountRecordKeys(){
-        return this.countRecordKeys;
-    }
-    
+
     private Type buttonToType(JRadioButton button) {
         for (Map.Entry<Type, javax.swing.JRadioButton> entry : buttonMap.entrySet()) {
             if (entry.getValue().equals(button)) {
@@ -138,10 +128,6 @@ public class PanelEditVariable extends javax.swing.JPanel {
         this.dataType = dataType;
         labelStartingPosition.setEnabled(dataType == Metadata.DATA_FILE_TYPE_FIXED);
         textFieldStartingPosition.setEnabled(dataType == Metadata.DATA_FILE_TYPE_FIXED);
-    }
-    
-    public void setRecordKeyOn(boolean HasRecordKey){
-        this.metadataHasRecordKey = HasRecordKey;
     }
     
     public void setDataOrigin(int dataOrigin) {
@@ -401,19 +387,17 @@ public class PanelEditVariable extends javax.swing.JPanel {
             if (variable.CKMType.equals("T")) {
                 try{
                     int TopK = Integer.parseInt(textFieldCKMTopK.getText());
-                    if (TopK < 0 || TopK > 5){
-                        //throw new NumberFormatException();
+                    if (TopK < 1 || TopK > 5){
                         textFieldCKMTopK.setText("");
                         textFieldCKMTopK.requestFocusInWindow();
-                        throw new ArgusException("TopK should be integer in [0,...,5]");
+                        throw new ArgusException("TopK should be integer in {1,...,5}");
                     }
                     variable.CKMTopK = TopK;
                 }
                 catch (NumberFormatException e){
-                    //JOptionPane.showMessageDialog(null, "TopK should be integer", null, JOptionPane.ERROR_MESSAGE);
                     textFieldCKMTopK.setText("");
                     textFieldCKMTopK.requestFocusInWindow();
-                    throw new ArgusException("TopK should be integer in [0,...,5]");
+                    throw new ArgusException("TopK should be integer in {1,...,5}");
                 }
             }
             else variable.CKMTopK = 1;
@@ -552,8 +536,7 @@ public class PanelEditVariable extends javax.swing.JPanel {
             panelMissings.setVisible(type.isCategorical());
             // Currently only available for microdata input
             if (dataOrigin == Metadata.DATA_ORIGIN_MICRO){
-                //panelCKM.setVisible(metadataHasRecordKey && type.isResponse());
-                panelCKM.setVisible((countRecordKeys > 0) && type.isResponse());
+                panelCKM.setVisible(type.isResponse());
                 textFieldCKMTopK.setEnabled(radioButtonTopK.isSelected());
                 panelPTable.setVisible(type.isRecordKey() || radioButtonRecordKey.isSelected());
                 ptablePanelSetEnabled(type.isRecordKey() || radioButtonRecordKey.isSelected());
@@ -1181,6 +1164,11 @@ public class PanelEditVariable extends javax.swing.JPanel {
                 textFieldCKMTopKFocusLost(evt);
             }
         });
+        textFieldCKMTopK.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                textFieldCKMTopKActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout panelCKMTypeLayout = new javax.swing.GroupLayout(panelCKMType);
         panelCKMType.setLayout(panelCKMTypeLayout);
@@ -1190,16 +1178,18 @@ public class PanelEditVariable extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(panelCKMTypeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(radioButtonNoCKM)
-                    .addComponent(radioButtonMean)
                     .addGroup(panelCKMTypeLayout.createSequentialGroup()
-                        .addComponent(radioButtonTopK)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(textFieldCKMTopK, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(18, 18, 18)
-                .addGroup(panelCKMTypeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(radioButtonValue)
-                    .addComponent(radioButtonSpread))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(panelCKMTypeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(radioButtonMean)
+                            .addGroup(panelCKMTypeLayout.createSequentialGroup()
+                                .addComponent(radioButtonTopK)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(textFieldCKMTopK, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(26, 26, 26)
+                        .addGroup(panelCKMTypeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(radioButtonValue, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(radioButtonSpread, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap())
         );
         panelCKMTypeLayout.setVerticalGroup(
             panelCKMTypeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1211,7 +1201,7 @@ public class PanelEditVariable extends javax.swing.JPanel {
                     .addComponent(radioButtonSpread)
                     .addComponent(textFieldCKMTopK, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelCKMTypeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(panelCKMTypeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(radioButtonValue)
                     .addComponent(radioButtonMean))
                 .addGap(0, 0, 0))
@@ -1228,7 +1218,6 @@ public class PanelEditVariable extends javax.swing.JPanel {
         });
 
         buttonGroupScaling.add(radioButtonSimple);
-        radioButtonSimple.setSelected(true);
         radioButtonSimple.setText("Simple");
         radioButtonSimple.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1267,7 +1256,7 @@ public class PanelEditVariable extends javax.swing.JPanel {
                             .addComponent(radioButtonSimple))
                         .addGap(118, 118, 118))
                     .addComponent(tableScaleParams, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(13, Short.MAX_VALUE))
+                .addContainerGap())
         );
         panelScalingLayout.setVerticalGroup(
             panelScalingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1300,7 +1289,7 @@ public class PanelEditVariable extends javax.swing.JPanel {
                     .addComponent(checkBoxIncludeZeros)
                     .addComponent(checkBoxParity)
                     .addComponent(checkBoxSeparation))
-                .addGap(11, 11, 11))
+                .addContainerGap())
         );
         panelCKMadditionalLayout.setVerticalGroup(
             panelCKMadditionalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1318,9 +1307,12 @@ public class PanelEditVariable extends javax.swing.JPanel {
         panelCKM.setLayout(panelCKMLayout);
         panelCKMLayout.setHorizontalGroup(
             panelCKMLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(panelCKMType, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(panelScaling, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(panelCKMadditional, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(panelCKMLayout.createSequentialGroup()
+                .addGroup(panelCKMLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(panelCKMType, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(panelScaling, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(panelCKMadditional, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         panelCKMLayout.setVerticalGroup(
             panelCKMLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1750,6 +1742,7 @@ public class PanelEditVariable extends javax.swing.JPanel {
             textFieldCKMTopK.setEnabled(true);
             checkBoxParity.setEnabled(Integer.parseInt(textFieldCKMTopK.getText())==1);
             if (buttonGroupScaling.getSelection() == null) displayScaling("N");
+            else displayScaling(buttonToCKMType(SwingUtils.getSelectedButton(buttonGroupScaling), ScalingMap));
         }
         else if (evt.getStateChange() == ItemEvent.DESELECTED) {
             textFieldCKMTopK.setEnabled(false);
@@ -1764,18 +1757,12 @@ public class PanelEditVariable extends javax.swing.JPanel {
     private void radioButtonTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioButtonTypeActionPerformed
         panelSetEnabled(true);
         if (buttonGroupScaling.getSelection() == null) displayScaling("N");
+        else displayScaling(buttonToCKMType(SwingUtils.getSelectedButton(buttonGroupScaling), ScalingMap));
         enableForSPSS (DialogSpecifyMetadata.SpssSelected);
     }//GEN-LAST:event_radioButtonTypeActionPerformed
 
     private void textFieldNameFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_textFieldNameFocusLost
-        // TODO add your handling code here:
         currentVariable.name = textFieldName.getText();
-        //       DialogSpecifyMetadata.SetSpecificElement(currentVariable);
-
-        //      try{
-            //       save(currentVariable);
-            //       } catch (ArgusException ex){};
-
     }//GEN-LAST:event_textFieldNameFocusLost
 
     private void radioButtonResponseItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_radioButtonResponseItemStateChanged
@@ -1829,17 +1816,27 @@ public class PanelEditVariable extends javax.swing.JPanel {
         checkBoxParity.setEnabled(Integer.parseInt(textFieldCKMTopK.getText()) == 1);
     }//GEN-LAST:event_textFieldCKMTopKFocusLost
 
+    private void textFieldCKMTopKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textFieldCKMTopKActionPerformed
+        displayScaling(currentVariable.CKMscaling);
+        checkBoxParity.setEnabled(Integer.parseInt(textFieldCKMTopK.getText()) == 1);
+    }//GEN-LAST:event_textFieldCKMTopKActionPerformed
+
     private void displayScaling(String ScalingType){
         int TopK;
         try{
-            TopK = Integer.parseInt(textFieldCKMTopK.getText());
-            if (TopK < 0 || TopK > 5){
-                throw new NumberFormatException();
+            if (radioButtonTopK.isSelected()){
+                TopK = Integer.parseInt(textFieldCKMTopK.getText());
+                if (TopK < 1 || TopK > 5){
+                    throw new NumberFormatException();
+                }
             }
-            setScaleTable(tableScaleParams,ScalingType,Integer.parseInt(textFieldCKMTopK.getText()));
+            else{
+                TopK = 1;
+            }
+            setScaleTable(tableScaleParams,ScalingType,TopK);
         }
         catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "TopK should be integer in [0,...,5]", null, JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "TopK should be integer in {1,...,5}", null, JOptionPane.ERROR_MESSAGE);
             textFieldCKMTopK.setText("");
             textFieldCKMTopK.requestFocusInWindow();
         }

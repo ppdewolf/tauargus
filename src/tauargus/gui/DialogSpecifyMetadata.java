@@ -68,11 +68,11 @@ public class DialogSpecifyMetadata extends DialogBase {
         }
         comboBoxFormat.setSelectedIndex(i);
         textFieldSeparator.setText(metadata.fieldSeparator);
-        variableListModel = new DefaultListModel<Variable>();
+        variableListModel = new DefaultListModel<>();
         previousSelectedVariable = null;
-        for (Variable variable : metadata.variables) {
+        metadata.variables.forEach((variable) -> {
             variableListModel.addElement(variable);
-        }
+        });
         listVariables.setModel(variableListModel);
 
         if (variableListModel.getSize() > 0) {
@@ -82,10 +82,7 @@ public class DialogSpecifyMetadata extends DialogBase {
         panelEditVariable.setMetadata(metadata);
         panelEditVariable.setDataType(metadata.dataFileType);
         panelEditVariable.setDataOrigin(metadata.dataOrigin);
-        panelEditVariable.setRecordKeyOn(metadata.containsRecordKey());
-        //panelEditVariable.panelSetEnabled(listVariables.getSelectedValue() != null);
         panelEditVariable.setVisible(listVariables.getSelectedValue() != null);
-        panelEditVariable.setCountRecordKeys(metadata.count(tauargus.model.Type.RECORD_KEY));
         pack();
         setLocationRelativeTo(this.getParent());
         setVisible(true);
@@ -131,7 +128,6 @@ public class DialogSpecifyMetadata extends DialogBase {
         panelEditVariable.setMaximumSize(new java.awt.Dimension(32769, 32769));
         panelEditVariable.setMinimumSize(new java.awt.Dimension(0, 0));
         panelEditVariable.setPreferredSize(null);
-        panelEditVariable.setRecordKeyOn(false);
 
         comboBoxFormat.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Fixed format", "Free format", "SPSS" }));
         comboBoxFormat.addActionListener(new java.awt.event.ActionListener() {
@@ -301,14 +297,22 @@ public class DialogSpecifyMetadata extends DialogBase {
         // Trigger a listvalue change so last edited variable data will be stored
         listVariables.clearSelection();
 
-        int ft = comboBoxFormat.getSelectedIndex();
+        switch (comboBoxFormat.getSelectedIndex()){
+            case 0: metadata.dataFileType  = Metadata.DATA_FILE_TYPE_FIXED;
+                    break;
+            case 1: metadata.dataFileType  = Metadata.DATA_FILE_TYPE_FREE;
+                    break;
+            case 2: metadata.dataFileType  = Metadata.DATA_FILE_TYPE_SPSS;
+                    break;
+        }
+        
+/*        int ft = comboBoxFormat.getSelectedIndex();
         if (ft==0) {metadata.dataFileType  = Metadata.DATA_FILE_TYPE_FIXED;}
         else
          if (ft==1) {metadata.dataFileType  = Metadata.DATA_FILE_TYPE_FREE;}
         else    
          if (ft==2) {metadata.dataFileType  = Metadata.DATA_FILE_TYPE_SPSS;}
-            
-  //      metadata.dataFileType = comboBoxFormat.getSelectedIndex() == 0 ? Metadata.DATA_FILE_TYPE_FIXED : Metadata.DATA_FILE_TYPE_FREE;
+*/            
         metadata.fieldSeparator = textFieldSeparator.getText();
         metadata.variables.clear();
         for (int i = 0; i < variableListModel.getSize(); i++) {
@@ -321,6 +325,8 @@ public class DialogSpecifyMetadata extends DialogBase {
             } 
             catch (ArgusException ex) {
                 if (!ex.getMessage().isEmpty()){JOptionPane.showMessageDialog(this, ex.getMessage());}
+                listVariables.setSelectedIndex(0);
+                panelEditVariable.load(variableListModel.get(0));
                 return;
             }
             //It looks a bit weird, but the PanelEditVariable stores the new statusses in oldmetadata.
@@ -420,7 +426,7 @@ public class DialogSpecifyMetadata extends DialogBase {
     }//GEN-LAST:event_buttonMoveDownActionPerformed
 
     private void comboBoxFormatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxFormatActionPerformed
-        if (metadata.dataOrigin == metadata.DATA_ORIGIN_TABULAR){
+        if (metadata.dataOrigin == Metadata.DATA_ORIGIN_TABULAR){
            if (comboBoxFormat.getSelectedIndex()!= 1){
                comboBoxFormat.setSelectedIndex(1);               
                JOptionPane.showMessageDialog(null,"For tabular data free format is required");
@@ -461,14 +467,9 @@ public class DialogSpecifyMetadata extends DialogBase {
                     try {
                         panelEditVariable.save(variable);
                         variableListModel.set(index, variable);
-                        if ((previousSelectedVariable.type == tauargus.model.Type.RECORD_KEY) && (variable.type != tauargus.model.Type.RECORD_KEY))
-                            panelEditVariable.setCountRecordKeys(panelEditVariable.getCountRecordKeys() - 1);
-                        if ((previousSelectedVariable.type != tauargus.model.Type.RECORD_KEY) && (variable.type == tauargus.model.Type.RECORD_KEY))
-                            panelEditVariable.setCountRecordKeys(panelEditVariable.getCountRecordKeys() + 1);
                     } catch (ArgusException ex) {
                         JOptionPane.showMessageDialog(null, ex.getMessage());
                         return;
-//                        logger.log(Level.SEVERE, null, ex);
                     }
                 }
             }
@@ -479,17 +480,13 @@ public class DialogSpecifyMetadata extends DialogBase {
 
         previousSelectedVariable = selectedVariable;
         calculateButtonStates();
-        //panelEditVariable.panelSetEnabled(selectedVariable != null);
-        //panelEditVariable.setVisible(selectedVariable != null);
         panelEditVariable.enableForSPSS(comboBoxFormat.getSelectedIndex()==2);
         pack();
     }//GEN-LAST:event_listVariablesValueChanged
 
     private void jButtonGetSPSSMetaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonGetSPSSMetaActionPerformed
-        // TODO add your handling code here:
-        int j;
+     int j;
      SpssSelectVariablesView selectView = new SpssSelectVariablesView(null, true);
-  //   selectView.showVariables(variables);
      selectView.showVariables(SpssUtilsTau.spssVariables);
      selectView.setVisible(true);
   //   Fill the meta with the SPSS variables
@@ -520,9 +517,9 @@ public class DialogSpecifyMetadata extends DialogBase {
        }
      }
      variableListModel.clear();
-    for (Variable variable : metadata.variables) {
-        variableListModel.addElement(variable);
-     }
+     metadata.variables.forEach((variable) -> {
+         variableListModel.addElement(variable);
+        });
    
     }//GEN-LAST:event_jButtonGetSPSSMetaActionPerformed
 

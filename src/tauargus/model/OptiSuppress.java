@@ -1047,7 +1047,7 @@ public class OptiSuppress {
     public static void runRounder(TableSet tableSet, final PropertyChangeListener propertyChangeListener) throws ArgusException, IOException{
         int i, j, j1, nPart=0; 
         String solutionString, hs, xs, solverName, LicenceFile;
-        int solutionType, maxRoundTime;
+        int solutionType, maxRoundTime, result;
         double[] upperBound = new double[] { 1.0E40 }; 
         double[] lowerBound = new double[] { 0.0 };
         double[] maxJump = new double[1]; 
@@ -1157,7 +1157,7 @@ public class OptiSuppress {
                TauArgusUtils.DeleteFile(Application.getTempFile("JJ"+xs+".OUT.RAPID"));
                TauArgusUtils.DeleteFile(Application.getTempFile("JJRound"+xs+".OUT"));
                TauArgusUtils.DeleteFile(Application.getTempFile("JJStat"+xs+".OUT"));
-               solutionType = rounder.DoRound(solverName, Application.getTempFile("JJ"+xs+".IN"), X, upperBound, lowerBound, 0,  
+               result = rounder.DoRound(solverName, Application.getTempFile("JJ"+xs+".IN"), X, upperBound, lowerBound, 0,  
                                   Application.getTempFile("JJ"+xs+".OUT"), 
                                   Application.getTempFile("JJstat"+xs+".OUT"),
                                   LicenceFile, 
@@ -1165,16 +1165,20 @@ public class OptiSuppress {
                                   maxRoundTime, 0,
                                   Application.getTempDir()+"/",
                                    maxJump, numberJump , usedTime, errorCode); //, activityListener );
-               if (solutionType>2) {throw new ArgusException("Rounding error code = "+tauArgus.GetErrorString(errorCode[0]) + "\noccured in subtable "+j);}             
+               solutionType = 0; // Only Optimal is implemented currently
+               //if (solutionType > 2) {throw new ArgusException("Rounding error code = "+tauArgus.GetErrorString(errorCode[0]) + "\noccured in subtable "+j);}             
+               if (result > 0) {throw new ArgusException("Rounding error code = "+tauArgus.GetErrorString(errorCode[0]) + "\noccured in subtable "+j);}
                tableSet.roundMaxJump = Math.max(tableSet.roundMaxJump, maxJump[0]);
                tableSet.roundJumps = Math.max(tableSet.roundJumps,numberJump[0]);
                if (maxJump[0] > tableSet.roundMaxJump){tableSet.roundMaxJump = maxJump[0];}
-               //SOLUTION TYPE IS ZOEK!!!!!!!!!!!!! I neem aan dat de retrun valeu nu de solution type is
+               //SOLUTION TYPE IS ZOEK!!!!!!!!!!!!! Ik neem aan dat de retrun valeu nu de solution type is
+               //NEE DUS!!!!!!!!
+               //return value > 0 is error; has nothing to do with solutionType !!!!!
                if (solutionType  > 2){
                 if (TauArgusUtils.ExistFile(Application.getTempFile("JJRound"+xs+".OUT.RAPID"))){
                  TauArgusUtils.renameFile(Application.getTempFile("JJRound"+xs+".OUT.RAPID"),Application.getTempFile("JJRound"+xs+".OUT"));
                 }
-               }                
+               }
                tableSet.roundSolType[solutionType]++;
                hs =  "<tr><td align=\"Right\">" + xs + "</td><td align=\"Right\">";
                if (solutionType == 2){hs = hs + "Rapid";}
@@ -1195,29 +1199,33 @@ public class OptiSuppress {
              joinRounded(tableSet,nPart);
            }
            else{ // round as a single table
-              xs = "";
-              solutionType = rounder.DoRound(solverName, Application.getTempFile("JJ"+xs+".IN"), X, upperBound, lowerBound, 0,  
-                                  Application.getTempFile("JJ"+xs+".OUT"), 
-                                  Application.getTempFile("JJstat"+xs+".OUT"),
+                result = rounder.DoRound(solverName, Application.getTempFile("JJ.IN"), X, upperBound, lowerBound, 0,  
+                                  Application.getTempFile("JJ.OUT"), 
+                                  Application.getTempFile("JJstat.OUT"),
                                   LicenceFile,
-                                  Application.getTempFile("JJRound"+xs+".log"),
+                                  Application.getTempFile("JJRound.log"),
                                   maxRoundTime, 0,  //Max time,zero restricted
                                   Application.getTempDir()+"/",   // NamePathExe
                                   maxJump, numberJump , usedTime, errorCode); //, activityListener );
-               if (solutionType  == 1){
-               if (TauArgusUtils.ExistFile(Application.getTempFile("JJRound.OUT.RAPID"))){
-                TauArgusUtils.renameFile(Application.getTempFile("JJRound.OUT.RAPID"),Application.getTempFile("JJRound.OUT"));
-               }
-             }                
-             if (solutionType>2) {throw new ArgusException("Rounding error: "+tauArgus.GetErrorString(errorCode[0]));}  
-             tableSet.roundMaxJump = maxJump[0];
-             tableSet.roundJumps = numberJump[0];
-             tableSet.roundSolType[solutionType]++;             
-             solutionString = "Solution Type: <b>";
-             if(solutionType ==0){solutionString=solutionString+"Optimal";}
-             if(solutionType ==1){solutionString=solutionString+"First feasible";}
-             if(solutionType ==2){solutionString=solutionString+"Rapid";}
-             solutionString=solutionString+"</b>" + 
+                solutionType = 0; // Only Optimal is currently implemented
+                //SOLUTION TYPE IS ZOEK!!!!!!!!!!!!! Ik neem aan dat de return value nu de solution type is
+                //NEE DUS!!!!!!!!
+                //return value > 0 is error; has nothing to do with solutionType !!!!!
+                if (solutionType  == 1){
+                    if (TauArgusUtils.ExistFile(Application.getTempFile("JJRound.OUT.RAPID"))){
+                        TauArgusUtils.renameFile(Application.getTempFile("JJRound.OUT.RAPID"),Application.getTempFile("JJRound.OUT"));
+                    }
+                }                
+                //if (solutionType>2) {throw new ArgusException("Rounding error: "+tauArgus.GetErrorString(errorCode[0]));}  
+                if (result > 0) {throw new ArgusException("Rounding error: "+tauArgus.GetErrorString(errorCode[0]));}  
+                tableSet.roundMaxJump = maxJump[0];
+                tableSet.roundJumps = numberJump[0];
+                tableSet.roundSolType[solutionType]++;             
+                solutionString = "Solution Type: <b>";
+                if(solutionType ==0){solutionString=solutionString+"Optimal";}
+                if(solutionType ==1){solutionString=solutionString+"First feasible";}
+                if(solutionType ==2){solutionString=solutionString+"Rapid";}
+                solutionString=solutionString+"</b>" + 
                      "; LowerBound:" + StrUtils.formatDouble(lowerBound[0], tableSet.respVar.nDecimals) +
                      ", UpperBound: "+ StrUtils.formatDouble(lowerBound[0], tableSet.respVar.nDecimals) + "<br>";
            }

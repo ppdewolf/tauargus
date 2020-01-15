@@ -234,7 +234,7 @@ public class Metadata implements Cloneable {
         boolean CKMspecified = false;
         dataOrigin = DATA_ORIGIN_MICRO;
         dataFileType = DATA_FILE_TYPE_FIXED;
-        String hs = "";
+        String hs; // = "";
         Variable variable = null;
         Tokenizer tokenizer = new Tokenizer(reader);
         while (tokenizer.nextLine() != null) {
@@ -992,8 +992,11 @@ public class Metadata implements Cloneable {
             
             if (variable.isResponse()){
                 if (!variable.CKMType.equals("N")){
+                    if (this.find(Type.RECORD_KEY) == null){
+                        throw new ArgusException("CKM specified for continuous variable " + variable.name + " without having a RecordKey specified.");
+                    }
                     if (this.find(Type.RECORD_KEY).PTableFileCont.equals("")){
-                        throw new ArgusException("CKM specified for continuous variable, without specification of ptable for continuous CKM.");
+                        throw new ArgusException("CKM specified for continuous variable " + variable.name + " without specification of ptable for continuous CKM.");
                     }
                     if (!(variable.CKMscaling.equals("F") || variable.CKMscaling.equals("N"))){
                         throw new ArgusException("Scaling should be set for variable " + variable.name + " when CKM is allowed.");

@@ -796,8 +796,6 @@ public class DialogSpecifyTablesTabular extends DialogBase {
 
     void load(Metadata metadata) {
         // Fill "Variables" panel...
-// Anco 1.6
-//        DefaultListModel<String> model = new DefaultListModel<>();
         DefaultListModel<String> model = new DefaultListModel<>();
         for (Variable variable : metadata.variables) {
             if (variable.isCategorical()) {
