@@ -33,6 +33,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import static javax.swing.JViewport.SIMPLE_SCROLL_MODE;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import tauargus.model.Application;
 import tauargus.model.ArgusException;
@@ -268,6 +269,7 @@ public class FrameMain extends javax.swing.JFrame {
         initComponents();
         panelTable = new tauargus.gui.PanelTable();
         jScrollPane1.setViewportView(panelTable);
+        jScrollPane1.getViewport().setScrollMode(SIMPLE_SCROLL_MODE);
         fileChooser = new javax.swing.JFileChooser();
         
 //        panelTable.setVisible(false);
