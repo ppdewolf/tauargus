@@ -907,13 +907,11 @@ public class FrameMain extends javax.swing.JFrame {
     }//GEN-LAST:event_menuItemOpenBatchProcessActionPerformed
 
     private void menuItemSolverOptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemSolverOptionsActionPerformed
-        // TODO add your handling code here:
         DialogSolverOptions dialog = new DialogSolverOptions(FrameMain.this,true);
         dialog.setVisible(true);
     }//GEN-LAST:event_menuItemSolverOptionsActionPerformed
 
     private void menuItemWriteBatchFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemWriteBatchFileActionPerformed
-        // TODO add your handling code here:
         DialogWriteBatchFile dialog = new DialogWriteBatchFile(FrameMain.this,true);
         dialog.setVisible(true);
     }//GEN-LAST:event_menuItemWriteBatchFileActionPerformed
@@ -923,18 +921,12 @@ public class FrameMain extends javax.swing.JFrame {
     }//GEN-LAST:event_menuItemViewReportActionPerformed
 
     private void menuItemProtectJJFormatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemProtectJJFormatActionPerformed
-        // TODO add your handling code here:
         DialogProtectJJFormat dialog = new DialogProtectJJFormat(FrameMain.this,true);
         dialog.setVisible(true);       
         
     }//GEN-LAST:event_menuItemProtectJJFormatActionPerformed
 
     private void menuItemContentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemContentActionPerformed
-        // TODO add your handling code here:
-//        try{
-//        Application.showHelp("General");
-//        }
-//        catch (ArgusException ex){ JOptionPane.showMessageDialog(FrameMain.this, "The report file is not (yet) available ") ;}
         try{
             Application.showHelp("General");
             }
