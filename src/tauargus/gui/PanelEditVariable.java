@@ -18,20 +18,27 @@
 package tauargus.gui;
 
 import argus.utils.StrUtils;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.io.File;
 import static java.lang.Integer.min;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.InputVerifier;
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.text.BadLocationException;
 import org.apache.commons.lang3.StringUtils;
 import tauargus.model.ArgusException;
@@ -52,6 +59,8 @@ public class PanelEditVariable extends javax.swing.JPanel {
     int dataType;
     int dataOrigin;
     
+    MyVerifier verifier = new MyVerifier();
+    
     final Map<Type, javax.swing.JRadioButton> buttonMap;
     final Map<String, javax.swing.JRadioButton> CKMMap;
     final Map<String, javax.swing.JRadioButton> ScalingMap;
@@ -60,7 +69,9 @@ public class PanelEditVariable extends javax.swing.JPanel {
         initComponents();
         
         setScaleTableModel();
-        
+        tableScaleParams.setDefaultRenderer(Object.class, new ScaleParamsCellRenderer());
+        textFieldCKMTopK.setInputVerifier(verifier);
+        textFieldCKMTopK.addActionListener(verifier);
         createComponentArrays();
 
         buttonMap = new EnumMap<>(Type.class);
@@ -1159,16 +1170,6 @@ public class PanelEditVariable extends javax.swing.JPanel {
 
         textFieldCKMTopK.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         textFieldCKMTopK.setText("1");
-        textFieldCKMTopK.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                textFieldCKMTopKFocusLost(evt);
-            }
-        });
-        textFieldCKMTopK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                textFieldCKMTopKActionPerformed(evt);
-            }
-        });
 
         javax.swing.GroupLayout panelCKMTypeLayout = new javax.swing.GroupLayout(panelCKMType);
         panelCKMType.setLayout(panelCKMTypeLayout);
@@ -1745,6 +1746,7 @@ public class PanelEditVariable extends javax.swing.JPanel {
             else displayScaling(buttonToCKMType(SwingUtils.getSelectedButton(buttonGroupScaling), ScalingMap));
         }
         else if (evt.getStateChange() == ItemEvent.DESELECTED) {
+            textFieldCKMTopK.setText("1");
             textFieldCKMTopK.setEnabled(false);
             checkBoxParity.setEnabled(true);
         }
@@ -1811,34 +1813,18 @@ public class PanelEditVariable extends javax.swing.JPanel {
         displayScaling("N");
     }//GEN-LAST:event_radioButtonSimpleActionPerformed
 
-    private void textFieldCKMTopKFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_textFieldCKMTopKFocusLost
-        displayScaling(currentVariable.CKMscaling);
-        checkBoxParity.setEnabled(Integer.parseInt(textFieldCKMTopK.getText()) == 1);
-    }//GEN-LAST:event_textFieldCKMTopKFocusLost
-
-    private void textFieldCKMTopKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textFieldCKMTopKActionPerformed
-        displayScaling(currentVariable.CKMscaling);
-        checkBoxParity.setEnabled(Integer.parseInt(textFieldCKMTopK.getText()) == 1);
-    }//GEN-LAST:event_textFieldCKMTopKActionPerformed
-
     private void displayScaling(String ScalingType){
         int TopK;
         try{
             if (radioButtonTopK.isSelected()){
                 TopK = Integer.parseInt(textFieldCKMTopK.getText());
-                if (TopK < 1 || TopK > 5){
-                    throw new NumberFormatException();
-                }
             }
             else{
                 TopK = 1;
             }
-            setScaleTable(tableScaleParams,ScalingType,TopK);
+            if (TopK >=1 && TopK <= 5) setScaleTable(tableScaleParams,ScalingType,TopK);
         }
         catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "TopK should be integer in {1,...,5}", null, JOptionPane.ERROR_MESSAGE);
-            textFieldCKMTopK.setText("");
-            textFieldCKMTopK.requestFocusInWindow();
         }
     }
    
@@ -1904,7 +1890,78 @@ public class PanelEditVariable extends javax.swing.JPanel {
             }
             
         });
-    }    
+    }  
+    
+    private class ScaleParamsCellRenderer extends DefaultTableCellRenderer{
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                try{
+                    if ((row == 1) || (row == 3)){
+                        double parametervalue = Double.parseDouble(value.toString());
+                        if (parametervalue < 0)
+                            comp.setForeground(Color.red);
+                        else comp.setForeground(Color.black);
+                    }
+                    else comp.setForeground(Color.black);
+                }
+                catch (Exception ex){}
+                return comp;
+            }
+    }
+    
+    private class MyVerifier extends InputVerifier implements ActionListener{
+        @Override
+        public boolean shouldYieldFocus(JComponent input) {
+            boolean inputOK = verify(input);
+            displayScaling(currentVariable.CKMscaling);
+
+            if (inputOK) {
+                return true;
+            }
+
+            //Avoid possible focus-transfer problems when bringing up
+            //the dialog by temporarily removing the input verifier.
+            //This is a workaround for bug #4532517.
+            input.setInputVerifier(null);
+
+            //Pop up the message dialog.
+            JOptionPane.showMessageDialog(null, //no owner frame
+                                          "TopK should be integer in {1,...,5}",
+                                          "Invalid Value", //title
+                                          JOptionPane.WARNING_MESSAGE);
+            
+            ((JTextField) input).setText("1");
+            ((JTextField) input).selectAll();
+
+            //Reinstall the input verifier.
+            input.setInputVerifier(this);
+
+            return false;
+        }
+        
+        @Override
+        public boolean verify(JComponent input) {
+            return checkField(input);
+        }
+        
+        protected boolean checkField(JComponent input) {
+            int TopK;
+            try {
+                TopK = Integer.parseInt(((JTextField) input).getText());
+                return ((TopK >=1) && (TopK <= 5));
+            }
+            catch(Exception ex){
+                return false;
+            }
+        }
+        
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JTextField source = (JTextField)e.getSource();
+            shouldYieldFocus(source); //ignore return value
+        }
+    }
     
     private javax.swing.JTextField[] textFieldDistanceFunction;
     private javax.swing.JTextField[] textFieldHierLevel;
