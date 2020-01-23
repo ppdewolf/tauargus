@@ -1170,6 +1170,16 @@ public class PanelEditVariable extends javax.swing.JPanel {
 
         textFieldCKMTopK.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         textFieldCKMTopK.setText("1");
+        textFieldCKMTopK.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                textFieldCKMTopKFocusLost(evt);
+            }
+        });
+        textFieldCKMTopK.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                textFieldCKMTopKActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout panelCKMTypeLayout = new javax.swing.GroupLayout(panelCKMType);
         panelCKMType.setLayout(panelCKMTypeLayout);
@@ -1813,6 +1823,14 @@ public class PanelEditVariable extends javax.swing.JPanel {
         displayScaling("N");
     }//GEN-LAST:event_radioButtonSimpleActionPerformed
 
+    private void textFieldCKMTopKFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_textFieldCKMTopKFocusLost
+        checkBoxParity.setEnabled(Integer.parseInt(textFieldCKMTopK.getText()) == 1);
+    }//GEN-LAST:event_textFieldCKMTopKFocusLost
+
+    private void textFieldCKMTopKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textFieldCKMTopKActionPerformed
+        checkBoxParity.setEnabled(Integer.parseInt(textFieldCKMTopK.getText()) == 1);
+    }//GEN-LAST:event_textFieldCKMTopKActionPerformed
+
     private void displayScaling(String ScalingType){
         int TopK;
         try{
@@ -1933,6 +1951,7 @@ public class PanelEditVariable extends javax.swing.JPanel {
             
             ((JTextField) input).setText("1");
             ((JTextField) input).selectAll();
+            displayScaling(currentVariable.CKMscaling);
 
             //Reinstall the input verifier.
             input.setInputVerifier(this);
