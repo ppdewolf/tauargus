@@ -646,6 +646,9 @@ public class PanelTable extends javax.swing.JPanel {
                 labelPTableSep.setText("");
             }
         }
+        else{
+            radioButtonHyperCube.setSelected(true);
+        }
         labelPTable.setVisible(CKMpossible && radioButtonCellKey.isSelected());
         labelPTableSep.setVisible(CKMpossible && radioButtonCellKey.isSelected());
         
@@ -1215,7 +1218,6 @@ public class PanelTable extends javax.swing.JPanel {
         });
 
         buttonChangePTable.setText("Change ptable");
-        buttonChangePTable.setToolTipText("");
         buttonChangePTable.setPreferredSize(new java.awt.Dimension(57, 23));
         buttonChangePTable.setRequestFocusEnabled(false);
         buttonChangePTable.addActionListener(new java.awt.event.ActionListener() {

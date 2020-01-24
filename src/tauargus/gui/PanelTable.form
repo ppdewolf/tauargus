@@ -791,7 +791,6 @@
         <Component class="javax.swing.JButton" name="buttonChangePTable">
           <Properties>
             <Property name="text" type="java.lang.String" value="Change ptable"/>
-            <Property name="toolTipText" type="java.lang.String" value=""/>
             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
               <Dimension value="[57, 23]"/>
             </Property>

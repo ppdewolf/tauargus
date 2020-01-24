@@ -33,6 +33,7 @@ import tauargus.model.ArgusException;
 import tauargus.model.Metadata;
 import tauargus.model.SpssUtilsTau;
 import tauargus.model.Variable;
+import tauargus.service.TableService;
 import tauargus.utils.SingleListSelectionModel;
 import tauargus.utils.TauArgusUtils;
 
@@ -363,6 +364,7 @@ public class DialogSpecifyMetadata extends DialogBase {
                 }
             }
             Application.replaceMetadata(oldMetadata, metadata);
+            TableService.clearTables(); // Make sure that the "old" tables are no longer available because the metadata has changed
         }
         setVisible(false);
         returnValue = APPROVE_OPTION;

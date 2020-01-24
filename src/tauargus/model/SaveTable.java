@@ -541,8 +541,8 @@ public class SaveTable {
         out.write(hs + "\n");
         
         out.write("<table>\n");
-        out.write("<tr><td width=\"25%\" height=\"11\">Original file:</td>\n");
-        out.write("<td width=\"75%\" height=\"11\">");
+        out.write("<tr><td width=\"15%\" height=\"11\">Original file:</td>\n");
+        out.write("<td width=\"85%\" height=\"11\">");
         out.write( tableSet.metadata.dataFile);
         out.write( "</td></tr>\n");
         out.write("<tr><td>Meta file:</td><td>");
@@ -633,7 +633,7 @@ public class SaveTable {
             }
             out.write("<p>\n");
             out.write("<h2>Sensitivity Rule:</h2><h3>\n");
-            if (tableSet.ckmProtect){
+            if (tableSet.ckmProtect && !tableSet.respVar.isResponse()){
                 out.write("None used for Noise addition using the Cell Key Method<br>\n");
             }
             if (tableSet.domRule) {
@@ -745,10 +745,61 @@ public class SaveTable {
                 case TableSet.SUP_CKM :
                     out.write("<h2>Protected with the Cell Key Method</h2>\n");
                     if (tableSet.respVar.isResponse()){
-                        out.write("<h3>P-table used from files<br>\n\""+tableSet.cellkeyVar.metadata.getFilePath(tableSet.cellkeyVar.PTableFileCont)+"\"<br>");
-                        if (tableSet.respVar.CKMseparation)
-                               out.write("\""+tableSet.cellkeyVar.metadata.getFilePath(tableSet.cellkeyVar.PTableFileSep)+"\"");
-                        out.write("</h3>\n");
+                        Variable var=tableSet.respVar;
+                        out.write("<h3>Parameters used:</h3>\n");
+                        out.write("<table>\n");
+                        out.write("<tr><td width=\"20%\">CKM Type</td>\n");
+                        out.write("<td width=\"80%\">");
+                        switch(var.CKMType){
+                            case "T": out.write("T: using TopK largest with TopK = "+var.CKMTopK); break;
+                            case "M": out.write("M: using cell mean"); break;
+                            case "D": out.write("D: using distance between largest and smallest"); break;
+                            case "V": out.write("V: using cell value"); break;
+                            default: out.write("N: CKM not allowed");
+                        }
+                        out.write("</td></tr>\n");
+                        out.write("<tr><td>Scaling</td><td>");
+                        if (var.CKMscaling.equals("F")){
+                            out.write("F: using flex function with");
+                            out.write(" &sigma;<sub>0</sub> = "+var.CKMsigma0);
+                            out.write(", &sigma;<sub>1</sub> = "+var.CKMsigma1);
+                            out.write(", x* = "+var.CKMxstar);
+                            out.write(", q = "+var.CKMq);
+                            for (int k=1;k<=var.CKMTopK;k++){
+                                out.write(", &epsilon;<sub>"+k+"</sub> = "+var.CKMepsilon[k-1]);
+                            }
+                        }
+                        if (var.CKMscaling.equals("N")){
+                            out.write("N: simple version with &sigma;<sub>1</sub> = "+var.CKMsigma1);
+                            for (int k=1;k<=var.CKMTopK;k++){
+                                out.write(", &epsilon;<sub>"+k+"</sub> = "+var.CKMepsilon[k-1]);
+                            }
+                        }
+                        out.write("</td></tr>\n");
+                        out.write("<tr><td>Zero contributions</td>");
+                        out.write("<td>"+ (var.zerosincellkey ? "Y: " : "N: "));
+                        out.write("zero contributions are "+ (var.zerosincellkey ? "" : "not") +" included in recordkey</td></tr>\n");
+                        out.write("<tr><td>Even/odd</td>");
+                        out.write("<td>"+ (var.CKMapply_even_odd ? "Y: " : "N: "));
+                        out.write("Even and odd number of contributors are "+ (var.CKMapply_even_odd ? "" : "not") +" treated differently</td></tr>\n");
+                        out.write("<tr><td>Small cells</td>");
+                        out.write("<td>" + (var.CKMseparation ? "Y: " : "N: "));
+                        out.write("Small cells are " + (var.CKMseparation ? "" : "not") + " treated differently</td></tr>\n");
+                        if (var.muC > 0){
+                            out.write("<tr><td>Additional protection</td>");
+                            out.write("<td>Additional protection with &mu;<sub>C</sub> = "+ var.muC +" for sensitive cells</td></tr>\n");
+                        }
+                        out.write("</table><p>\n");
+                        
+                        out.write("<h3>P-table used from files</h3>\n");
+                        out.write("<table>\n");
+                        out.write("<tr><td width=\"15%\">p-table for general cells</td>");
+                        out.write("<td width=\"85%\">"+tableSet.cellkeyVar.metadata.getFilePath(tableSet.cellkeyVar.PTableFileCont)+"</td></tr>\n");
+                        if (var.CKMseparation){
+                               out.write("<tr><td>p-table for small cells</td>");
+                               out.write("<td>"+tableSet.cellkeyVar.metadata.getFilePath(tableSet.cellkeyVar.PTableFileSep)+"</td></tr>\n");
+                        }
+                        out.write("</table>\n");
                     }
                     else{
                         out.write("<h3>P-table used from file\n\""+tableSet.cellkeyVar.metadata.getFilePath(tableSet.cellkeyVar.PTableFile)+"\"</h3>\n");

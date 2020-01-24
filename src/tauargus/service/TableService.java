@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
 import org.apache.commons.lang3.StringUtils;
 import tauargus.extern.dataengine.IProgressListener;
 import tauargus.extern.dataengine.TauArgus;
