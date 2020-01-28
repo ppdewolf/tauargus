@@ -2152,7 +2152,7 @@ public class PanelTable extends javax.swing.JPanel {
                                 }
                             }
                             else{
-                                if(OptiSuppress.RunCellKeyCont(tableSet, tableSet.cellkeyVar.PTableFileCont, tableSet.cellkeyVar.PTableFileSep, tableSet.respVar)){
+                                if(OptiSuppress.RunCellKeyCont(tableSet, tableSet.cellkeyVar.PTableFileCont, tableSet.cellkeyVar.PTableFileSep)){
                                     JOptionPane.showMessageDialog(null, "The Cell Key Method has been applied succesfully in " + tableSet.processingTime + " seconds\n");
                                 }
                             }

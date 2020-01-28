@@ -1705,9 +1705,10 @@ public class OptiSuppress {
                                                   "The problem might be infeasible"); }
     }
 
-    public static boolean RunCellKeyCont(TableSet tableSet, String PTableFileCont, String PTableFileSep, Variable var)throws ArgusException, FileNotFoundException, IOException{
+    public static boolean RunCellKeyCont(TableSet tableSet, String PTableFileCont, String PTableFileSep)throws ArgusException, FileNotFoundException, IOException{
         long startTime = new Date().getTime();
         int result;
+        Variable var = tableSet.respVar;
 
         //JOptionPane.showMessageDialog(null,"variable "+var.name+" CKMType "+var.CKMType+" CKMTopK "+var.CKMTopK);
         if (var.CKMseparation){ 

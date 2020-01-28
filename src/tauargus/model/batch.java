@@ -287,6 +287,7 @@ public class batch {
     //                    { break;}
     // Case "<RECODE>": BatchRecode (Staart)
                     case ("<SUPPRESS>"):  {
+                        if ( status != 4) { throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
                         suppressBatch();
                         break;}
                     
@@ -815,35 +816,50 @@ public class batch {
                 
               break;
             }
-            case "CKM":{ // TabNo, ptableFileName (optional)
+            case "CKM":{
+                // For frequency count tbales: TabNo ptablefile (optional)
+                //      e.g., CKM(1) "ptableFREQ"
+                // For magnitude tables: TabNo ptablefileCONT | ptablefileSEP (optional) | muC (optional)
+                //      e.g., CKM(1) "ptableCONT" | "ptableSEP" | 2.7 Everything specified
+                //            CKM(1) | "ptableSEP" | 2.7)  Only ptablefileSEP and muC specified
+                //            CKM(1) "ptableCONT" | | 2.7)  Only ptablefileCONT and muC specified
+                //            CKM(1) "ptableCONT"||  Only ptableCONT specified
+                //            CKM(1) ||2.7  Only muC specified
                 if (!tableset.CellKeyAvailable){
-                    throw new ArgusException("CKM is not available: no recordkey available");
+                    throw new ArgusException("CKM is not possible: no recordkey available");
                 }
                 
                 if (tableset.holding){
                     throw new ArgusException("Sorry, Cell Key Method not available when \"holdings\" are used");
                 }
-                if (tableset.respVar.type != Type.FREQUENCY){
-                    throw new ArgusException("Sorry, currently Cell Key Method only imlemented for frequency tables");
-                }
+
+                if (!readCKMparams(tail, tableset.cellkeyVar,tableset.respVar)) {}
+                else {reportProgress("Some CKM parameters are read from batch file");}
+
+                String hs1, hs2;
                 
-                token = nextChar(tail);
-                if (!token.equals(",")){ // If not specified, use ptable from metadata, if available
-                    if (tableset.cellkeyVar.PTableFile != null) hs = tableset.cellkeyVar.PTableFile;
-                    else throw new ArgusException("No ptable file defined");
-                }
-                else{
-                    token = nextToken(tail);
-                    token = StrUtils.unQuote(token);
-                    if (!TauArgusUtils.ExistFile(token)){
-                        throw new ArgusException("ptable file ("+token+") does not exist");                               
-                    }
-                    hs = TauArgusUtils.getFullFileName(token);
-                } 
                 try {
-                    tableset.cellkeyVar.PTableFile = hs;
-                    if(OptiSuppress.RunCellKey(tableset, tableset.cellkeyVar.PTableFile)){
-                        reportProgress("Using ptable file "+hs);
+                    if (tableset.respVar.isResponse()){
+                        hs1 = TauArgusUtils.getFullFileName(tableset.cellkeyVar.PTableFileCont);
+                        if (!TauArgusUtils.ExistFile(hs1)){
+                            throw new ArgusException("\"ptable file (" + hs1 + ") does not exist\"");
+                        }
+                        hs2 = TauArgusUtils.getFullFileName(tableset.cellkeyVar.PTableFileSep);
+                        if (!TauArgusUtils.ExistFile(hs2) && !tableset.cellkeyVar.PTableFileSep.equals("")){
+                            throw new ArgusException("\"ptable file (" + hs2 + ") does not exist\"");
+                        }
+                        if (OptiSuppress.RunCellKeyCont(tableset, hs1, hs2)){
+                            reportProgress("Using ptable files "+hs1+" and "+hs2);
+                        }
+                    }
+                    else{
+                        hs1 = TauArgusUtils.getFullFileName(tableset.cellkeyVar.PTableFile);
+                        if (!TauArgusUtils.ExistFile(hs1)){
+                            throw new ArgusException("\"ptable file (" + hs1 + ") does not exist\"");
+                        }
+                        if(OptiSuppress.RunCellKey(tableset, hs1)){
+                            reportProgress("Using ptable file " + hs1);
+                        }
                     }
                 }
                 catch (ArgusException | IOException ex){
@@ -855,6 +871,72 @@ public class batch {
                 throw new ArgusException ("Unknown suppression method ("+SuppressType+") found");
         }   
 
+    }
+    
+    /**
+     * Usage:
+     * 
+     * For frequency count tables: TabNo ptablefileFREQ (optional)
+     *      e.g., CKM(1) "ptableFREQ"
+     *            CKM(1)
+     * For magnitude tables: TabNo ptablefileCONT (optional) | ptablefileSEP (optional) | muC (optional)
+     *      e.g., CKM(1) "ptableCONT" | "ptableSEP" | 2.7   //Everything specified
+     *            CKM(1) | "ptableSEP" | 2.7)               //Only ptablefileSEP and muC specified
+     *            CKM(1) "ptableCONT" || 2.7)               //Only ptablefileCONT and muC specified
+     *            CKM(1) "ptableCONT"||                     //Only ptableCONT specified
+     *            CKM(1) ||2.7                              //Only muC specified
+     *            CKM(1)                                    //Nothing specified
+     * @param tail
+     * @param cellkeyVar
+     * @param respVar
+     * @return
+     * @throws ArgusException 
+     */
+    static boolean readCKMparams(String[] tail, Variable cellkeyVar, Variable respVar) throws ArgusException{
+        String token, hs;
+        token = nextChar(tail);
+        if (!token.equals(")")){throw new ArgusException("A ) is expected here");}
+        // tail[0] now equals remainder of line that started with CKM(TabNo)
+        if (tail[0].equals("")) return false; // Can be empty: then do nothing and return false
+        
+        if (respVar.isResponse()){
+        // tail now contains a token delimiter ( , ) or |
+            if (!testNextToken(tail)) return false;
+            token = nextToken(tail); 
+            if (!token.equals("")){  // first parameter should be ptableCONT
+                if (token.substring(0,2).equals("//")) return false; // Comment, so do nothing and return false
+                if (TauArgusUtils.ExistFile(TauArgusUtils.getFullFileName(StrUtils.unQuote(token)))) cellkeyVar.PTableFileCont = token;
+            }
+            token = nextChar(tail);
+            if (token.equals("|")){
+                token = nextToken(tail);
+                if (!token.equals("")){  // second paramter should be ptableSEP
+                    if (token.substring(0,2).equals("//")) return false; // Comment, so do nothing and return false
+                    if (TauArgusUtils.ExistFile(TauArgusUtils.getFullFileName(StrUtils.unQuote(token)))) cellkeyVar.PTableFileSep = token;
+                }
+                token = nextChar(tail);
+                if (token.equals("|")){
+                    if (!tail[0].equals("")){ // remainder should be muC
+                        try{
+                            respVar.muC = Double.parseDouble(tail[0]);
+                        }catch(Exception ex){
+                            throw new ArgusException("muC = " + tail[0]+" is not a double");
+                        }
+                    }
+                }
+            }
+        }
+        else{// Frequency count table so only one optional parameter
+            if (!tail[0].equals("")){ // there should be some filename
+                hs = StrUtils.unQuote(tail[0].trim());
+                if (hs.substring(0,2).equals("//")) 
+                    return false; // Comment, so do nothing and return false
+                if (TauArgusUtils.ExistFile(TauArgusUtils.getFullFileName(hs))) 
+                    cellkeyVar.PTableFile = hs;
+            }
+        }
+        
+        return true;
     }
     
     static boolean readSafetyRuleBatch() throws ArgusException{
@@ -1000,7 +1082,6 @@ public class batch {
   
    /**
    * Returns the next token in a string, when various separators can occur
-   * The tokenizer can not cope with this
    * @param tail
    * @return
    * @throws ArgusException 
@@ -1014,7 +1095,7 @@ public class batch {
           p[2] = tail[0].indexOf(")");
           p[3] = tail[0].indexOf("|");
           pMin = 100000;
-          for (i=0;i<3;i++){ if (p[i] >=0 && pMin > p[i]){pMin = p[i];}}
+          for (i=0;i<4;i++){ if (p[i] >=0 && pMin > p[i]){pMin = p[i];}}
           hs = tail[0].substring(0,pMin).trim();
           tail[0]=tail[0].substring(pMin).trim();
           if (pMin == 100000){throw new ArgusException("No separator found in string "+ tail[0]);}
@@ -1023,17 +1104,44 @@ public class batch {
         return hs;
     }
     
-       /**
-     * In addition to the tokenizer functionality two functions have been added.
+    // Tests if tail contains a token, i.e. something starting with ( , ) or |
+    private static boolean testNextToken( String[] tail )throws ArgusException{
+        int[] p = new int[4]; int i, pMin;
+        if(! tail[0].equals("")){
+          p[0] = tail[0].indexOf("(");
+          p[1] = tail[0].indexOf(",");
+          p[2] = tail[0].indexOf(")");
+          p[3] = tail[0].indexOf("|");
+          pMin = 100000;
+          for (i=0;i<4;i++){ if (p[i] >=0 && pMin > p[i]){pMin = p[i];}}
+          if (pMin == 100000){return false;}
+        }
+        return true;
+    }
+    
+    /**
+     * returns the next character of a string and strips that character from the string
      * @param tail
      * @return 
      */
     private static String nextChar (String[] tail){
-      String hs;
+      /*String hs;
       hs = "";
       if(! tail[0].equals("")){
        hs =  tail[0].substring(0,1);       
        tail[0]=tail[0].substring(1);
+      } 
+      return hs;*/
+      return nextChar(tail, true);
+    }
+    
+    
+    private static String nextChar (String[] tail, boolean strip){
+      String hs;
+      hs = "";
+      if(! tail[0].equals("")){
+       hs =  tail[0].substring(0,1);
+       if (strip) tail[0] = tail[0].substring(1);
       } 
       return hs;
     }

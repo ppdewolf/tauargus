@@ -121,7 +121,7 @@ public class Tokenizer {
         return value;
     }
 
-        public String testNextChar() {
+    public String testNextChar() {
         if (line.equals("")) {value = "";}    
         else                 {value = line.substring(0, 1);}
         return value;
