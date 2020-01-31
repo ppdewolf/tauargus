@@ -287,7 +287,7 @@ public class DialogOpenMicrodata extends DialogBase{ //javax.swing.JDialog {
              JOptionPane.showMessageDialog(this, e.getMessage()); 
              return;
            }           
-      }
+        }
         
         SystemUtils.writeLogbook("Microdata file: "+textFieldMicrodata.getText()+" has been opened");            
         if (!textFieldMetadata.getText().trim().equals(""))SystemUtils.writeLogbook("Metadata file: "+textFieldMetadata.getText()+" has been opened");            

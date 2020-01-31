@@ -351,6 +351,20 @@ public class DialogWriteBatchFile extends DialogBase {
             case TableSet.SUP_MARGINAL: hs = ""; break;
             case TableSet.SUP_UWE: hs = ""; break;
             case TableSet.SUP_CTA: hs = ""; break;
+            case TableSet.SUP_CKM: hs = hs + "CKM(" + Integer.toString(t+1)+ ")";
+                                   if (!tableSet.respVar.isResponse()){ // Should be frequency table
+                                       hs = hs + " " + 
+                                               StrUtils.quote(metadata.getFilePath(tableSet.cellkeyVar.PTableFile));
+                                   }
+                                   else{
+                                       hs = hs + " " + 
+                                               StrUtils.quote(metadata.getFilePath(tableSet.cellkeyVar.PTableFileCont)) + 
+                                               " | " + 
+                                               StrUtils.quote(metadata.getFilePath(tableSet.cellkeyVar.PTableFileSep)) +
+                                               " | " +
+                                               ((tableSet.respVar.muC > 0) ? Double.toString(tableSet.respVar.muC) : "");
+                                   }
+                                   break;
             }
             if(!hs.equals("")){batch.write(hs); batch.newLine();}
           }
