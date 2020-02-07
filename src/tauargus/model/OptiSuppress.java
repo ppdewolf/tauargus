@@ -1165,7 +1165,8 @@ public class OptiSuppress {
                                   maxRoundTime, 0,
                                   Application.getTempDir()+"/",
                                    maxJump, numberJump , usedTime, errorCode); //, activityListener );
-               solutionType = 0; // Only Optimal is implemented currently
+               // Only Optimal is implemented currently, so set manually solutionType = 0;
+               solutionType = 0; 
                //if (solutionType > 2) {throw new ArgusException("Rounding error code = "+tauArgus.GetErrorString(errorCode[0]) + "\noccured in subtable "+j);}             
                if (result > 0) {throw new ArgusException("Rounding error code = "+tauArgus.GetErrorString(errorCode[0]) + "\noccured in subtable "+j);}
                tableSet.roundMaxJump = Math.max(tableSet.roundMaxJump, maxJump[0]);

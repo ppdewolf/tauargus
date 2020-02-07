@@ -296,3 +296,37 @@ summary	   : Fixed bug that shadow variabel and record key could not be first va
 
 above released up to version 4.1.16_BETA
 --------------------------------------------------------------
+date       : Aug 21, 2019
+summary    : Fixed small bug in ECDF graphs
+
+date       : Sep 25, 2019
+summary    : Added CKM for magnitude tables
+
+date       : Nov 5, 2019
+summary    : First version of GUI for specifying CKM for magnitude tables
+
+date       : Dec 5, 2019
+summary    : Fixed inconsistent behaviour of CKM (in TauArgusJava.dll)
+
+date       : Jan 15, 2020
+summary    : Fixed error messages for controlled rounding (in CRP.dll)
+
+date       : Jan 23, 2020
+summary    : Fixed several GUI aspects (mainly related to CKM for magnitude tables)
+
+date       : Jan 24, 2020
+summary    : Added parameters info to report file in case of CKM for magnitude tables
+
+date       : Jan 28, 2020
+summary    : Possible to call CKM for magnitude tables from batch-file
+
+date       : Jan 31, 2020
+summary    : Possible to save CKM for magnitude tables call to batch-file (write batch)
+
+date       : Feb 3, 2020
+summary    : Empty ptable file now raises error (no crash anymore)
+
+above released in 4.2.0 build 1 (test version first)
+--------------------------------------------------------------
+
+

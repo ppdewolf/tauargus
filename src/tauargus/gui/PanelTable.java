@@ -69,6 +69,8 @@ import tauargus.utils.TauArgusUtils;
 
 public class PanelTable extends javax.swing.JPanel {
 
+    final Map<Integer,javax.swing.JRadioButton> buttonMap;
+    
     private static final Logger logger = Logger.getLogger(PanelTable.class.getName());
    
     private JFrame getParentFrame() {
@@ -403,6 +405,30 @@ public class PanelTable extends javax.swing.JPanel {
         radioButtonMarginal.setVisible(false);
         checkBoxInverseWeight.setVisible(false);
       
+        buttonMap = new HashMap<>();
+   /*         public static final int SUP_NO = 0;
+    public static final int SUP_JJ_OPT = 1;
+    public static final int SUP_GHMITER = 2;
+    public static final int SUP_HITAS = 3;
+    public static final int SUP_NETWORK = 4;
+    public static final int SUP_SINGLETON = 5;
+    public static final int SUP_ROUNDING = 6;
+    public static final int SUP_MARGINAL = 7;
+    public static final int SUP_UWE = 8;
+    public static final int SUP_CTA = 9;
+    public static final int SUP_CKM = 10;
+    */
+   
+        buttonMap.put(TableSet.SUP_JJ_OPT,radioButtonOptimal);
+        buttonMap.put(TableSet.SUP_GHMITER,radioButtonHyperCube);
+        buttonMap.put(TableSet.SUP_HITAS,radioButtonModular);
+        buttonMap.put(TableSet.SUP_NETWORK,radioButtonNetwork);
+        buttonMap.put(TableSet.SUP_ROUNDING,radioButtonRounding);
+        buttonMap.put(TableSet.SUP_MARGINAL,radioButtonMarginal);
+        buttonMap.put(TableSet.SUP_UWE,radioButtonUwe);
+        buttonMap.put(TableSet.SUP_CTA,radioButtonCta);
+        buttonMap.put(TableSet.SUP_CKM,radioButtonCellKey);
+        
         // disable reordering of columns
         table.getTableHeader().setReorderingAllowed(false);        
     }
@@ -444,6 +470,12 @@ public class PanelTable extends javax.swing.JPanel {
         Variable columnVar = null;
         if (!isSingleColumn) {columnVar = tableSet.expVar.get(1);}
         setRowColumnVariables(tableSet.expVar.get(0), columnVar);
+        if (buttonMap.containsKey(tableSet.suppressed)) {
+            buttonMap.get(tableSet.suppressed).setSelected(true);
+        }
+        else{
+            if (tableSet.suppressed==TableSet.SUP_NO) radioButtonHyperCube.setSelected(true);
+        }
         updateSuppressButtons();
     }
     
@@ -647,7 +679,7 @@ public class PanelTable extends javax.swing.JPanel {
             }
         }
         else{
-            radioButtonHyperCube.setSelected(true);
+            //radioButtonHyperCube.setSelected(true);
         }
         labelPTable.setVisible(CKMpossible && radioButtonCellKey.isSelected());
         labelPTableSep.setVisible(CKMpossible && radioButtonCellKey.isSelected());
