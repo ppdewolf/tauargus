@@ -17,6 +17,7 @@
 
 package tauargus.gui;
 
+import argus.utils.SystemUtils;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.WindowAdapter;
@@ -50,11 +51,8 @@ import tauargus.model.RecodeInfo;
 import tauargus.model.TableSet;
 import tauargus.model.VarCodeProperties;
 import tauargus.model.Variable;
-import tauargus.utils.SingleListSelectionModel;
-//import tauargus.utils.ExecUtils;
-import argus.utils.SystemUtils;
 import tauargus.service.TableService;
-import tauargus.utils.TableColumnResizer;
+import tauargus.utils.SingleListSelectionModel;
 import tauargus.utils.TauArgusUtils;
 import tauargus.utils.TreeUtils;
 

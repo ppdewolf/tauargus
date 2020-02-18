@@ -246,5 +246,90 @@ above is RELEASED IN 4.1.7
 date       : Mar 6, 2018
 summary    : No longer check for Cplex licence file in Optimal when not using Cplex
 
+date       : Mar 21, 2018
+summary    : Saving the recode tree has been implemented. Reading back still to come.
+
+date       : June 11, 2018
+summary    : Cell Key method implemented (frequency tables)
+
+date       : July 2, 2018
+summary    : Info screen (table summary) adjusted to display CKM info
+
+date       : July 9, 2018
+summary    : CKM for weighted frequency tables implemented
+
+date       : July 20, 2018
+summary    : Saving CKM protected as csv or codevalue did not work correctly
+
+date       : Oct 1, 2018
+summary    : Added percentage of perturbed files in CKM reporting
+
 date	   : Dec 19, 2018
 summary    : Bug with not initialised MaxCost in tauhitas.dll fixed
+	
+date       : Apr 16, 2019
+summary    : Linked tables with set of tables as input: fixed bug in case name of table-file contains name of spanning variable
+
+date       : May 8, 2019
+summary    : Basic Info Loss for CKM added, in dialog and in report. 
+
+date	   : May 22, 2019
+summary	   : Now possible to call CKM from batch file
+
+date       : May 27, 2019
+summary    : Now possible to change ptable in GUI suppress-view
+
+above released up to version 4.1.14_BETA
+--------------------------------------------------------------
+date       : June 14, 2019
+summary    : Information loss measures added for CKM protected tables
+
+above released up to version 4.1.15_BETA
+--------------------------------------------------------------
+date       : June 19, 2019
+summary    : Fixed bug that using request rule in batch mode did not detect use of holdings
+
+date	   : July 4, 2019
+summary    : Some refactoring
+
+date       : July 15, 2019
+summary	   : Fixed bug that shadow variabel and record key could not be first variable in microdata
+	     Added Information Loss over non-empty cells to report file
+	     Added Graphics of ECDF to report file
+
+above released up to version 4.1.16_BETA
+--------------------------------------------------------------
+date       : Aug 21, 2019
+summary    : Fixed small bug in ECDF graphs
+
+date       : Sep 25, 2019
+summary    : Added CKM for magnitude tables
+
+date       : Nov 5, 2019
+summary    : First version of GUI for specifying CKM for magnitude tables
+
+date       : Dec 5, 2019
+summary    : Fixed inconsistent behaviour of CKM (in TauArgusJava.dll)
+
+date       : Jan 15, 2020
+summary    : Fixed error messages for controlled rounding (in CRP.dll)
+
+date       : Jan 23, 2020
+summary    : Fixed several GUI aspects (mainly related to CKM for magnitude tables)
+
+date       : Jan 24, 2020
+summary    : Added parameters info to report file in case of CKM for magnitude tables
+
+date       : Jan 28, 2020
+summary    : Possible to call CKM for magnitude tables from batch-file
+
+date       : Jan 31, 2020
+summary    : Possible to save CKM for magnitude tables call to batch-file (write batch)
+
+date       : Feb 3, 2020
+summary    : Empty ptable file now raises error (no crash anymore)
+
+above released in 4.2.0 build 1 (test version first)
+--------------------------------------------------------------
+
+

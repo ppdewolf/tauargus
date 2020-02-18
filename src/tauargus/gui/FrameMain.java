@@ -17,36 +17,33 @@
 
 package tauargus.gui;
 
+import argus.utils.StrUtils;
+import argus.utils.SystemUtils;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-//import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-//import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import static javax.swing.JViewport.SIMPLE_SCROLL_MODE;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import tauargus.model.Application;
 import tauargus.model.ArgusException;
 import tauargus.model.DataFilePair;
 import tauargus.model.LinkedTables;
 import tauargus.model.Metadata;
+import tauargus.model.SpssUtilsTau;
 import tauargus.model.TableSet;
 import tauargus.model.batch;
 import tauargus.service.TableService;
-import argus.utils.StrUtils;
-//import tauargus.gui.PanelTable;
-//import tauargus.utils.ExecUtils;
-import argus.utils.SystemUtils;
-import tauargus.model.SpssUtilsTau;
 import tauargus.utils.TauArgusUtils;
 
 public class FrameMain extends javax.swing.JFrame {
@@ -145,8 +142,8 @@ public class FrameMain extends javax.swing.JFrame {
     private final Action specifyMetadataAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            DialogSpecifyMetadata dialog = new DialogSpecifyMetadata(FrameMain.this, true);
             Metadata metadata = Application.getMetadata(0);
+            DialogSpecifyMetadata dialog = new DialogSpecifyMetadata(FrameMain.this, true);
             if (dialog.showDialog(metadata) == DialogSpecifyMetadata.APPROVE_OPTION) {
                 organise();
             }
@@ -272,6 +269,7 @@ public class FrameMain extends javax.swing.JFrame {
         initComponents();
         panelTable = new tauargus.gui.PanelTable();
         jScrollPane1.setViewportView(panelTable);
+        jScrollPane1.getViewport().setScrollMode(SIMPLE_SCROLL_MODE);
         fileChooser = new javax.swing.JFileChooser();
         
 //        panelTable.setVisible(false);
@@ -405,6 +403,11 @@ public class FrameMain extends javax.swing.JFrame {
         buttonOpenMicrodata.setFocusable(false);
         buttonOpenMicrodata.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         buttonOpenMicrodata.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        buttonOpenMicrodata.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonOpenMicrodataActionPerformed(evt);
+            }
+        });
         toolBar.add(buttonOpenMicrodata);
 
         buttonOpenTable.setAction(openTableAction);
@@ -531,7 +534,6 @@ public class FrameMain extends javax.swing.JFrame {
             }
         });
         toolBar.add(buttonAbout);
-        buttonAbout.getAccessibleContext().setAccessibleDescription("About");
 
         jScrollPane1.setMaximumSize(new java.awt.Dimension(0, 0));
 
@@ -543,11 +545,6 @@ public class FrameMain extends javax.swing.JFrame {
         menuItemOpenMicrodata.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/OpenMicrodata.png"))); // NOI18N
         menuItemOpenMicrodata.setMnemonic('M');
         menuItemOpenMicrodata.setText("Open Microdata...");
-        menuItemOpenMicrodata.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuItemOpenMicrodataActionPerformed(evt);
-            }
-        });
         menuFile.add(menuItemOpenMicrodata);
 
         menuItemOpenTable.setAction(openTableAction);
@@ -555,11 +552,6 @@ public class FrameMain extends javax.swing.JFrame {
         menuItemOpenTable.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/OpenTable.png"))); // NOI18N
         menuItemOpenTable.setMnemonic('T');
         menuItemOpenTable.setText("Open Table...");
-        menuItemOpenTable.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuItemOpenTableActionPerformed(evt);
-            }
-        });
         menuFile.add(menuItemOpenTable);
 
         menuItemOpenTableSet.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/OpenTableSet.png"))); // NOI18N
@@ -829,7 +821,7 @@ public class FrameMain extends javax.swing.JFrame {
         String hs="";
         DialogHtmlViewer dialog = new DialogHtmlViewer(FrameMain.this, true);
         try{hs = SystemUtils.getApplicationDirectory(FrameMain.class).getCanonicalPath();}
-        catch (IOException ex){};
+        catch (IOException ex){}
         hs = hs +"/tauNews.html";
         if (TauArgusUtils.ExistFile(hs)){
         dialog.showDialog("News","file:////"+  hs);
@@ -880,10 +872,6 @@ public class FrameMain extends javax.swing.JFrame {
         // TODO add your handling code here:*/
     }//GEN-LAST:event_menuItemLinkedTablesActionPerformed
 
-    private void menuItemOpenMicrodataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemOpenMicrodataActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_menuItemOpenMicrodataActionPerformed
-
     private void menuItemOpenBatchProcessActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemOpenBatchProcessActionPerformed
         // TODO add your handling code here:
 //        String hs = SystemUtils.getRegString("general", "datadir", "");
@@ -920,18 +908,12 @@ public class FrameMain extends javax.swing.JFrame {
         }           
     }//GEN-LAST:event_menuItemOpenBatchProcessActionPerformed
 
-    private void menuItemOpenTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemOpenTableActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_menuItemOpenTableActionPerformed
-
     private void menuItemSolverOptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemSolverOptionsActionPerformed
-        // TODO add your handling code here:
         DialogSolverOptions dialog = new DialogSolverOptions(FrameMain.this,true);
         dialog.setVisible(true);
     }//GEN-LAST:event_menuItemSolverOptionsActionPerformed
 
     private void menuItemWriteBatchFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemWriteBatchFileActionPerformed
-        // TODO add your handling code here:
         DialogWriteBatchFile dialog = new DialogWriteBatchFile(FrameMain.this,true);
         dialog.setVisible(true);
     }//GEN-LAST:event_menuItemWriteBatchFileActionPerformed
@@ -941,23 +923,21 @@ public class FrameMain extends javax.swing.JFrame {
     }//GEN-LAST:event_menuItemViewReportActionPerformed
 
     private void menuItemProtectJJFormatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemProtectJJFormatActionPerformed
-        // TODO add your handling code here:
         DialogProtectJJFormat dialog = new DialogProtectJJFormat(FrameMain.this,true);
         dialog.setVisible(true);       
         
     }//GEN-LAST:event_menuItemProtectJJFormatActionPerformed
 
     private void menuItemContentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemContentActionPerformed
-        // TODO add your handling code here:
-//        try{
-//        Application.showHelp("General");
-//        }
-//        catch (ArgusException ex){ JOptionPane.showMessageDialog(FrameMain.this, "The report file is not (yet) available ") ;}
         try{
             Application.showHelp("General");
             }
         catch (argus.model.ArgusException ex){JOptionPane.showMessageDialog(null, ex.getMessage());}
     }//GEN-LAST:event_menuItemContentActionPerformed
+
+    private void buttonOpenMicrodataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonOpenMicrodataActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_buttonOpenMicrodataActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonAbout;

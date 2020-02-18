@@ -709,7 +709,7 @@ public class DialogSpecifyTablesTabular extends DialogBase {
                      Info.addLabel("Overview of the additivity errors");
                      try{
                        Info.addTextFile(Application.getTempFile("additerr.txt"));}
-                     catch (ArgusException ex1){};
+                     catch (ArgusException ex1){}
                      Info.setVisible(true);
                     }
                     
@@ -796,8 +796,6 @@ public class DialogSpecifyTablesTabular extends DialogBase {
 
     void load(Metadata metadata) {
         // Fill "Variables" panel...
-// Anco 1.6
-//        DefaultListModel<String> model = new DefaultListModel<>();
         DefaultListModel<String> model = new DefaultListModel<>();
         for (Variable variable : metadata.variables) {
             if (variable.isCategorical()) {

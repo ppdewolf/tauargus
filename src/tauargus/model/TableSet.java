@@ -17,6 +17,8 @@
 
 package tauargus.model;
 
+import argus.utils.StrUtils;
+import argus.utils.SystemUtils;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.BufferedReader;
@@ -29,33 +31,30 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import static java.lang.Math.abs;
 import java.nio.channels.FileChannel;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
+import java.util.TreeMap;
 import java.util.logging.Logger;
-//import javax.swing.JOptionPane;
-//import org.apache.commons.lang3.StringUtils;
+import java.util.stream.DoubleStream;
 import tauargus.extern.dataengine.TauArgus;
-//import tauargus.gui.ActivityListener;
+import tauargus.gui.DialogErrorApriori;
 import tauargus.service.TableService;
-//import argus.utils.StrUtils;
-//import tauargus.utils.ExecUtils;
 import tauargus.utils.TauArgusUtils;
 import tauargus.utils.Tokenizer;
-//import tauargus.model.CellStatus;
-import argus.utils.SystemUtils;
-import argus.utils.StrUtils;
-import static java.lang.Math.abs;
-import tauargus.gui.DialogErrorApriori;
 
 public class TableSet {
 
     private static final Logger logger = Logger.getLogger(TableSet.class.getName());
+    private static final double EPSILON = 1.0e-10;
 
     public static final int MAX_EXP_VAR = 10;
     public static final int MAX_RESP_VAR = 10;
@@ -72,24 +71,6 @@ public class TableSet {
     public static final int COST_VAR = -4; // Not used in communication with dll
     public static final int COST_RESPONSE = -5; // Not used in communication with dll
 
-//    public static final int SRT_GHMITER = 1;  //These SRT parameters are never used; Anco
-//    public static final int SRT_HITAS = 2;
-//    public static final int SRT_NETWORK = 3;
-//    public static final int SRT_OPTIMAL = 4;
-//    public static final int SRT_ROUNDING = 5;
-//    public static final int SRT_MARGINAL = 6;
-//    public static final int SRT_UWE = 7;
-//    public static final int SRT_MAX = 7;
-//    public static final int SRT_CTA = 8;
-
-
-//    public static final int SUP_JJ_OPT_XP = 1;
-//    public static final int SUP_JJ_OPT_CP = 2;
-//    public static final int SUP_HITAS_XP = 4;
-//    public static final int SUP_HITAS_CP = 5;
-//    public static final int SUP_ROUNDING_CP = 8;
-//    public static final int SUP_ROUNDING_XP = 9;
-
     public static final int SUP_NO = 0;
     public static final int SUP_JJ_OPT = 1;
     public static final int SUP_GHMITER = 2;
@@ -100,12 +81,7 @@ public class TableSet {
     public static final int SUP_MARGINAL = 7;
     public static final int SUP_UWE = 8;
     public static final int SUP_CTA = 9;
-
-    public static final int CT_RESPONSE = 1;
-    public static final int CT_SHADOW = 2;
-    public static final int CT_COST = 3;
-    public static final int CT_ROUNDEDRESP = 4;
-    public static final int CT_CTA = 5;
+    public static final int SUP_CKM = 10;
 
     public static final int ADDITIVITY_CHECK = 0;
     public static final int ADDITIVITY_RECOMPUTE = 1;
@@ -118,13 +94,14 @@ public class TableSet {
     public static final int FILE_FORMAT_SBS = 3;
     public static final int FILE_FORMAT_INTERMEDIATE = 4;
     public static final int FILE_FORMAT_JJ = 5;
+    public static final int FILE_FORMAT_CKM = 6;
 
     public static final String DATA_FILE_EXTENSION = ".tab";
     public static final String METADATA_FILE_EXTENSION = ".rda";
 
     static BufferedWriter outApriori, outStatus, outCost, outProtL,  outBound;
     
-    private static TauArgus tauArgus = Application.getTauArgusDll();
+    private static final TauArgus tauArgus = Application.getTauArgusDll();
     public Metadata metadata;
 
     public int index;  //mag niet static zijn!!!!!!!!!!!!
@@ -132,12 +109,15 @@ public class TableSet {
     // explanatory variables...
 // Anco 1.6    
 //    public List<Variable> expVar = new ArrayList<>();
-    public List<Variable> expVar = new ArrayList<Variable>();
+    public List<Variable> expVar = new ArrayList<>();
     // result variables...
     public Variable respVar;
 
     // shadow variable
     public Variable shadowVar;
+    
+    // variable to calculate cellkey
+    public Variable cellkeyVar;
 
     // cost func/variable/parameters
     public int costFunc = COST_VAR;
@@ -206,6 +186,7 @@ public class TableSet {
     public boolean weighted = false;
     public boolean missingIsSafe = false;
     public boolean holding = false;
+    public boolean CellKeyAvailable = false;
     ////////////////////////////////////////////
     public boolean singletonUsed = false;
     public int suppressed = SUP_NO;
@@ -234,6 +215,7 @@ public class TableSet {
     public boolean minFreqCheck = true;
     public int processingTime = 0;
     public boolean ctaProtect = false;
+    public boolean ckmProtect = false;
     public int networkSolverType = 1;
     public int networkPrimariesOrder = 1;
     public int networkMaxProtLevel = 20;
@@ -263,6 +245,8 @@ public class TableSet {
     boolean scalingUsed = false;
     public double minTabVal = 0;
     public double maxTabVal;
+    public int minDiff = 0;
+    public int maxDiff = 0;
     public boolean computeTotals = false;
     public boolean useStatusOnly = false;
     public int additivity = ADDITIVITY_CHECK;
@@ -280,6 +264,10 @@ public class TableSet {
         }
     }
     int APriory = -1;
+    
+    private TreeMap<Integer,Long> CKMStatistics = new TreeMap<>();
+    private long nEmpty;
+    
     private static String[][] codeList;
     private static int[][] codeListLevel;
     private static int[][] codeListNChild;
@@ -293,6 +281,8 @@ public class TableSet {
     private static int[] level = new int[1];
     private static int[] nChild = new int[1];
     private static String[] code = new String[1];
+    
+    private final CKMInfoLoss InfoLoss = new CKMInfoLoss();
 
 
     public TableSet(Metadata metadata) {
@@ -325,14 +315,28 @@ public class TableSet {
             if (shadowVar == null) {
                 shadowVar = respVar;
             }
+            
             costVar = metadata.find(tauargus.model.Type.COST);
             if (costVar == null) {
-                
                 costVar = respVar;
             }
+        }else{ // find out if a record key is available in the data
+            CellKeyAvailable = !(metadata.find(tauargus.model.Type.RECORD_KEY)==null);
         }
     }
 
+    public long numberOfEmpty(){
+        return nEmpty;
+    }
+    
+    public void setNumberOfEmpty(long numberEmpty){
+        nEmpty=numberEmpty;
+    }
+    
+    public TreeMap<Integer, Long> getCKMStats(){
+        return CKMStatistics;
+    }
+    
     public int indexOfResponseVariable() {
         return Application.indexOfVariable(respVar);
     }
@@ -347,6 +351,11 @@ public class TableSet {
             iShadow = indexOfResponseVariable();
         }
         return iShadow;
+    }
+    
+    public int indexOfCellKeyVariable(){
+        int iCellKey = Application.indexOfVariable(cellkeyVar);
+        return iCellKey;
     }
 
     public int indexOfCostVariable() {
@@ -374,8 +383,11 @@ public class TableSet {
         //int[] roundedResponse = {0};
         double[] roundedResponse = {0.0};
         double[] CTAValue = {0.0};
+        double[] CKMValue = {0.0};
         double[] shadow = {0.0};
         double[] cost = {0.0};
+        double[] cellkey = {0.0};
+        double[] cellkeynozeros = {0.0};
         int[] freq = {0};
         int[] status = {0};
         int[] holdingFreq = {0};
@@ -388,14 +400,17 @@ public class TableSet {
         double[] realizedLower = {0.0};
         double[] realizedUpper = {0.0};
         Cell cell = new Cell();
-        if (!tauArgus.GetTableCell(index, dimIndex, response, roundedResponse, CTAValue, shadow, cost, freq, status, cell.maxScore, cell.maxScoreWeight, holdingFreq, cell.holdingMaxScore, cell.holdingNrPerMaxScore, peepCell, peepHolding, peepSortCell, peepSortHolding, lower, upper, realizedLower, realizedUpper)) {
+        if (!tauArgus.GetTableCell(index, dimIndex, response, roundedResponse, CTAValue, CKMValue, shadow, cost, cellkey, cellkeynozeros, freq, status, cell.maxScore, cell.maxScoreWeight, holdingFreq, cell.holdingMaxScore, cell.holdingNrPerMaxScore, peepCell, peepHolding, peepSortCell, peepSortHolding, lower, upper, realizedLower, realizedUpper)) {
             return null;
         }
         cell.response = response[0];
         cell.roundedResponse = roundedResponse[0];
         cell.CTAValue = CTAValue[0];
+        cell.CKMValue = CKMValue[0];
         cell.shadow = shadow[0];
         cell.cost = cost[0];
+        cell.cellkey = cellkey[0];
+        cell.cellkeynozeros = cellkeynozeros[0];
         cell.freq = freq[0];
         cell.setStatusAndAuditByValue(status[0]);
         cell.holdingFreq = holdingFreq[0];
@@ -747,7 +762,9 @@ public class TableSet {
         }
     }
 
-    private static boolean getTableCell (int tabNo, int[] dimIndex, double[] CellResp, int[] CellStatus, double[] CellLower, double[] CellUpper, double[]CellCost){
+    private static boolean getTableCell (int tabNo, int[] dimIndex, double[] CellResp, int[] CellStatus, 
+                                         double[] CellLower, double[] CellUpper, double[] CellCost, 
+                                         double[] CellKey, double[] CellKeyNoZeros){
       double[] CR = new double[1];
       double[] Lower = new double[1];
       double[] Upper = new double[1];
@@ -759,7 +776,10 @@ public class TableSet {
       double[] x5 = new double[MAX_TOP_N_VAR];
       double[] x8 = new double[1];
       double[] x9 = new double[1];
+      double[] x10 = new double[1]; //CellKey
+      double[] x11 = new double[1]; //CellKeyNoZeros      
       double[] xcta = new double[1];
+      double[] xckm = new double[1];
       double[] hms = new double[MAX_TOP_N_VAR];
       double[] peep = new double[1];
       double[] peephold = new double[1];
@@ -773,7 +793,8 @@ public class TableSet {
         int[] peepsrthold = new int[1];
         boolean oke;       
         oke = tauArgus.GetTableCell(tabNo, dimIndex, CR, ix, xcta,
-                                    x2, x3, cf, Status, x4,
+                                    xckm,
+                                    x2, x3, x10, x11, cf, Status, x4,
                                     x5, cfh,   hms, holdnr,
                                     peep, peephold, peepsrt,  peepsrthold,  Lower,
                                     Upper, x8, x9);
@@ -783,6 +804,8 @@ public class TableSet {
       CellLower[0] = Lower[0];
       CellUpper[0] = Upper[0];
       CellCost[0] = x3[0];
+      CellKey[0] = x10[0];
+      CellKeyNoZeros[0] = x11[0];
       return oke;
     //public boolean GetTableCell(int TableIndex, int[] DimIndex, double[] CellResponse, int[] CellRoundedResp,
     //        double[] CellCTAResp, double[] CellShadow, double[] CellCost, int[] CellFreq,
@@ -904,7 +927,10 @@ public class TableSet {
 
   //      boolean isFrequencyTable = respVar == Application.getFreqVar();
 
-        if (!tauArgus.SetTable(index, varlist.length, varlist, isFrequencyTable(), indexOfResponseVariable(), indexOfShadowVariable(), indexOfCostVariable(), lambda, maxScaleCost, 0, missingIsSafe)) {
+        if (!tauArgus.SetTable(index, varlist.length, varlist, isFrequencyTable(), 
+                                indexOfResponseVariable(), indexOfShadowVariable(), indexOfCostVariable(), indexOfCellKeyVariable(), 
+                                respVar.CKMType, respVar.CKMTopK,
+                                lambda, maxScaleCost, 0, missingIsSafe)) {
             throw new ArgusException("Error in specifying table " + index);
         }
         boolean hasMaxScore = metadata.numberOfTopNVariables() > 0;
@@ -1320,7 +1346,8 @@ if (Application.isProtectCoverTable()){
                             writer.print(codeString + ";");
                         }
                     }
-                    writer.print(mdecimalFormat.format(cell.response) + ";");
+                    if (!rounded) writer.print(mdecimalFormat.format(cell.response) + ";");
+                    if (rounded) writer.print(mdecimalFormat.format(cell.roundedResponse) + ";");
                     // for freq tables no double column resp and freq nor shadow variable
                     if (!isFrequencyTable()){
                      if (!holdinglevel) {
@@ -1409,6 +1436,133 @@ if (Application.isProtectCoverTable()){
         metadata.writeTableMetadata(metadataFileName, nExpVar, expVar.toArray(new Variable[expVar.size()]), respVar, shadowVar, costFunc, costVar, numberOfTopNNeeded, simple, withAudit);
     }
 
+    
+    public void writeCKM(boolean addOrig, boolean addDiff, boolean addCellKey, boolean suppressEmpty, 
+                         boolean EmbedQuotes, PropertyChangeListener propertyChangeListener) throws IOException, ArgusException {
+        PropertyChangeSupport propertyChangeSupport = null;
+        if (!Application.isBatch()){
+          propertyChangeSupport  = new PropertyChangeSupport(this);
+          propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);
+        }  
+
+        int nExpVar = expVar.size();
+        int[] maxDim = new int[nExpVar];
+        int[] dimArray = new int[nExpVar];
+
+        // including empty cells
+        int numberOfCells = 1;
+        for (int i = 0; i < nExpVar; i++) {
+            dimArray[i] = 0;
+            maxDim[i] = TauArgusUtils.getNumberOfActiveCodes(expVar.get(i).index);
+            numberOfCells = numberOfCells * maxDim[i];
+        }
+
+        FileWriter fw = null;
+        BufferedWriter bw = null;
+        PrintWriter writer = null;
+        try {
+            fw = new FileWriter(safeFileName);
+            bw = new BufferedWriter(fw);
+            writer = new PrintWriter(bw);
+
+            VarCode varCode = new VarCode();
+            int cellIndex = 0;
+            int nDec = respVar.nDecimals;
+            DecimalFormat mdecimalFormat = new DecimalFormat();
+            mdecimalFormat.setMinimumFractionDigits(nDec);
+            mdecimalFormat.setMaximumFractionDigits(nDec);
+            mdecimalFormat.setGroupingUsed(false);
+            
+            DecimalFormat CKdecimalFormat = new DecimalFormat();
+            CKdecimalFormat.setMinimumFractionDigits(cellkeyVar.nDecimals);
+            CKdecimalFormat.setMaximumFractionDigits(cellkeyVar.nDecimals);
+            CKdecimalFormat.setGroupingUsed(false);
+            
+            for (;;) {
+                Cell cell = getCell(dimArray);
+                
+                if (cell.status != CellStatus.EMPTY || !suppressEmpty) {
+                    for (int j = 0; j < expVar.size(); j++) {
+                        Variable variable = expVar.get(j);
+                        varCode.setCode(variable.index, dimArray[j]);
+                        String codeString = varCode.getCodeString();
+                        if (codeString.equals("")) {
+                            codeString = variable.getTotalCode();
+                        }
+                        if (EmbedQuotes){
+                            writer.print(StrUtils.quote(codeString) + ";");
+                        }
+                        else{
+                            writer.print(codeString + ";");
+                        }
+                    }
+
+                    writer.print(mdecimalFormat.format(cell.CKMValue));
+                    
+                    if (addOrig){
+                        writer.print(";" + mdecimalFormat.format(cell.response));
+                    }
+                    if (addDiff){
+                        writer.print(";" + mdecimalFormat.format(cell.CKMValue - cell.response));
+                    }
+                    if (addCellKey){
+                            writer.print(";" + CKdecimalFormat.format(respVar.zerosincellkey ? cell.cellkey : cell.cellkeynozeros));
+                    }
+                    writer.println();
+                }
+                cellIndex++;
+                if (!Application.isBatch()){
+                  if (cellIndex % 1000 == 0) {
+                      int percentage = (int)(100L * cellIndex / numberOfCells);
+                      propertyChangeSupport.firePropertyChange("progressMain", null, percentage);
+                      propertyChangeSupport.firePropertyChange("activityMain", null, "(" + cellIndex + ")");
+                  }
+                }
+
+                // dimArray ophogen
+                int k = nExpVar;
+                while (k-- > 0) {
+                    dimArray[k]++;
+                    if (dimArray[k] < maxDim[k]) {
+                        break;
+                    } else {
+                        dimArray[k] = 0;
+                    }
+                }
+                if (k == -1) {
+                    break;
+                }
+            }
+        }
+        finally {
+ //         fw.close();
+ //         bw.close();
+          writer.close();
+        }
+
+        String metadataFileName = StrUtils.replaceExtension(safeFileName, METADATA_FILE_EXTENSION);
+        metadata.writeCKMMetadata(metadataFileName, nExpVar, expVar.toArray(new Variable[expVar.size()]), respVar, addOrig, addDiff, addCellKey);
+    }    
+    
+    public void writeCKMStats(){
+        FileWriter fw = null;
+        BufferedWriter bw = null;
+        try{
+            fw = new FileWriter(StrUtils.replaceExtension(safeFileName, ".log"));
+            bw = new BufferedWriter(fw);
+            for (int i=this.minDiff;i<=this.maxDiff;i++){
+                bw.write(Integer.toString(i) + ": ");
+                bw.write(Long.toString(this.getCKMStats().get(i))+"\n");
+            }
+            bw.write("Empty: "+Long.toString(this.numberOfEmpty())+"\n");
+            bw.write("Total: "+Long.toString(this.numberOfCells())+"\n");
+            bw.close();
+        }catch (IOException ex){
+            
+        }
+    }
+    
+    
     //dubbel op gebruik de TableService
   //  public void undoSuppressFOUT(){;
   //    suppressed = SUP_NO;
@@ -1675,7 +1829,10 @@ if (Application.isProtectCoverTable()){
         double[] x7 = new double[1];
         double[] x8 = new double[1];
         double[] x9 = new double[1];
+        double[] x10 = new double[1];
+        double[] x11 = new double[1];
         double[] xcta = new double[1];
+        double[] xckm = new double[1];
         double[] hms = new double[MAX_TOP_N_VAR];
         double[] peep = new double[1];
         double[] peephold = new double[1];
@@ -1688,7 +1845,8 @@ if (Application.isProtectCoverTable()){
         int[] peepsrt = new int[1];
         int[] peepsrthold = new int[1];
         oke = tauArgus.GetTableCell(tableSet.index, dimArray, x, ix, xcta,
-                                    x2, x3, cf, cellStatus, x4,
+                                    xckm,
+                                    x2, x3, x10, x11, cf, cellStatus, x4,
                                     x5, cfh,   hms, holdnr,
                                     peep, peephold, peepsrt,  peepsrthold,  x6,
                                     x7, x8, x9);
@@ -1749,6 +1907,8 @@ if (Application.isProtectCoverTable()){
      double[] CellLower = new double[1];
      double[] CellUpper = new double[1];
      double[] CellCost = new double[1];
+     double[] CellKey = new double[1];
+     double[] CellKeyNoZeros = new double[1];
      TableSet tableSet = TableService.getTable(tableNumber);
      String[] codes = new String[tableSet.expVar.size()]; String codesString;
      int[] dimIndex = new int[tableSet.expVar.size()];
@@ -1974,7 +2134,7 @@ if (Application.isProtectCoverTable()){
              if(x1==0){x1=1;} //zero is a silly value
              oke = (x1 > 0);
              if (oke) {
-                 getTableCell (tableNumber, dimIndex, CellResp, CellStat, CellLower, CellUpper, CellCost);
+                 getTableCell (tableNumber, dimIndex, CellResp, CellStat, CellLower, CellUpper, CellCost, CellKey, CellKeyNoZeros);
                  oke =tauArgus.SetTableCellCost(tableSet.index, dimIndex, x1);}
              if ( oke) { aPrioryStatus[2][0]++; }
              else      { aPrioryStatus[2][1]++;
@@ -2006,7 +2166,7 @@ if (Application.isProtectCoverTable()){
              }
              if (oke){
                oldStatus = getCellStatus(tableSet, dimIndex);
-               getTableCell (tableNumber, dimIndex, CellResp, CellStat, CellLower, CellUpper, CellCost);
+               getTableCell (tableNumber, dimIndex, CellResp, CellStat, CellLower, CellUpper, CellCost, CellKey, CellKeyNoZeros);
                if ( (oldStatus < CellStatus.UNSAFE_RULE.getValue())||(oldStatus > CellStatus.UNSAFE_MANUAL.getValue()) ){
                  oke = false; 
                  hs = "Protection levels can only be changed for unsafe cells"; 
@@ -2128,7 +2288,7 @@ if (Application.isProtectCoverTable()){
        deci = tableSet.respVar.nDecimals;
        try{
        SaveTable.writeJJ(tableSet, Application.getTempFile("AddErr.JJ"), false, false, 1, false, false);
-       }catch (ArgusException ex){};
+       }catch (ArgusException ex){}
        
        try{
         BufferedWriter out = new BufferedWriter(new FileWriter(Application.getTempFile("AdditErr.txt")));
@@ -2210,7 +2370,7 @@ if (Application.isProtectCoverTable()){
 // anco 1.6       
 //       catch (ArgusException | IOException ex){};
 //       catch (ArgusException ex){;}
-       catch (IOException ex){;}
+       catch (IOException ex){}
  }
 
 
@@ -2229,13 +2389,252 @@ if (Application.isProtectCoverTable()){
         return minRoundBase;
     }
     
-        public static void writeJJ(TableSet tableSet, String fileName, boolean forRounding,
+    public static void writeJJ(TableSet tableSet, String fileName, boolean forRounding,
                                boolean singleton, int minFreq, boolean withBogusRemoval)throws ArgusException{
     }
 
+    public void CalculateCKMInfo(){
+        CKMStatistics.clear();
+        for (int i=this.minDiff; i<=this.maxDiff; i++){
+            CKMStatistics.put(i, 0L);
+        }
+        nEmpty = 0L;
+        
+        int nExpVar = expVar.size();
+        int[] maxDim = new int[nExpVar];
+        int[] dimArray = new int[nExpVar];
 
+        // including empty cells
+        for (int i = 0; i < nExpVar; i++) {
+            dimArray[i] = 0;
+            maxDim[i] = TauArgusUtils.getNumberOfActiveCodes(expVar.get(i).index);
+        }        
+        
+        for (;;) {
+            Cell cell = getCell(dimArray);
+                if (cell.status == CellStatus.EMPTY) {
+                    nEmpty++;
+                }else{
+                    int Diff = (int) Math.round(cell.CKMValue-cell.response);
+                    CKMStatistics.put(Diff, CKMStatistics.get(Diff)+1);
+                }
+ 
+            // dimArray ophogen
+            int k = nExpVar;
+            while (k-- > 0) {
+                dimArray[k]++;
+                if (dimArray[k] < maxDim[k]) { break; }
+                else { dimArray[k] = 0; }
+            }
+            if (k == -1) { break; }
+        }
+        
+        // remove info of differences that are not present in the table 
+        // i.e. remove entries with CKMStatistics(Diff) == 0
+        for (Iterator<Map.Entry<Integer,Long>> it = CKMStatistics.entrySet().iterator();it.hasNext();){
+            Map.Entry<Integer,Long> entry = it.next();
+            if (entry.getValue()==0) it.remove();
+        }
+    }
+    
+    // Calculates mean 
+    public void CalculateCKMInfoLoss(){
+        final double[] percs = new double[]{0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95,0.99};
+        final double[] RADDRbreaks = new double[]{0.0,0.02,0.05,0.1,0.2,0.3,0.4,0.5,1.0};
+        final double[] ADbreaks;
+        int nFalseZeros = 0;
+        int nFalseNonzeros = 0;
+        int nExpVar = expVar.size();
+        int[] maxDim = new int[nExpVar];
+        int[] dimArray = new int[nExpVar];
+        
+        double[] AD = new double[this.numberOfCells()];
+        double[] RAD = new double[this.numberOfCells()];
+        double[] DR = new double[this.numberOfCells()];
+        
+        // including empty cells
+        for (int i = 0; i < nExpVar; i++) {
+            dimArray[i] = 0;
+            maxDim[i] = TauArgusUtils.getNumberOfActiveCodes(expVar.get(i).index);
+        }        
+        
+        int j=0;
+        for (;;) {
+            Cell cell = getCell(dimArray);
+            if ((Math.abs(cell.CKMValue) <= EPSILON) && (Math.abs(cell.response) > EPSILON)) nFalseZeros++;
+            if ((Math.abs(cell.response) <= EPSILON) && (Math.abs(cell.CKMValue) > EPSILON)) nFalseNonzeros++;
+            
+            AD[j] = Math.abs(cell.CKMValue - cell.response);
+            // If cell is empty, it is not perturbed by default in frequency count tables, using standard CKM
+            if (cell.status==CellStatus.EMPTY) RAD[j] = 0;
+            else {
+                if (Math.abs(cell.response) <= EPSILON){ // original cell value is (close to) zero
+                    RAD[j] = Math.abs(cell.CKMValue - cell.response)/EPSILON;
+                }
+                else RAD[j] = Math.abs(cell.CKMValue - cell.response)/cell.response;
+            }
+            DR[j] = Math.abs(Math.sqrt(cell.CKMValue) - Math.sqrt(cell.response));
+            j++;
+            // dimArray ophogen
+            int k = nExpVar;
+            while (k-- > 0) {
+                dimArray[k]++;
+                if (dimArray[k] < maxDim[k]) { break; }
+                else { dimArray[k] = 0; }
+            }
+            if (k == -1) { break; }            
+        }
+        
+        this.InfoLoss.SetNumberOfCells(this.numberOfCells());
+        this.InfoLoss.SetNumberOfEmpty((int) this.numberOfEmpty());
+        this.InfoLoss.SetFalseZeros(nFalseZeros);
+        this.InfoLoss.SetFalseNonzeros(nFalseNonzeros);
+       
+        this.InfoLoss.SetMean("AD",DoubleStream.of(AD).average().getAsDouble());
+        this.InfoLoss.SetMean("RAD",DoubleStream.of(RAD).average().getAsDouble());
+        this.InfoLoss.SetMean("DR",DoubleStream.of(DR).average().getAsDouble());
+        
+        double multiplier = ((double) this.numberOfCells())/(this.numberOfCells() - this.numberOfEmpty());
+        this.InfoLoss.SetMean("ADnonempty",this.InfoLoss.GetMean("AD")*multiplier);
+        this.InfoLoss.SetMean("RADnonempty",this.InfoLoss.GetMean("RAD")*multiplier);
+        this.InfoLoss.SetMean("DRnonempty",this.InfoLoss.GetMean("DR")*multiplier);
+
+        // Sort the values
+        Arrays.sort(AD);
+        Arrays.sort(RAD);
+        Arrays.sort(DR);
+        InfoLoss.setDiffs("AD", AD);
+        InfoLoss.setDiffs("RAD", RAD);
+        InfoLoss.setDiffs("DR", DR);
+        
+        // Calculations below this line make use of fact that 
+        // AD, RAD and DA are sorted
+        
+        if (this.isFrequencyTable()){
+            int ADbreakssize = Math.max(Math.abs(this.maxDiff),Math.abs(this.minDiff)) + 1;
+            ADbreaks = new double[ADbreakssize];
+            for (int i=0; i<ADbreakssize; i++) ADbreaks[i]=(double)i;
+        }
+        else{
+            ADbreaks = new double[]{0.0,1.0,2.0,3.0,4.0,5.0};// Possibly different in case of continuous variables?
+        }
+        
+        this.InfoLoss.SetECDFcounts("AD", ECDFcounts(AD,ADbreaks));
+        this.InfoLoss.SetECDFcounts("RAD", ECDFcounts(RAD,RADDRbreaks));
+        this.InfoLoss.SetECDFcounts("DR", ECDFcounts(DR,RADDRbreaks));
+        
+        this.InfoLoss.SetMaxs("AD",AD[AD.length-1]);
+        this.InfoLoss.SetMaxs("RAD",RAD[RAD.length-1]);
+        this.InfoLoss.SetMaxs("DR",DR[DR.length-1]);
+        this.InfoLoss.SetMaxs("ADnonempty",AD[AD.length-1]);
+        this.InfoLoss.SetMaxs("RADnonempty",RAD[RAD.length-1]);
+        this.InfoLoss.SetMaxs("DRnonempty",DR[DR.length-1]);
+
+        this.InfoLoss.SetMins("AD",AD[0]);
+        this.InfoLoss.SetMins("RAD",RAD[0]);
+        this.InfoLoss.SetMins("DR",DR[0]);
+        // First this.numberOfEmpty() values are zero because of empty cells
+        this.InfoLoss.SetMins("ADnonempty",AD[(int) this.numberOfEmpty()]);
+        this.InfoLoss.SetMins("RADnonempty",RAD[(int) this.numberOfEmpty()]);
+        this.InfoLoss.SetMins("DRnonempty",DR[(int) this.numberOfEmpty()]);
+        
+        this.InfoLoss.SetMedian("AD",percentiles(AD,0.5)[0]);
+        this.InfoLoss.SetMedian("RAD",percentiles(RAD,0.5)[0]);
+        this.InfoLoss.SetMedian("DR",percentiles(DR,0.5)[0]);
+        this.InfoLoss.SetMedian("ADnonempty",percentiles(Arrays.copyOfRange(AD, (int) this.numberOfEmpty(), AD.length),0.5)[0]);
+        this.InfoLoss.SetMedian("RADnonempty",percentiles(Arrays.copyOfRange(RAD, (int) this.numberOfEmpty(), AD.length),0.5)[0]);
+        this.InfoLoss.SetMedian("DRnonempty",percentiles(Arrays.copyOfRange(DR, (int) this.numberOfEmpty(), AD.length),0.5)[0]);
+        
+        this.InfoLoss.SetPercentiles("AD",percentiles(AD,percs));
+        this.InfoLoss.SetPercentiles("RAD",percentiles(RAD,percs));
+        this.InfoLoss.SetPercentiles("DR",percentiles(DR,percs));
+        this.InfoLoss.SetPercentiles("ADnonempty",percentiles(Arrays.copyOfRange(AD, (int) this.numberOfEmpty(), AD.length),percs));
+        this.InfoLoss.SetPercentiles("RADnonempty",percentiles(Arrays.copyOfRange(RAD, (int) this.numberOfEmpty(), AD.length),percs));
+        this.InfoLoss.SetPercentiles("DRnonempty",percentiles(Arrays.copyOfRange(DR, (int) this.numberOfEmpty(), AD.length),percs));
+        
+    }
+    
+    public CKMInfoLoss GetCKMInfoLoss(){
+        return this.InfoLoss;
+    }
+    
+    // calculates percentiles of sorted double array
+    // perc is vector of values between 0 and 1
+    private double[] percentiles(double[] data, double... perc){
+        assert data.length > 0;
+        double pos;
+        double d;
+        double[] values = new double[perc.length];
+        for (int i=0; i<perc.length;i++){
+            pos = perc[i]*(data.length + 1);
+            if ((data.length == 1)||(pos < 1)) values[i] = data[0];
+            else{
+                if (pos >= data.length) values[i] = data[data.length-1];
+                else{
+                    d = pos - Math.floor(pos);
+                    values[i] = (1.0-d)*data[(int)Math.floor(pos)-1] + d*data[(int)Math.floor(pos)];
+                }
+            }
+        }
+        return values;
+    }
+
+    // Returns number of cells <= threshold
+    // arr[] is sorted array of data
+    // breaks is a vector of thresholds
+    // Essentially this returns the Empirical Cumulative Distribution Function counts
+    private ECDF ECDFcounts(double arr[], double... breaks){
+        int[] values = new int[breaks.length];
+        int pos = 0;
+        int ndata = arr.length;
+        int nbreaks = breaks.length;
+        
+        for (int i=0; i<nbreaks; i++){
+            if (pos < (ndata - 1)){
+                pos = last(arr, pos, ndata - 1, breaks[i], ndata);
+                values[i] = pos + 1;
+            }
+            else values[i] = values[i-1];
+        }
+        ECDF ecdf = new ECDF(nbreaks);
+        ecdf.setBreaks(breaks);
+        ecdf.setCounts(values);
+        return ecdf;
+    }
+    
+    // returns the index of LAST occurrence of a value <= x in arr[0..n-1]
+    // between index low and index high
+    private static int last(double arr[], int low, int high, double x, int n) 
+    { 
+        if (high >= low) 
+        { 
+            int mid = low + (high - low)/2; 
+            //if (( mid == n-1 || x < arr[mid+1]) && Math.abs(arr[mid] - x) <= EPSILON) 
+            if (( mid == n-1 || x < arr[mid+1]) && arr[mid]<=x) 
+                 return mid; 
+            else if (x < arr[mid]) 
+                return last(arr, low, (mid -1), x, n); 
+            else
+                return last(arr, (mid + 1), high, x, n); 
+        } 
+    return -1; 
+    } 
+    
+    /* if x is present in arr[] then returns the index of 
+    FIRST occurrence of x in arr[0..n-1], otherwise 
+    returns -1 */
+    private static int first(double arr[], int low, int high, double x, int n) 
+    { 
+        if(high >= low) 
+        { 
+            int mid = low + (high - low)/2; 
+            if( ( mid == 0 || x > arr[mid-1]) && Math.abs(arr[mid] - x) <= EPSILON) 
+                return mid; 
+             else if(x > arr[mid]) 
+                return first(arr, (mid + 1), high, x, n); 
+            else
+                return first(arr, low, (mid -1), x, n); 
+        } 
+    return -1; 
+    } 
 }
-
-
-
-

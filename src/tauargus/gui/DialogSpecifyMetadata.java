@@ -17,7 +17,9 @@
 
 package tauargus.gui;
 
-import tauargus.utils.SingleListSelectionModel;
+import argus.model.SpssVariable;
+import argus.utils.SystemUtils;
+import argus.view.SpssSelectVariablesView;
 import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,12 +31,10 @@ import org.apache.commons.io.FilenameUtils;
 import tauargus.model.Application;
 import tauargus.model.ArgusException;
 import tauargus.model.Metadata;
-import tauargus.model.Variable;
-//import tauargus.utils.ExecUtils;
-import argus.utils.SystemUtils;
-import argus.model.SpssVariable;
-import argus.view.SpssSelectVariablesView;
 import tauargus.model.SpssUtilsTau;
+import tauargus.model.Variable;
+import tauargus.service.TableService;
+import tauargus.utils.SingleListSelectionModel;
 import tauargus.utils.TauArgusUtils;
 
 public class DialogSpecifyMetadata extends DialogBase {
@@ -49,10 +49,8 @@ public class DialogSpecifyMetadata extends DialogBase {
     public DialogSpecifyMetadata(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        setLocationRelativeTo(parent);
         listVariables.setSelectionModel(new SingleListSelectionModel());
         listVariables.setCellRenderer(new VariableNameCellRenderer());
-        
     }
 
     public int showDialog(Metadata metadata) {
@@ -70,16 +68,12 @@ public class DialogSpecifyMetadata extends DialogBase {
          case Metadata.DATA_FILE_TYPE_SPSS: i=2; break; 
         }
         comboBoxFormat.setSelectedIndex(i);
-        
-//        comboBoxFormat.setSelectedIndex(metadata.dataFileType == Metadata.DATA_FILE_TYPE_FIXED ? 0 : 1);
         textFieldSeparator.setText(metadata.fieldSeparator);
-// Anco 1.6        
-//        variableListModel = new DefaultListModel<>();
-        variableListModel = new DefaultListModel<Variable>();
+        variableListModel = new DefaultListModel<>();
         previousSelectedVariable = null;
-        for (Variable variable : metadata.variables) {
+        metadata.variables.forEach((variable) -> {
             variableListModel.addElement(variable);
-        }
+        });
         listVariables.setModel(variableListModel);
 
         if (variableListModel.getSize() > 0) {
@@ -87,9 +81,11 @@ public class DialogSpecifyMetadata extends DialogBase {
         }
         calculateButtonStates();
         panelEditVariable.setMetadata(metadata);
-        pack();
         panelEditVariable.setDataType(metadata.dataFileType);
-        panelEditVariable.panelSetEnabled(listVariables.getSelectedValue() != null);
+        panelEditVariable.setDataOrigin(metadata.dataOrigin);
+        panelEditVariable.setVisible(listVariables.getSelectedValue() != null);
+        pack();
+        setLocationRelativeTo(this.getParent());
         setVisible(true);
         return returnValue;
     }
@@ -104,6 +100,7 @@ public class DialogSpecifyMetadata extends DialogBase {
     private void initComponents() {
 
         fileChooser = new javax.swing.JFileChooser();
+        panelEditVariable = new tauargus.gui.PanelEditVariable();
         panelEdit = new javax.swing.JPanel();
         comboBoxFormat = new javax.swing.JComboBox();
         panelSeparator = new javax.swing.JPanel();
@@ -116,7 +113,6 @@ public class DialogSpecifyMetadata extends DialogBase {
         buttonMoveUp = new javax.swing.JButton();
         buttonMoveDown = new javax.swing.JButton();
         jButtonGetSPSSMeta = new javax.swing.JButton();
-        panelEditVariable = new tauargus.gui.PanelEditVariable();
         buttonOK = new javax.swing.JButton();
         buttonCancel = new javax.swing.JButton();
 
@@ -126,7 +122,13 @@ public class DialogSpecifyMetadata extends DialogBase {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Specify Metadata");
+        setModalityType(java.awt.Dialog.ModalityType.APPLICATION_MODAL);
+        setPreferredSize(null);
         setResizable(false);
+
+        panelEditVariable.setMaximumSize(new java.awt.Dimension(32769, 32769));
+        panelEditVariable.setMinimumSize(new java.awt.Dimension(0, 0));
+        panelEditVariable.setPreferredSize(null);
 
         comboBoxFormat.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Fixed format", "Free format", "SPSS" }));
         comboBoxFormat.addActionListener(new java.awt.event.ActionListener() {
@@ -209,15 +211,14 @@ public class DialogSpecifyMetadata extends DialogBase {
                     .addComponent(panelSeparator, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(comboBoxFormat, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(scrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panelEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(buttonMoveUp, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(buttonMoveDown, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(buttonRemove, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(buttonAdd, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(jButtonGetSPSSMeta))
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(panelEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(buttonMoveUp, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(buttonMoveDown, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(buttonRemove, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(buttonAdd, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButtonGetSPSSMeta, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(8, 8, 8))
         );
         panelEditLayout.setVerticalGroup(
             panelEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -235,10 +236,10 @@ public class DialogSpecifyMetadata extends DialogBase {
                         .addComponent(buttonMoveUp)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(buttonMoveDown)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
                         .addComponent(jButtonGetSPSSMeta))
-                    .addComponent(scrollPane))
-                .addContainerGap())
+                    .addComponent(scrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 437, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         buttonOK.setText("OK");
@@ -260,16 +261,17 @@ public class DialogSpecifyMetadata extends DialogBase {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(panelEdit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(panelEditVariable, javax.swing.GroupLayout.DEFAULT_SIZE, 630, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(buttonOK)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(buttonCancel)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(buttonCancel))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(panelEdit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, 0)
+                        .addComponent(panelEditVariable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
 
@@ -278,16 +280,15 @@ public class DialogSpecifyMetadata extends DialogBase {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(6, 6, 6)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(panelEdit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(panelEditVariable, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(buttonOK)
-                            .addComponent(buttonCancel))
-                        .addContainerGap())))
+                    .addComponent(panelEditVariable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(panelEdit, javax.swing.GroupLayout.PREFERRED_SIZE, 491, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(buttonOK)
+                    .addComponent(buttonCancel))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -297,14 +298,22 @@ public class DialogSpecifyMetadata extends DialogBase {
         // Trigger a listvalue change so last edited variable data will be stored
         listVariables.clearSelection();
 
-        int ft = comboBoxFormat.getSelectedIndex();
+        switch (comboBoxFormat.getSelectedIndex()){
+            case 0: metadata.dataFileType  = Metadata.DATA_FILE_TYPE_FIXED;
+                    break;
+            case 1: metadata.dataFileType  = Metadata.DATA_FILE_TYPE_FREE;
+                    break;
+            case 2: metadata.dataFileType  = Metadata.DATA_FILE_TYPE_SPSS;
+                    break;
+        }
+        
+/*        int ft = comboBoxFormat.getSelectedIndex();
         if (ft==0) {metadata.dataFileType  = Metadata.DATA_FILE_TYPE_FIXED;}
         else
          if (ft==1) {metadata.dataFileType  = Metadata.DATA_FILE_TYPE_FREE;}
         else    
          if (ft==2) {metadata.dataFileType  = Metadata.DATA_FILE_TYPE_SPSS;}
-            
-  //      metadata.dataFileType = comboBoxFormat.getSelectedIndex() == 0 ? Metadata.DATA_FILE_TYPE_FIXED : Metadata.DATA_FILE_TYPE_FREE;
+*/            
         metadata.fieldSeparator = textFieldSeparator.getText();
         metadata.variables.clear();
         for (int i = 0; i < variableListModel.getSize(); i++) {
@@ -317,6 +326,8 @@ public class DialogSpecifyMetadata extends DialogBase {
             } 
             catch (ArgusException ex) {
                 if (!ex.getMessage().isEmpty()){JOptionPane.showMessageDialog(this, ex.getMessage());}
+                listVariables.setSelectedIndex(0);
+                panelEditVariable.load(variableListModel.get(0));
                 return;
             }
             //It looks a bit weird, but the PanelEditVariable stores the new statusses in oldmetadata.
@@ -353,6 +364,7 @@ public class DialogSpecifyMetadata extends DialogBase {
                 }
             }
             Application.replaceMetadata(oldMetadata, metadata);
+            TableService.clearTables(); // Make sure that the "old" tables are no longer available because the metadata has changed
         }
         setVisible(false);
         returnValue = APPROVE_OPTION;
@@ -416,7 +428,7 @@ public class DialogSpecifyMetadata extends DialogBase {
     }//GEN-LAST:event_buttonMoveDownActionPerformed
 
     private void comboBoxFormatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxFormatActionPerformed
-        if (metadata.dataOrigin == metadata.DATA_ORIGIN_TABULAR){
+        if (metadata.dataOrigin == Metadata.DATA_ORIGIN_TABULAR){
            if (comboBoxFormat.getSelectedIndex()!= 1){
                comboBoxFormat.setSelectedIndex(1);               
                JOptionPane.showMessageDialog(null,"For tabular data free format is required");
@@ -459,7 +471,7 @@ public class DialogSpecifyMetadata extends DialogBase {
                         variableListModel.set(index, variable);
                     } catch (ArgusException ex) {
                         JOptionPane.showMessageDialog(null, ex.getMessage());
-//                        logger.log(Level.SEVERE, null, ex);
+                        return;
                     }
                 }
             }
@@ -470,15 +482,13 @@ public class DialogSpecifyMetadata extends DialogBase {
 
         previousSelectedVariable = selectedVariable;
         calculateButtonStates();
-        panelEditVariable.panelSetEnabled(selectedVariable != null);
         panelEditVariable.enableForSPSS(comboBoxFormat.getSelectedIndex()==2);
+        pack();
     }//GEN-LAST:event_listVariablesValueChanged
 
     private void jButtonGetSPSSMetaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonGetSPSSMetaActionPerformed
-        // TODO add your handling code here:
-        int j;
+     int j;
      SpssSelectVariablesView selectView = new SpssSelectVariablesView(null, true);
-  //   selectView.showVariables(variables);
      selectView.showVariables(SpssUtilsTau.spssVariables);
      selectView.setVisible(true);
   //   Fill the meta with the SPSS variables
@@ -509,9 +519,9 @@ public class DialogSpecifyMetadata extends DialogBase {
        }
      }
      variableListModel.clear();
-    for (Variable variable : metadata.variables) {
-        variableListModel.addElement(variable);
-     }
+     metadata.variables.forEach((variable) -> {
+         variableListModel.addElement(variable);
+        });
    
     }//GEN-LAST:event_jButtonGetSPSSMetaActionPerformed
 
@@ -524,10 +534,10 @@ public class DialogSpecifyMetadata extends DialogBase {
             buttonMoveDown.setEnabled(false);                      
         } else
         {    
-        buttonRemove.setEnabled(selectedIndex != -1);
-        buttonAdd.setEnabled(true);
-        buttonMoveUp.setEnabled(selectedIndex > 0);
-        buttonMoveDown.setEnabled((selectedIndex != -1) && (selectedIndex < variableListModel.getSize() - 1));
+            buttonRemove.setEnabled(selectedIndex != -1);
+            buttonAdd.setEnabled(true);
+            buttonMoveUp.setEnabled(selectedIndex > 0);
+            buttonMoveDown.setEnabled((selectedIndex != -1) && (selectedIndex < variableListModel.getSize() - 1));
         }
     }
 

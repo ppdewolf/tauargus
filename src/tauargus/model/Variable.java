@@ -72,6 +72,26 @@ public class Variable implements Cloneable {
     public String hierFileName = "";
     public String leadingString = ".";
 
+    // Only used by variable of type 'RecordKey'
+    public String PTableFile = "";      // For CKM on count tables
+    public String PTableFileCont = "";  // For CKM on magnitude tables
+    public String PTableFileSep = "";   // For CKM on magnitude tables
+    
+    // Used for CKM
+    public boolean zerosincellkey = false; // default: false
+    public boolean CKMapply_even_odd = false; // default: false
+    public String CKMType = "N";           // default: not allowed to apply CKM
+    public int CKMTopK = 1;                // default: only largest observation used, topK = T = 1
+    public boolean CKMseparation = false;  // default: small values not treated differently
+    public double CKMm1squared = 0;        // default: no variance for small values
+    public String CKMscaling = "";         // default: there is no default. Needs to specificied when using CKM with magnitude table
+    public double CKMsigma0 = -1;          // default "unknown" for parameters sigma0, sigma1, xstar, q
+    public double CKMsigma1 = -1;          // default "unknown" for parameters sigma0, sigma1, xstar, q
+    public double CKMxstar = -1;           // default "unknown" for parameters sigma0, sigma1, xstar, q
+    public double CKMq = -1;               // default "unknown" for parameters sigma0, sigma1, xstar, q
+    public double[] CKMepsilon;            // for parameters epsilon2, epsilon3, ..., epsilonT
+    public double muC = 0;                 // default: no additional perturbation for sensitivecells
+            
     // Only used by variables of type 'Request'
     public String[] requestCode;
 
@@ -106,6 +126,10 @@ public class Variable implements Cloneable {
     public boolean isResponse() {
         return type.isResponse();
     }
+    
+    public boolean isRecordKey() {
+        return type.isRecordKey();
+    }   
     
     public boolean isTotalCode(String code) {
         return code.equalsIgnoreCase(totCode);
@@ -329,7 +353,6 @@ public class Variable implements Cloneable {
                 && type == variable.type
                 && bPos == variable.bPos
                 && varLen == variable.varLen;
-//                && truncatable == variable.truncatable // only needed fot MuArgus
 
         if (variable.isCategorical()) {
             equal = equal
@@ -350,6 +373,29 @@ public class Variable implements Cloneable {
 
         if (variable.type == Type.REQUEST) {
             equal = equal && Arrays.equals(requestCode, variable.requestCode);
+        }
+        
+        if (variable.type == Type.RECORD_KEY){
+            equal = equal && PTableFile.equals(variable.PTableFile)
+                    && PTableFileCont.equals(variable.PTableFileCont)
+                    && PTableFileSep.equals(variable.PTableFileSep);
+        }
+        
+        if (variable.type == Type.RESPONSE){
+            equal = equal 
+                    && Arrays.equals(CKMepsilon, variable.CKMepsilon)
+                    && CKMType.equals(variable.CKMType)
+                    && CKMTopK == variable.CKMTopK
+                    && CKMseparation == variable.CKMseparation
+                    && zerosincellkey == variable.zerosincellkey
+                    && CKMapply_even_odd == variable.CKMapply_even_odd
+                    && CKMm1squared == variable.CKMm1squared
+                    && CKMscaling.equals(variable.CKMscaling)
+                    && CKMsigma0 == variable.CKMsigma0
+                    && CKMsigma1 == variable.CKMsigma1
+                    && CKMxstar == variable.CKMxstar
+                    && CKMq == variable.CKMq
+                    && muC == variable.muC;
         }
         
         return equal;
@@ -374,6 +420,16 @@ public class Variable implements Cloneable {
         hash = 89 * hash + Objects.hashCode(this.leadingString);
         hash = 89 * hash + Arrays.deepHashCode(this.missing);
         hash = 89 * hash + Objects.hashCode(this.totCode);
+        hash = 89 * hash + Objects.hashCode(this.PTableFile);
+        hash = 89 * hash + Objects.hashCode(this.PTableFileCont);
+        hash = 89 * hash + Objects.hashCode(this.PTableFileSep);
+        hash = 89 * hash + (this.zerosincellkey ? 1 : 0);
+        hash = 89 * hash + (this.CKMapply_even_odd ? 1 : 0);
+        hash = 89 * hash + Objects.hashCode(this.CKMType);
+        hash = 89 * hash + this.CKMTopK;
+        hash = 89 * hash + (this.CKMseparation ? 1 : 0);
+        hash = 89 * hash + Objects.hashCode(this.CKMscaling);
+
         return hash;
     }
 
@@ -392,6 +448,9 @@ public class Variable implements Cloneable {
         }
         if (missing != null) {
             variable.missing = (String[])missing.clone();
+        }
+        if (CKMepsilon != null){
+            variable.CKMepsilon = (double[])CKMepsilon.clone();
         }
         variable.originalVariable = this;
         return variable;

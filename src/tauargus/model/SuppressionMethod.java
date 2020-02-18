@@ -25,7 +25,8 @@ public enum SuppressionMethod {
     NETWORK ("Network"),
     MARGINAL("marginal suppression"),
     UWE("UWE optimisation"),
-    CTA("CTA_solution");
+    CTA("CTA_solution"),
+    CELLKEY("Cell Key Method");
 
     SuppressionMethod(String description) {
         this.description = description;
@@ -45,6 +46,10 @@ public enum SuppressionMethod {
     
     public boolean isUsingSuppliedCostFunction() {
         return this != ROUNDING;
+    }
+    
+    public boolean isCellKey(){
+        return this == CELLKEY;
     }
     
     public boolean isCosmetic() {

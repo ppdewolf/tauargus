@@ -17,13 +17,18 @@
 
 package tauargus.gui;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.util.Locale;
+import java.util.TreeMap;
+import javax.swing.JFrame;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
+import tauargus.model.CKMInfoLoss;
 import tauargus.model.CellStatus;
 import tauargus.model.CellStatusStatistics;
 import tauargus.model.TableSet;
@@ -32,6 +37,8 @@ import tauargus.utils.TableColumnResizer;
 import tauargus.utils.TauArgusUtils;
 
 public class DialogTableSummary extends javax.swing.JDialog {
+
+    public CKMInfoLoss InfoLossMeasures = new CKMInfoLoss();
     
     public DialogTableSummary(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
@@ -72,43 +79,8 @@ public class DialogTableSummary extends javax.swing.JDialog {
         setTitle("Summary for table no: " + (tableSet.index + 1) + " (" + 
                  tableSet.toString() + ")");
         
-        tableExpVars.setModel(new AbstractTableModel() {
+        setExpVarsModel(tableSet);
         
-            @Override
-            public int getRowCount() {
-                return tableSet.expVar.size();
-            }
-
-            @Override
-            public int getColumnCount() {
-                return 2;
-            }
-
-            @Override
-            public Object getValueAt(int rowIndex, int columnIndex) {
-                Variable variable = tableSet.expVar.get(rowIndex);
-                if (columnIndex == 0) {
-                    return variable.name;
-                } else {
-                    return TauArgusUtils.getNumberOfActiveCodes(variable.index);
-                }
-            }
-
-            @Override
-            public String getColumnName(int column) {
-                if (column == 0) {
-                    return "Expl. var";
-                } else {
-                    return "#Codes";
-                }
-            }
-
-            @Override
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return false;
-            }
-        });
-                
         labelResponseVar.setText(tableSet.respVar.name);
         labelShadowVar.setText(tableSet.shadowVar == null ? "" : tableSet.shadowVar.name);
         labelCostVar.setText(tableSet.costVar == null ? "" : tableSet.costVar.name);
@@ -123,25 +95,107 @@ public class DialogTableSummary extends javax.swing.JDialog {
             case TableSet.SUP_MARGINAL: labelStatus.setText("Protected by marginal"); break;
             case TableSet.SUP_UWE:      labelStatus.setText("Protected by UWE"); break;
             case TableSet.SUP_CTA:      labelStatus.setText("Protected by CTA"); break;
-            default:                    labelStatus.setText("Unknown"); break; 
-                
+            case TableSet.SUP_CKM:      labelStatus.setText("<html>Protecetd by<br>Cell Key Method</html>");break;
+            default:                    labelStatus.setText("Unknown"); break;
         }
                
+        if (tableSet.suppressed == TableSet.SUP_CKM){
+            jButtonMoreInfo.setVisible(true);
+            setSummaryCKM(tableSet);
+            InfoLossMeasures = tableSet.GetCKMInfoLoss();
+        }
+        else{
+            jButtonMoreInfo.setVisible(false);
+            setSummaryStandard(tableSet);
+        }
         
+        TableColumnResizer.adjustColumnPreferredWidths(tableExpVars, false);
+        TableColumnResizer.adjustColumnPreferredWidths(tableSummary, false);
+        if (tableSet.suppressed == TableSet.SUP_CKM){
+            TableColumnResizer.FixColumnWidth(tableSummary.getColumnModel().getColumn(0), 40);
+        }
+
+        ResizeSummaryDialog();
+
+        setVisible(true);
+    }
+    
+    private void ResizeSummaryDialog(){
+        java.awt.Dimension d = new java.awt.Dimension(0,0);
+        tableSummary.setPreferredScrollableViewportSize(tableSummary.getPreferredSize());
+        d = tableSummary.getPreferredSize();
+        d.width = d.width+10;
+        scrollPaneSummary.setPreferredSize(d);
+        scrollPaneSummary.setSize(d);
+        
+        d.width = (scrollPaneSummary.getWidth() + scrollPaneExpVars.getWidth() + 75);
+        d.height = getHeight();
+        setPreferredSize(d);
+        setSize(d);
+    }
+    
+    private void setSummaryCKM(final TableSet tableSet){
+        //Set TableModel
         tableSummary.setModel(new AbstractTableModel() {
+            TreeMap<Integer,Long> CKMInfo = tableSet.getCKMStats();
+            int rangeD = CKMInfo.size();
+            Integer[] TreeMapKeys = CKMInfo.keySet().toArray(new Integer[rangeD]);
             
+            @Override
+            public int getRowCount() {return (rangeD + 2);}
+                
+            @Override
+            public int getColumnCount() {return 4;}
+                
+            @Override
+            public Object getValueAt(int rowIndex, int columnIndex) {
+                switch(columnIndex) {
+                    case 1:
+                        if (rowIndex == rangeD){return "Empty";}
+                        if (rowIndex == (rangeD + 1)) {return "Total";}
+                        else {return TreeMapKeys[rowIndex];}
+                    case 2:
+                        if (rowIndex == rangeD) return tableSet.numberOfEmpty();
+                        else if (rowIndex == rangeD + 1) return tableSet.numberOfCells();
+                            else return Long.toString(CKMInfo.get(TreeMapKeys[rowIndex]));
+                    case 3:
+                        if (rowIndex == rangeD) return String.format("%6.2f",100.0*tableSet.numberOfEmpty()/tableSet.numberOfCells());
+                        else if (rowIndex == rangeD + 1) return "100";
+                            else return String.format("%6.2f",100.0*CKMInfo.get(TreeMapKeys[rowIndex])/tableSet.numberOfCells());
+                    default:
+                        return "";
+                }
+            }
+                
+            @Override
+            public String getColumnName(int column) {
+                switch(column) {
+                    case 1:  return "Noise";
+                    case 2:  return "# Cells";
+                    case 3:  return "% Cells";
+                    default: return "";
+                }
+            }
+
+            @Override
+            public boolean isCellEditable(int rowIndex, int columnIndex) {return false;}
+        });
+        
+        // Change alignment of columns
+        tableSummary.setDefaultRenderer(Object.class, new CKMcellRenderer());
+    }    
+    
+    private void setSummaryStandard(final TableSet tableSet){
+        //Set TableModel
+        tableSummary.setModel(new AbstractTableModel() {
             private CellStatusStatistics statistics = tableSet.getCellStatusStatistics();
             int d = tableSet.respVar.nDecimals;
 
             @Override
-            public int getRowCount() {
-                return CellStatus.size();
-            }
+            public int getRowCount() {return CellStatus.size();}
 
             @Override
-            public int getColumnCount() {
-                return 5;
-            }
+            public int getColumnCount() {return 5;}
 
             @Override
             public Object getValueAt(int rowIndex, int columnIndex) {
@@ -149,11 +203,8 @@ public class DialogTableSummary extends javax.swing.JDialog {
                 rowIndex++;
                 switch(columnIndex) {
                     case 0:
-                        if (rowIndex == CellStatus.size()) {
-                            return "Total";
-                        } else {
-                            return CellStatus.findByValue(rowIndex).getDescription();
-                        }
+                        if (rowIndex == CellStatus.size()) {return "Total";}
+                        else {return CellStatus.findByValue(rowIndex).getDescription();}
                     case 1:
                         return statistics.freq[rowIndex];
                     case 2:
@@ -175,33 +226,75 @@ public class DialogTableSummary extends javax.swing.JDialog {
             @Override
             public String getColumnName(int column) {
                 switch(column) {
-                    case 0:
-                        return "Status";
-                    case 1:
-                        return "Freq";
-                    case 2:
-                        return "#rec";
-                    case 3:
-                        return "Sum resp";
-                    case 4:
-                        return "Sum cost";
-                    default:
-                        return "";
+                    case 0:  return "Status";
+                    case 1:  return "#Cells";
+                    case 2:  return "#Rec";
+                    case 3:  return "Sum resp";
+                    case 4:  return "Sum cost";
+                    default: return "";
                 }
             }
 
             @Override
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return false;
-            }
+            public boolean isCellEditable(int rowIndex, int columnIndex) {return false;}
         });
-        
-        TableColumnResizer.adjustColumnPreferredWidths(tableExpVars, false);
-        TableColumnResizer.adjustColumnPreferredWidths(tableSummary, false);
-        
-        setVisible(true);
     }
 
+    private void setExpVarsModel(final TableSet tableSet){
+        tableExpVars.setModel(new AbstractTableModel() {
+        
+            @Override
+            public int getRowCount() {return tableSet.expVar.size();}
+
+            @Override
+            public int getColumnCount() {return 2;}
+
+            @Override
+            public Object getValueAt(int rowIndex, int columnIndex) {
+                Variable variable = tableSet.expVar.get(rowIndex);
+                if (columnIndex == 0) {return variable.name;} 
+                else {return TauArgusUtils.getNumberOfActiveCodes(variable.index);}
+            }
+
+            @Override
+            public String getColumnName(int column) {
+                if (column == 0) {return "Expl. var";} 
+                else {return "#Codes";}
+            }
+
+            @Override
+            public boolean isCellEditable(int rowIndex, int columnIndex) {return false;}
+            
+        });
+    }
+    
+    private class CKMcellRenderer extends DefaultTableCellRenderer{
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                if (row == table.getModel().getRowCount() - 1) {
+                    comp.setFont(comp.getFont().deriveFont(Font.BOLD));
+                }
+                setHorizontalAlignment(SwingConstants.RIGHT);
+                
+                int R, G, B = 255; // darkest: (85,85,255) brightest: (235,235,255)
+                int maxColor = Math.max(Math.abs((Integer) table.getValueAt(0, 1)),
+                                        Math.abs((Integer) table.getValueAt(table.getModel().getRowCount() - 3,1)));
+                Object colorvalue;
+                colorvalue = table.getValueAt(row,1);
+                if (column==0 & row < table.getModel().getRowCount() - 2 & !colorvalue.equals(0)){
+                    R = (int) (235 - (235-85)*(Math.abs((Integer) colorvalue) - 1)/(maxColor-1));
+                    G = R;
+                    comp.setBackground(new Color(R,G,B));
+                }
+                else comp.setBackground(Color.white);
+                
+                comp.setForeground(Color.black);
+                
+                return comp;                
+            }
+    }    
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -221,12 +314,12 @@ public class DialogTableSummary extends javax.swing.JDialog {
         labelCostVar = new javax.swing.JLabel();
         scrollPaneSummary = new javax.swing.JScrollPane();
         tableSummary = new javax.swing.JTable();
-        buttonClose = new javax.swing.JButton();
         labelStatus = new javax.swing.JLabel();
+        jButtonMoreInfo = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Summary for table no: ");
-        setResizable(false);
+        setIconImages(null);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 DialogClosing(evt);
@@ -235,28 +328,48 @@ public class DialogTableSummary extends javax.swing.JDialog {
 
         tableExpVars.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Title 1", "Title 2"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         scrollPaneExpVars.setViewportView(tableExpVars);
 
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         jLabel1.setText("Respons Var");
 
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         jLabel2.setText("Shadow Var");
+        jLabel2.setMaximumSize(new java.awt.Dimension(60, 14));
+        jLabel2.setMinimumSize(new java.awt.Dimension(60, 14));
+        jLabel2.setName(""); // NOI18N
+        jLabel2.setPreferredSize(new java.awt.Dimension(60, 14));
 
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         jLabel3.setText("Cost Var");
+        jLabel3.setMaximumSize(new java.awt.Dimension(60, 14));
+        jLabel3.setMinimumSize(new java.awt.Dimension(60, 14));
+        jLabel3.setPreferredSize(new java.awt.Dimension(60, 14));
 
         labelResponseVar.setText(" ");
 
         labelShadowVar.setText(" ");
 
         labelCostVar.setText(" ");
+
+        scrollPaneSummary.setPreferredSize(new java.awt.Dimension(454, 404));
 
         tableSummary.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -271,14 +384,14 @@ public class DialogTableSummary extends javax.swing.JDialog {
         ));
         scrollPaneSummary.setViewportView(tableSummary);
 
-        buttonClose.setText("Close");
-        buttonClose.addActionListener(new java.awt.event.ActionListener() {
+        labelStatus.setText(" ");
+
+        jButtonMoreInfo.setText("<html>Information Loss Measures");
+        jButtonMoreInfo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonCloseActionPerformed(evt);
+                jButtonMoreInfoActionPerformed(evt);
             }
         });
-
-        labelStatus.setText(" ");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -287,29 +400,22 @@ public class DialogTableSummary extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING))
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(labelResponseVar)
-                                    .addComponent(labelShadowVar)
-                                    .addComponent(labelCostVar)))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(10, 10, 10)
-                                .addComponent(scrollPaneExpVars, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(labelStatus)))
+                            .addComponent(labelStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(scrollPaneExpVars, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButtonMoreInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(scrollPaneSummary))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(buttonClose)))
+                        .addComponent(scrollPaneSummary, javax.swing.GroupLayout.DEFAULT_SIZE, 428, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(80, 80, 80)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(labelResponseVar, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(labelShadowVar, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(labelCostVar, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -325,31 +431,31 @@ public class DialogTableSummary extends javax.swing.JDialog {
                             .addComponent(labelResponseVar))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel2)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(labelShadowVar))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel3)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(labelCostVar))
                         .addGap(18, 18, 18)
                         .addComponent(labelStatus)
-                        .addGap(0, 59, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
+                        .addComponent(jButtonMoreInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(scrollPaneSummary, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(buttonClose)
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void buttonCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCloseActionPerformed
-        setVisible(false);
-    }//GEN-LAST:event_buttonCloseActionPerformed
-
     private void DialogClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_DialogClosing
-        setVisible(false);
+        //setVisible(false);
     }//GEN-LAST:event_DialogClosing
+
+    private void jButtonMoreInfoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonMoreInfoActionPerformed
+        ShowMoreInfoLoss infodialog = new ShowMoreInfoLoss((JFrame)SwingUtilities.getAncestorOfClass(JFrame.class, this), true);
+        infodialog.showDialog(InfoLossMeasures);
+    }//GEN-LAST:event_jButtonMoreInfoActionPerformed
 
     /**
      * @param args the command line arguments
@@ -393,7 +499,7 @@ public class DialogTableSummary extends javax.swing.JDialog {
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton buttonClose;
+    private javax.swing.JButton jButtonMoreInfo;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

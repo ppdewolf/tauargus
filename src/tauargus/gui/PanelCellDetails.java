@@ -63,25 +63,42 @@ public class PanelCellDetails extends javax.swing.JPanel {
     private void update() {
         boolean visible;
         
-        textFieldValue.setText(doubleFormatter.format(cell.response));
-
-        visible = table.rounded || table.ctaProtect;
-        labelAdjustedValue.setVisible(visible);
-        textFieldAdjustedValue.setVisible(visible);
-        if (table.rounded) {
-            labelAdjustedValue.setText("Rounded");
-            textFieldAdjustedValue.setText(integerFormatter.format(cell.roundedResponse));
-        } else if (table.ctaProtect) {
-            labelAdjustedValue.setText("CTA-Adjusted");
-            textFieldAdjustedValue.setText(doubleFormatter.format(cell.CTAValue));
-        }
-
         textFieldStatus.setText(cell.status.getDescription());
-        textFieldShadow.setText(doubleFormatter.format(cell.shadow));
-        if (table.costFunc == TableSet.COST_DIST) {
-            textFieldCost.setText("dist");
-        } else {
-            textFieldCost.setText(doubleFormatter.format(cell.cost));
+        if (cell.status.isEmpty()){
+            textFieldValue.setText("-");
+            textFieldShadow.setText("-");
+            textFieldCost.setText("-");
+            textFieldAdjustedValue.setText("-");
+        }
+        else{
+            textFieldValue.setText(doubleFormatter.format(cell.response));
+            visible = table.domRule || table.pqRule;
+            labelTopN.setVisible(visible);
+            labelTopNValue.setVisible(visible);
+            
+            checkBoxHoldingLevel.setVisible(table.holding);
+            
+            // Use AdjustedValue to show perturbed value in case of cellkey method
+            visible = table.rounded || table.ctaProtect || table.ckmProtect;
+            labelAdjustedValue.setVisible(visible);
+            textFieldAdjustedValue.setVisible(visible);
+            if (table.rounded) {
+                labelAdjustedValue.setText("Rounded");
+                textFieldAdjustedValue.setText(integerFormatter.format(cell.roundedResponse));
+            } else if (table.ctaProtect) {
+                labelAdjustedValue.setText("CTA-Adjusted");
+                textFieldAdjustedValue.setText(doubleFormatter.format(cell.CTAValue));
+            } else if (table.ckmProtect) {
+                labelAdjustedValue.setText("CKM-Adjusted");
+                textFieldAdjustedValue.setText(doubleFormatter.format(cell.CKMValue));
+            }
+            
+            textFieldShadow.setText(doubleFormatter.format(cell.shadow));
+            if (table.costFunc == TableSet.COST_DIST) {
+                textFieldCost.setText("dist");
+            } else {
+                textFieldCost.setText(doubleFormatter.format(cell.cost));
+            }
         }
         
         // fill top n box
@@ -106,7 +123,7 @@ public class PanelCellDetails extends javax.swing.JPanel {
             textFieldContributions.setText(integerFormatter.format(cell.freq));
         }
         sb.append("</html>");
-        if (!cell.status.isEmpty()){
+        if (!cell.status.isEmpty() && !(table.respVar.name=="<freq>")){
             labelTopNValue.setText(sb.toString());
         } else {
             labelTopNValue.setText("<html><p align=\"right\">-</p></html>");
@@ -116,19 +133,23 @@ public class PanelCellDetails extends javax.swing.JPanel {
         labelProtectionInterval.setVisible(visible);
         textFieldProtectionLower.setVisible(visible);
         textFieldProtectionUpper.setVisible(visible);
-        textFieldProtectionLower.setText(doubleFormatter.format(cell.response - cell.lower)); 
-        textFieldProtectionUpper.setText(doubleFormatter.format(cell.response + cell.upper)); 
-        textFieldProtectionLower.setToolTipText(getToolTipText(true, cell.lower, cell.response));
-        textFieldProtectionUpper.setToolTipText(getToolTipText(false, cell.upper, cell.response));
+        if (visible){
+            textFieldProtectionLower.setText(doubleFormatter.format(cell.response - cell.lower)); 
+            textFieldProtectionUpper.setText(doubleFormatter.format(cell.response + cell.upper)); 
+            textFieldProtectionLower.setToolTipText(getToolTipText(true, cell.lower, cell.response));
+            textFieldProtectionUpper.setToolTipText(getToolTipText(false, cell.upper, cell.response));
+        }
 
         visible = table.hasBeenAudited && !cell.status.isSafe();
         textFieldRealizedLower.setVisible(visible);
         textFieldRealizedUpper.setVisible(visible);
         labelAuditInterval.setVisible(visible);
-        textFieldRealizedLower.setText(doubleFormatter.format(cell.realizedLower));
-        textFieldRealizedUpper.setText(doubleFormatter.format(cell.realizedUpper));
-        textFieldRealizedLower.setToolTipText(getToolTipText(true, cell.response - cell.realizedLower, cell.response));
-        textFieldRealizedUpper.setToolTipText(getToolTipText(false, cell.realizedUpper - cell.response, cell.response));
+        if (visible){
+            textFieldRealizedLower.setText(doubleFormatter.format(cell.realizedLower));
+            textFieldRealizedUpper.setText(doubleFormatter.format(cell.realizedUpper));
+            textFieldRealizedLower.setToolTipText(getToolTipText(true, cell.response - cell.realizedLower, cell.response));
+            textFieldRealizedUpper.setToolTipText(getToolTipText(false, cell.realizedUpper - cell.response, cell.response));
+        }
     }
 
     /**
@@ -163,6 +184,8 @@ public class PanelCellDetails extends javax.swing.JPanel {
         labelTopN = new javax.swing.JLabel();
         labelContributions = new javax.swing.JLabel();
         labelCost = new javax.swing.JLabel();
+
+        setName(""); // NOI18N
 
         labelValue.setText("Value");
 
@@ -239,10 +262,6 @@ public class PanelCellDetails extends javax.swing.JPanel {
                     .addComponent(labelAuditInterval, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(labelProtectionInterval, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(textFieldProtectionLower, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(textFieldProtectionUpper, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
                         .addComponent(textFieldRealizedLower, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(textFieldRealizedUpper, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -268,7 +287,11 @@ public class PanelCellDetails extends javax.swing.JPanel {
                             .addComponent(textFieldValue, javax.swing.GroupLayout.Alignment.TRAILING)))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(checkBoxHoldingLevel, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(textFieldProtectionLower, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(textFieldProtectionUpper, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -299,7 +322,7 @@ public class PanelCellDetails extends javax.swing.JPanel {
                     .addComponent(labelContributions)
                     .addComponent(textFieldContributions, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(labelTopN)
                     .addComponent(labelTopNValue))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
