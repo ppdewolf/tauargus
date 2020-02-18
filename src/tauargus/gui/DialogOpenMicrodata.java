@@ -18,18 +18,15 @@
 package tauargus.gui;
 
 //import argus.model.SpssVariable;
+import argus.utils.SystemUtils;
 import java.io.File;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.commons.io.FilenameUtils;
-import tauargus.model.DataFilePair;
-//import tauargus.utils.ExecUtils;
-import argus.utils.SystemUtils;
-//import java.util.List;
 import tauargus.model.Application;
 import tauargus.model.ArgusException;
-//import tauargus.model.SpssUtilsTau;
+import tauargus.model.DataFilePair;
 import tauargus.utils.TauArgusUtils;
 
 public class DialogOpenMicrodata extends DialogBase{ //javax.swing.JDialog {
@@ -203,8 +200,8 @@ public class DialogOpenMicrodata extends DialogBase{ //javax.swing.JDialog {
         fileChooser.setSelectedFile(new File(""));
         fileChooser.resetChoosableFileFilters();
         // filters are shown in order of declaration, setFileFilter sets the default filter
-        fileChooser.setFileFilter(new FileNameExtensionFilter("Microdata (*.asc)", "asc"));
-        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Microdata (*.dat)", "dat"));
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Microdata (*.asc, *.dat, *.csv)", "asc", "dat", "csv"));
+        //fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Microdata (*.dat, *.csv)", "dat", "csv"));
         fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("SPSS system file (*.sav)", "sav"));
         if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
             String hs = fileChooser.getSelectedFile().toString();
@@ -290,7 +287,7 @@ public class DialogOpenMicrodata extends DialogBase{ //javax.swing.JDialog {
              JOptionPane.showMessageDialog(this, e.getMessage()); 
              return;
            }           
-      }
+        }
         
         SystemUtils.writeLogbook("Microdata file: "+textFieldMicrodata.getText()+" has been opened");            
         if (!textFieldMetadata.getText().trim().equals(""))SystemUtils.writeLogbook("Metadata file: "+textFieldMetadata.getText()+" has been opened");            

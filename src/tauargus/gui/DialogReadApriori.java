@@ -19,17 +19,14 @@ package tauargus.gui;
 
 //import tauargus.model.APriori;
 
+import java.awt.Cursor;
 import java.io.File;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
-//import static tauargus.gui.DialogOpenTable.CANCEL_OPTION;
+import tauargus.model.APriori;
 import tauargus.model.ArgusException;
 import tauargus.model.TableSet;
-import tauargus.model.APriori;
 import tauargus.service.TableService;
-//import tauargus.utils.ExecUtils;
-import argus.utils.SystemUtils;
-import java.awt.Cursor;
 import tauargus.utils.TauArgusUtils;
 
 /**

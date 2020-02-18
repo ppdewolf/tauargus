@@ -80,12 +80,13 @@
                   </Group>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="scrollPaneTables" pref="113" max="32767" attributes="0"/>
+              <Component id="scrollPaneTables" pref="102" max="32767" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="buttonComputeTables" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="buttonCancel" alignment="3" max="32767" attributes="0"/>
+              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                  <Component id="buttonComputeTables" max="32767" attributes="0"/>
+                  <Component id="buttonCancel" max="32767" attributes="0"/>
               </Group>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>

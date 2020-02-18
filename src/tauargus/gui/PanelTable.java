@@ -17,10 +17,12 @@
 
 package tauargus.gui;
 
-import tauargus.utils.TableColumnResizer;
+import argus.utils.StrUtils;
+import argus.utils.SystemUtils;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.FileNotFoundException;
@@ -37,36 +39,38 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
-import org.apache.commons.lang3.StringUtils;
 import javax.swing.table.TableCellRenderer;
+import org.apache.commons.lang3.StringUtils;
 import tauargus.extern.dataengine.TauArgus;
 import tauargus.model.Application;
 import tauargus.model.ArgusException;
 import tauargus.model.Cell;
 import tauargus.model.CellStatus;
 import tauargus.model.CellStatusStatistics;
+import tauargus.model.GHMiter;
 import tauargus.model.Metadata;
+import tauargus.model.OptiSuppress;
+import tauargus.model.ProgressSwingWorker;
 import tauargus.model.SuppressionMethod;
+import static tauargus.model.SuppressionMethod.OPTIMAL;
 import tauargus.model.TableSet;
+import tauargus.model.Type;
 import tauargus.model.VarCode;
 import tauargus.model.Variable;
-import tauargus.utils.TauArgusUtils;
-import tauargus.model.GHMiter;
-import tauargus.model.OptiSuppress;
-import javax.swing.SwingWorker;
-import tauargus.model.ProgressSwingWorker;
-import static tauargus.model.SuppressionMethod.OPTIMAL;
 import tauargus.service.TableService;
-import argus.utils.StrUtils;
-//import tauargus.utils.ExecUtils;
-import argus.utils.SystemUtils;
+import tauargus.utils.TableColumnResizer;
+import tauargus.utils.TauArgusUtils;
 
 public class PanelTable extends javax.swing.JPanel {
 
+    final Map<Integer,javax.swing.JRadioButton> buttonMap;
+    
     private static final Logger logger = Logger.getLogger(PanelTable.class.getName());
    
     private JFrame getParentFrame() {
@@ -122,7 +126,6 @@ public class PanelTable extends javax.swing.JPanel {
           hs = SystemUtils.getApplicationDirectory(PanelTable.class).getCanonicalPath();
       } catch (Exception ex) {}
       radioButtonUwe.setVisible(TauArgusUtils.ExistFile(hs+"/EXP_ExternalUnpickerOnJJ.exe") && activate);
-      //radioButtonUwe.setVisible(activate);
       radioButtonMarginal.setVisible(activate);
       checkBoxInverseWeight.setVisible(activate);
     } 
@@ -145,20 +148,53 @@ public class PanelTable extends javax.swing.JPanel {
               if ((cell.response == cell.realizedLower) && (cell.response == cell.realizedUpper)) {return Color.orange;}  //exact
               if ( (cell.response + cell.upper) > cell.realizedUpper){return Color.getHSBColor(255,100,100);}
               if ( (cell.response + cell.lower) < cell.realizedLower){return Color.getHSBColor(255,100,100);}
-              return getBackgroundColor(code);
+              return getBackgroundColor(code); // gray background depending on level in hierarchy
             } else {
-              return getBackgroundColor(code);}
+              return getBackgroundColor(code); // gray background depending on level in hierarchy
+            }
 //        if (cell.status.isUnsafe() && cell.auditOk) {
 //            if (cell.status.isPrimaryUnsafe()) {
 //                return Color.red;
 //            } else {
 //                return Color.orange;
 //            }
-        } else {
-            return getBackgroundColor(code);
+        } 
+        else {
+            return getBackgroundColor(code); // gray background depending on level in hierarchy
         }
+//        else if (tableSet.ckmProtect){
+//            float maxColor = (float) Math.max(Math.abs(tableSet.minDiff), Math.abs(tableSet.maxDiff));
+//            float diff = (float) Math.abs(cell.CKMValue - cell.response);
+//            if (diff >= maxColor) diff = maxColor;
+//            int R, G, B = 255; // darkest: (85,85,255) brightest: (235,235,255)
+//            R = (int) (235 - (235-85)*(diff-1)/(maxColor-1));
+//            G = R;
+//            if (diff > 0){
+//                return(new Color(R,G,B));
+//            }
+//            return getBackgroundColor(code); // gray background depending on level in hierarchy
+//        } else {
+//            return getBackgroundColor(code); // gray background depending on level in hierarchy
+//        }
     }
 
+    private Color getCKMBackgroundColor(Cell cell, Code code){
+        if (tableSet.ckmProtect){
+            float maxColor = (float) Math.max(Math.abs(tableSet.minDiff), Math.abs(tableSet.maxDiff));
+            float diff = (float) Math.abs(cell.CKMValue - cell.response);
+            if (diff >= maxColor) diff = maxColor;
+            int R, G, B = 255; // darkest: (85,85,255) brightest: (235,235,255)
+            R = (int) (235 - (235-85)*(diff-1)/(maxColor-1));
+            G = R;
+            if (diff > 0){
+                return(new Color(R,G,B));
+            }
+            return getBackgroundColor(code); // gray background depending on level in hierarchy
+        } else {
+            return getBackgroundColor(code); // gray background depending on level in hierarchy
+        }
+    }
+    
     private class ColumnHeaderRenderer extends DefaultTableCellRenderer {
         final TableCellRenderer renderer;
 
@@ -217,27 +253,35 @@ public class PanelTable extends javax.swing.JPanel {
      * This renderer is used by table cells
      */
     private class CellRenderer extends javax.swing.table.DefaultTableCellRenderer {
-        
+       
         @Override
         public java.awt.Component getTableCellRendererComponent(javax.swing.JTable table, Object value, boolean isSelected,
                 boolean hasFocus, int rowIndex, int vcolIndex) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, rowIndex, vcolIndex);
             Cell cell = (Cell) value;
-
+            
             if (cell.status == CellStatus.EMPTY) {
                 setText("-");
             } else if (checkBoxOutputView.isSelected() && !cell.status.isSafe()) {
                 setText("X");
+                setToolTipText(doubleFormatter.format(cell.response));
             } else if (tableSet.rounded) {
                 setText(doubleFormatter.format(cell.roundedResponse));
             } else if (tableSet.ctaProtect) {
                 setText(doubleFormatter.format(cell.CTAValue));
+            } else if (tableSet.ckmProtect) {
+                setText(doubleFormatter.format(cell.CKMValue));
             } else {
                 setText(doubleFormatter.format(cell.response));
             }
 
             setForeground(cell.status.getForegroundColor());
-            setBackground(getBackgroundColor(cell, getRowCode(rowIndex)));
+            if (!(checkBoxColoredView.isEnabled() && checkBoxColoredView.isSelected())){
+                setBackground(getBackgroundColor(cell, getRowCode(rowIndex)));
+            }
+            else{
+                setBackground(getCKMBackgroundColor(cell, getRowCode(rowIndex)));
+            }
 
             setHorizontalAlignment(SwingConstants.RIGHT);
             return this;
@@ -343,7 +387,8 @@ public class PanelTable extends javax.swing.JPanel {
             radioButtonUwe,
             radioButtonMarginal,
             radioButtonCta,            
-            radioButtonRounding
+            radioButtonRounding,
+            radioButtonCellKey
         };
     }
 
@@ -356,23 +401,35 @@ public class PanelTable extends javax.swing.JPanel {
         initComponentArrays();
         initTableRenderers();
         initTableSelectionListeners();
-        //show the UWE radio button only if the software is available and Anco option is enabled
-/*        if (Application.isAnco()){
-            try {
-                hs = SystemUtils.getApplicationDirectory(PanelTable.class).getCanonicalPath();
-            } catch (Exception ex) {}
-        
-            radioButtonUwe.setVisible(TauArgusUtils.ExistFile(hs+"/EXP_ExternalUnpickerOnJJ.exe"));
-        }*/
         radioButtonUwe.setVisible(false);
         radioButtonMarginal.setVisible(false);
         checkBoxInverseWeight.setVisible(false);
-//        radioButtonUwe.setVisible(TauArgusUtils.ExistFile(hs+"/EXP_ExternalUnpickerOnJJ.exe"));        
-//        radioButtonNetwork.setVisible(TauArgusUtils.ExistFile(hs+"/main1H2D.exe"));
-//        moved to updateSuppressButtons        
-        // disable reordering of columns
-
+      
+        buttonMap = new HashMap<>();
+   /*         public static final int SUP_NO = 0;
+    public static final int SUP_JJ_OPT = 1;
+    public static final int SUP_GHMITER = 2;
+    public static final int SUP_HITAS = 3;
+    public static final int SUP_NETWORK = 4;
+    public static final int SUP_SINGLETON = 5;
+    public static final int SUP_ROUNDING = 6;
+    public static final int SUP_MARGINAL = 7;
+    public static final int SUP_UWE = 8;
+    public static final int SUP_CTA = 9;
+    public static final int SUP_CKM = 10;
+    */
+   
+        buttonMap.put(TableSet.SUP_JJ_OPT,radioButtonOptimal);
+        buttonMap.put(TableSet.SUP_GHMITER,radioButtonHyperCube);
+        buttonMap.put(TableSet.SUP_HITAS,radioButtonModular);
+        buttonMap.put(TableSet.SUP_NETWORK,radioButtonNetwork);
+        buttonMap.put(TableSet.SUP_ROUNDING,radioButtonRounding);
+        buttonMap.put(TableSet.SUP_MARGINAL,radioButtonMarginal);
+        buttonMap.put(TableSet.SUP_UWE,radioButtonUwe);
+        buttonMap.put(TableSet.SUP_CTA,radioButtonCta);
+        buttonMap.put(TableSet.SUP_CKM,radioButtonCellKey);
         
+        // disable reordering of columns
         table.getTableHeader().setReorderingAllowed(false);        
     }
     
@@ -413,6 +470,12 @@ public class PanelTable extends javax.swing.JPanel {
         Variable columnVar = null;
         if (!isSingleColumn) {columnVar = tableSet.expVar.get(1);}
         setRowColumnVariables(tableSet.expVar.get(0), columnVar);
+        if (buttonMap.containsKey(tableSet.suppressed)) {
+            buttonMap.get(tableSet.suppressed).setSelected(true);
+        }
+        else{
+            if (tableSet.suppressed==TableSet.SUP_NO) radioButtonHyperCube.setSelected(true);
+        }
         updateSuppressButtons();
     }
     
@@ -479,7 +542,7 @@ public class PanelTable extends javax.swing.JPanel {
 //        createColumnIndices();
 
         Variable RowVar = tableSet.expVar.get(rowExpVarIndex);
-        String hs = RowVar.name;
+        String hs = tableSet.respVar.name + ": " + RowVar.name;
         if (RowVar.recoded) hs += "(R)";
         
         if (!isSingleColumn){
@@ -583,29 +646,80 @@ public class PanelTable extends javax.swing.JPanel {
     }
     
     public void updateSuppressButtons() {
-        int s = tableSet.suppressed; int radioSelect = 0; String hs = "";
+        int s = tableSet.suppressed; 
+        int radioSelect = 0; 
+        boolean CKMpossible = false;
+        String hs = "";
         try {
            hs = SystemUtils.getApplicationDirectory(PanelTable.class).getCanonicalPath();
         } catch (Exception ex) {}
+        
         if (Application.isAnco()) {
                 radioButtonUwe.setVisible(TauArgusUtils.ExistFile(hs+"/EXP_ExternalUnpickerOnJJ.exe"));        
         }
-        radioButtonNetwork.setVisible(TauArgusUtils.ExistFile(hs+"/main1H2D.exe")||TauArgusUtils.ExistFile(hs+"/main1H2D"));        
+        
+        radioButtonNetwork.setVisible(TauArgusUtils.ExistFile(hs+"/main1H2D.exe")||TauArgusUtils.ExistFile(hs+"/main1H2D")); 
+        
+        CKMpossible = tableSet.CellKeyAvailable && (!tableSet.respVar.CKMType.equals("N") || tableSet.respVar.type.equals(Type.FREQUENCY));
+        
+        radioButtonCellKey.setVisible(CKMpossible);
+        buttonChangePTable.setVisible(CKMpossible && radioButtonCellKey.isSelected());
+        buttonChangePTable.setEnabled(radioButtonCellKey.isSelected());// && !tableSet.respVar.isResponse());
+        if (CKMpossible){
+            if (tableSet.respVar.isResponse()){
+                labelPTable.setText("ptablefileCont: "+tableSet.cellkeyVar.PTableFileCont.substring(tableSet.cellkeyVar.PTableFileCont.lastIndexOf("\\")+1));
+                if (tableSet.respVar.CKMseparation){
+                    labelPTableSep.setText("ptablefileSep: "+tableSet.cellkeyVar.PTableFileSep.substring(tableSet.cellkeyVar.PTableFileSep.lastIndexOf("\\")+1));
+                }
+                else labelPTableSep.setText("");
+            }
+            else{
+                labelPTable.setText("ptablefile: "+tableSet.cellkeyVar.PTableFile.substring(tableSet.cellkeyVar.PTableFile.lastIndexOf("\\")+1));
+                labelPTableSep.setText("");
+            }
+        }
+        else{
+            //radioButtonHyperCube.setSelected(true);
+        }
+        labelPTable.setVisible(CKMpossible && radioButtonCellKey.isSelected());
+        labelPTableSep.setVisible(CKMpossible && radioButtonCellKey.isSelected());
+        
         for (int i = 0; i < radioButtonSuppress.length; i++) {
             radioButtonSuppress[i].setEnabled(s == TableSet.SUP_NO);
             if (radioButtonSuppress[i].isSelected()){radioSelect = i;}
         }
+        labelPTable.setEnabled(s == TableSet.SUP_NO);
+        labelPTableSep.setEnabled(s == TableSet.SUP_NO);
+        
         checkBoxInverseWeight.setEnabled(radioButtonSuppress[radioSelect]== radioButtonOptimal);
-        if (radioSelect == radioButtonSuppress.length-1 || s == TableSet.SUP_ROUNDING){ //Rounder selected
+        if (radioSelect == radioButtonSuppress.length-2 || s == TableSet.SUP_ROUNDING){ //Rounder selected
           buttonSuppress.setText("Round");
-          buttonUndoSuppress.setText("Undo round");
         }
         else{
-          buttonSuppress.setText("Suppress");
-          buttonUndoSuppress.setText("Undo suppress");
-            
+            if (radioButtonCta.isSelected()) {
+                buttonSuppress.setText("CTA");
+            }
+            else{
+                if (radioButtonCellKey.isSelected()) {
+                    buttonSuppress.setText("Cell Key");
+                }
+                else{
+                    buttonSuppress.setText("Suppress");
+                }
+            }
         }
-        boolean b = (s == TableSet.SUP_ROUNDING)  || (s == TableSet.SUP_CTA);
+        
+        checkBoxColoredView.setVisible(CKMpossible);
+        boolean b = (s == TableSet.SUP_CKM) || (s == TableSet.SUP_NO);
+        if (tableSet.respVar.isResponse()){ b=false;} // For now no colored view for magnitude tables
+        checkBoxColoredView.setEnabled(b);
+        if (!b) checkBoxColoredView.setSelected(false);
+        if (s == TableSet.SUP_CKM) {
+            checkBoxColoredView.setSelected(true);
+            buttonChangePTable.setEnabled(false);
+        }
+        
+        b = (s == TableSet.SUP_ROUNDING)  || (s == TableSet.SUP_CTA) || (s == TableSet.SUP_CKM);
         checkBoxOutputView.setEnabled(!b);
         if (b) {
             checkBoxOutputView.setSelected(false);
@@ -818,6 +932,10 @@ public class PanelTable extends javax.swing.JPanel {
         buttonUndoSuppress = new javax.swing.JButton();
         buttonAudit = new javax.swing.JButton();
         radioButtonNetwork = new javax.swing.JRadioButton();
+        radioButtonCellKey = new javax.swing.JRadioButton();
+        buttonChangePTable = new javax.swing.JButton();
+        labelPTable = new javax.swing.JLabel();
+        labelPTableSep = new javax.swing.JLabel();
         labelRowColVars = new javax.swing.JLabel();
         panelBottomButtons = new javax.swing.JPanel();
         buttonSelectView = new javax.swing.JButton();
@@ -830,6 +948,7 @@ public class PanelTable extends javax.swing.JPanel {
         comboBoxDecimals = new javax.swing.JComboBox();
         checkBoxOutputView = new javax.swing.JCheckBox();
         checkBoxThousandSeparator = new javax.swing.JCheckBox();
+        checkBoxColoredView = new javax.swing.JCheckBox();
 
         table.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -916,13 +1035,12 @@ public class PanelTable extends javax.swing.JPanel {
             }
         });
 
-        panelCellInformation.setBorder(javax.swing.BorderFactory.createTitledBorder("Cell Information"));
-        panelCellInformation.setMinimumSize(new java.awt.Dimension(273, 368));
-        panelCellInformation.setPreferredSize(new java.awt.Dimension(273, 368));
+        panelCellInformation.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Cell Information"));
+        panelCellInformation.setMinimumSize(null);
+        panelCellInformation.setPreferredSize(null);
 
-        panelStatus.setBorder(javax.swing.BorderFactory.createTitledBorder("Change status"));
+        panelStatus.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Change status"));
         panelStatus.setToolTipText("");
-        panelStatus.setPreferredSize(new java.awt.Dimension(273, 155));
 
         buttonSecondary.setText("Set to second.");
         buttonSecondary.setNextFocusableComponent(table);
@@ -991,15 +1109,15 @@ public class PanelTable extends javax.swing.JPanel {
                     .addComponent(buttonSafe, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(19, 19, 19)
                 .addGroup(panelStatusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(buttonSecondary, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(buttonNonStructEmpty, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(buttonPriory, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(buttonSecondary, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(buttonNonStructEmpty, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(buttonPriory, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
         panelStatusLayout.setVerticalGroup(
             panelStatusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelStatusLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(12, Short.MAX_VALUE)
                 .addGroup(panelStatusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(buttonSafe)
                     .addComponent(buttonSecondary))
@@ -1018,6 +1136,7 @@ public class PanelTable extends javax.swing.JPanel {
         );
 
         buttonRecode.setText("Recode");
+        buttonRecode.setPreferredSize(null);
         buttonRecode.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonRecodeActionPerformed(evt);
@@ -1029,11 +1148,6 @@ public class PanelTable extends javax.swing.JPanel {
         buttonGroupSuppress.add(radioButtonHyperCube);
         radioButtonHyperCube.setSelected(true);
         radioButtonHyperCube.setText("Hypercube");
-        radioButtonHyperCube.addContainerListener(new java.awt.event.ContainerAdapter() {
-            public void componentAdded(java.awt.event.ContainerEvent evt) {
-                radioButtonHyperCubeComponentAdded(evt);
-            }
-        });
         radioButtonHyperCube.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 radioButtonHyperCubeActionPerformed(evt);
@@ -1096,13 +1210,15 @@ public class PanelTable extends javax.swing.JPanel {
         });
 
         buttonSuppress.setText("Suppress");
+        buttonSuppress.setNextFocusableComponent(table);
         buttonSuppress.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonSuppressActionPerformed(evt);
             }
         });
 
-        buttonUndoSuppress.setText("Undo suppress");
+        buttonUndoSuppress.setText("Undo");
+        buttonUndoSuppress.setNextFocusableComponent(table);
         buttonUndoSuppress.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonUndoSuppressActionPerformed(evt);
@@ -1110,6 +1226,7 @@ public class PanelTable extends javax.swing.JPanel {
         });
 
         buttonAudit.setText("Audit");
+        buttonAudit.setNextFocusableComponent(table);
         buttonAudit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonAuditActionPerformed(evt);
@@ -1124,41 +1241,68 @@ public class PanelTable extends javax.swing.JPanel {
             }
         });
 
+        buttonGroupSuppress.add(radioButtonCellKey);
+        radioButtonCellKey.setText("Cell Key Method");
+        radioButtonCellKey.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                radioButtonCellKeyActionPerformed(evt);
+            }
+        });
+
+        buttonChangePTable.setText("Change ptable");
+        buttonChangePTable.setPreferredSize(new java.awt.Dimension(57, 23));
+        buttonChangePTable.setRequestFocusEnabled(false);
+        buttonChangePTable.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonChangePTableActionPerformed(evt);
+            }
+        });
+
+        labelPTable.setText("ptable");
+        labelPTable.setMaximumSize(new java.awt.Dimension(34, 14));
+        labelPTable.setMinimumSize(new java.awt.Dimension(34, 14));
+        labelPTable.setPreferredSize(new java.awt.Dimension(34, 14));
+
+        labelPTableSep.setText("ptableSEP");
+
         javax.swing.GroupLayout panelSuppressLayout = new javax.swing.GroupLayout(panelSuppress);
         panelSuppress.setLayout(panelSuppressLayout);
         panelSuppressLayout.setHorizontalGroup(
             panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelSuppressLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(panelSuppressLayout.createSequentialGroup()
                         .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(panelSuppressLayout.createSequentialGroup()
-                                .addComponent(radioButtonModular)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(buttonUndoSuppress, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelSuppressLayout.createSequentialGroup()
                                 .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(radioButtonOptimal)
-                                    .addComponent(radioButtonHyperCube)
-                                    .addComponent(radioButtonNetwork))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(buttonSuppress, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(buttonAudit, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addContainerGap())
-                    .addGroup(panelSuppressLayout.createSequentialGroup()
-                        .addComponent(radioButtonRounding)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addComponent(radioButtonCellKey, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addComponent(radioButtonHyperCube, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(radioButtonModular, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(radioButtonOptimal, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(radioButtonNetwork, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(radioButtonRounding, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(radioButtonCta, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 115, Short.MAX_VALUE)))
+                                .addGap(31, 31, 31)
+                                .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(buttonSuppress, javax.swing.GroupLayout.DEFAULT_SIZE, 103, Short.MAX_VALUE)
+                                        .addComponent(buttonAudit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(buttonUndoSuppress, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addComponent(buttonChangePTable, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(panelSuppressLayout.createSequentialGroup()
+                                .addGap(21, 21, 21)
+                                .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(labelPTableSep, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(labelPTable, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGap(10, 10, 10))
                     .addGroup(panelSuppressLayout.createSequentialGroup()
                         .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(radioButtonUwe)
-                            .addComponent(radioButtonMarginal))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(panelSuppressLayout.createSequentialGroup()
-                        .addComponent(radioButtonCta)
+                            .addComponent(radioButtonUwe, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(radioButtonMarginal, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(checkBoxInverseWeight, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(checkBoxInverseWeight)
                         .addGap(20, 20, 20))))
         );
         panelSuppressLayout.setVerticalGroup(
@@ -1178,18 +1322,25 @@ public class PanelTable extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(radioButtonOptimal)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(radioButtonNetwork)))
+                        .addComponent(radioButtonNetwork, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(radioButtonUwe)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(radioButtonMarginal)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(radioButtonCta)
-                    .addComponent(checkBoxInverseWeight))
+                .addComponent(radioButtonCta)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(radioButtonRounding)
-                .addGap(21, 21, 21))
+                .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(radioButtonCellKey)
+                    .addComponent(buttonChangePTable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(labelPTable, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(labelPTableSep)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panelSuppressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(checkBoxInverseWeight)
+                    .addComponent(radioButtonUwe))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(radioButtonMarginal)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         buttonGroupSuppress.add(radioButtonModular);
@@ -1230,8 +1381,8 @@ public class PanelTable extends javax.swing.JPanel {
 
         labelDecimals.setText("Number of decimals:");
 
-        comboBoxDecimals.setMaximumRowCount(10);
-        comboBoxDecimals.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" }));
+        comboBoxDecimals.setMaximumRowCount(15);
+        comboBoxDecimals.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15" }));
         comboBoxDecimals.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comboBoxDecimalsActionPerformed(evt);
@@ -1252,6 +1403,14 @@ public class PanelTable extends javax.swing.JPanel {
             }
         });
 
+        checkBoxColoredView.setText("Colored view");
+        checkBoxColoredView.setToolTipText("Currently only available for frequency count tables");
+        checkBoxColoredView.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkBoxColoredViewActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout panelBottomButtonsLayout = new javax.swing.GroupLayout(panelBottomButtons);
         panelBottomButtons.setLayout(panelBottomButtonsLayout);
         panelBottomButtonsLayout.setHorizontalGroup(
@@ -1259,8 +1418,8 @@ public class PanelTable extends javax.swing.JPanel {
             .addGroup(panelBottomButtonsLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelBottomButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(buttonTableSummary, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(buttonSelectView, javax.swing.GroupLayout.DEFAULT_SIZE, 108, Short.MAX_VALUE))
+                    .addComponent(buttonTableSummary, javax.swing.GroupLayout.DEFAULT_SIZE, 108, Short.MAX_VALUE)
+                    .addComponent(buttonSelectView, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGroup(panelBottomButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panelBottomButtonsLayout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -1272,16 +1431,20 @@ public class PanelTable extends javax.swing.JPanel {
                         .addComponent(LabelNrOfVertLevels)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(comboBoxNrOfVertLevels, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(0, 10, Short.MAX_VALUE)
+                .addGap(12, 12, 12)
                 .addGroup(panelBottomButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panelBottomButtonsLayout.createSequentialGroup()
                         .addComponent(labelDecimals)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(comboBoxDecimals, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(checkBoxOutputView))
-                    .addComponent(checkBoxThousandSeparator))
-                .addGap(3, 3, 3))
+                        .addComponent(comboBoxDecimals, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(panelBottomButtonsLayout.createSequentialGroup()
+                        .addGap(10, 10, 10)
+                        .addComponent(checkBoxThousandSeparator)))
+                .addGap(30, 30, 30)
+                .addGroup(panelBottomButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(checkBoxColoredView)
+                    .addComponent(checkBoxOutputView))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panelBottomButtonsLayout.setVerticalGroup(
             panelBottomButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1299,7 +1462,8 @@ public class PanelTable extends javax.swing.JPanel {
                     .addComponent(buttonTableSummary)
                     .addComponent(LabelNrOfVertLevels)
                     .addComponent(comboBoxNrOfVertLevels, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(checkBoxThousandSeparator))
+                    .addComponent(checkBoxThousandSeparator)
+                    .addComponent(checkBoxColoredView))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -1345,16 +1509,14 @@ public class PanelTable extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(panelBottomButtons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addGap(18, 18, 18)
+                    .addComponent(scrollPane)
+                    .addComponent(panelBottomButtons, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(panelSuppress, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(panelStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(panelCellInformation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(buttonRecode, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(buttonRecode, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(panelSuppress, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(10, 10, 10))
         );
         layout.setVerticalGroup(
@@ -1397,18 +1559,19 @@ public class PanelTable extends javax.swing.JPanel {
                         .addComponent(comboBoxSpan7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(scrollPane)
-                        .addGap(18, 18, 18)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(panelBottomButtons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(panelCellInformation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(panelStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(buttonRecode)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(panelSuppress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addComponent(buttonRecode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(panelSuppress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -1427,7 +1590,7 @@ public class PanelTable extends javax.swing.JPanel {
     private void buttonSetStatusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSetStatusActionPerformed
 // Anco 1.6
 //        Map<javax.swing.JButton, CellStatus> statusMap = new HashMap<>();
-        Map<javax.swing.JButton, CellStatus> statusMap = new HashMap<javax.swing.JButton, CellStatus>();
+        Map<javax.swing.JButton, CellStatus> statusMap = new HashMap<>();
         statusMap.put(buttonSafe, CellStatus.SAFE_MANUAL);
         statusMap.put(buttonUnsafe, CellStatus.UNSAFE_MANUAL);
         statusMap.put(buttonSecondary, CellStatus.SECONDARY_UNSAFE);
@@ -1534,8 +1697,8 @@ public class PanelTable extends javax.swing.JPanel {
         }
         // Is eigenlijk onzin !!!!!!!
         table.minTabVal = x;
-        if (xMax[0]<0) {xMax[0] = 0;}
-        table.maxTabVal = 1.5 * xMax[0];
+        //if (xMax[0]<0) {xMax[0] = 0;}
+        //table.maxTabVal = 1.5 * xMax[0];
         return true;
     }
 
@@ -1593,12 +1756,11 @@ public class PanelTable extends javax.swing.JPanel {
     }//GEN-LAST:event_buttonSelectViewActionPerformed
 
     private void buttonTableSummaryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonTableSummaryActionPerformed
-        DialogTableSummary dialog = new DialogTableSummary(null, true);
+        DialogTableSummary dialog = new DialogTableSummary((JFrame)SwingUtilities.getAncestorOfClass(JFrame.class, this), true);
         dialog.showDialog(tableSet);
     }//GEN-LAST:event_buttonTableSummaryActionPerformed
 
     private void buttonPrioryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPrioryActionPerformed
-        // TODO add your handling code here:
        DialogReadApriori dialog = new DialogReadApriori(null, true);
        dialog.SetAprioyTable(tableSet.index);
        dialog.ShowDialog();  
@@ -1613,9 +1775,22 @@ public class PanelTable extends javax.swing.JPanel {
      */   
     }//GEN-LAST:event_buttonPrioryActionPerformed
 
-    private void buttonAuditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonAuditActionPerformed
+    private void checkBoxColoredViewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxColoredViewActionPerformed
+        ((AbstractTableModel)table.getModel()).fireTableDataChanged();
+        adjustColumnWidths();
+    }//GEN-LAST:event_checkBoxColoredViewActionPerformed
+
+    private void radioButtonCellKeyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioButtonCellKeyActionPerformed
         // TODO add your handling code here:
-        // JOptionPane.showMessageDialog(this, "Not yet implemented");
+        updateSuppressButtons();
+    }//GEN-LAST:event_radioButtonCellKeyActionPerformed
+
+    private void radioButtonNetworkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioButtonNetworkActionPerformed
+        // TODO add your handling code here:
+        updateSuppressButtons();
+    }//GEN-LAST:event_radioButtonNetworkActionPerformed
+
+    private void buttonAuditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonAuditActionPerformed
         new Thread(){
             @Override public void run(){
                 try {
@@ -1642,7 +1817,6 @@ public class PanelTable extends javax.swing.JPanel {
     }//GEN-LAST:event_buttonAuditActionPerformed
 
     private void buttonUndoSuppressActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonUndoSuppressActionPerformed
-        // TODO add your handling code here:
         TableService.undoSuppress(tableSet.index);
         updateSuppressButtons();
         SystemUtils.writeLogbook("Protection for table: " + tableSet.toString() +  " has been removed");
@@ -1661,6 +1835,7 @@ public class PanelTable extends javax.swing.JPanel {
         if (radioButtonUwe.isSelected()) Soort = SuppressionMethod.UWE;
         if (radioButtonCta.isSelected()) Soort = SuppressionMethod.CTA;
         if (radioButtonRounding.isSelected()) Soort = SuppressionMethod.ROUNDING;
+        if (radioButtonCellKey.isSelected()) Soort = SuppressionMethod.CELLKEY;
 
         if (Soort.isAdditivityDesirable() && !tableSet.isAdditive) {
             if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(this, "Table is not additive. Optimisation routines might be tricky\nDo you want to proceed?", "Question", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)) {
@@ -1681,7 +1856,7 @@ public class PanelTable extends javax.swing.JPanel {
         }
         int totalUnsafeCells  = statistics.totalPrimaryUnsafe();
 
-        if (!Soort.isCosmetic()) {
+        if (!Soort.isCosmetic() && !Soort.isCellKey()) {
             if (totalUnsafeCells == 0) {
                 JOptionPane.showMessageDialog(this, "No unsafe cells found\nNo protection required");
                 return;
@@ -1701,11 +1876,11 @@ public class PanelTable extends javax.swing.JPanel {
         }
 
         switch(Soort) {
-            case ROUNDING:
+        case ROUNDING:
             if (Application.solverSelected == Application.SOLVER_CPLEX){
-             JOptionPane.showMessageDialog(null, "Whether controlled rounding can be used when Cplex is selected as solver, depends on your specific license",
-                     "", JOptionPane.ERROR_MESSAGE);   
-            } 
+                JOptionPane.showMessageDialog(null, "Whether controlled rounding can be used when Cplex is selected as solver, depends on your specific license",
+                    "", JOptionPane.INFORMATION_MESSAGE);
+            }
             //else
             DialogRoundingParameters paramsR = new DialogRoundingParameters(parentFrame, true);
             if (paramsR.showDialog(tableSet) == DialogRoundingParameters.APPROVE_OPTION) {
@@ -1716,7 +1891,7 @@ public class PanelTable extends javax.swing.JPanel {
                         OptiSuppress.runRounder(tableSet, getPropertyChangeListener());
                         return null;
                     }
-                    
+
                     @Override
                     protected void done(){
                         super.done();
@@ -1737,211 +1912,211 @@ public class PanelTable extends javax.swing.JPanel {
                         }
                     }
                 };
-                
+
                 worker.execute();
-/*                try{
+                /*                try{
                     OptiSuppress.runRounder(tableSet);
                     JOptionPane.showMessageDialog(null, "The table has been rounded\n" +
-                                "Number of steps: " + tableSet.roundMaxStep+"\n"+
-                                "Max step: " + 
-                                StrUtils.formatDouble(tableSet.roundMaxJump, tableSet.respVar.nDecimals)  +"\n"+
-                                "Processing time: " + StrUtils.timeToString(tableSet.processingTime));
+                        "Number of steps: " + tableSet.roundMaxStep+"\n"+
+                        "Max step: " +
+                        StrUtils.formatDouble(tableSet.roundMaxJump, tableSet.respVar.nDecimals)  +"\n"+
+                        "Processing time: " + StrUtils.timeToString(tableSet.processingTime));
                     ((AbstractTableModel)table.getModel()).fireTableDataChanged();
                     adjustColumnWidths();
                     updateSuppressButtons();
                 }
-// Anco 1.6                
-//                catch (ArgusException | IOException ex) {
-                catch (ArgusException ex) {
-                    JOptionPane.showMessageDialog(this, ex.getMessage());}
-                catch (IOException ex) {
-                    JOptionPane.showMessageDialog(this, ex.getMessage());
-                }*/
-            }  
-            break;
+                // Anco 1.6
+                //                catch (ArgusException | IOException ex) {
+                    catch (ArgusException ex) {
+                        JOptionPane.showMessageDialog(this, ex.getMessage());}
+                    catch (IOException ex) {
+                        JOptionPane.showMessageDialog(this, ex.getMessage());
+                    }*/
+                }
+                break;
             case CTA:  //do CTA
-            final int i=JOptionPane.showConfirmDialog(parentFrame, "Do you prefer to use the expert version?", "Select CTA version", JOptionPane.YES_NO_CANCEL_OPTION);
-            if ((i == JOptionPane.YES_OPTION)||(i == JOptionPane.NO_OPTION) ){
-                new Thread(){
-                    @Override public void run(){
-                        try{
-                            OptiSuppress.RunCTA(tableSet, (i == JOptionPane.YES_OPTION));
-                            JOptionPane.showMessageDialog(null, "The CTA procedure has been completed\n" +
-                                tableSet.nSecond+ " cells have been modified\n"+
-                                StrUtils.timeToString(tableSet.processingTime) + " needed");
-                            ((AbstractTableModel)table.getModel()).fireTableDataChanged();
-                            adjustColumnWidths();
-                            updateSuppressButtons();                            
-                        }
-                        catch(ArgusException  ex) {JOptionPane.showMessageDialog(null, ex.getMessage());}
-                        catch(FileNotFoundException  ex) {JOptionPane.showMessageDialog(null, ex.getMessage());}
-                        catch(IOException  ex) {JOptionPane.showMessageDialog(null, ex.getMessage());}
-                    }
-                }.start();
-            }
-            break;
-            case UWE:
-            DialogModularParameters uweParams = new DialogModularParameters(parentFrame, tableSet, false, true);
-            if (uweParams.showDialog() == DialogModularParameters.APPROVE_OPTION){  
-                new Thread(){
-                    @Override public void run(){
-                        try{  
-                            OptiSuppress.runUWE(tableSet);
-                            JOptionPane.showMessageDialog(null, "The UWE procedure has finished the protection\n" +
-                                tableSet.nSecond+" cells have been suppressed\n"+
-                                StrUtils.timeToString(tableSet.processingTime) + " needed");
-                            ((AbstractTableModel)table.getModel()).fireTableDataChanged();
-                            adjustColumnWidths();
-                            updateSuppressButtons();
-                        }
-                        catch (ArgusException ex) {
-                            JOptionPane.showMessageDialog(null, ex.getMessage());}                   
-                        catch (IOException ex) {
-                            JOptionPane.showMessageDialog(null, ex.getMessage());}
-                    }
-                }.start();
-            }
-            break;
-            case GHMITER:
-            DialogHypercubeParameters paramsG = new DialogHypercubeParameters(parentFrame, true);
-            if (paramsG.showDialog(tableSet) == DialogHypercubeParameters.APPROVE_OPTION) {
-                new Thread(){
-                    @Override public void run(){
-                        try {GHMiter.RunGHMiter(tableSet);
-                            JOptionPane.showMessageDialog(null, "The Hypercube has finished the protection\n" +
-                                tableSet.nSecond+" cells have been suppressed\n"+
-                                tableSet.ghMiterMessage +
-                                StrUtils.timeToString(tableSet.processingTime) + " needed");
-                    //                              tableSet.suppressed = TableSet.SUP_GHMITER;
-                            if (argus.utils.TauArgusUtils.ExistFile(Application.getTempFile("frozen.txt"))){
-                            DialogInfo Info = new DialogInfo(getParentFrame(), true);
-                            Info.addLabel("Overview of the frozen cells");
+                final int i=JOptionPane.showConfirmDialog(parentFrame, "Do you prefer to use the expert version?", "Select CTA version", JOptionPane.YES_NO_CANCEL_OPTION);
+                if ((i == JOptionPane.YES_OPTION)||(i == JOptionPane.NO_OPTION) ){
+                    new Thread(){
+                        @Override public void run(){
                             try{
-                             Info.addTextFile(Application.getTempFile("frozen.txt"));}
-                            catch (ArgusException ex1){};
-                            Info.setVisible(true);
+                                OptiSuppress.RunCTA(tableSet, (i == JOptionPane.YES_OPTION));
+                                JOptionPane.showMessageDialog(null, "The CTA procedure has been completed\n" +
+                                    tableSet.nSecond+ " cells have been modified\n"+
+                                    StrUtils.timeToString(tableSet.processingTime) + " needed");
+                                ((AbstractTableModel)table.getModel()).fireTableDataChanged();
+                                adjustColumnWidths();
+                                updateSuppressButtons();
                             }
-                            ((AbstractTableModel)table.getModel()).fireTableDataChanged();
-                            adjustColumnWidths();
-                            updateSuppressButtons();                        
+                            catch(ArgusException  ex) {JOptionPane.showMessageDialog(null, ex.getMessage());}
+                            catch(FileNotFoundException  ex) {JOptionPane.showMessageDialog(null, ex.getMessage());}
+                            catch(IOException  ex) {JOptionPane.showMessageDialog(null, ex.getMessage());}
                         }
-                        catch (ArgusException ex) {
-                           
-                            JOptionPane.showMessageDialog(null, ex.getMessage());
-                            if (GHMiter.ShowProto002){
-                               DialogInfo Info = new DialogInfo(getParentFrame(), true);
-                               Info.addLabel("Overview of the file PROTO002");
-                               Info.setSize(1000, 500);
-                               Info.setLocationRelativeTo(null);
-                               try{
-                                 Info.addTextFile(Application.getTempFile("PROTO002"));}
-                              catch (ArgusException ex1){};
-                              Info.setVisible(true);                                   
+                    }.start();
+                }
+                break;
+            case UWE:
+                DialogModularParameters uweParams = new DialogModularParameters(parentFrame, tableSet, false, true);
+                if (uweParams.showDialog() == DialogModularParameters.APPROVE_OPTION){
+                    new Thread(){
+                        @Override public void run(){
+                            try{
+                                OptiSuppress.runUWE(tableSet);
+                                JOptionPane.showMessageDialog(null, "The UWE procedure has finished the protection\n" +
+                                    tableSet.nSecond+" cells have been suppressed\n"+
+                                    StrUtils.timeToString(tableSet.processingTime) + " needed");
+                                ((AbstractTableModel)table.getModel()).fireTableDataChanged();
+                                adjustColumnWidths();
+                                updateSuppressButtons();
+                            }
+                            catch (ArgusException ex) {
+                                JOptionPane.showMessageDialog(null, ex.getMessage());}
+                            catch (IOException ex) {
+                                JOptionPane.showMessageDialog(null, ex.getMessage());}
+                        }
+                    }.start();
+                }
+                break;
+            case GHMITER:
+                DialogHypercubeParameters paramsG = new DialogHypercubeParameters(parentFrame, true);
+                if (paramsG.showDialog(tableSet) == DialogHypercubeParameters.APPROVE_OPTION) {
+                    new Thread(){
+                        @Override public void run(){
+                            try {GHMiter.RunGHMiter(tableSet);
+                                JOptionPane.showMessageDialog(null, "The Hypercube has finished the protection\n" +
+                                    tableSet.nSecond+" cells have been suppressed\n"+
+                                    tableSet.ghMiterMessage +
+                                    StrUtils.timeToString(tableSet.processingTime) + " needed");
+                                //                              tableSet.suppressed = TableSet.SUP_GHMITER;
+                                if (argus.utils.TauArgusUtils.ExistFile(Application.getTempFile("frozen.txt"))){
+                                    DialogInfo Info = new DialogInfo(getParentFrame(), true);
+                                    Info.addLabel("Overview of the frozen cells");
+                                    try{
+                                        Info.addTextFile(Application.getTempFile("frozen.txt"));}
+                                    catch (ArgusException ex1){}
+                                    Info.setVisible(true);
+                                }
+                                ((AbstractTableModel)table.getModel()).fireTableDataChanged();
+                                adjustColumnWidths();
+                                updateSuppressButtons();
+                            }
+                            catch (ArgusException ex) {
+
+                                JOptionPane.showMessageDialog(null, ex.getMessage());
+                                if (GHMiter.ShowProto002){
+                                    DialogInfo Info = new DialogInfo(getParentFrame(), true);
+                                    Info.addLabel("Overview of the file PROTO002");
+                                    Info.setSize(1000, 500);
+                                    Info.setLocationRelativeTo(null);
+                                    try{
+                                        Info.addTextFile(Application.getTempFile("PROTO002"));}
+                                    catch (ArgusException ex1){}
+                                    Info.setVisible(true);
+                                }
                             }
                         }
-                    }
-                }.start();
-            }
-            // run hypercube method
-            break;
-            /*            case HITAS:
-            DialogModularParameters params = new DialogModularParameters(parentFrame, tableSet, false, true);
-            params.showDialog();
-            try {
-                boolean oke = OptiSuppress.runModular(tableSet);
-                JOptionPane.showMessageDialog(this, "Modular has finished the protection\n"
-                    + tableSet.nSecond + " cells have been suppressed\n"
-                    + StrUtils.timeToString(tableSet.processingTime) + " needed");
-            } //|FileNotFoundException
-            catch (ArgusException | IOException ex) {
-                JOptionPane.showMessageDialog(this, ex.getMessage());
-            }
-            break;
-            */
+                    }.start();
+                }
+                // run hypercube method
+                break;
+                /*            case HITAS:
+                DialogModularParameters params = new DialogModularParameters(parentFrame, tableSet, false, true);
+                params.showDialog();
+                try {
+                    boolean oke = OptiSuppress.runModular(tableSet);
+                    JOptionPane.showMessageDialog(this, "Modular has finished the protection\n"
+                        + tableSet.nSecond + " cells have been suppressed\n"
+                        + StrUtils.timeToString(tableSet.processingTime) + " needed");
+                } //|FileNotFoundException
+                catch (ArgusException | IOException ex) {
+                    JOptionPane.showMessageDialog(this, ex.getMessage());
+                }
+                break;
+                */
             case HITAS:
-            DialogModularParameters params = new DialogModularParameters(parentFrame, tableSet, false, true);
-            if (params.showDialog() == DialogModularParameters.APPROVE_OPTION){
-                final SwingWorker <Integer, Void> worker = new ProgressSwingWorker<Integer, Void>(ProgressSwingWorker.DOUBLE,"Modular approach") {
-                    @Override
-                    protected Integer doInBackground() throws ArgusException, Exception{
-                        super.doInBackground();
-                        OptiSuppress.runModular(tableSet, getPropertyChangeListener());
-                        return null;
-                    }
+                DialogModularParameters params = new DialogModularParameters(parentFrame, tableSet, false, true);
+                if (params.showDialog() == DialogModularParameters.APPROVE_OPTION){
+                    final SwingWorker <Integer, Void> worker = new ProgressSwingWorker<Integer, Void>(ProgressSwingWorker.DOUBLE,"Modular approach") {
+                        @Override
+                        protected Integer doInBackground() throws ArgusException, Exception{
+                            super.doInBackground();
+                            OptiSuppress.runModular(tableSet, getPropertyChangeListener());
+                            return null;
+                        }
 
-                    @Override
-                    protected void done(){
-                        super.done();
-                        try{
-                            get();
-                            JOptionPane.showMessageDialog(null, "Modular has finished the protection\n"
-                                + tableSet.nSecond + " cells have been suppressed\n"
-                                + StrUtils.timeToString(tableSet.processingTime) + " needed");
-                            tableSet.undoAudit();
-                            ((AbstractTableModel)table.getModel()).fireTableDataChanged();
-                            adjustColumnWidths();
-                            updateSuppressButtons();
+                        @Override
+                        protected void done(){
+                            super.done();
+                            try{
+                                get();
+                                JOptionPane.showMessageDialog(null, "Modular has finished the protection\n"
+                                    + tableSet.nSecond + " cells have been suppressed\n"
+                                    + StrUtils.timeToString(tableSet.processingTime) + " needed");
+                                tableSet.undoAudit();
+                                ((AbstractTableModel)table.getModel()).fireTableDataChanged();
+                                adjustColumnWidths();
+                                updateSuppressButtons();
+                            }
+                            catch (InterruptedException ex) {
+                                logger.log(Level.SEVERE, null, ex);
+                            } catch (ExecutionException ex) {
+                                JOptionPane.showMessageDialog(null, ex.getCause().getMessage());
+                            }
                         }
-                        catch (InterruptedException ex) {
-                            logger.log(Level.SEVERE, null, ex);
-                        } catch (ExecutionException ex) {
-                            JOptionPane.showMessageDialog(null, ex.getCause().getMessage());
-                        }
-                    }
-                };
-                worker.execute();               
-            }
-            break;
+                    };
+                    worker.execute();
+                }
+                break;
             case OPTIMAL:
-            /*               params = new DialogModularParameters(parentFrame, tableSet, true, true);
-            params.showDialog();
-            try{
-                OptiSuppress.runOptimal(tableSet);
-                JOptionPane.showMessageDialog(null, "Optimal has finished the protection\n"
-                    + tableSet.nSecond + " cells have been suppressed\n"
-                                + StrUtils.timeToString(tableSet.processingTime) + " needed");
-                tableSet.hasBeenAudited = false;
-            } catch (ArgusException| IOException  ex)
-            {JOptionPane.showMessageDialog(this, ex.getMessage());
-            }
-            // run optimal
-            */
-            params = new DialogModularParameters(parentFrame, tableSet, true, true);
-            if (params.showDialog() == DialogModularParameters.APPROVE_OPTION){
-                final SwingWorker <Void, Void> worker = new ProgressSwingWorker<Void, Void>(ProgressSwingWorker.VALUES,"Optimal approach") {
-                    
-                    // called in a separate thread...
-                    @Override
-                    protected Void doInBackground() throws ArgusException, Exception{
-                        super.doInBackground();
-                        OptiSuppress.runOptimal(tableSet, getPropertyChangeListener(), checkBoxInverseWeight.isSelected(), false, 1);
-                        return null;
-                    }
+                /*               params = new DialogModularParameters(parentFrame, tableSet, true, true);
+                params.showDialog();
+                try{
+                    OptiSuppress.runOptimal(tableSet);
+                    JOptionPane.showMessageDialog(null, "Optimal has finished the protection\n"
+                        + tableSet.nSecond + " cells have been suppressed\n"
+                        + StrUtils.timeToString(tableSet.processingTime) + " needed");
+                    tableSet.hasBeenAudited = false;
+                } catch (ArgusException| IOException  ex)
+                {JOptionPane.showMessageDialog(this, ex.getMessage());
+                }
+                // run optimal
+                */
+                params = new DialogModularParameters(parentFrame, tableSet, true, true);
+                if (params.showDialog() == DialogModularParameters.APPROVE_OPTION){
+                    final SwingWorker <Void, Void> worker = new ProgressSwingWorker<Void, Void>(ProgressSwingWorker.VALUES,"Optimal approach") {
 
-                    // called on the GUI thread
-                    @Override
-                    protected void done(){
-                        super.done();
-                        try{
-                            get();
-                            JOptionPane.showMessageDialog(null, "Optimal has finished the protection\n"
-                                + tableSet.nSecond + " cells have been suppressed\n"
-                                + StrUtils.timeToString(tableSet.processingTime) + " needed");
-                            tableSet.undoAudit();
-                            ((AbstractTableModel)table.getModel()).fireTableDataChanged();
-                            adjustColumnWidths();
-                            updateSuppressButtons();
+                        // called in a separate thread...
+                        @Override
+                        protected Void doInBackground() throws ArgusException, Exception{
+                            super.doInBackground();
+                            OptiSuppress.runOptimal(tableSet, getPropertyChangeListener(), checkBoxInverseWeight.isSelected(), false, 1);
+                            return null;
                         }
-                        catch (InterruptedException ex) {
-                            logger.log(Level.SEVERE, null, ex);
-                        } catch (ExecutionException ex) {
-                            JOptionPane.showMessageDialog(null, ex.getCause().getMessage());
+
+                        // called on the GUI thread
+                        @Override
+                        protected void done(){
+                            super.done();
+                            try{
+                                get();
+                                JOptionPane.showMessageDialog(null, "Optimal has finished the protection\n"
+                                    + tableSet.nSecond + " cells have been suppressed\n"
+                                    + StrUtils.timeToString(tableSet.processingTime) + " needed");
+                                tableSet.undoAudit();
+                                ((AbstractTableModel)table.getModel()).fireTableDataChanged();
+                                adjustColumnWidths();
+                                updateSuppressButtons();
+                            }
+                            catch (InterruptedException ex) {
+                                logger.log(Level.SEVERE, null, ex);
+                            } catch (ExecutionException ex) {
+                                JOptionPane.showMessageDialog(null, ex.getCause().getMessage());
+                            }
                         }
-                    }
-                };
-                worker.execute();
-            }
-            break;
+                    };
+                    worker.execute();
+                }
+                break;
             case NETWORK:
                 try { OptiSuppress.TestNetwork(tableSet);
                 }
@@ -1955,8 +2130,8 @@ public class PanelTable extends javax.swing.JPanel {
                         @Override public void run(){
                             try {OptiSuppress.RunNetwork(tableSet);
                                 JOptionPane.showMessageDialog(null, "The network has finished the protection\n" +
-                                tableSet.nSecond+" cells have been suppressed\n"
-                                + StrUtils.timeToString(tableSet.processingTime) + " needed");
+                                    tableSet.nSecond+" cells have been suppressed\n"
+                                    + StrUtils.timeToString(tableSet.processingTime) + " needed");
                                 ((AbstractTableModel)table.getModel()).fireTableDataChanged();
                                 adjustColumnWidths();
                                 updateSuppressButtons();
@@ -1966,20 +2141,77 @@ public class PanelTable extends javax.swing.JPanel {
                             }
                         }
                     }.start();
-              }
-              break; 
-            case MARGINAL: {
+                }
+                break;
+            case MARGINAL:
                 JOptionPane.showMessageDialog(null,"The marginal method still has to be implemented");
-            }    
-        }
-        //updateSuppressButtons(); // Needs to be at each try{} of "done"because it will not wait for finishing of ProcessSwingWorker
-        //        Suppress(tableIndex, false, Soort);
-        tableSet.undoAudit();
+                break;
+            case CELLKEY:
+                if (tableSet.holding){
+                    JOptionPane.showMessageDialog(null,"Sorry, Cell Key Method not available when \"holdings\" are used","Warning",JOptionPane.WARNING_MESSAGE);
+                    break;
+                }
+//                if (tableSet.respVar.type != Type.FREQUENCY){
+//                    JOptionPane.showMessageDialog(null,"Sorry, currently Cell Key Method only imlemented for frequency tables","Warning",JOptionPane.WARNING_MESSAGE);
+//                    break;
+//                }
+                String message="";
+                if (tableSet.respVar.isResponse()){ // magnitude table
+                    if (tableSet.respVar.CKMType.equals("N")) message = "No cell key method specified for this variable";
+                    if (tableSet.respVar.CKMscaling.isEmpty()) message += "\n<SCALING> is not specified but is mandatory in .rda-file for variable "+tableSet.respVar.name;
+                    if (tableSet.respVar.CKMType.equals("T") && (tableSet.respVar.CKMTopK>1) && tableSet.respVar.CKMapply_even_odd) message += "\n<PARITY>=Y is not allowed when <CKM>=T(TopK) with TopK > 1"; 
+                    if ((tableSet.respVar.CKMseparation) && (tableSet.cellkeyVar.PTableFileSep==null)) message += "\nWith <SEPARATION>=Y you need to specify a separate ptable for small values";
+                }
+                if (!message.isEmpty()){
+                    JOptionPane.showMessageDialog(null,message,"Warning",JOptionPane.WARNING_MESSAGE);
+                    break;
+                }
+ 
+                if (tableSet.respVar.isResponse()){
+                    DialogMuC GetmuC = new DialogMuC(parentFrame, tableSet, true);
+                    if (tableSet.domRule || tableSet.frequencyRule || tableSet.pqRule || tableSet.piepRule[0] || tableSet.piepRule[1]) {
+                        GetmuC.showDialog(); // returns DialogMuC.APPROVE_OPTION or DialogMuC.CANCEL_OPTION but return value is not (yet) used
+                    }
+                }
+                
+                new Thread(){
+                    @Override public void run(){
+                        try {
+                            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                            if (tableSet.respVar.type == Type.FREQUENCY){
+                                if(OptiSuppress.RunCellKey(tableSet, tableSet.cellkeyVar.PTableFile)){
+                                    JOptionPane.showMessageDialog(null, "The Cell Key Method has been applied succesfully in " + tableSet.processingTime + " seconds\n");
+                                }
+                            }
+                            else{
+                                if(OptiSuppress.RunCellKeyCont(tableSet, tableSet.cellkeyVar.PTableFileCont, tableSet.cellkeyVar.PTableFileSep)){
+                                    JOptionPane.showMessageDialog(null, "The Cell Key Method has been applied succesfully in " + tableSet.processingTime + " seconds\n");
+                                }
+                            }
+                            setCursor(Cursor.getDefaultCursor());
+                        }
+                        catch (ArgusException | IOException ex){
+                            setCursor(Cursor.getDefaultCursor());
+                            JOptionPane.showMessageDialog(null,ex.getMessage());
+                        }
+                        ((AbstractTableModel)table.getModel()).fireTableDataChanged();
+                        adjustColumnWidths();
+                        updateSuppressButtons();
+                    }
+                }.start();
 
-        // TODO Optimalisation: Only do this if a suppression method has run
-        //((AbstractTableModel)table.getModel()).fireTableDataChanged();
-        //adjustColumnWidths();
+                break;
+            }
+            tableSet.undoAudit();
     }//GEN-LAST:event_buttonSuppressActionPerformed
+
+    private void checkBoxInverseWeightActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxInverseWeightActionPerformed
+        // TODO add your handling code here:
+        //        if (checkBoxInverseWeight.isSelected()){
+            //          JOptionPane.showMessageDialog(null, "The inverse weight has not yet been implemented");
+            //          checkBoxInverseWeight.setSelected(false);
+            //        }
+    }//GEN-LAST:event_checkBoxInverseWeightActionPerformed
 
     private void radioButtonUweActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioButtonUweActionPerformed
         updateSuppressButtons();
@@ -2010,25 +2242,20 @@ public class PanelTable extends javax.swing.JPanel {
         updateSuppressButtons();
     }//GEN-LAST:event_radioButtonHyperCubeActionPerformed
 
-    private void radioButtonNetworkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioButtonNetworkActionPerformed
-        // TODO add your handling code here:
-        updateSuppressButtons();
-    }//GEN-LAST:event_radioButtonNetworkActionPerformed
-
-    private void radioButtonHyperCubeComponentAdded(java.awt.event.ContainerEvent evt) {//GEN-FIRST:event_radioButtonHyperCubeComponentAdded
-        // TODO add your handling code here:
-    }//GEN-LAST:event_radioButtonHyperCubeComponentAdded
-
-    private void checkBoxInverseWeightActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxInverseWeightActionPerformed
-        // TODO add your handling code here:
-//        if (checkBoxInverseWeight.isSelected()){
-//          JOptionPane.showMessageDialog(null, "The inverse weight has not yet been implemented");
-//          checkBoxInverseWeight.setSelected(false);
-//        }
-    }//GEN-LAST:event_checkBoxInverseWeightActionPerformed
+    private void buttonChangePTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonChangePTableActionPerformed
+        DialogChangePTable dialog = new DialogChangePTable(this.getParentFrame(), true);
+        if (dialog.showDialog(tableSet)==DialogChangePTable.APPROVE_OPTION) {
+            if (tableSet.respVar.isResponse()){
+                labelPTable.setText("ptablefileCont: "+tableSet.cellkeyVar.PTableFileCont.substring(tableSet.cellkeyVar.PTableFileCont.lastIndexOf("\\")+1));
+            }
+            else{
+                labelPTable.setText("ptablefile: "+tableSet.cellkeyVar.PTableFile.substring(tableSet.cellkeyVar.PTableFile.lastIndexOf("\\")+1));                
+            }
+        }
+    }//GEN-LAST:event_buttonChangePTableActionPerformed
 
     private void organiseSafetyButtons(CellStatus status) {
-         if (status.isEmpty()) {
+        if (status.isEmpty()) {
             buttonSafe.setEnabled(false);
             buttonUnsafe.setEnabled(false);
             buttonCost.setEnabled(false);
@@ -2084,6 +2311,7 @@ public class PanelTable extends javax.swing.JPanel {
     private javax.swing.JLabel LabelNrOfHorLevels;
     private javax.swing.JLabel LabelNrOfVertLevels;
     private javax.swing.JButton buttonAudit;
+    private javax.swing.JButton buttonChangePTable;
     private javax.swing.JButton buttonCost;
     private javax.swing.ButtonGroup buttonGroupSuppress;
     private javax.swing.JButton buttonNonStructEmpty;
@@ -2097,6 +2325,7 @@ public class PanelTable extends javax.swing.JPanel {
     private javax.swing.JButton buttonTableSummary;
     private javax.swing.JButton buttonUndoSuppress;
     private javax.swing.JButton buttonUnsafe;
+    private javax.swing.JCheckBox checkBoxColoredView;
     private javax.swing.JCheckBox checkBoxInverseWeight;
     private javax.swing.JCheckBox checkBoxOutputView;
     private javax.swing.JCheckBox checkBoxThousandSeparator;
@@ -2112,6 +2341,8 @@ public class PanelTable extends javax.swing.JPanel {
     private javax.swing.JComboBox<String> comboBoxSpan6;
     private javax.swing.JComboBox<String> comboBoxSpan7;
     private javax.swing.JLabel labelDecimals;
+    private javax.swing.JLabel labelPTable;
+    private javax.swing.JLabel labelPTableSep;
     private javax.swing.JLabel labelRowColVars;
     private javax.swing.JLabel labelSpan0;
     private javax.swing.JLabel labelSpan1;
@@ -2125,6 +2356,7 @@ public class PanelTable extends javax.swing.JPanel {
     private tauargus.gui.PanelCellDetails panelCellInformation;
     private javax.swing.JPanel panelStatus;
     private javax.swing.JPanel panelSuppress;
+    private javax.swing.JRadioButton radioButtonCellKey;
     private javax.swing.JRadioButton radioButtonCta;
     private javax.swing.JRadioButton radioButtonHyperCube;
     private javax.swing.JRadioButton radioButtonMarginal;

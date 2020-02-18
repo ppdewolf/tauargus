@@ -17,10 +17,7 @@
 
 package tauargus.gui;
 
-import tauargus.utils.DoubleInputVerifier;
-import tauargus.utils.IntegerInputVerifier;
-import tauargus.utils.MouseJListDoubleClickedListener;
-import tauargus.utils.SingleListSelectionModel;
+import argus.utils.SystemUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -40,11 +37,11 @@ import tauargus.model.ProgressSwingWorker;
 import tauargus.model.TableSet;
 import tauargus.model.Variable;
 import tauargus.service.TableService;
+import tauargus.utils.DoubleInputVerifier;
+import tauargus.utils.IntegerInputVerifier;
+import tauargus.utils.MouseJListDoubleClickedListener;
+import tauargus.utils.SingleListSelectionModel;
 import tauargus.utils.SwingUtils;
-//import tauargus.utils.ExecUtils;
-import argus.utils.SystemUtils;
-//import tauargus.utils.TauArgusUtils;
-
 
 public class DialogSpecifyTablesMicro extends DialogBase {
 
@@ -213,7 +210,7 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         checkBoxRequestRule.setEnabled(metadata.containsRequestVariable());
         checkBoxApplyWeights.setEnabled(metadata.containsWeightVariable());
         checkBoxUseHoldingsInfo.setEnabled(metadata.containsHoldingVariable());
-        
+                
         //load(new TableSet(metadata));
         if (TableService.numberOfTables()==0)
         {
@@ -340,6 +337,7 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         boolean b = checkBoxRequestRule.isSelected();
         tabbedPaneRules.setEnabledAt(2, b);
         labelReqSafetyRange.setEnabled(b);
+        labelReqSafetyRangeHolding.setEnabled(b && checkBoxUseHoldingsInfo.isSelected());
         for (int i=0; i<4; i++) {
             if (i==2) {
                 b = b && checkBoxUseHoldingsInfo.isSelected();
@@ -516,6 +514,7 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         tableSet.suppressed = TableSet.SUP_NO;
         tableSet.solverUsed = Application.SOLVER_NO;                
         tableSet.singletonUsed = false;
+        tableSet.cellkeyVar = metadata.find(tauargus.model.Type.RECORD_KEY);
     }
 
     private void createComponentArrays() {
@@ -1679,11 +1678,12 @@ public class DialogSpecifyTablesMicro extends DialogBase {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(panelParameters, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(scrollPaneTables, javax.swing.GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE)
+                .addComponent(scrollPaneTables, javax.swing.GroupLayout.DEFAULT_SIZE, 102, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(buttonComputeTables)
-                    .addComponent(buttonCancel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(buttonComputeTables, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(buttonCancel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         panelExplanatoryVariables.getAccessibleContext().setAccessibleName("Explanatory variables");
@@ -1949,10 +1949,11 @@ public class DialogSpecifyTablesMicro extends DialogBase {
             return false;
         }
         
+       
         // Alleen de freq-regel bij freq-tabellen!!!!
         if (checkBoxDominanceRule.isSelected() || checkBoxPqRule.isSelected() || checkBoxRequestRule.isSelected() || checkBoxZeroUnsafe.isSelected()) {
             if (responseVariable == freqVar) {
-                JOptionPane.showMessageDialog(this, "Only the frequency rule is allowed, when a freq-table is requested");
+                JOptionPane.showMessageDialog(this, "When using response variable <freq>, dominance rule and p%-rule are not allowed");
                 return false;
             }
         }

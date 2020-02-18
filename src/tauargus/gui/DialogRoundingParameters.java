@@ -17,15 +17,12 @@
 
 package tauargus.gui;
 
+import argus.utils.StrUtils;
 import javax.swing.JOptionPane;
 import tauargus.extern.dataengine.TauArgus;
 import tauargus.model.Application;
-//import tauargus.model.ArgusException;
-//import tauargus.model.Metadata;
 import tauargus.model.TableSet;
 import tauargus.model.Variable;
-//import tauargus.service.TableService;
-import argus.utils.StrUtils;
 import tauargus.utils.TauArgusUtils;
 
 public class DialogRoundingParameters extends DialogBase {

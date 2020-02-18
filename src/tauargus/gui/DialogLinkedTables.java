@@ -29,11 +29,10 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import tauargus.model.Application;
 import tauargus.model.ArgusException;
-//import tauargus.model.GHMiter;
+import tauargus.model.LinkedTables;
 import tauargus.model.TableSet;
 import tauargus.model.Variable;
 import tauargus.service.TableService;
-import tauargus.model.LinkedTables;
 
 /**
  * Controls the linked tables procedure, both the modular version as well as the hypercube version.
@@ -422,7 +421,7 @@ public class DialogLinkedTables extends DialogBase {
                Info.addLabel("Overview of the inconsistency errors");
                try{
                   Info.addTextFile(Application.getTempFile("inconsistent.txt"));}
-               catch (ArgusException ex1){};
+               catch (ArgusException ex1){}
                Info.setVisible(true);  
                hs = hs + "\nSolve the inconsistencies first";
              }
@@ -467,7 +466,7 @@ public class DialogLinkedTables extends DialogBase {
              Info.addLabel("Overview of the frozen cells");
              try{
                Info.addTextFile(Application.getTempFile("frozen.txt"));}
-             catch (ArgusException ex1){};
+             catch (ArgusException ex1){}
                     Info.setVisible(true);
               }
           }

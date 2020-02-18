@@ -19,29 +19,22 @@ package tauargus.gui;
 
 //import java.awt.image.ImageObserver;
 //import java.io.BufferedReader;
+import argus.utils.StrUtils;
+import argus.utils.SystemUtils;
 import java.io.BufferedWriter;
 import java.io.File;
-//import java.io.FileNotFoundException;
-//import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Date;
-//import java.util.List;
-//import javax.swing.filechooser.FileNameExtensionFilter;
-//import tauargus.utils.ExecUtils;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.commons.io.FilenameUtils;
 import tauargus.model.Application;
 import tauargus.model.ArgusException;
-//import tauargus.model.DataFilePair;
 import tauargus.model.Metadata;
 import tauargus.model.TableSet;
 import tauargus.model.Variable;
 import tauargus.service.TableService;
-import argus.utils.StrUtils;
-//import tauargus.utils.ExecUtils;
-import argus.utils.SystemUtils;
 import tauargus.utils.TauArgusUtils;
 
 /**
@@ -358,6 +351,20 @@ public class DialogWriteBatchFile extends DialogBase {
             case TableSet.SUP_MARGINAL: hs = ""; break;
             case TableSet.SUP_UWE: hs = ""; break;
             case TableSet.SUP_CTA: hs = ""; break;
+            case TableSet.SUP_CKM: hs = hs + "CKM(" + Integer.toString(t+1)+ ")";
+                                   if (!tableSet.respVar.isResponse()){ // Should be frequency table
+                                       hs = hs + " " + 
+                                               StrUtils.quote(metadata.getFilePath(tableSet.cellkeyVar.PTableFile));
+                                   }
+                                   else{
+                                       hs = hs + " " + 
+                                               StrUtils.quote(metadata.getFilePath(tableSet.cellkeyVar.PTableFileCont)) + 
+                                               " | " + 
+                                               StrUtils.quote(metadata.getFilePath(tableSet.cellkeyVar.PTableFileSep)) +
+                                               " | " +
+                                               ((tableSet.respVar.muC > 0) ? Double.toString(tableSet.respVar.muC) : "");
+                                   }
+                                   break;
             }
             if(!hs.equals("")){batch.write(hs); batch.newLine();}
           }

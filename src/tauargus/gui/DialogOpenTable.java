@@ -19,7 +19,6 @@ package tauargus.gui;
 
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-//import static tauargus.gui.DialogOpenMicrodata.APPROVE_OPTION;
 import tauargus.model.DataFilePair;
 import tauargus.utils.TauArgusUtils;
 

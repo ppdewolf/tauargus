@@ -27,7 +27,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
-//import tauargus.model.Application;
 import tauargus.model.OptiSuppress;
 import tauargus.utils.TauArgusUtils;
 
