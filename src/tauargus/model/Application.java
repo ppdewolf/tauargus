@@ -17,32 +17,26 @@
 
 package tauargus.model;
 
-import java.awt.*;
+import argus.model.ArgusException;
+import argus.utils.SystemUtils;
+import com.ibm.statistics.util.Utility;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.SplashScreen;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-//import java.util.Locale;
 import java.util.logging.Logger;
-//import java.util.prefs.Preferences;
+import javax.swing.JOptionPane;
 import org.apache.commons.io.FilenameUtils;
 import tauargus.extern.dataengine.TauArgus;
 import tauargus.extern.tauhitas.HiTaSCtrl;
-//import tauargus.extern.rounder.Rounder;
 import tauargus.extern.taurounder.RounderCtrl;
 import tauargus.gui.FrameInfo;
 import tauargus.gui.FrameMain;
 import tauargus.service.TableService;
-import argus.utils.SystemUtils;
-import argus.model.ArgusException;
-import tauargus.model.batch;
-import com.ibm.statistics.util.Utility;
-import java.io.File;
-import java.io.IOException;
-import javax.swing.JOptionPane;
-//import tauargus.utils.StrUtils;
 
 public class Application {
 
@@ -50,9 +44,9 @@ public class Application {
 
     // Version info
     public static final int MAJOR = 4;
-    public static final int MINOR = 1;
-    public static final String REVISION = "7";
-    public static final int BUILD = 4;
+    public static final int MINOR = 2;
+    public static final String REVISION = "0";
+    public static final int BUILD = 1;
     
     // Error codes returned by functions in TauArgusJava dll
     public static final int ERR_CODENOTINCODELIST = 1017;
@@ -141,7 +135,7 @@ public class Application {
     static{
         try{
             ClassPathHack.addFile(getSpssVersion() + "\\spssjavaplugin.jar");
-        }catch (IOException ex){System.out.print(ex.toString());};
+        }catch (IOException ex){System.out.print(ex.toString());}
     }
         
     //private static final SpssUtilsTau spssUtils = new SpssUtilsTau();
@@ -452,7 +446,7 @@ public class Application {
         //catch (IOException ex){};
         //manualPath = manualPath +"/tauManual.pdf";
         try{manualPath = manual.getPath();}
-        catch (Exception ex){};
+        catch (Exception ex){}
         
         SystemUtils.setRegistryRoot("tauargus/");
         batch = BATCH_NOBATCH;

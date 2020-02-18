@@ -18,6 +18,9 @@
 package tauargus.model;
 
 //import argus.model.SpssVariable;
+import argus.utils.StrUtils;
+import argus.utils.SystemUtils;
+import argus.utils.Tokenizer;
 import java.beans.PropertyChangeSupport;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -35,12 +38,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-//import tauargus.utils.StrUtils;
-import argus.utils.StrUtils;
-//import tauargus.utils.ExecUtils;
-import argus.utils.SystemUtils;
-//import tauargus.utils.Tokenizer;
-import argus.utils.Tokenizer;
 import static tauargus.utils.TauArgusUtils.ShowWarningMessage;
 
 public class Metadata implements Cloneable {
@@ -60,11 +57,9 @@ public class Metadata implements Cloneable {
     public int dataFileType = DATA_FILE_TYPE_FIXED;
     public String metaFile = "";
     public String dataFile = "";
-    public String mataPath = "";
+    //public String mataPath = ""; // Never used????
     public String fieldSeparator = ";";
 
-// Anco 1.6
-//    public List<Variable> variables = new ArrayList<>();
     public List<Variable> variables = new ArrayList<>();
     public String safeStatus = "S";
     public String unSafeStatus = "U";
@@ -84,7 +79,7 @@ public class Metadata implements Cloneable {
         }
         return false;
     }
-
+    
     public int count(Type type) {
         int n = 0;
         for (Variable variable : variables) {
@@ -164,6 +159,10 @@ public class Metadata implements Cloneable {
     public boolean containsStatusVariable() {
         return contains(Type.STATUS);
     }
+    
+    public boolean containsRecordKey(){
+        return contains(Type.RECORD_KEY);
+    }
 
     public boolean containsDistanceFunction() {
         for (Variable variable : variables) {
@@ -232,9 +231,10 @@ public class Metadata implements Cloneable {
    */  
 
     public void readMicroMetadata(BufferedReader reader) throws ArgusException {
+        boolean CKMspecified = false;
         dataOrigin = DATA_ORIGIN_MICRO;
         dataFileType = DATA_FILE_TYPE_FIXED;
-        String hs = "";
+        String hs; // = "";
         Variable variable = null;
         Tokenizer tokenizer = new Tokenizer(reader);
         while (tokenizer.nextLine() != null) {
@@ -359,6 +359,145 @@ public class Metadata implements Cloneable {
                         break;
                     case "<TRUNCABLE>":
                         variable.truncatable = true;
+                        break;
+                    case "<RECORDKEY>":
+                        if (this.containsRecordKey()){
+                            throw new ArgusException("Only one <RECORDKEY> variable is allowed. Please check your .rda-file.");
+                        }
+                        hs = tokenizer.nextToken();
+                        if (!hs.equals("")) {
+                            throw new ArgusException("Unknown token (" + hs + ") in line " + tokenizer.getLineNumber() + " after keyword <RECORDKEY>.");
+                        }
+                        variable.type = Type.RECORD_KEY;
+                        break;
+                    case "<PFILE_FREQ>":
+                    case "<PFILE>":
+                        variable.PTableFile = tokenizer.nextToken();
+                        break;
+                    case "<PFILE_CONT>":
+                        variable.PTableFileCont = tokenizer.nextToken();
+                        break;
+                    case "<PFILE_SEP>":
+                        variable.PTableFileSep = tokenizer.nextToken();
+                        break;
+                    case "<CKM>":
+                        if (!variable.isResponse()) throw new ArgusException("<CKM> tag only allowed for numeric variables.");
+                        hs = tokenizer.nextField("(").toUpperCase();
+                        CKMspecified = true;
+                        switch(hs){
+                            case "N":
+                                CKMspecified = false;
+                            case "M":
+                            case "D":
+                            case "V":
+                                variable.CKMType=hs;
+                                break;
+                            case "T":
+                                variable.CKMType=hs;
+                                try{
+                                    variable.CKMTopK = Integer.parseInt(tokenizer.nextField(")"));
+                                }
+                                catch (NumberFormatException ex){
+                                    throw new ArgusException("topK in <CKM> T(topK) should be integer\n" + ex.getMessage());
+                                }
+                                break;
+                            default:
+                                throw new ArgusException("Unknown type <CKM> " + hs + " for variable " + variable.name);
+                        }
+                        if (CKMspecified) {
+                            variable.CKMepsilon = new double[variable.CKMTopK];
+                            variable.CKMepsilon[0] = 1.0;
+                        }
+                        break;
+                    case "<INCLUDEZEROS>":
+                        if (!CKMspecified) throw new ArgusException("<INCLUDEZEROS> only allowed after <CKM> is specified.");
+                        if (variable.isResponse()) {
+                                variable.zerosincellkey = tokenizer.nextToken().equals("Y");
+                        }
+                        else{
+                            throw new ArgusException("<INCLUDEZEROS> only allowed for numeric variables.");
+                        }
+                        break;
+                    case "<PARITY>":
+                        if (!CKMspecified) throw new ArgusException("<PARITY> only allowed after <CKM> is specified.");
+                        if (variable.isResponse()) {
+                                variable.CKMapply_even_odd = ("Y".equals(tokenizer.nextToken()));
+                        }
+                        else{
+                            throw new ArgusException("<INCLUDEZEROS> only allowed for numeric variables.");
+                        }
+                        break;
+                    case "<SCALING>": // Can much nicer and needs exception cheking!
+                        if (!CKMspecified) throw new ArgusException("<SCALING> only allowed after <CKM> is specified.");
+                        if (!variable.isResponse()) throw new ArgusException("<SCALING> tag only allowed for numeric variables.");
+                        hs = tokenizer.nextField("(").toUpperCase();
+                        if (!(hs.equals("N") || hs.equals("F"))){
+                            throw new ArgusException("Unknown type <SCALING> " + hs + " for variable " + variable.name);
+                        }
+                        else{
+                            try{  
+                                variable.CKMscaling = hs;
+                                int T = variable.CKMTopK;
+
+                                if (variable.CKMscaling.equals("F")){
+                                    hs = tokenizer.nextField(",");
+                                    variable.CKMsigma0 = Double.parseDouble(hs);
+                                    hs = tokenizer.nextField(",");
+                                    variable.CKMsigma1 = Double.parseDouble(hs);
+                                    hs = tokenizer.nextField(",");
+                                    variable.CKMxstar = Double.parseDouble(hs);
+                                    if (T>=2){
+                                        hs = tokenizer.nextField(",");
+                                        variable.CKMq = Double.parseDouble(hs);
+                                        for (int i=2; i<T;i++){
+                                            hs = tokenizer.nextField(",");
+                                            variable.CKMepsilon[i-1] = Double.parseDouble(hs);
+                                        }
+                                        hs = tokenizer.nextField(")");
+                                        variable.CKMepsilon[T-1] = Double.parseDouble(hs);
+                                    }
+                                    else{
+                                        hs = tokenizer.nextField(")");
+                                        variable.CKMq = Double.parseDouble(hs);
+                                    }
+                                }
+                                if (variable.CKMscaling.equals("N")){
+                                    if (T>=2){
+                                        hs = tokenizer.nextField(",");
+                                        variable.CKMsigma1 = Double.parseDouble(hs);
+                                        for (int i=2; i<T;i++){
+                                            hs = tokenizer.nextField(",");
+                                            variable.CKMepsilon[i-1] = Double.parseDouble(hs);
+                                        }   
+                                        hs = tokenizer.nextField(")");
+                                        variable.CKMepsilon[T-1] = Double.parseDouble(hs);
+                                    }
+                                    else{
+                                        hs = tokenizer.nextField(")");
+                                        variable.CKMsigma1 = Double.parseDouble(hs);
+                                    }
+                                }
+                            }
+                            catch(Exception ex){
+                                throw new ArgusException("Exception when reading <SCALING> parameters:\n"+ex.getMessage()+
+                                        "\nCheck number of parameters\nCheck number of epsilons related to TopK\nCheck format double/integer");
+                            }
+                        }
+                        break;
+                    case "<SEPARATION>":
+                        if (!CKMspecified) throw new ArgusException("<SEPARATION> only allowed after <CKM> is specified.");
+                        if (!variable.isResponse()) throw new ArgusException("<SEPARATION> tag only allowed for numeric variables.");
+                        //hs = tokenizer.nextField("(").toUpperCase();
+                        //variable.CKMseparation = hs.equals("Y");
+                        //if (variable.CKMseparation){
+                        //  try{
+                        //        variable.CKMm1squared = Double.parseDouble(tokenizer.nextField(")"));
+                        //    }
+                        //    catch (NumberFormatException ex){
+                        //        throw new ArgusException("value in <SEPARATION> Y(value) should be double\n" + ex.getMessage());
+                        //    }
+                        //}
+                        variable.CKMseparation = tokenizer.nextToken().equals("Y");
                         break;
                     default:
                         throw new ArgusException("Unknown keyword (" + token + ") in line " + tokenizer.getLineNumber());
@@ -625,6 +764,38 @@ public class Metadata implements Cloneable {
                 }
             case RESPONSE:
                 writer.println("    <NUMERIC>");
+                if (!variable.CKMType.equals("N")){ // This means that CKM information for magnitude tables should/could be available
+                    writer.print("    <CKM> " + variable.CKMType);
+                    if (variable.CKMType.equals("T"))
+                        writer.println("("+variable.CKMTopK+")");
+                    writer.println("    <INCLUDEZEROS> " + (variable.zerosincellkey ? "Y" : "N"));
+                    writer.println("    <PARITY> " + (variable.CKMapply_even_odd ? "Y" : "N"));
+                    writer.print("    <SCALING> ");
+                    String hs;
+                    switch (variable.CKMscaling){
+                        case "F": hs = "F(";
+                                  hs += Double.toString(variable.CKMsigma0) + ",";
+                                  hs += Double.toString(variable.CKMsigma1) + ",";
+                                  hs += Double.toString(variable.CKMxstar) + ",";
+                                  hs += Double.toString(variable.CKMq);
+                                  for (int i=1; i<variable.CKMTopK; i++){
+                                      hs += "," + variable.CKMepsilon[i];
+                                  }
+                                  hs += ")";
+                                  writer.println(hs);
+                                  break;
+                        case "N": hs = "N(";
+                                  hs += Double.toString(variable.CKMsigma1) + ",";
+                                  for (int i=1; i<variable.CKMTopK; i++){
+                                      hs += "," + variable.CKMepsilon[i];
+                                  }
+                                  hs += ")";
+                                  writer.println(hs);
+                                  break;
+                        default: break;
+                    }
+                    writer.println("    <SEPARATION> " + (variable.CKMseparation ? "Y" : "N"));
+                }
                 break;
             case WEIGHT:
                 writer.println("    <WEIGHT>");
@@ -638,6 +809,21 @@ public class Metadata implements Cloneable {
                     writer.print(" " + StrUtils.quote(variable.requestCode[j]));
                 }
                 writer.println();
+                break;
+            case RECORD_KEY:
+                writer.println("    <RECORDKEY>");
+                String hs = variable.PTableFile;
+                if ( hs.indexOf("\\",0)>0 ||hs.indexOf(":",0)>0||hs.indexOf(":",0)>0){}
+                else { hs = variable.metadata.getFilePath(variable.PTableFile);}
+                writer.println("    <PFILE_FREQ> " + StrUtils.quote(hs));
+                hs = variable.PTableFileCont;
+                if ( hs.indexOf("\\",0)>0 ||hs.indexOf(":",0)>0||hs.indexOf(":",0)>0){}
+                else { hs = variable.metadata.getFilePath(variable.PTableFileCont);}
+                writer.println("    <PFILE_CONT> " + StrUtils.quote(hs));
+                hs = variable.PTableFileSep;
+                if ( hs.indexOf("\\",0)>0 ||hs.indexOf(":",0)>0||hs.indexOf(":",0)>0){}
+                else { hs = variable.metadata.getFilePath(variable.PTableFileSep);}
+                writer.println("    <PFILE_SEP> " + StrUtils.quote(hs));
                 break;
             case SHADOW:
                 writer.println("    <NUMERIC> <SHADOW>");
@@ -719,12 +905,16 @@ public class Metadata implements Cloneable {
 
     public void verify() throws ArgusException {
         boolean overlapFound = false; String overlapString = "";  
-          if (variables.isEmpty()) {
+        if (variables.isEmpty()) {
              throw new ArgusException("No variables have been specified.");
         }
 
         if (numberOfExplanatoryVariables() == 0) {
             throw new ArgusException("No explanatory variables found.");
+        }
+        
+        if (count(Type.RECORD_KEY) > 1) {
+            throw new ArgusException("More than one record key variable found.");
         }
         
         if (dataOrigin == DATA_ORIGIN_TABULAR) {
@@ -796,6 +986,20 @@ public class Metadata implements Cloneable {
                 if (variable.hierarchical == Variable.HIER_LEVELS) {
                     if (variable.hierLevelsSum == 0) {
                         throw new ArgusException("Sum of number of digits of hierarchical levels may not be zero for variable " + variable.name + ".");
+                    }
+                }
+            }
+            
+            if (variable.isResponse()){
+                if (!variable.CKMType.equals("N")){
+                    if (this.find(Type.RECORD_KEY) == null){
+                        throw new ArgusException("CKM specified for continuous variable " + variable.name + " without having a RecordKey specified.");
+                    }
+                    if (this.find(Type.RECORD_KEY).PTableFileCont.equals("")){
+                        throw new ArgusException("CKM specified for continuous variable " + variable.name + " without specification of ptable for continuous CKM.");
+                    }
+                    if (!(variable.CKMscaling.equals("F") || variable.CKMscaling.equals("N"))){
+                        throw new ArgusException("Scaling should be set for variable " + variable.name + " when CKM is allowed.");
                     }
                 }
             }
@@ -903,6 +1107,42 @@ public class Metadata implements Cloneable {
         }
         finally {writer.close();}
     }
+
+    public void writeCKMMetadata(String fileName, int NExpVar, Variable[] ExpVar, Variable RespVar, boolean addOrig, boolean addDiff, boolean addCellKey) throws IOException, ArgusException {
+        int dataFileType = DATA_FILE_TYPE_FREE;
+        int microTabularData = DATA_ORIGIN_TABULAR;
+
+        FileWriter fw = null;
+        BufferedWriter bw = null;
+        PrintWriter writer = null;
+        try {
+            fw = new FileWriter(fileName);
+            bw = new BufferedWriter(fw);
+            writer = new PrintWriter(bw);
+            writer.println("   <SEPARATOR> " + StrUtils.quote(";"));
+            for (int i = 0; i < NExpVar; i++) {
+                Variable variable = ExpVar[i];
+                writeVariable(dataFileType, microTabularData, fileName, writer, variable, Type.CATEGORICAL);
+            }
+
+            writeVariable(dataFileType, microTabularData, fileName, writer, RespVar, Type.RESPONSE);
+
+            if (addOrig){
+                writer.println("OrigVar");
+                writer.println("    <NUMERIC>");
+            }
+            if (addDiff){
+                writer.println("Difference");
+                writer.println("    <NUMERIC>");
+            }
+            if (addCellKey){
+                writer.println("CellKey");
+                writer.println("    <CELLKEY>");
+            }
+        }
+        finally {writer.close();}
+    }
+
     
     private void updateProgress(long Fread, long Flen, int LineNo, PropertyChangeSupport propertyChangeSupport) {
         if (LineNo % 100 == 0) {

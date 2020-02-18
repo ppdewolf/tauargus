@@ -17,26 +17,22 @@
 
 package tauargus.model;
 
-import java.io.BufferedWriter;
+import argus.utils.SystemUtils;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.FileReader;
-//import java.io.IOException;
+import java.io.FileWriter;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-//import javax.swing.JOptionPane;
 import tauargus.extern.dataengine.TauArgus;
 import tauargus.service.TableService;
 import tauargus.utils.ExecUtils;
 import tauargus.utils.TauArgusUtils;
-import argus.utils.SystemUtils;
-import java.util.ArrayList;
-//import tauargus.gui.DialogInfo;
-
 
 /**
  *
@@ -263,7 +259,7 @@ public class GHMiter {
          Hs = GetToken(Hs); Freq = Token;
          Hs = GetToken(Hs);  ValueSt = Token;
          Value = Double.parseDouble(ValueSt);
-         if( (Freq.equals("2") ) & (Value == 0) & (Stat.equals("1"))) {Freq = "0";};
+         if( (Freq.equals("2") ) & (Value == 0) & (Stat.equals("1"))) {Freq = "0";}
          if ( Freq.equals("1") & Stat.equals("1") ) { Freq = "2";}
          if ( Freq.equals("1") & Stat.equals("129") & !tableSet.ghMiterApplySingleton) {Freq = "2";} 
          Regel = AddLeadingSpaces(Stat,5) + 
@@ -302,7 +298,7 @@ public class GHMiter {
      String Hs; double CellResp, MinTVal;
      TableSet tableSet;
      if (!Linked) { t1 = tIndex; t2=tIndex;}
-             else { t1 = 0; t2= TableService.numberOfTables()-1; };
+             else { t1 = 0; t2= TableService.numberOfTables()-1; }
      P4 = 0;  P5 = 0;
      // ANCO nog een loopje over de tabellen voor linked
      for (int t=t1;t<=t2;t++){
@@ -415,7 +411,7 @@ public class GHMiter {
         Oke = TauArgusUtils.DeleteFile(Application.getTempFile("proto001"));
         Oke = TauArgusUtils.DeleteFile(Application.getTempFile("proto002"));
         Oke = TauArgusUtils.DeleteFile(Application.getTempFile("proto003"));
-        Oke = TauArgusUtils.DeleteFile(Application.getTempFile("ausgabe"));
+        Oke = TauArgusUtils.DeleteFile(Application.getTempFile("AUSGABE"));
         Oke = TauArgusUtils.DeleteFile(Application.getTempFile("Ft17f001"));
         Oke = TauArgusUtils.DeleteFile(Application.getTempFile("Ft14f001"));
         Oke = TauArgusUtils.DeleteFile(Application.getTempFile("Ft09file"));

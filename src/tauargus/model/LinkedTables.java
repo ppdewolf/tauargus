@@ -17,19 +17,18 @@
 
 package tauargus.model;
 
+import argus.utils.SystemUtils;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.util.ArrayList;
 import java.util.Date;
-//import javax.swing.JOptionPane;
-import tauargus.service.TableService;
-import tauargus.utils.TauArgusUtils;
 import tauargus.extern.dataengine.TauArgus;
 import tauargus.gui.DialogLinkedTables;
+import tauargus.service.TableService;
 import tauargus.utils.ExecUtils;
-import argus.utils.SystemUtils;
-import java.util.ArrayList;
+import tauargus.utils.TauArgusUtils;
 
 /**
  *
@@ -64,7 +63,7 @@ public class LinkedTables {
         String hs = ""; int i,j; TableSet tableSet0, tableSet;
         Date startDate = new Date();
         if (coverDim > 10){
-            throw new ArgusException ("The total number of explanatory variables for the Modular approach is 10");
+            throw new ArgusException ("The total number of explanatory variables for the Modular approach is 10+");
         }
         for (i=0;i<TableService.numberOfTables();i++){
             hs = hs + "\n"+ (i+1) + ": "+ TableService.getTableDescription(TableService.getTable(i));        } 
@@ -76,7 +75,7 @@ public class LinkedTables {
           tableSet = TableService.getTable(i);
           j = tableSet.expVar.size();
           if (j > 4) {
-              throw new ArgusException ("The max. dimension of the indivudual tables must not exceed 4");
+              throw new ArgusException ("The max. dimension of the individual tables must not exceed 4");
           }
           TableService.undoSuppress(i);
           tableSet.singletonSingletonCheck = tableSet0.singletonSingletonCheck; 
@@ -160,7 +159,7 @@ public class LinkedTables {
       for (int i=0;i<TableService.numberOfTables();i++){
         tableSet = TableService.getTable(i); 
         tableSet.suppressINFO = OptiSuppress.ReadHitasINFO("hitas.log");
-        tableSet.solverUsed = Application.solverSelected;;
+        tableSet.solverUsed = Application.solverSelected;
         int[][] aPrioryStatus = new int[5][2];
         if (TableSet.processAprioryFile(Application.getTempFile("temp"+i+".hst"), i, ";", true, false, false, aPrioryStatus)!=0){
              TableService.undoSuppress(i);
@@ -200,7 +199,7 @@ public class LinkedTables {
         // Then write the corresponding metadata file
         int i, j; TableSet tableSet; String regelOut;
         String[] codes = new String[coverDim];String [] regel = new String[1];
-      for (i=0;i<TableService.numberOfTables();i++){
+        for (i=0;i<TableService.numberOfTables();i++){
             tableSet = TableService.getTable(i);
             try{
             tableSet.write(Application.getTempFile("temp"+i+".tab"),
@@ -236,6 +235,7 @@ public class LinkedTables {
            j=coverSourceTab[i];  
            BufferedReader in = new BufferedReader(new FileReader(Application.getTempFile("temp"+j+".rda")));
             regelOut = in.readLine();
+            // This assumes that the name of a variable does not appear in any text before the definition of the variable
             while (regelOut.indexOf(coverVariablesName[i],0) == -1) {regelOut = in.readLine();}
             rda.write(regelOut); rda.newLine();
             regelOut = in.readLine();
