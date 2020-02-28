@@ -59,7 +59,7 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         super(parent, modal);
         initComponents();
         createComponentArrays();
-        loadDefaultsFromRegistry();
+       // loadDefaultsFromRegistry(); //Why load defaults here if it is done in ShowDialog as well?
         
         labelMSC.setVisible(Application.isAnco());
         textFieldMSC.setVisible(Application.isAnco());
@@ -2284,8 +2284,8 @@ public class DialogSpecifyTablesMicro extends DialogBase {
       textFieldDomHold2N.setText(SystemUtils.getRegString("sensitivityrules", "domn4", "0"));
       textFieldDomHold2K.setText(SystemUtils.getRegString("sensitivityrules", "dimk4", "0"));
       
-      //peep rule
-      checkBoxRequestRule.setSelected(SystemUtils.getRegBoolean("sensitivityrules", "peeprule", false));
+      //peep rule Only if requestvariable is present in data
+      checkBoxRequestRule.setSelected(this.metadata.containsRequestVariable() ? SystemUtils.getRegBoolean("sensitivityrules", "peeprule", false) : false);
       
       textFieldReqInd1.setText(SystemUtils.getRegString("sensitivityrules", "peepindk1", "0"));
       textFieldReqInd2.setText(SystemUtils.getRegString("sensitivityrules", "peepindk2", "0"));
@@ -2308,9 +2308,8 @@ public class DialogSpecifyTablesMicro extends DialogBase {
       textFieldlZeroUnsafeRange.setText(SystemUtils.getRegString("sensitivityrules", "zerorulerange", "10"));
 
       textFieldManualSafetyRange.setText(SystemUtils.getRegString("sensitivityrules", "manualrange", "10"));
-
-      
     }
+    
     private void saveDefaultsToRegistry(){    
      SystemUtils.putRegString("sensitivityrules", "pqp1",textFieldPqInd1P.getText());
      SystemUtils.putRegString("sensitivityrules", "pqq1",textFieldPqInd1Q.getText());
@@ -2374,10 +2373,6 @@ public class DialogSpecifyTablesMicro extends DialogBase {
       SystemUtils.putRegString("sensitivityrules", "zerorulerange", textFieldlZeroUnsafeRange.getText());
 
       SystemUtils.putRegString("sensitivityrules", "manualrange", textFieldManualSafetyRange.getText());
-
-
-     
-     
     }
 
     
