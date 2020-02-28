@@ -1,9 +1,9 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"  "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!DOCTYPE HTML>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script type="text/javascript">
 function showStats(data) {
 
-	var reponame = data[0].url.substring(data[0].url.indexOf("/sdcTools")+10,data[0].url.indexOf("/releases"));
+    var reponame = data[0].url.substring(data[0].url.indexOf("/sdcTools")+10,data[0].url.indexOf("/releases"));
     var html = '';
 	
     html += "<div class='row release'>" +
@@ -45,6 +45,19 @@ function showStats(data) {
 	$.getJSON("https://api.github.com/repos/sdcTools/sdctable/releases", showStats).fail(showStats);	
 </script>
 
+<script>
+$.getJSON( "ajax/test.json", function( data ) {
+  var items = [];
+  $.each( data, function( key, val ) {
+    items.push( "<li id='" + key + "'>" + val + "</li>" );
+  });
+ 
+  $( "<ul/>", {
+    "class": "my-new-list",
+    html: items.join( "" )
+  }).appendTo( "body" );
+});
+</script>
 
 <html>
 <style>
