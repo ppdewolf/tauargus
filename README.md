@@ -12,7 +12,3 @@ https://joinup.ec.europa.eu/software/page/eupl/licence-eupl
 
 This software is distributed on an "AS IS" basis without 
 warranties or conditions of any kind, either express or implied.
-
-
-For information on the number of downloads of releases (binaries) of SDC software from sdcTools on github
-<a href="https://htmlpreview.github.io/?https://github.com/ppdewolf/tauargus/blob/master/Test.html" target="_blank">click here</a>
