@@ -98,8 +98,9 @@ public class DialogTableSummary extends javax.swing.JDialog {
             case TableSet.SUP_CKM:      labelStatus.setText("<html>Protecetd by<br>Cell Key Method</html>");break;
             default:                    labelStatus.setText("Unknown"); break;
         }
-               
-        if (tableSet.suppressed == TableSet.SUP_CKM){
+        
+        // Currently CKM info only available for frequency count tables
+        if ((tableSet.suppressed == TableSet.SUP_CKM) && (tableSet.respVar.type == tauargus.model.Type.FREQUENCY )){
             jButtonMoreInfo.setVisible(true);
             setSummaryCKM(tableSet);
             InfoLossMeasures = tableSet.GetCKMInfoLoss();
@@ -111,7 +112,7 @@ public class DialogTableSummary extends javax.swing.JDialog {
         
         TableColumnResizer.adjustColumnPreferredWidths(tableExpVars, false);
         TableColumnResizer.adjustColumnPreferredWidths(tableSummary, false);
-        if (tableSet.suppressed == TableSet.SUP_CKM){
+        if ((tableSet.suppressed == TableSet.SUP_CKM) && (tableSet.respVar.type == tauargus.model.Type.FREQUENCY )){
             TableColumnResizer.FixColumnWidth(tableSummary.getColumnModel().getColumn(0), 40);
         }
 
