@@ -331,9 +331,11 @@ summary    : Empty ptable file now raises error (no crash anymore)
 
 above released in 4.2.0 build 1 (test version first)
 --------------------------------------------------------------
-
 date	   : Feb 28, 2020
 summary    : Small bug fix concerning request rule being selected even when disabled because of absence of request variable
 
 above released in 4.2.0 build 2 
 --------------------------------------------------------------
+date	   : Mar 4, 2020
+summary    : Small bug fix concerning SummaryDialog in case of CKM on magnitude table
+

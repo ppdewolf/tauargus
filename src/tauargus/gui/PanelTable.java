@@ -1987,7 +1987,6 @@ public class PanelTable extends javax.swing.JPanel {
                                     tableSet.nSecond+" cells have been suppressed\n"+
                                     tableSet.ghMiterMessage +
                                     StrUtils.timeToString(tableSet.processingTime) + " needed");
-                                //                              tableSet.suppressed = TableSet.SUP_GHMITER;
                                 if (argus.utils.TauArgusUtils.ExistFile(Application.getTempFile("frozen.txt"))){
                                     DialogInfo Info = new DialogInfo(getParentFrame(), true);
                                     Info.addLabel("Overview of the frozen cells");

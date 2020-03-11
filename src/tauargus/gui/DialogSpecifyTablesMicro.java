@@ -465,10 +465,11 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         tableSet.zeroUnsafe = checkBoxZeroUnsafe.isSelected();
 
         // Set dom rule, pq-rule and request rule parameters...
-        int j = 4;
-        if (!tableSet.holding) {
-            j = 2;
-        }
+        //int j = 4;
+        //if (!tableSet.holding) {
+        //    j = 2;
+        //}
+        int j = (tableSet.holding && tableSet.metadata.containsHoldingVariable()) ? 4 : 2;
         for (int i=0; i<j; i++) {
 // if-tests are not needed: usage of rule is controlled by boolean when calling SetTableSafety-routine (from tauargus.extern.dataengine.TauArgus)
             //if (tableSet.domRule) {
@@ -490,7 +491,8 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         }
 
         // Set request rule (remaining) and frequency rule parameter...
-        for (int i=0; i<2; i++) {
+        j = (tableSet.holding && tableSet.metadata.containsHoldingVariable()) ? 2 : 1;
+        for (int i=0; i<j; i++) {
             tableSet.piepMarge[i] = Integer.parseInt(textFieldReqRange[i].getText());
             tableSet.piepMinFreq[i] = Integer.parseInt(textFieldReqFreq[i].getText());
 
@@ -1982,7 +1984,7 @@ public class DialogSpecifyTablesMicro extends DialogBase {
                 textFieldDomN[0].requestFocusInWindow();
                 return false;
             }
-            if (checkBoxUseHoldingsInfo.isSelected()) {
+            if (metadata.containsHoldingVariable() && checkBoxUseHoldingsInfo.isSelected()) {
                 if (Integer.parseInt(textFieldDomN[2].getText()) == 0 && Integer.parseInt(textFieldDomN[3].getText()) > 0) {
                     JOptionPane.showMessageDialog(this, "illegal value for the first holding dominance rule");
                     tabbedPaneRules.setSelectedIndex(0);
@@ -2018,13 +2020,13 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         }
         if (checkBoxPqRule.isSelected()) {
             int j = 2;
-            if (Integer.parseInt(textFieldPqP[0].getText()) == 0 && Integer.parseInt(textFieldPqP[0].getText()) > 0) {
+            if (Integer.parseInt(textFieldPqP[0].getText()) == 0 && Integer.parseInt(textFieldPqP[1].getText()) > 0) {
                 JOptionPane.showMessageDialog(this, "The first P-rule should be specified too");
                 tabbedPaneRules.setSelectedIndex(1);
                 textFieldPqP[0].requestFocusInWindow();
                 return false;
             }
-            if (checkBoxUseHoldingsInfo.isSelected()) {
+            if (metadata.containsHoldingVariable() && checkBoxUseHoldingsInfo.isSelected()) {
                 if (Integer.parseInt(textFieldPqP[2].getText()) == 0 && Integer.parseInt(textFieldPqP[3].getText()) > 0) {
                     JOptionPane.showMessageDialog(this, "Illegal value for first P-Holding-rule");
                     tabbedPaneRules.setSelectedIndex(1);
@@ -2051,7 +2053,8 @@ public class DialogSpecifyTablesMicro extends DialogBase {
             }
         }
         if (checkBoxMinimumFrequency.isSelected()) {
-            for (int i=0; i<2; i++) {
+            int maxi = (metadata.containsHoldingVariable() && checkBoxUseHoldingsInfo.isSelected()) ? 2 : 1;
+            for (int i=0; i<maxi; i++) {
                 if (Integer.parseInt(textFieldMinFreq[i].getText()) < 0) {
                     JOptionPane.showMessageDialog(this, "Illegal value for min. frequency: " + textFieldMinFreq[i].getText() + "\nMust be positive");
                     textFieldMinFreq[i].requestFocusInWindow();
