@@ -28,6 +28,8 @@ public enum SuppressionMethod {
     CTA("CTA_solution"),
     CELLKEY("Cell Key Method");
 
+    private final String description;
+    
     SuppressionMethod(String description) {
         this.description = description;
     }
@@ -61,5 +63,4 @@ public enum SuppressionMethod {
         return this == HITAS || this == OPTIMAL || this == GHMITER;
     }
 
-    private final String description;
 }

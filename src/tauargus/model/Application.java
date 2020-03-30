@@ -88,7 +88,7 @@ public class Application {
     public static int solverSelected;
     public static int generalMaxHitasTime;
     public static boolean SaveDebugHiTaS = false;
-    public static FrameInfo windowInfo; 
+    public static FrameInfo windowInfo = new FrameInfo();
     public static boolean windowInfoIsOpen = false;
     //private static String manualPath = "C:/Users/Gebruiker/Desktop/MUmanual4.3.pdf";
     private static String manualPath;
@@ -278,13 +278,12 @@ public class Application {
    
     public static void openInfoWindow(boolean openen){
         if (openen) {
-         windowInfo = new FrameInfo();    
+         //windowInfo = new FrameInfo(); 
          windowInfo.setVisible(true);
          windowInfoIsOpen = true; 
         } else { 
          windowInfo.setVisible(false);
-         windowInfoIsOpen = false; 
-        
+         windowInfoIsOpen = false;
        }
     }
 
@@ -301,6 +300,7 @@ public class Application {
         metadatas.add(metadata);
     }
 
+/* Never used?????
     public static Metadata removeMetadata(int index) {
         Metadata metadata = metadatas.get(index);
         metadatas.remove(index);
@@ -309,7 +309,7 @@ public class Application {
         }
         return metadata;
     }
-
+*/
     public static void replaceMetadata(Metadata oldMetadata, Metadata metadata) {
         metadatas.set(oldMetadata.index, metadata);
         metadata.index = oldMetadata.index;

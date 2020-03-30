@@ -78,33 +78,33 @@ public class OptiSuppress {
     private static BufferedWriter out;
     private static final Logger logger = Logger.getLogger(OptiSuppress.class.getName());
     
-    static DialogStopTime dialog = new DialogStopTime(null,true);
-    static DialogStopTime rdialog = new DialogStopTime(null,true);
+//    static DialogStopTime dialog = new DialogStopTime(null,true);
+//    static DialogStopTime rdialog = new DialogStopTime(null,true);
     
-    static ICallback jCallback = new ICallback(){
-            @Override
-            public int SetStopTime(){
-                dialog.SetUB(UB);
-                dialog.SetLB(LB);
-                dialog.SetDiff(Diff);
-                dialog.SetTimeSoFar(TimeSoFar);
-                dialog.SetNSuppressed(nSuppressed);
-                dialog.setVisible(true);
-                return dialog.AddTime;
-            }
-    };
+//    static ICallback jCallback = new ICallback(){
+//            @Override
+//            public int SetStopTime(){
+//                dialog.SetUB(UB);
+//                dialog.SetLB(LB);
+//                dialog.SetDiff(Diff);
+//                dialog.SetTimeSoFar(TimeSoFar);
+//                dialog.SetNSuppressed(nSuppressed);
+//                dialog.setVisible(true);
+//                return dialog.AddTime;
+//            }
+//    };
     
-    static RCallback jRCallback = new RCallback(){
-            @Override
-            public int SetExtraTime(){
-                rdialog.HideForRounder();
-                rdialog.SetUB(DUB);
-                rdialog.SetLB(DLB);
-                rdialog.SetDiff(100.0*(DUB-DLB)/DLB);
-                rdialog.setVisible(true);
-                return rdialog.AddTime;
-            }
-    };
+//    static RCallback jRCallback = new RCallback(){
+//            @Override
+//            public int SetExtraTime(){
+//                rdialog.HideForRounder();
+//                rdialog.SetUB(DUB);
+//                rdialog.SetLB(DLB);
+//                rdialog.SetDiff(100.0*(DUB-DLB)/DLB);
+//                rdialog.setVisible(true);
+//                return rdialog.AddTime;
+//            }
+//    };
         
     public static void loadJJParamFromRegistry(){
       String hs;
@@ -1045,6 +1045,20 @@ public class OptiSuppress {
     
 //    public static void runRounder(TableSet tableSet) throws ArgusException, IOException{
     public static void runRounder(TableSet tableSet, final PropertyChangeListener propertyChangeListener) throws ArgusException, IOException{
+        DialogStopTime rdialog = new DialogStopTime(null,true);
+        RCallback jRCallback = new RCallback(){
+            @Override
+            public int SetExtraTime(){
+                rdialog.HideForRounder();
+                rdialog.SetUB(DUB);
+                rdialog.SetLB(DLB);
+                rdialog.SetDiff(100.0*(DUB-DLB)/DLB);
+                rdialog.setVisible(true);
+                return rdialog.AddTime;
+            }
+        };
+
+        
         int i, j, j1, nPart=0; 
         String solutionString, hs, xs, solverName, LicenceFile;
         int solutionType, maxRoundTime, result;
@@ -1249,8 +1263,12 @@ public class OptiSuppress {
            SystemUtils.writeLogbook("End of the rounding procedure");
             
                 
-        } catch(Exception ex){ throw new ArgusException("Error in the rounding procedure\n" + ex.getMessage());
-            
+        } catch(Exception ex){ 
+            throw new ArgusException("Error in the rounding procedure\n" + ex.getMessage());
+        }
+        finally{ // cleanup
+            rdialog.dispose();
+            jRCallback.delete();
         }
  
     } 
@@ -1503,6 +1521,20 @@ public class OptiSuppress {
     }
 
     public static void runOptimal(TableSet tableSet, final PropertyChangeListener propertyChangeListener, Boolean inverseWeight, Boolean externalJJFile, int maxTime) throws ArgusException, FileNotFoundException, IOException{
+        DialogStopTime dialog = new DialogStopTime(null,true);    
+        ICallback jCallback = new ICallback(){
+            @Override
+            public int SetStopTime(){
+                dialog.SetUB(UB);
+                dialog.SetLB(LB);
+                dialog.SetDiff(Diff);
+                dialog.SetTimeSoFar(TimeSoFar);
+                dialog.SetNSuppressed(nSuppressed);
+                dialog.setVisible(true);
+                return dialog.AddTime;
+            }
+        };
+
         int i,result; double apBound = 0.5; String hs;
         int[] nSecondary = new int[1]; int maxTimeAllowed;
         // First check for the max. dimension of the table. 
@@ -1605,6 +1637,10 @@ public class OptiSuppress {
         } 
         catch (IOException ex){
             throw new ArgusException("An error occured while processing the output of Optimal");
+        }
+        finally{ // cleanup
+            dialog.dispose();
+            jCallback.delete();
         }
         if (externalJJFile){return;}
         result = tauArgus.SetSecondaryJJFORMAT(tableSet.index, Application.getTempFile("JJ2.OUT"), false, nSecondary);
@@ -1711,7 +1747,6 @@ public class OptiSuppress {
         int result;
         Variable var = tableSet.respVar;
 
-        //JOptionPane.showMessageDialog(null,"variable "+var.name+" CKMType "+var.CKMType+" CKMTopK "+var.CKMTopK);
         if (var.CKMseparation){ 
             result = tauArgus.SetCellKeyValuesCont(tableSet.index, tableSet.cellkeyVar.metadata.getFilePath(PTableFileCont), 
                         tableSet.cellkeyVar.metadata.getFilePath(PTableFileSep), var.CKMType, var.CKMTopK,

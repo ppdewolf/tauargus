@@ -62,10 +62,10 @@ public class DialogSpecifyMetadata extends DialogBase {
             logger.log(Level.SEVERE, null, ex);
         }
         i=0;
-       switch (metadata.dataFileType){
-         case Metadata.DATA_FILE_TYPE_FIXED:i=0; break; 
-         case Metadata.DATA_FILE_TYPE_FREE: i=1; break;
-         case Metadata.DATA_FILE_TYPE_SPSS: i=2; break; 
+        switch (metadata.dataFileType){
+            case Metadata.DATA_FILE_TYPE_FIXED:i=0; break; 
+            case Metadata.DATA_FILE_TYPE_FREE: i=1; break;
+            case Metadata.DATA_FILE_TYPE_SPSS: i=2; break; 
         }
         comboBoxFormat.setSelectedIndex(i);
         textFieldSeparator.setText(metadata.fieldSeparator);
@@ -79,11 +79,17 @@ public class DialogSpecifyMetadata extends DialogBase {
         if (variableListModel.getSize() > 0) {
             listVariables.setSelectedIndex(0);
         }
+        
         calculateButtonStates();
         panelEditVariable.setMetadata(metadata);
         panelEditVariable.setDataType(metadata.dataFileType);
         panelEditVariable.setDataOrigin(metadata.dataOrigin);
-        panelEditVariable.setVisible(listVariables.getSelectedValue() != null);
+
+        // If start with empty rda-file, show minimum needed from panelEditvariable
+        // with disabled fields and buttons; only enable the "New"-button
+        if (listVariables.getSelectedValue() == null){
+            panelEditVariable.panelSetEnabled(false);
+        }
         pack();
         setLocationRelativeTo(this.getParent());
         setVisible(true);
@@ -108,7 +114,7 @@ public class DialogSpecifyMetadata extends DialogBase {
         textFieldSeparator = new javax.swing.JTextField();
         scrollPane = new javax.swing.JScrollPane();
         listVariables = new javax.swing.JList<>();
-        buttonAdd = new javax.swing.JButton();
+        buttonNew = new javax.swing.JButton();
         buttonRemove = new javax.swing.JButton();
         buttonMoveUp = new javax.swing.JButton();
         buttonMoveDown = new javax.swing.JButton();
@@ -123,7 +129,6 @@ public class DialogSpecifyMetadata extends DialogBase {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Specify Metadata");
         setModalityType(java.awt.Dialog.ModalityType.APPLICATION_MODAL);
-        setPreferredSize(null);
         setResizable(false);
 
         panelEditVariable.setMaximumSize(new java.awt.Dimension(32769, 32769));
@@ -165,10 +170,10 @@ public class DialogSpecifyMetadata extends DialogBase {
         });
         scrollPane.setViewportView(listVariables);
 
-        buttonAdd.setText("Add");
-        buttonAdd.addActionListener(new java.awt.event.ActionListener() {
+        buttonNew.setText("New");
+        buttonNew.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonAddActionPerformed(evt);
+                buttonNewActionPerformed(evt);
             }
         });
 
@@ -216,7 +221,7 @@ public class DialogSpecifyMetadata extends DialogBase {
                     .addComponent(buttonMoveUp, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(buttonMoveDown, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(buttonRemove, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(buttonAdd, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(buttonNew, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jButtonGetSPSSMeta, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(8, 8, 8))
         );
@@ -229,7 +234,7 @@ public class DialogSpecifyMetadata extends DialogBase {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panelEditLayout.createSequentialGroup()
-                        .addComponent(buttonAdd)
+                        .addComponent(buttonNew)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(buttonRemove)
                         .addGap(18, 18, 18)
@@ -297,7 +302,7 @@ public class DialogSpecifyMetadata extends DialogBase {
     private void buttonOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonOKActionPerformed
         // Trigger a listvalue change so last edited variable data will be stored
         listVariables.clearSelection();
-
+        
         switch (comboBoxFormat.getSelectedIndex()){
             case 0: metadata.dataFileType  = Metadata.DATA_FILE_TYPE_FIXED;
                     break;
@@ -366,19 +371,19 @@ public class DialogSpecifyMetadata extends DialogBase {
             Application.replaceMetadata(oldMetadata, metadata);
             TableService.clearTables(); // Make sure that the "old" tables are no longer available because the metadata has changed
         }
-        setVisible(false);
         returnValue = APPROVE_OPTION;
+        setVisible(false);
+        dispose();
     }//GEN-LAST:event_buttonOKActionPerformed
 
     private void buttonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCancelActionPerformed
+        returnValue = CANCEL_OPTION;
         setVisible(false);
+        dispose(); // free memory of this dialog
     }//GEN-LAST:event_buttonCancelActionPerformed
 
-    private void buttonAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonAddActionPerformed
+    private void buttonNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonNewActionPerformed
         int selectedIndex = listVariables.getSelectedIndex();
-        if (selectedIndex == -1) {
-            selectedIndex = 0;
-        }
         Variable variable = new Variable(metadata);
         variable.name = "New";
         variable.bPos = 1;
@@ -387,9 +392,11 @@ public class DialogSpecifyMetadata extends DialogBase {
         for (int i=0; i<Variable.MAX_NUMBER_OF_MISSINGS; i++) {
             variable.missing[i] = "";
         }
-        variableListModel.add(selectedIndex, variable);
-        listVariables.setSelectedIndex(selectedIndex);
-    }//GEN-LAST:event_buttonAddActionPerformed
+        variableListModel.add(selectedIndex + 1, variable);
+        listVariables.setSelectedIndex(selectedIndex + 1);
+        listVariables.ensureIndexIsVisible(selectedIndex + 1);
+    }//GEN-LAST:event_buttonNewActionPerformed
+    
     public void SetSpecificElement(Variable variable){
        int index = listVariables.getSelectedIndex(); 
        if (index != -1){ 
@@ -408,6 +415,7 @@ public class DialogSpecifyMetadata extends DialogBase {
             listVariables.setSelectedIndex(selectedIndex + 1);
         }
         variableListModel.remove(selectedIndex);
+        listVariables.ensureIndexIsVisible(selectedIndex + 1);
         calculateButtonStates();
     }//GEN-LAST:event_buttonRemoveActionPerformed
 
@@ -529,13 +537,13 @@ public class DialogSpecifyMetadata extends DialogBase {
         int selectedIndex = listVariables.getSelectedIndex();
         if (comboBoxFormat.getSelectedIndex() == 2){ //SPSS
             buttonRemove.setEnabled(false);
-            buttonAdd.setEnabled(false);
+            buttonNew.setEnabled(false);
             buttonMoveUp.setEnabled(false);
             buttonMoveDown.setEnabled(false);                      
         } else
         {    
             buttonRemove.setEnabled(selectedIndex != -1);
-            buttonAdd.setEnabled(true);
+            buttonNew.setEnabled(true);
             buttonMoveUp.setEnabled(selectedIndex > 0);
             buttonMoveDown.setEnabled((selectedIndex != -1) && (selectedIndex < variableListModel.getSize() - 1));
         }
@@ -548,10 +556,10 @@ public class DialogSpecifyMetadata extends DialogBase {
     private int returnValue = CANCEL_OPTION;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton buttonAdd;
     private javax.swing.JButton buttonCancel;
     private javax.swing.JButton buttonMoveDown;
     private javax.swing.JButton buttonMoveUp;
+    private javax.swing.JButton buttonNew;
     private javax.swing.JButton buttonOK;
     private javax.swing.JButton buttonRemove;
     private javax.swing.JComboBox comboBoxFormat;

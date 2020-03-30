@@ -183,25 +183,9 @@ public class DialogReadApriori extends DialogBase {
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttonOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonOKActionPerformed
-        
-//           public static int processAprioryFile(String fileName, int tableNumber, String separator, 
-//                                     boolean ignoreError, boolean expandBogus, boolean report, int[][] aPrioryStatus) throws ArgusException{
-
-        
-        
         TableSet currentTable = TableService.getTable(apTableNumber); // is 0 altijd de current table ???
         int[][] aPrioryStatus = new int[10][2];///check: is OK, 1e index = 5 waardes, 2e index slechts 2
-/*
-   if (TableService.numberOfTables() > 1){
-           JOptionPane.showMessageDialog(this,"Apriori is not yet possible when multiple tables are active./n Sorry");
-           returnValue =  CANCEL_OPTION;
-           return;
-       }  
-*/ 
-        
-// Maar even de oude versie van Robert        
-//   public static int processAprioryFile(String fileName, int tableNumber, String separator,
-//                                     boolean ignoreError, boolean expandBogus, boolean report, int[][] aPrioryStatus) throws ArgusException{
+
         try{
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             TableSet.processAprioryFile(txtAprioriFilename.getText(), 
@@ -220,36 +204,13 @@ public class DialogReadApriori extends DialogBase {
                     }  
                 }   
             setCursor(Cursor.getDefaultCursor());
-            }catch (ArgusException ex){
+        }
+        catch (ArgusException ex){
                 setCursor(Cursor.getDefaultCursor());
                 JOptionPane.showMessageDialog(this,ex.getMessage());
                 if(! (aPrioryStatus == null) ){
                     TableSet.CloseAprioriFiles(chkExpandTrivialLevels.isSelected(), aPrioryStatus);}
-                }
-        /*   versie Wim Hacking     
-        try
-        {
-        _Apriori.ProcessAprioriFile(currentTable.index, 
-                                    txtSeparator.getText(), 
-                                    chkIgnoreIcorrectLines.isSelected(), 
-                                    chkExpandTrivialLevels.isSelected(), 
-                                    true, 
-                                    aPrioryStatus);
-        
-            jTable1.setVisible(true);
-            
-            for(int type=0; type<5; type++)
-            {          
-                jTable1.getModel().setValueAt(_Apriori.getStatus(type), type, 0 );
-                jTable1.getModel().setValueAt(aPrioryStatus[type][0], type, 1 );
-                jTable1.getModel().setValueAt(aPrioryStatus[type][1], type, 2 );
-            }
         }
-        catch(Exception ex)
-        {
-            JOptionPane.showMessageDialog(this, ex.getMessage());
-        }
-*/        
         returnValue = APPROVE_OPTION;
     }//GEN-LAST:event_buttonOKActionPerformed
 
@@ -257,7 +218,7 @@ public class DialogReadApriori extends DialogBase {
     public void ShowDialog()
     {
         setVisible(true);
-       }
+    }
     
     public void SetAprioyTable(int tabNo)
     {
@@ -266,6 +227,7 @@ public class DialogReadApriori extends DialogBase {
     
     private void buttonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCancelActionPerformed
         setVisible(false);
+        dispose();
     }//GEN-LAST:event_buttonCancelActionPerformed
 
     private void btnSelectAprioriFilenameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectAprioriFilenameActionPerformed
@@ -291,47 +253,47 @@ public class DialogReadApriori extends DialogBase {
         }
     }//GEN-LAST:event_btnSelectAprioriFilenameActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(DialogReadApriori.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(DialogReadApriori.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(DialogReadApriori.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(DialogReadApriori.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                DialogReadApriori dialog = new DialogReadApriori(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
+//    /**
+//     * @param args the command line arguments
+//     */
+//    public static void main(String args[]) {
+//        /* Set the Nimbus look and feel */
+//        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+//        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+//         */
+//        try {
+//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//                if ("Nimbus".equals(info.getName())) {
+//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//                    break;
+//                }
+//            }
+//        } catch (ClassNotFoundException ex) {
+//            java.util.logging.Logger.getLogger(DialogReadApriori.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (InstantiationException ex) {
+//            java.util.logging.Logger.getLogger(DialogReadApriori.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (IllegalAccessException ex) {
+//            java.util.logging.Logger.getLogger(DialogReadApriori.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+//            java.util.logging.Logger.getLogger(DialogReadApriori.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        }
+//        //</editor-fold>
+//
+//        /* Create and display the dialog */
+//        java.awt.EventQueue.invokeLater(new Runnable() {
+//            public void run() {
+//                DialogReadApriori dialog = new DialogReadApriori(new javax.swing.JFrame(), true);
+//                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+//                    @Override
+//                    public void windowClosing(java.awt.event.WindowEvent e) {
+//                        System.exit(0);
+//                    }
+//                });
+//                dialog.setVisible(true);
+//            }
+//        });
+//    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSelectAprioriFilename;

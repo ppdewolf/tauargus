@@ -1736,15 +1736,18 @@ public class DialogSpecifyTablesMicro extends DialogBase {
                 } catch (ExecutionException ex) {
                     JOptionPane.showMessageDialog(null, ex.getCause().getMessage());
                 }
+                finally { // cleanup
+                    dispose(); 
+                }
             }
-        };        
+        };
         worker.execute();
-
     }//GEN-LAST:event_buttonComputeTablesActionPerformed
 
     private void buttonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCancelActionPerformed
-        setVisible(false);
         if (hasBeenModified)TableService.clearTables();
+        setVisible(false);
+        dispose();
     }//GEN-LAST:event_buttonCancelActionPerformed
 
     private void buttonResponseDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonResponseDeleteActionPerformed
@@ -1918,8 +1921,9 @@ public class DialogSpecifyTablesMicro extends DialogBase {
     }//GEN-LAST:event_listResponseVariablesValueChanged
 
     private void dialogClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_dialogClosing
-        setVisible(false);
         if (hasBeenModified) TableService.clearTables();
+        setVisible(false);
+        dispose();
     }//GEN-LAST:event_dialogClosing
 
     private void setResponseVariable(Variable variable) {

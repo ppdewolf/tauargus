@@ -42,17 +42,17 @@ public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
         
         try{ 
             ptableFREQ = tmpTableSet.cellkeyVar.PTableFile;
-            if ( ptableFREQ.indexOf("\\",0)>0 || ptableFREQ.indexOf(":",0)>0 || ptableFREQ.indexOf(":",0)>0){}
+            if ( ptableFREQ.indexOf("\\",0)>0 || ptableFREQ.indexOf(":",0)>0 ){}
             else { ptableFREQ = tmpTableSet.cellkeyVar.metadata.getFilePath(tmpTableSet.cellkeyVar.PTableFile);}
             textFieldPTable.setText(ptableFREQ);
         
             ptableCONT = tmpTableSet.cellkeyVar.PTableFileCont;
-            if ( ptableCONT.indexOf("\\",0)>0 || ptableCONT.indexOf(":",0)>0 || ptableCONT.indexOf(":",0)>0){}
+            if ( ptableCONT.indexOf("\\",0)>0 || ptableCONT.indexOf(":",0)>0 ){}
             else { ptableCONT = tmpTableSet.cellkeyVar.metadata.getFilePath(tmpTableSet.cellkeyVar.PTableFileCont);}
             textFieldPTableCont.setText(ptableCONT);
         
             ptableSEP = tmpTableSet.cellkeyVar.PTableFileSep;
-            if ( ptableSEP.indexOf("\\",0)>0 || ptableSEP.indexOf(":",0)>0 || ptableSEP.indexOf(":",0)>0){}
+            if ( ptableSEP.indexOf("\\",0)>0 || ptableSEP.indexOf(":",0)>0 ){}
             else { ptableSEP = tmpTableSet.cellkeyVar.metadata.getFilePath(tmpTableSet.cellkeyVar.PTableFileSep);}
             textFieldPTableSep.setText(ptableSEP);
         }
@@ -243,6 +243,7 @@ public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
     private void buttonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCancelActionPerformed
         returnValue = CANCEL_OPTION;
         setVisible(false);
+        dispose();
     }//GEN-LAST:event_buttonCancelActionPerformed
 
     private void buttonOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonOKActionPerformed
@@ -262,6 +263,7 @@ public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
 
         returnValue = APPROVE_OPTION;
         setVisible(false);
+        dispose();
     }//GEN-LAST:event_buttonOKActionPerformed
 
     private void buttonPTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPTableActionPerformed
@@ -277,6 +279,7 @@ public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
 
     private void DialogClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_DialogClosing
         setVisible(false);
+        dispose();
     }//GEN-LAST:event_DialogClosing
 
     private void buttonPTableContActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPTableContActionPerformed
@@ -313,47 +316,47 @@ public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
         ptableSEP = textFieldPTableSep.getText();
     }//GEN-LAST:event_textFieldPTableSepFocusLost
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(DialogChangePTable.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(DialogChangePTable.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(DialogChangePTable.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(DialogChangePTable.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                DialogChangePTable dialog = new DialogChangePTable(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
+//    /**
+//     * @param args the command line arguments
+//     */
+//    public static void main(String args[]) {
+//        /* Set the Nimbus look and feel */
+//        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+//        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+//         */
+//        try {
+//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//                if ("Nimbus".equals(info.getName())) {
+//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//                    break;
+//                }
+//            }
+//        } catch (ClassNotFoundException ex) {
+//            java.util.logging.Logger.getLogger(DialogChangePTable.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (InstantiationException ex) {
+//            java.util.logging.Logger.getLogger(DialogChangePTable.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (IllegalAccessException ex) {
+//            java.util.logging.Logger.getLogger(DialogChangePTable.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+//            java.util.logging.Logger.getLogger(DialogChangePTable.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        }
+//        //</editor-fold>
+//
+//        /* Create and display the dialog */
+//        java.awt.EventQueue.invokeLater(new Runnable() {
+//            public void run() {
+//                DialogChangePTable dialog = new DialogChangePTable(new javax.swing.JFrame(), true);
+//                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+//                    @Override
+//                    public void windowClosing(java.awt.event.WindowEvent e) {
+//                        System.exit(0);
+//                    }
+//                });
+//                dialog.setVisible(true);
+//            }
+//        });
+//    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonCancel;

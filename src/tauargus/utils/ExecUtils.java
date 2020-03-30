@@ -177,7 +177,10 @@ public class ExecUtils {
             //windowInfo.setVisible(false);
             System.out.println("Process is interrupted: " + commandString);
         } finally {
-            if (!silent) windowInfo.setVisible(false);
+            if (!silent) {
+                windowInfo.setVisible(false);
+                windowInfo.dispose();
+            }
         }
         return -99;
     }
@@ -250,7 +253,10 @@ public class ExecUtils {
             //windowInfo.setVisible(false);
             System.out.println("Process is interrupted: " + commandString);
         } finally {
-            if (!silent) windowInfo.setVisible(false);
+            if (!silent) {
+                windowInfo.setVisible(false);
+                windowInfo.dispose();
+            }
         }
         return -99;
     }
@@ -340,7 +346,7 @@ public class ExecUtils {
         return decimalFormat;
     }
 */    
-    public static void main(String[] args) {
+//    public static void main(String[] args) {
 //        try {
             // execCommand("c:\\Program Files\\Microsoft Office\\Office14\\WINWORD.EXE c:\\Users\\Gebruiker\\Projects\\TauArgus\\doc\\Install.docx", "c:\\Users\\Gebruiker\\Google Drive\\TauJava");
 //            System.out.println(getApplicationDirectory().getCanonicalPath());
@@ -349,7 +355,7 @@ public class ExecUtils {
 //        } catch (IOException ex) {
 //            Logger.getLogger(ExecUtils.class.getName()).log(Level.SEVERE, null, ex);
 //        }
-    }
+//    }
 /*    
     public static void putRegBoolean(String subRoot, String name, Boolean boolKey){
         Preferences p = Preferences.userRoot().node("tauargus/"+subRoot);

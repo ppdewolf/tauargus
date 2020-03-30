@@ -279,9 +279,9 @@ public class PanelEditVariable extends javax.swing.JPanel {
                 
             case RECORD_KEY:
                 // Only show file name, without directory-structure-name
-                textFieldPTableFreqFileName.setText(variable.PTableFile.substring(variable.PTableFile.lastIndexOf("\\")+1));
-                textFieldPTableContFileName.setText(variable.PTableFileCont.substring(variable.PTableFileCont.lastIndexOf("\\")+1));
-                textFieldPTableSepFileName.setText(variable.PTableFileSep.substring(variable.PTableFileSep.lastIndexOf("\\")+1));
+                textFieldPTableFreqFileName.setText(variable.PTableFile);
+                textFieldPTableContFileName.setText(variable.PTableFileCont);
+                textFieldPTableSepFileName.setText(variable.PTableFileSep);
                 if (StringUtils.isBlank(variable.PTableFile)) {
                     textFieldPTableFreqFileName.setText("");
                 }
@@ -586,6 +586,19 @@ public class PanelEditVariable extends javax.swing.JPanel {
             panelHierarchy.setVisible(type.isCategorical());
             labelDecimals.setEnabled((type.hasDecimals()) && !(dataType == Metadata.DATA_FILE_TYPE_SPSS));
             textFieldDecimals.setEnabled(labelDecimals.isEnabled());   
+            enableForSPSS(DialogSpecifyMetadata.SpssSelected); 
+        }
+        else{ // empty list of variables: set default to categorical type fields
+            labelTotalCode.setVisible(true);
+            textFieldTotalCode.setVisible(true);
+            panelMissings.setVisible(true);
+            panelCKM.setVisible(false);
+            panelPTable.setVisible(false);
+            panelRequestCodes.setVisible(false);
+            panelStatusIndicator.setVisible(false);
+            panelDistance.setVisible(true);
+            panelCodelist.setVisible(true);
+            panelHierarchy.setVisible(true);
             enableForSPSS(DialogSpecifyMetadata.SpssSelected); 
         }
         SwingUtilities.getWindowAncestor(this).pack();
@@ -1118,7 +1131,7 @@ public class PanelEditVariable extends javax.swing.JPanel {
                 .addGap(3, 3, 3))
         );
 
-        panelCKM.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "CKM"));
+        panelCKM.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "CKM for magnitude tables"));
         panelCKM.setName(""); // NOI18N
 
         panelCKMType.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Type"));
@@ -1417,7 +1430,7 @@ public class PanelEditVariable extends javax.swing.JPanel {
                         .addComponent(labelTotalCode)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(textFieldTotalCode, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(textFieldCodeListFileName))
+                    .addComponent(textFieldCodeListFileName, javax.swing.GroupLayout.PREFERRED_SIZE, 558, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(buttonCodeListFileName, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -1483,8 +1496,8 @@ public class PanelEditVariable extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(panelHierarchyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panelHierarchyLayout.createSequentialGroup()
-                        .addComponent(textFieldHierFileName)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(textFieldHierFileName, javax.swing.GroupLayout.PREFERRED_SIZE, 558, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(buttonHierFileName, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(panelHierarchyLayout.createSequentialGroup()
                         .addGroup(panelHierarchyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1592,12 +1605,13 @@ public class PanelEditVariable extends javax.swing.JPanel {
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelPTableLayout.createSequentialGroup()
                         .addGroup(panelPTableLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(textFieldPTableSepFileName)
+                            .addComponent(textFieldPTableSepFileName, javax.swing.GroupLayout.PREFERRED_SIZE, 558, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelPTableLayout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(textFieldPTableFreqFileName, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(textFieldPTableContFileName, javax.swing.GroupLayout.Alignment.LEADING))
+                                .addGroup(panelPTableLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(textFieldPTableContFileName, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 558, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(textFieldPTableFreqFileName, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 558, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(0, 0, Short.MAX_VALUE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(panelPTableLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelPTableLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -1644,7 +1658,7 @@ public class PanelEditVariable extends javax.swing.JPanel {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(panelVariableType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(panelDistance, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(panelMissings, javax.swing.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
                             .addComponent(panelStatusIndicator, javax.swing.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
@@ -1719,7 +1733,7 @@ public class PanelEditVariable extends javax.swing.JPanel {
         fileChooser.resetChoosableFileFilters();
         fileChooser.setFileFilter(new FileNameExtensionFilter("ptable file (*.csv, *.txt)", "csv", "txt"));
         if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
-            textFieldPTableFreqFileName.setText(fileChooser.getSelectedFile().toString().substring(fileChooser.getSelectedFile().toString().lastIndexOf("\\")+1));
+            textFieldPTableFreqFileName.setText(fileChooser.getSelectedFile().toString());
             TauArgusUtils.putDataDirInRegistry(fileChooser.getSelectedFile().toString());
         }
     }//GEN-LAST:event_buttonPTableFreqFileNameActionPerformed
@@ -1731,7 +1745,7 @@ public class PanelEditVariable extends javax.swing.JPanel {
         fileChooser.resetChoosableFileFilters();
         fileChooser.setFileFilter(new FileNameExtensionFilter("ptable file (*.csv, *.txt)", "csv", "txt"));
         if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
-            textFieldPTableContFileName.setText(fileChooser.getSelectedFile().toString().substring(fileChooser.getSelectedFile().toString().lastIndexOf("\\")+1));
+            textFieldPTableContFileName.setText(fileChooser.getSelectedFile().toString());
             TauArgusUtils.putDataDirInRegistry(fileChooser.getSelectedFile().toString());
         }
     }//GEN-LAST:event_buttonPTableContFileNameActionPerformed
@@ -1743,7 +1757,7 @@ public class PanelEditVariable extends javax.swing.JPanel {
         fileChooser.resetChoosableFileFilters();
         fileChooser.setFileFilter(new FileNameExtensionFilter("ptable file (*.csv, *.txt)", "csv", "txt"));
         if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
-            textFieldPTableSepFileName.setText(fileChooser.getSelectedFile().toString().substring(fileChooser.getSelectedFile().toString().lastIndexOf("\\")+1));
+            textFieldPTableSepFileName.setText(fileChooser.getSelectedFile().toString());
             TauArgusUtils.putDataDirInRegistry(fileChooser.getSelectedFile().toString());
         }
     }//GEN-LAST:event_buttonPTableSepFileNameActionPerformed

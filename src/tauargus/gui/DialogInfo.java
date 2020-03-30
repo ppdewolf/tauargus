@@ -106,6 +106,7 @@ public class DialogInfo extends javax.swing.JDialog {
     private void jButtonOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOKActionPerformed
         // TODO add your handling code here:
         this.setVisible(false);
+        dispose();
     }//GEN-LAST:event_jButtonOKActionPerformed
 
 
@@ -114,82 +115,74 @@ public class DialogInfo extends javax.swing.JDialog {
     }
 
     public void addText (String s){
-      jTextAreaInfo.append(s + "\n");   
+        jTextAreaInfo.append(s + "\n");   
     }
     
     public void clearText(){
-      jTextAreaInfo.setText("");  
+        jTextAreaInfo.setText("");  
     }
     
     public void addTextFile (String fn) throws ArgusException{
-      String hs;  
-      clearText();
-      if (!TauArgusUtils.ExistFile(fn)){
-        jTextAreaInfo.setText("The file " + fn + " could not be displayed; sorry"); 
-        return;
-      }
-      else { 
-        try{  
-          BufferedReader reader = new BufferedReader(new FileReader(fn));
-          while ( (hs = reader.readLine()) != null){
-            jTextAreaInfo.append(hs + "\n");
-          }
-          reader.close();
+        String hs;  
+        clearText();
+        if (!TauArgusUtils.ExistFile(fn)){
+            jTextAreaInfo.setText("The file " + fn + " could not be displayed; sorry"); 
+            return;
         }
-        catch (IOException ex){ throw new ArgusException("An error occured reading the file "+fn); }
-      
-      
-      jTextAreaInfo.setCaretPosition(1);
-              
-          
-      }
-          
-      
-        
-        
+        else { 
+            try{  
+                BufferedReader reader = new BufferedReader(new FileReader(fn));
+                while ( (hs = reader.readLine()) != null){
+                    jTextAreaInfo.append(hs + "\n");
+                }
+                reader.close();
+            }
+            catch (IOException ex){ throw new ArgusException("An error occured reading the file "+fn); }
+            jTextAreaInfo.setCaretPosition(1);
+        }
     }
     
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(DialogInfo.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(DialogInfo.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(DialogInfo.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(DialogInfo.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                DialogInfo dialog = new DialogInfo(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
+//    /**
+//     * @param args the command line arguments
+//     */
+//    public static void main(String args[]) {
+//        /* Set the Nimbus look and feel */
+//        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+//        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+//         */
+//        try {
+//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//                if ("Nimbus".equals(info.getName())) {
+//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//                    break;
+//                }
+//            }
+//        } catch (ClassNotFoundException ex) {
+//            java.util.logging.Logger.getLogger(DialogInfo.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (InstantiationException ex) {
+//            java.util.logging.Logger.getLogger(DialogInfo.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (IllegalAccessException ex) {
+//            java.util.logging.Logger.getLogger(DialogInfo.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+//            java.util.logging.Logger.getLogger(DialogInfo.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        }
+//        //</editor-fold>
+//
+//        /* Create and display the dialog */
+//        java.awt.EventQueue.invokeLater(new Runnable() {
+//            public void run() {
+//                DialogInfo dialog = new DialogInfo(new javax.swing.JFrame(), true);
+//                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+//                    @Override
+//                    public void windowClosing(java.awt.event.WindowEvent e) {
+//                        System.exit(0);
+//                    }
+//                });
+//                dialog.setVisible(true);
+//            }
+//        });
+//    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonOK;
     private javax.swing.JLabel jLabelInfo;

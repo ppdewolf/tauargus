@@ -301,7 +301,7 @@ public class FrameMain extends javax.swing.JFrame {
     
     public void organise() {
         specifyMetadataAction.setEnabled(Application.numberOfMetadatas() > 0);
-        specifyTablesAction.setEnabled(Application.numberOfMetadatas() > 0);
+        specifyTablesAction.setEnabled((Application.numberOfMetadatas() > 0) && (Application.getMetadatas().get(0).containsExplanatoryVariable()));
 
         selectTableAction.setEnabled(TableService.numberOfTables() > 1);     
         menuItemLinkedTables.setEnabled(TableService.numberOfTables() > 1);

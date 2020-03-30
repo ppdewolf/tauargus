@@ -152,30 +152,10 @@ public class PanelTable extends javax.swing.JPanel {
             } else {
               return getBackgroundColor(code); // gray background depending on level in hierarchy
             }
-//        if (cell.status.isUnsafe() && cell.auditOk) {
-//            if (cell.status.isPrimaryUnsafe()) {
-//                return Color.red;
-//            } else {
-//                return Color.orange;
-//            }
         } 
         else {
             return getBackgroundColor(code); // gray background depending on level in hierarchy
         }
-//        else if (tableSet.ckmProtect){
-//            float maxColor = (float) Math.max(Math.abs(tableSet.minDiff), Math.abs(tableSet.maxDiff));
-//            float diff = (float) Math.abs(cell.CKMValue - cell.response);
-//            if (diff >= maxColor) diff = maxColor;
-//            int R, G, B = 255; // darkest: (85,85,255) brightest: (235,235,255)
-//            R = (int) (235 - (235-85)*(diff-1)/(maxColor-1));
-//            G = R;
-//            if (diff > 0){
-//                return(new Color(R,G,B));
-//            }
-//            return getBackgroundColor(code); // gray background depending on level in hierarchy
-//        } else {
-//            return getBackgroundColor(code); // gray background depending on level in hierarchy
-//        }
     }
 
     private Color getCKMBackgroundColor(Cell cell, Code code){
@@ -231,12 +211,16 @@ public class PanelTable extends javax.swing.JPanel {
             for (int i=0; i<code.level; i++) {
                 s.append("   ");
             }
-            if (code.state == Code.EXPANDED) {
-                s.append("- ");
-            } else if (code.state == Code.COLLAPSED) {
-                s.append("+ ");
-            } else {
-                s.append("   ");
+            switch (code.state) {
+                case Code.EXPANDED:
+                    s.append("- ");
+                    break;
+                case Code.COLLAPSED:
+                    s.append("+ ");
+                    break;
+                default:
+                    s.append("   ");
+                    break;
             }
             s.append(code.label);
             setText(s.toString());
@@ -454,12 +438,10 @@ public class PanelTable extends javax.swing.JPanel {
         if (isSingleColumn){n=0;}
         for (int i = 0; i < n; i++) {
             labelSpan[i].setVisible(true);
-            //comboBoxSpan[i].setVisible(true);
             comboBoxSpan.get(i).setVisible(true);
         }
         for (int i = n; i < labelSpan.length; i++) {
             labelSpan[i].setVisible(false);
-            //comboBoxSpan[i].setVisible(false);
             comboBoxSpan.get(i).setVisible(false);
         }
         
@@ -500,7 +482,6 @@ public class PanelTable extends javax.swing.JPanel {
         {
             for (int j=MaxLevelChoice+1;j<=VarDepth;j++)
             {
-                //comboBoxNrOfVertLevels.addItem(Integer.toString(j+1));
                 comboBoxNrOfVertLevels.addItem(Integer.toString(j));
             }
         }
@@ -509,7 +490,9 @@ public class PanelTable extends javax.swing.JPanel {
         if (!isSingleColumn)
         {
             comboBoxNrOfHorLevels.setVisible(true);
+            comboBoxNrOfHorLevels.setEnabled(true);
             LabelNrOfHorLevels.setVisible(true);
+            LabelNrOfHorLevels.setEnabled(true);
             buttonSelectView.setEnabled(true);
             VarDepth = columnVariable.GetDepthOfHierarchicalBoom(columnVariable.recoded);
             MaxLevelChoice = comboBoxNrOfHorLevels.getItemCount()-1;
@@ -532,15 +515,15 @@ public class PanelTable extends javax.swing.JPanel {
         }
         else 
         {
-            comboBoxNrOfHorLevels.setVisible(false);
-            LabelNrOfHorLevels.setVisible(false);
+            comboBoxNrOfHorLevels.setVisible(true);
+            comboBoxNrOfHorLevels.setEnabled(false);
+            LabelNrOfHorLevels.setVisible(true);
+            LabelNrOfHorLevels.setEnabled(false);
             buttonSelectView.setEnabled(false);
+            comboBoxNrOfHorLevels.removeAllItems();
+            comboBoxNrOfHorLevels.addItem("0");
         }
         
-//      Implicitly called by setting above 2 combo boxes.        
-//        createRowIndices();
-//        createColumnIndices();
-
         Variable RowVar = tableSet.expVar.get(rowExpVarIndex);
         String hs = tableSet.respVar.name + ": " + RowVar.name;
         if (RowVar.recoded) hs += "(R)";
@@ -550,8 +533,6 @@ public class PanelTable extends javax.swing.JPanel {
             hs += " x " + ColVar.name;
             if (ColVar.recoded) hs += "(R)";
         }
-//        String hs =tableSet.expVar.get(rowExpVarIndex).name;
-//        if (!isSingleColumn) {hs = tableSet.expVar.get(rowExpVarIndex).name + " x " + tableSet.expVar.get(columnExpVarIndex).name;}
         labelRowColVars.setText(hs);
         
         int n = tableSet.expVar.size();
@@ -559,13 +540,10 @@ public class PanelTable extends javax.swing.JPanel {
             labelSpan[i].setText(tableSet.expVar.get(expVarPermutation[i + 2]).name);
             if (tableSet.expVar.get(expVarPermutation[i + 2]).recoded) labelSpan[i].setText(tableSet.expVar.get(expVarPermutation[i + 2]).name + "(R)");
             int expvarIndex = expVarPermutation[i + 2];
-            //comboBoxSpan[i].removeAllItems();
             comboBoxSpan.get(i).removeAllItems();
             for (int j = 0; j < codeList[expvarIndex].length; j++) {
-                //comboBoxSpan[i].addItem(codeList[expvarIndex][j].label);
                 comboBoxSpan.get(i).addItem(codeList[expvarIndex][j].label);
             }
-            //comboBoxSpan[i].setSelectedIndex(0);
             comboBoxSpan.get(i).setSelectedIndex(0);
         }
         
@@ -627,8 +605,8 @@ public class PanelTable extends javax.swing.JPanel {
         });
 
         isAdjusting = false;
-        ((AbstractTableModel)table.getModel()).fireTableStructureChanged();
         ((AbstractTableModel)table.getModel()).fireTableDataChanged();
+        ((AbstractTableModel)table.getModel()).fireTableStructureChanged();
         adjustColumnWidths();
         table.getSelectionModel().setSelectionInterval(0, 0);
         table.getColumnModel().getSelectionModel().setSelectionInterval(1, 1);
@@ -1722,9 +1700,12 @@ public class PanelTable extends javax.swing.JPanel {
     }//GEN-LAST:event_checkBoxOutputViewActionPerformed
 
     private void comboBoxNrOfHorLevelsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxNrOfHorLevelsActionPerformed
-        int maxLevel = Integer.parseInt((String)comboBoxNrOfHorLevels.getSelectedItem());
-        setLevel(codeList[columnExpVarIndex], maxLevel+1);
-        createColumnIndices();
+        int maxLevel;
+        if (!isSingleColumn){
+            maxLevel = Integer.parseInt((String)comboBoxNrOfHorLevels.getSelectedItem());
+            setLevel(codeList[columnExpVarIndex], maxLevel+1);
+            createColumnIndices();
+        }
         ((AbstractTableModel)table.getModel()).fireTableStructureChanged();
         adjustColumnWidths();
     }//GEN-LAST:event_comboBoxNrOfHorLevelsActionPerformed
@@ -1881,7 +1862,7 @@ public class PanelTable extends javax.swing.JPanel {
                 JOptionPane.showMessageDialog(null, "Whether controlled rounding can be used when Cplex is selected as solver, depends on your specific license",
                     "", JOptionPane.INFORMATION_MESSAGE);
             }
-            //else
+
             DialogRoundingParameters paramsR = new DialogRoundingParameters(parentFrame, true);
             if (paramsR.showDialog(tableSet) == DialogRoundingParameters.APPROVE_OPTION) {
                 final SwingWorker <Integer, Void> worker = new ProgressSwingWorker<Integer, Void>(ProgressSwingWorker.ROUNDER,"Rounding") {
@@ -1914,24 +1895,6 @@ public class PanelTable extends javax.swing.JPanel {
                 };
 
                 worker.execute();
-                /*                try{
-                    OptiSuppress.runRounder(tableSet);
-                    JOptionPane.showMessageDialog(null, "The table has been rounded\n" +
-                        "Number of steps: " + tableSet.roundMaxStep+"\n"+
-                        "Max step: " +
-                        StrUtils.formatDouble(tableSet.roundMaxJump, tableSet.respVar.nDecimals)  +"\n"+
-                        "Processing time: " + StrUtils.timeToString(tableSet.processingTime));
-                    ((AbstractTableModel)table.getModel()).fireTableDataChanged();
-                    adjustColumnWidths();
-                    updateSuppressButtons();
-                }
-                // Anco 1.6
-                //                catch (ArgusException | IOException ex) {
-                    catch (ArgusException ex) {
-                        JOptionPane.showMessageDialog(this, ex.getMessage());}
-                    catch (IOException ex) {
-                        JOptionPane.showMessageDialog(this, ex.getMessage());
-                    }*/
                 }
                 break;
             case CTA:  //do CTA
@@ -2016,22 +1979,7 @@ public class PanelTable extends javax.swing.JPanel {
                         }
                     }.start();
                 }
-                // run hypercube method
                 break;
-                /*            case HITAS:
-                DialogModularParameters params = new DialogModularParameters(parentFrame, tableSet, false, true);
-                params.showDialog();
-                try {
-                    boolean oke = OptiSuppress.runModular(tableSet);
-                    JOptionPane.showMessageDialog(this, "Modular has finished the protection\n"
-                        + tableSet.nSecond + " cells have been suppressed\n"
-                        + StrUtils.timeToString(tableSet.processingTime) + " needed");
-                } //|FileNotFoundException
-                catch (ArgusException | IOException ex) {
-                    JOptionPane.showMessageDialog(this, ex.getMessage());
-                }
-                break;
-                */
             case HITAS:
                 DialogModularParameters params = new DialogModularParameters(parentFrame, tableSet, false, true);
                 if (params.showDialog() == DialogModularParameters.APPROVE_OPTION){
@@ -2067,19 +2015,6 @@ public class PanelTable extends javax.swing.JPanel {
                 }
                 break;
             case OPTIMAL:
-                /*               params = new DialogModularParameters(parentFrame, tableSet, true, true);
-                params.showDialog();
-                try{
-                    OptiSuppress.runOptimal(tableSet);
-                    JOptionPane.showMessageDialog(null, "Optimal has finished the protection\n"
-                        + tableSet.nSecond + " cells have been suppressed\n"
-                        + StrUtils.timeToString(tableSet.processingTime) + " needed");
-                    tableSet.hasBeenAudited = false;
-                } catch (ArgusException| IOException  ex)
-                {JOptionPane.showMessageDialog(this, ex.getMessage());
-                }
-                // run optimal
-                */
                 params = new DialogModularParameters(parentFrame, tableSet, true, true);
                 if (params.showDialog() == DialogModularParameters.APPROVE_OPTION){
                     final SwingWorker <Void, Void> worker = new ProgressSwingWorker<Void, Void>(ProgressSwingWorker.VALUES,"Optimal approach") {
@@ -2150,10 +2085,7 @@ public class PanelTable extends javax.swing.JPanel {
                     JOptionPane.showMessageDialog(null,"Sorry, Cell Key Method not available when \"holdings\" are used","Warning",JOptionPane.WARNING_MESSAGE);
                     break;
                 }
-//                if (tableSet.respVar.type != Type.FREQUENCY){
-//                    JOptionPane.showMessageDialog(null,"Sorry, currently Cell Key Method only imlemented for frequency tables","Warning",JOptionPane.WARNING_MESSAGE);
-//                    break;
-//                }
+
                 String message="";
                 if (tableSet.respVar.isResponse()){ // magnitude table
                     if (tableSet.respVar.CKMType.equals("N")) message = "No cell key method specified for this variable";

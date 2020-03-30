@@ -351,8 +351,11 @@ public class Variable implements Cloneable {
 
         boolean equal = name.equals(variable.name)
                 && type == variable.type
-                && bPos == variable.bPos
                 && varLen == variable.varLen;
+        
+        if (variable.metadata.dataFileType != Metadata.DATA_FILE_TYPE_FREE){
+            equal = equal && bPos == variable.bPos;
+        }
 
         if (variable.isCategorical()) {
             equal = equal

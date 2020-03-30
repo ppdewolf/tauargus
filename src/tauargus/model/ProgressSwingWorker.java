@@ -78,11 +78,17 @@ public abstract class ProgressSwingWorker<T, V> extends SwingWorker<T, V> {
     }
 
     @Override
-    protected void done() {
-        if (progressType == ROUNDER)
+    protected void done() { // cleanup dialogs
+        if (progressType == ROUNDER){
             dialogRounderProgress.setVisible(false);
-        else
+            dialogRounderProgress.dispose();
+            dialogProgress.dispose();
+        }
+        else{
             dialogProgress.setVisible(false);
+            dialogProgress.dispose();
+            dialogRounderProgress.dispose();
+        }
     }
 
     public PropertyChangeListener getPropertyChangeListener() {

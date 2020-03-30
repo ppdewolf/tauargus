@@ -41,8 +41,8 @@ public class TableColumnResizer {
             for (int row = 0; row < count; row++) {
                 value = table.getValueAt(row, col);
                 TableCellRenderer rend = table.getCellRenderer(row, col);
-                Component comp = rend.getTableCellRendererComponent(table, value, false, false, row, col);
-                maxWidth = Math.max(comp.getPreferredSize().width, maxWidth);
+                c = rend.getTableCellRendererComponent(table, value, false, false, row, col);
+                maxWidth = Math.max(c.getPreferredSize().width, maxWidth);
             }
 
             TableColumn column = columnModel.getColumn(col);

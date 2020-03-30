@@ -60,7 +60,7 @@
                           </Group>
                           <Component id="panelDistance" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
                           <Component id="panelMissings" pref="248" max="32767" attributes="0"/>
                           <Component id="panelStatusIndicator" pref="248" max="32767" attributes="0"/>
@@ -808,7 +808,7 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="CKM">
+            <TitledBorder title="CKM for magnitude tables">
               <Border PropertyName="innerBorder" info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">
                 <EtchetBorder/>
               </Border>
@@ -1251,7 +1251,7 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="textFieldTotalCode" min="-2" pref="110" max="-2" attributes="0"/>
                       </Group>
-                      <Component id="textFieldCodeListFileName" max="32767" attributes="0"/>
+                      <Component id="textFieldCodeListFileName" min="-2" pref="558" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="buttonCodeListFileName" min="-2" pref="33" max="-2" attributes="0"/>
@@ -1343,8 +1343,8 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
-                          <Component id="textFieldHierFileName" max="32767" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="textFieldHierFileName" min="-2" pref="558" max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                           <Component id="buttonHierFileName" min="-2" pref="33" max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" attributes="0">
@@ -1526,13 +1526,15 @@
                       </Group>
                       <Group type="102" alignment="1" attributes="0">
                           <Group type="103" groupAlignment="1" attributes="0">
-                              <Component id="textFieldPTableSepFileName" max="32767" attributes="0"/>
+                              <Component id="textFieldPTableSepFileName" min="-2" pref="558" max="-2" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
-                                  <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="1" attributes="0">
+                                      <Component id="textFieldPTableContFileName" alignment="0" min="-2" pref="558" max="-2" attributes="0"/>
+                                      <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="textFieldPTableFreqFileName" alignment="0" min="-2" pref="558" max="-2" attributes="0"/>
+                                  </Group>
                                   <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                               </Group>
-                              <Component id="textFieldPTableFreqFileName" alignment="0" max="32767" attributes="0"/>
-                              <Component id="textFieldPTableContFileName" alignment="0" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">

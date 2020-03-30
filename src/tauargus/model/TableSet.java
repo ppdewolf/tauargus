@@ -765,24 +765,23 @@ public class TableSet {
     private static boolean getTableCell (int tabNo, int[] dimIndex, double[] CellResp, int[] CellStatus, 
                                          double[] CellLower, double[] CellUpper, double[] CellCost, 
                                          double[] CellKey, double[] CellKeyNoZeros){
-      double[] CR = new double[1];
-      double[] Lower = new double[1];
-      double[] Upper = new double[1];
-      int[] Status = new int[1];
-      double[] x1 = new double[1];
-      double[] x2 = new double[1];
-      double[] x3 = new double[1];
-      double[] x4 = new double[MAX_TOP_N_VAR];
-      double[] x5 = new double[MAX_TOP_N_VAR];
-      double[] x8 = new double[1];
-      double[] x9 = new double[1];
-      double[] x10 = new double[1]; //CellKey
-      double[] x11 = new double[1]; //CellKeyNoZeros      
-      double[] xcta = new double[1];
-      double[] xckm = new double[1];
-      double[] hms = new double[MAX_TOP_N_VAR];
-      double[] peep = new double[1];
-      double[] peephold = new double[1];
+        double[] CR = new double[1];
+        double[] Lower = new double[1];
+        double[] Upper = new double[1];
+        int[] Status = new int[1];
+        double[] Shadow = new double[1];
+        double[] Cost = new double[1];
+        double[] MaxScore = new double[MAX_TOP_N_VAR];
+        double[] MaxScoreWeight = new double[MAX_TOP_N_VAR];
+        double[] RealLower = new double[1];
+        double[] RealUpper = new double[1];
+        double[] CK = new double[1]; //CellKey
+        double[] CKNZ = new double[1]; //CellKeyNoZeros      
+        double[] xcta = new double[1];
+        double[] xckm = new double[1];
+        double[] hms = new double[MAX_TOP_N_VAR];
+        double[] peep = new double[1];
+        double[] peephold = new double[1];
 
         //int[] ix = new int[1];
         double[] ix = new double[1];
@@ -793,19 +792,19 @@ public class TableSet {
         int[] peepsrthold = new int[1];
         boolean oke;       
         oke = tauArgus.GetTableCell(tabNo, dimIndex, CR, ix, xcta,
-                                    xckm,
-                                    x2, x3, x10, x11, cf, Status, x4,
-                                    x5, cfh,   hms, holdnr,
-                                    peep, peephold, peepsrt,  peepsrthold,  Lower,
-                                    Upper, x8, x9);
+                                    xckm, Shadow, Cost, CK, CKNZ, 
+                                    cf, Status, MaxScore, MaxScoreWeight, 
+                                    cfh, hms, holdnr,
+                                    peep, peephold, peepsrt, peepsrthold,
+                                    Lower, Upper, RealLower, RealUpper);
 
       CellResp[0] = CR[0];
-      CellStatus[0]=Status[0];
+      CellStatus[0] = Status[0];
       CellLower[0] = Lower[0];
       CellUpper[0] = Upper[0];
-      CellCost[0] = x3[0];
-      CellKey[0] = x10[0];
-      CellKeyNoZeros[0] = x11[0];
+      CellCost[0] = Cost[0];
+      CellKey[0] = CK[0];
+      CellKeyNoZeros[0] = CKNZ[0];
       return oke;
     //public boolean GetTableCell(int TableIndex, int[] DimIndex, double[] CellResponse, int[] CellRoundedResp,
     //        double[] CellCTAResp, double[] CellShadow, double[] CellCost, int[] CellFreq,

@@ -339,3 +339,11 @@ above released in 4.2.0 build 2
 date	   : Mar 4, 2020
 summary    : Small bug fix concerning SummaryDialog in case of CKM on magnitude table
 
+date	   : Mar 11, 2020
+summary    : Small bug fixes for holding settings in Specify Table (microdata)
+
+date	   : Mar 25, 2020
+summary    : Bug fix starting with empty rda-file was not possible + slightly adjusted the way of constructing new metadata with the GUI
+
+date	   : Mar 27, 2020
+summary    : Some refactoring, adding a lot of "dispose()", removing "main()" from many dialog classes

@@ -727,13 +727,15 @@ public class DialogSpecifyTablesTabular extends DialogBase {
     }//GEN-LAST:event_buttonGroupCostActionPerformed
 
     private void buttonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCancelActionPerformed
-        setVisible(false);
         TableService.clearTables();
+        setVisible(false);
+        dispose();
     }//GEN-LAST:event_buttonCancelActionPerformed
 
     private void dialogClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_dialogClosing
-        setVisible(false);
         TableService.clearTables();
+        setVisible(false);
+        dispose();
     }//GEN-LAST:event_dialogClosing
 
     boolean verify() {
