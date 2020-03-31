@@ -29,12 +29,15 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import static javax.swing.JViewport.SIMPLE_SCROLL_MODE;
+import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import tauargus.model.Application;
 import tauargus.model.ArgusException;
@@ -881,12 +884,6 @@ public class FrameMain extends javax.swing.JFrame {
     }//GEN-LAST:event_menuItemLinkedTablesActionPerformed
 
     private void menuItemOpenBatchProcessActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemOpenBatchProcessActionPerformed
-        // TODO add your handling code here:
-//        String hs = SystemUtils.getRegString("general", "datadir", "");
-//        if (!hs.equals("")){
-//            File file = new File(hs); 
-//            fileChooser.setCurrentDirectory(file);
-//        }
         TauArgusUtils.getDataDirFromRegistry(fileChooser);
         fileChooser.setDialogTitle("Open Batch file");
         fileChooser.setSelectedFile(new File(""));
@@ -898,21 +895,32 @@ public class FrameMain extends javax.swing.JFrame {
             String hs =fileChooser.getSelectedFile().toString();
             TauArgusUtils.putDataDirInRegistry(hs);
             Application.setBatch(Application.BATCH_FROMMENU);
-          
-//              String xs =fileChooser.getSelectedFile().toString();  
-//              batch.runBatchProcess(xs);
-// start a new thread to allow a window to show progress.               
-              new Thread(){
-                public void run(){
-                String xs =fileChooser.getSelectedFile().toString();  
-                batch.runBatchProcess(xs); 
-                if (TableService.numberOfTables() > 0) {
-                  currentTable = TableService.getTable(0);
-                  panelTable.setTable(currentTable);
+            // start a new thread to allow a window to show progress.               
+            final SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>(){
+                @Override
+                protected Void doInBackground()throws ArgusException, Exception{
+                    String xs =fileChooser.getSelectedFile().toString();  
+                    batch.runBatchProcess(xs); 
+                    return null;
                 }
-                organise();    
-               }
-             }.start();     
+                @Override
+                protected void done(){
+                    try{
+                        get();
+                        if (TableService.numberOfTables() > 0) {
+                            currentTable = TableService.getTable(0);
+                            panelTable.setTable(currentTable);
+                        }
+                        organise();    
+                    }
+                    catch (InterruptedException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    } catch (ExecutionException ex) {
+                        JOptionPane.showMessageDialog(null, ex.getCause().getMessage());
+                    }
+                }
+            };
+            worker.execute();    
         }           
     }//GEN-LAST:event_menuItemOpenBatchProcessActionPerformed
 

@@ -78,34 +78,6 @@ public class OptiSuppress {
     private static BufferedWriter out;
     private static final Logger logger = Logger.getLogger(OptiSuppress.class.getName());
     
-//    static DialogStopTime dialog = new DialogStopTime(null,true);
-//    static DialogStopTime rdialog = new DialogStopTime(null,true);
-    
-//    static ICallback jCallback = new ICallback(){
-//            @Override
-//            public int SetStopTime(){
-//                dialog.SetUB(UB);
-//                dialog.SetLB(LB);
-//                dialog.SetDiff(Diff);
-//                dialog.SetTimeSoFar(TimeSoFar);
-//                dialog.SetNSuppressed(nSuppressed);
-//                dialog.setVisible(true);
-//                return dialog.AddTime;
-//            }
-//    };
-    
-//    static RCallback jRCallback = new RCallback(){
-//            @Override
-//            public int SetExtraTime(){
-//                rdialog.HideForRounder();
-//                rdialog.SetUB(DUB);
-//                rdialog.SetLB(DLB);
-//                rdialog.SetDiff(100.0*(DUB-DLB)/DLB);
-//                rdialog.setVisible(true);
-//                return rdialog.AddTime;
-//            }
-//    };
-        
     public static void loadJJParamFromRegistry(){
       String hs;
       //Initialize the JJ-parameters first, then get them from the registry.

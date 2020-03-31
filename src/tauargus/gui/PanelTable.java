@@ -25,8 +25,6 @@ import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -1772,14 +1770,20 @@ public class PanelTable extends javax.swing.JPanel {
     }//GEN-LAST:event_radioButtonNetworkActionPerformed
 
     private void buttonAuditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonAuditActionPerformed
-        new Thread(){
-            @Override public void run(){
-                try {
-                    OptiSuppress.RunAudit(tableSet);
+        final SwingWorker <Void, Void> worker = new SwingWorker<Void, Void>(){
+            @Override
+            protected Void doInBackground() throws ArgusException, Exception{
+                OptiSuppress.RunAudit(tableSet);
+                return null;
+            }
 
+            @Override
+            protected void done(){
+                try{
+                    get();
                     JOptionPane.showMessageDialog(null, "The audit has been successfully performed\n" +
-                        tableSet.auditExactDisclosure + " cells could be exactly disclosed\n"+
-                        tableSet.auditPartialDisclosure + " cells could be partially disclosed\n");
+                                                    tableSet.auditExactDisclosure + " cells could be exactly disclosed\n"+
+                                                    tableSet.auditPartialDisclosure + " cells could be partially disclosed\n");
                     ((AbstractTableModel)table.getModel()).fireTableDataChanged();
                     adjustColumnWidths();
                     updateSuppressButtons();
@@ -1790,11 +1794,14 @@ public class PanelTable extends javax.swing.JPanel {
                         }
                     }
                 }
-                catch (ArgusException ex) {
-                    JOptionPane.showMessageDialog(null, ex.getMessage());
+                catch (InterruptedException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                } catch (ExecutionException ex) {
+                    JOptionPane.showMessageDialog(null, ex.getCause().getMessage());
                 }
             }
-        }.start();
+        };
+        worker.execute();
     }//GEN-LAST:event_buttonAuditActionPerformed
 
     private void buttonUndoSuppressActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonUndoSuppressActionPerformed
@@ -1900,56 +1907,79 @@ public class PanelTable extends javax.swing.JPanel {
             case CTA:  //do CTA
                 final int i=JOptionPane.showConfirmDialog(parentFrame, "Do you prefer to use the expert version?", "Select CTA version", JOptionPane.YES_NO_CANCEL_OPTION);
                 if ((i == JOptionPane.YES_OPTION)||(i == JOptionPane.NO_OPTION) ){
-                    new Thread(){
-                        @Override public void run(){
+                    final SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>(){
+                        @Override 
+                        protected Void doInBackground() throws ArgusException, Exception{
+                            OptiSuppress.RunCTA(tableSet, (i == JOptionPane.YES_OPTION));
+                            return null;
+                        } 
+                        @Override 
+                        protected void done(){
                             try{
-                                OptiSuppress.RunCTA(tableSet, (i == JOptionPane.YES_OPTION));
+                                get();
                                 JOptionPane.showMessageDialog(null, "The CTA procedure has been completed\n" +
                                     tableSet.nSecond+ " cells have been modified\n"+
                                     StrUtils.timeToString(tableSet.processingTime) + " needed");
                                 ((AbstractTableModel)table.getModel()).fireTableDataChanged();
                                 adjustColumnWidths();
                                 updateSuppressButtons();
+                            } catch (InterruptedException ex) {
+                                logger.log(Level.SEVERE, null, ex);
+                            } catch (ExecutionException ex) {
+                                JOptionPane.showMessageDialog(null, ex.getCause().getMessage());
                             }
-                            catch(ArgusException  ex) {JOptionPane.showMessageDialog(null, ex.getMessage());}
-                            catch(FileNotFoundException  ex) {JOptionPane.showMessageDialog(null, ex.getMessage());}
-                            catch(IOException  ex) {JOptionPane.showMessageDialog(null, ex.getMessage());}
                         }
-                    }.start();
+                    };
+                    worker.execute();
                 }
                 break;
             case UWE:
                 DialogModularParameters uweParams = new DialogModularParameters(parentFrame, tableSet, false, true);
                 if (uweParams.showDialog() == DialogModularParameters.APPROVE_OPTION){
-                    new Thread(){
-                        @Override public void run(){
+                    final SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>(){
+                        @Override 
+                        protected Void doInBackground() throws ArgusException, Exception{
+                            OptiSuppress.runUWE(tableSet);
+                            return null;
+                        } 
+                        @Override 
+                        protected void done(){
                             try{
-                                OptiSuppress.runUWE(tableSet);
+                                get();
                                 JOptionPane.showMessageDialog(null, "The UWE procedure has finished the protection\n" +
                                     tableSet.nSecond+" cells have been suppressed\n"+
                                     StrUtils.timeToString(tableSet.processingTime) + " needed");
                                 ((AbstractTableModel)table.getModel()).fireTableDataChanged();
                                 adjustColumnWidths();
                                 updateSuppressButtons();
+                            } catch (InterruptedException ex) {
+                                logger.log(Level.SEVERE, null, ex);
+                            } catch (ExecutionException ex) {
+                                JOptionPane.showMessageDialog(null, ex.getCause().getMessage());
                             }
-                            catch (ArgusException ex) {
-                                JOptionPane.showMessageDialog(null, ex.getMessage());}
-                            catch (IOException ex) {
-                                JOptionPane.showMessageDialog(null, ex.getMessage());}
-                        }
-                    }.start();
+                        }  
+                    };
+                    worker.execute();
                 }
                 break;
             case GHMITER:
                 DialogHypercubeParameters paramsG = new DialogHypercubeParameters(parentFrame, true);
                 if (paramsG.showDialog(tableSet) == DialogHypercubeParameters.APPROVE_OPTION) {
-                    new Thread(){
-                        @Override public void run(){
-                            try {GHMiter.RunGHMiter(tableSet);
+                    final SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>(){
+                        @Override 
+                        protected Void doInBackground() throws ArgusException, Exception{
+                            GHMiter.RunGHMiter(tableSet);
+                            return null;
+                        } 
+                        
+                        @Override
+                        protected void done(){
+                            try{
+                                get();
                                 JOptionPane.showMessageDialog(null, "The Hypercube has finished the protection\n" +
-                                    tableSet.nSecond+" cells have been suppressed\n"+
-                                    tableSet.ghMiterMessage +
-                                    StrUtils.timeToString(tableSet.processingTime) + " needed");
+                                                                    tableSet.nSecond+" cells have been suppressed\n"+
+                                                                    tableSet.ghMiterMessage +
+                                                                    StrUtils.timeToString(tableSet.processingTime) + " needed");
                                 if (argus.utils.TauArgusUtils.ExistFile(Application.getTempFile("frozen.txt"))){
                                     DialogInfo Info = new DialogInfo(getParentFrame(), true);
                                     Info.addLabel("Overview of the frozen cells");
@@ -1960,24 +1990,15 @@ public class PanelTable extends javax.swing.JPanel {
                                 }
                                 ((AbstractTableModel)table.getModel()).fireTableDataChanged();
                                 adjustColumnWidths();
-                                updateSuppressButtons();
-                            }
-                            catch (ArgusException ex) {
-
-                                JOptionPane.showMessageDialog(null, ex.getMessage());
-                                if (GHMiter.ShowProto002){
-                                    DialogInfo Info = new DialogInfo(getParentFrame(), true);
-                                    Info.addLabel("Overview of the file PROTO002");
-                                    Info.setSize(1000, 500);
-                                    Info.setLocationRelativeTo(null);
-                                    try{
-                                        Info.addTextFile(Application.getTempFile("PROTO002"));}
-                                    catch (ArgusException ex1){}
-                                    Info.setVisible(true);
-                                }
+                                updateSuppressButtons();                                
+                            } catch (InterruptedException ex) {
+                                logger.log(Level.SEVERE, null, ex);
+                            } catch (ExecutionException ex) {
+                                JOptionPane.showMessageDialog(null, ex.getCause().getMessage());
                             }
                         }
-                    }.start();
+                    };
+                    worker.execute();
                 }
                 break;
             case HITAS:
@@ -2059,22 +2080,32 @@ public class PanelTable extends javax.swing.JPanel {
                     break;
                 }
                 DialogNetwork paramsN = new DialogNetwork(parentFrame, true, tableSet);
+                
                 if (paramsN.showDialog() == DialogRoundingParameters.APPROVE_OPTION) {
-                    new Thread(){
-                        @Override public void run(){
-                            try {OptiSuppress.RunNetwork(tableSet);
+                    final SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>(){
+                        @Override 
+                        protected Void doInBackground() throws ArgusException, Exception{
+                            OptiSuppress.RunNetwork(tableSet);
+                            return null;
+                        } 
+                        @Override 
+                        protected void done(){
+                            try{
+                                get();
                                 JOptionPane.showMessageDialog(null, "The network has finished the protection\n" +
                                     tableSet.nSecond+" cells have been suppressed\n"
                                     + StrUtils.timeToString(tableSet.processingTime) + " needed");
                                 ((AbstractTableModel)table.getModel()).fireTableDataChanged();
                                 adjustColumnWidths();
                                 updateSuppressButtons();
+                            } catch (InterruptedException ex) {
+                                logger.log(Level.SEVERE, null, ex);
+                            } catch (ExecutionException ex) {
+                                JOptionPane.showMessageDialog(null, ex.getCause().getMessage());
                             }
-                            catch (ArgusException ex){
-                                JOptionPane.showMessageDialog(null,ex.getMessage());
-                            }
-                        }
-                    }.start();
+                        }  
+                    };
+                    worker.execute();                    
                 }
                 break;
             case MARGINAL:
@@ -2105,32 +2136,41 @@ public class PanelTable extends javax.swing.JPanel {
                     }
                 }
                 
-                new Thread(){
-                    @Override public void run(){
-                        try {
-                            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                            if (tableSet.respVar.type == Type.FREQUENCY){
-                                if(OptiSuppress.RunCellKey(tableSet, tableSet.cellkeyVar.PTableFile)){
-                                    JOptionPane.showMessageDialog(null, "The Cell Key Method has been applied succesfully in " + tableSet.processingTime + " seconds\n");
-                                }
-                            }
-                            else{
-                                if(OptiSuppress.RunCellKeyCont(tableSet, tableSet.cellkeyVar.PTableFileCont, tableSet.cellkeyVar.PTableFileSep)){
-                                    JOptionPane.showMessageDialog(null, "The Cell Key Method has been applied succesfully in " + tableSet.processingTime + " seconds\n");
-                                }
-                            }
-                            setCursor(Cursor.getDefaultCursor());
+                final SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>(){
+                    @Override 
+                    protected Boolean doInBackground() throws ArgusException, Exception{
+                        boolean result = false;
+                        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                        
+                        if (tableSet.respVar.type == Type.FREQUENCY)
+                            result = OptiSuppress.RunCellKey(tableSet, tableSet.cellkeyVar.PTableFile);
+                        else
+                            result = OptiSuppress.RunCellKeyCont(tableSet, tableSet.cellkeyVar.PTableFileCont, tableSet.cellkeyVar.PTableFileSep);
+                        
+                        setCursor(Cursor.getDefaultCursor());
+                        return result;
+                    } 
+                    
+                    @Override 
+                    protected void done(){
+                        try{
+                            boolean result = get();
+                            if (result)
+                                JOptionPane.showMessageDialog(null, "The Cell Key Method has been applied succesfully in " + tableSet.processingTime + " seconds\n");
+                            ((AbstractTableModel)table.getModel()).fireTableDataChanged();
+                            adjustColumnWidths();
+                            updateSuppressButtons();
+                        } 
+                        catch (InterruptedException ex) {
+                            logger.log(Level.SEVERE, null, ex);
+                        } 
+                        catch (ExecutionException ex) {
+                            JOptionPane.showMessageDialog(null, ex.getCause().getMessage());
                         }
-                        catch (ArgusException | IOException ex){
-                            setCursor(Cursor.getDefaultCursor());
-                            JOptionPane.showMessageDialog(null,ex.getMessage());
-                        }
-                        ((AbstractTableModel)table.getModel()).fireTableDataChanged();
-                        adjustColumnWidths();
-                        updateSuppressButtons();
+                        finally {setCursor(Cursor.getDefaultCursor());}
                     }
-                }.start();
-
+                };
+                worker.execute();
                 break;
             }
             tableSet.undoAudit();
