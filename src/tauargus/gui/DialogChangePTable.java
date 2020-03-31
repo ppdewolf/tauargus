@@ -41,20 +41,23 @@ public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
         tmpTableSet=tableSet;
         
         try{ 
-            ptableFREQ = tmpTableSet.cellkeyVar.PTableFile;
-            if ( ptableFREQ.indexOf("\\",0)>0 || ptableFREQ.indexOf(":",0)>0 ){}
-            else { ptableFREQ = tmpTableSet.cellkeyVar.metadata.getFilePath(tmpTableSet.cellkeyVar.PTableFile);}
-            textFieldPTable.setText(ptableFREQ);
+            if (tmpTableSet.respVar.type == tauargus.model.Type.FREQUENCY){
+                ptableFREQ = tmpTableSet.cellkeyVar.PTableFile;
+                if ( ptableFREQ.indexOf("\\",0)>0 || ptableFREQ.indexOf(":",0)>0 ){}
+                else { ptableFREQ = tmpTableSet.cellkeyVar.metadata.getFilePath(tmpTableSet.cellkeyVar.PTableFile);}
+                textFieldPTable.setText(ptableFREQ);
+            }
+            else{
+                ptableCONT = tmpTableSet.cellkeyVar.PTableFileCont;
+                if ( ptableCONT.indexOf("\\",0)>0 || ptableCONT.indexOf(":",0)>0 ){}
+                else { ptableCONT = tmpTableSet.cellkeyVar.metadata.getFilePath(tmpTableSet.cellkeyVar.PTableFileCont);}
+                textFieldPTableCont.setText(ptableCONT);
         
-            ptableCONT = tmpTableSet.cellkeyVar.PTableFileCont;
-            if ( ptableCONT.indexOf("\\",0)>0 || ptableCONT.indexOf(":",0)>0 ){}
-            else { ptableCONT = tmpTableSet.cellkeyVar.metadata.getFilePath(tmpTableSet.cellkeyVar.PTableFileCont);}
-            textFieldPTableCont.setText(ptableCONT);
-        
-            ptableSEP = tmpTableSet.cellkeyVar.PTableFileSep;
-            if ( ptableSEP.indexOf("\\",0)>0 || ptableSEP.indexOf(":",0)>0 ){}
-            else { ptableSEP = tmpTableSet.cellkeyVar.metadata.getFilePath(tmpTableSet.cellkeyVar.PTableFileSep);}
-            textFieldPTableSep.setText(ptableSEP);
+                ptableSEP = tmpTableSet.cellkeyVar.PTableFileSep;
+                if ( ptableSEP.indexOf("\\",0)>0 || ptableSEP.indexOf(":",0)>0 ){}
+                else { ptableSEP = tmpTableSet.cellkeyVar.metadata.getFilePath(tmpTableSet.cellkeyVar.PTableFileSep);}
+                textFieldPTableSep.setText(ptableSEP);
+            }
         }
         catch (ArgusException ex){
             JOptionPane.showMessageDialog(null, ex.getMessage());
@@ -254,11 +257,8 @@ public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
              ((!IsFrequency && !CheckFile(textFieldPTableCont.getText())) ||
                (!IsFrequency && tmpTableSet.respVar.CKMseparation && !CheckFile(textFieldPTableSep.getText())))) return;
         
-        TauArgusUtils.putDataDirInRegistry(ptableFREQ);
         tmpTableSet.cellkeyVar.PTableFile=ptableFREQ;
-        TauArgusUtils.putDataDirInRegistry(ptableCONT);
         tmpTableSet.cellkeyVar.PTableFileCont=ptableCONT;
-        TauArgusUtils.putDataDirInRegistry(ptableSEP);
         tmpTableSet.cellkeyVar.PTableFileSep=ptableSEP;
 
         returnValue = APPROVE_OPTION;
@@ -267,9 +267,8 @@ public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
     }//GEN-LAST:event_buttonOKActionPerformed
 
     private void buttonPTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPTableActionPerformed
-        TauArgusUtils.getDataDirFromRegistry(filechooser);
+        filechooser.setCurrentDirectory(new File(ptableFREQ));
         filechooser.setDialogTitle("Select ptable file for frequency variable");
-        filechooser.setSelectedFile(new File(""));
         filechooser.resetChoosableFileFilters();
         if (filechooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
             ptableFREQ = filechooser.getSelectedFile().toString();
@@ -283,9 +282,8 @@ public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
     }//GEN-LAST:event_DialogClosing
 
     private void buttonPTableContActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPTableContActionPerformed
-        TauArgusUtils.getDataDirFromRegistry(filechooser);
+        filechooser.setCurrentDirectory(new File(ptableCONT));
         filechooser.setDialogTitle("Select ptable file for continuous variable");
-        filechooser.setSelectedFile(new File(""));
         filechooser.resetChoosableFileFilters();
         if (filechooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
             ptableCONT = filechooser.getSelectedFile().toString();
@@ -294,9 +292,8 @@ public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
     }//GEN-LAST:event_buttonPTableContActionPerformed
 
     private void buttonPTableSepActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPTableSepActionPerformed
-        TauArgusUtils.getDataDirFromRegistry(filechooser);
+        filechooser.setCurrentDirectory(new File(ptableSEP));
         filechooser.setDialogTitle("Select ptable file for continuous variable, small values");
-        filechooser.setSelectedFile(new File(""));
         filechooser.resetChoosableFileFilters();
         if (filechooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
             ptableSEP = filechooser.getSelectedFile().toString();

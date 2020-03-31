@@ -22,6 +22,7 @@ import argus.utils.SystemUtils;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -55,6 +56,7 @@ public class FrameMain extends javax.swing.JFrame {
     private final Action openMicrodataAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
+            boolean MetadataError = false;
             DialogOpenMicrodata dialog = new DialogOpenMicrodata(FrameMain.this, true);
             if (dialog.showDialog() == DialogOpenMicrodata.APPROVE_OPTION) {
                 DataFilePair dataFilePair = dialog.getMicrodataFilePair();
@@ -78,30 +80,36 @@ public class FrameMain extends javax.swing.JFrame {
                 {
                     try {
                         metadata.readMicroMetadata();
-// Anco 1.6                        
-//                    } catch (ArgusException | FileNotFoundException ex) {
-                    } catch (ArgusException  ex) {
-                        if (!ex.getMessage().isEmpty()){JOptionPane.showMessageDialog(FrameMain.this, ex.getMessage());}}
-                      catch ( FileNotFoundException ex) {
+                    }
+                    catch (ArgusException  ex) {
+                        if (!ex.getMessage().isEmpty()){
+                            JOptionPane.showMessageDialog(FrameMain.this, ex.getMessage());
+                            MetadataError = true;
+                        }
+                    }
+                    catch ( FileNotFoundException ex) {
                         JOptionPane.showMessageDialog(FrameMain.this, ex.getMessage());  
                     } 
  // If SPSS then check the validity of the metadata  
-                if (metadata.dataFileType == Metadata.DATA_FILE_TYPE_SPSS){
-                    try{
-                       SpssUtilsTau.checkSpssMeta (metadata); 
-                    }
-                    catch (ArgusException ex){
-                      JOptionPane.showMessageDialog(FrameMain.this, ex.getMessage()+ 
-                              "\nPlease correct first"); 
-                      Application.clearMetadatas();
-                      metadata = null;
-                    }
-                    
-                }    
-                    
+                    if (metadata.dataFileType == Metadata.DATA_FILE_TYPE_SPSS){
+                        try{
+                            SpssUtilsTau.checkSpssMeta (metadata); 
+                        }
+                        catch (ArgusException ex){
+                            JOptionPane.showMessageDialog(FrameMain.this, ex.getMessage()+ 
+                                                                  "\nPlease correct first"); 
+                            Application.clearMetadatas();
+                            metadata = null;
+                        }
+                    }    
                 }
                 
                 Application.addMetadata(metadata);
+                if (MetadataError){ // then show metadata window
+                    for (ActionListener a: menuItemSpecifyMetadata.getActionListeners()){
+                        a.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null) { });
+                    }
+                }
                 organise();
             }
         }

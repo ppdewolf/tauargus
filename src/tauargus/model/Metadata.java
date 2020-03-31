@@ -813,17 +813,23 @@ public class Metadata implements Cloneable {
             case RECORD_KEY:
                 writer.println("    <RECORDKEY>");
                 String hs = variable.PTableFile;
-                if ( hs.indexOf("\\",0)>0 ||hs.indexOf(":",0)>0||hs.indexOf(":",0)>0){}
-                else { hs = variable.metadata.getFilePath(variable.PTableFile);}
-                writer.println("    <PFILE_FREQ> " + StrUtils.quote(hs));
+                if (StringUtils.isNotEmpty(hs)){
+                    if ( hs.indexOf("\\",0)>0 || hs.indexOf(":",0)>0 || hs.indexOf(":",0)>0){}
+                    else { hs = variable.metadata.getFilePath(variable.PTableFile);}
+                    writer.println("    <PFILE_FREQ> " + StrUtils.quote(hs));
+                }
                 hs = variable.PTableFileCont;
-                if ( hs.indexOf("\\",0)>0 ||hs.indexOf(":",0)>0||hs.indexOf(":",0)>0){}
-                else { hs = variable.metadata.getFilePath(variable.PTableFileCont);}
-                writer.println("    <PFILE_CONT> " + StrUtils.quote(hs));
+                if (StringUtils.isNotEmpty(hs)){
+                    if ( hs.indexOf("\\",0)>0 || hs.indexOf(":",0)>0 || hs.indexOf(":",0)>0){}
+                    else { hs = variable.metadata.getFilePath(variable.PTableFileCont);}
+                    writer.println("    <PFILE_CONT> " + StrUtils.quote(hs));
+                }
                 hs = variable.PTableFileSep;
-                if ( hs.indexOf("\\",0)>0 ||hs.indexOf(":",0)>0||hs.indexOf(":",0)>0){}
-                else { hs = variable.metadata.getFilePath(variable.PTableFileSep);}
-                writer.println("    <PFILE_SEP> " + StrUtils.quote(hs));
+                if (StringUtils.isNotEmpty(hs)){
+                    if ( hs.indexOf("\\",0)>0 || hs.indexOf(":",0)>0 || hs.indexOf(":",0)>0){}
+                    else { hs = variable.metadata.getFilePath(variable.PTableFileSep);}
+                    writer.println("    <PFILE_SEP> " + StrUtils.quote(hs));
+                }
                 break;
             case SHADOW:
                 writer.println("    <NUMERIC> <SHADOW>");
@@ -995,7 +1001,7 @@ public class Metadata implements Cloneable {
                     if (this.find(Type.RECORD_KEY) == null){
                         throw new ArgusException("CKM specified for continuous variable " + variable.name + " without having a RecordKey specified.");
                     }
-                    if (this.find(Type.RECORD_KEY).PTableFileCont.equals("")){
+                    if (StringUtils.isEmpty(this.find(Type.RECORD_KEY).PTableFileCont)){
                         throw new ArgusException("CKM specified for continuous variable " + variable.name + " without specification of ptable for continuous CKM.");
                     }
                     if (!(variable.CKMscaling.equals("F") || variable.CKMscaling.equals("N"))){
@@ -1012,7 +1018,13 @@ public class Metadata implements Cloneable {
                     }
                 }
                 if (emptyRequestCodes) {
-                    throw new ArgusException("There is no request code specified for variable" + variable.name + ".");
+                    throw new ArgusException("There is no request code specified for variable " + variable.name + ".");
+                }
+            }
+            
+            if (variable.type == Type.RECORD_KEY){
+                if (StringUtils.isEmpty(variable.PTableFile)){
+                    throw new ArgusException("There is no ptable file specified for frequency CKM");
                 }
             }
         }            

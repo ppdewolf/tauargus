@@ -325,16 +325,17 @@ public class DialogSpecifyMetadata extends DialogBase {
             metadata.variables.add(variableListModel.get(i));
         }
 
+        // Always check the validity of the metadata: you may have come from incorrect metadata and did not change correctly
+        try {
+            metadata.verify(); 
+        } 
+        catch (ArgusException ex) {
+            if (!ex.getMessage().isEmpty()){JOptionPane.showMessageDialog(this, ex.getMessage());}
+            listVariables.setSelectedIndex(0);
+            panelEditVariable.load(variableListModel.get(0));
+            return;
+        }
         if (!metadata.equals(oldMetadata)) { // Data has changed
-            try {
-                metadata.verify(); 
-            } 
-            catch (ArgusException ex) {
-                if (!ex.getMessage().isEmpty()){JOptionPane.showMessageDialog(this, ex.getMessage());}
-                listVariables.setSelectedIndex(0);
-                panelEditVariable.load(variableListModel.get(0));
-                return;
-            }
             //It looks a bit weird, but the PanelEditVariable stores the new statusses in oldmetadata.
             //vreemde actie van Robert
             metadata.safeStatus = oldMetadata.safeStatus;
