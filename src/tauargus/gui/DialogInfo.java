@@ -127,7 +127,6 @@ public class DialogInfo extends javax.swing.JDialog {
         clearText();
         if (!TauArgusUtils.ExistFile(fn)){
             jTextAreaInfo.setText("The file " + fn + " could not be displayed; sorry"); 
-            return;
         }
         else { 
             try{  

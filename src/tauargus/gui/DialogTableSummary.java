@@ -72,7 +72,6 @@ public class DialogTableSummary extends javax.swing.JDialog {
                 return comp;                
             }
         });
-        setLocationRelativeTo(parent);
     }
 
     void showDialog(final TableSet tableSet) {
@@ -117,12 +116,13 @@ public class DialogTableSummary extends javax.swing.JDialog {
         }
 
         ResizeSummaryDialog();
-
+        setLocationRelativeTo(this.getParent());
+        
         setVisible(true);
     }
     
     private void ResizeSummaryDialog(){
-        java.awt.Dimension d = new java.awt.Dimension(0,0);
+        java.awt.Dimension d;// = new java.awt.Dimension(0,0);
         tableSummary.setPreferredScrollableViewportSize(tableSummary.getPreferredSize());
         d = tableSummary.getPreferredSize();
         d.width = d.width+10;
@@ -189,7 +189,7 @@ public class DialogTableSummary extends javax.swing.JDialog {
     private void setSummaryStandard(final TableSet tableSet){
         //Set TableModel
         tableSummary.setModel(new AbstractTableModel() {
-            private CellStatusStatistics statistics = tableSet.getCellStatusStatistics();
+            private final CellStatusStatistics statistics = tableSet.getCellStatusStatistics();
             int d = tableSet.respVar.nDecimals;
 
             @Override
@@ -284,7 +284,8 @@ public class DialogTableSummary extends javax.swing.JDialog {
                 Object colorvalue;
                 colorvalue = table.getValueAt(row,1);
                 if (column==0 & row < table.getModel().getRowCount() - 2 & !colorvalue.equals(0)){
-                    R = (int) (235 - (235-85)*(Math.abs((Integer) colorvalue) - 1)/(maxColor-1));
+                    R = (235 - (235 - 85)*(Math.abs((Integer) colorvalue) - 1)/(maxColor-1));
+                    //R = (int) (235 - (235-85)*(Math.abs((Integer) colorvalue) - 1)/(maxColor-1));
                     G = R;
                     comp.setBackground(new Color(R,G,B));
                 }

@@ -36,7 +36,7 @@ public class Variable implements Cloneable {
     
     private static final Logger logger = Logger.getLogger(Variable.class.getName());
     
-    private TauArgus tauArgus = Application.getTauArgusDll();
+    private final TauArgus tauArgus = Application.getTauArgusDll();
 
     // Determines lengths of fixed sized arrays being used
     public static final int MAX_NUMBER_OF_MISSINGS = 2;
@@ -191,11 +191,9 @@ public class Variable implements Cloneable {
         String missing1 = "";
         String missing2 = "";
         String codeList = "";
-// Anco 1.6 try with recources        
-//        try (BufferedReader reader = new BufferedReader(new FileReader(fileName));) {
-        BufferedReader reader = null;
-        try {reader = new BufferedReader(new FileReader(fileName));
-              Tokenizer tokenizer = new Tokenizer(reader);
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {              
+            Tokenizer tokenizer = new Tokenizer(reader);
             while ((tokenizer.nextLine()) != null) {
                 String hs;
                 hs = tokenizer.getLine();
@@ -214,19 +212,14 @@ public class Variable implements Cloneable {
                     codeList = tokenizer.nextToken();
                 } else if (!token.equals("")) {
                     recodeData = recodeData + hs + "\n";
-//                    recodeData = recodeData + token + "\n";
                 }
             }
             return new RecodeInfo(recodeData, missing1, missing2, codeList);
         }
-        finally {reader.close();}
     }
 
     public void writeRecodeFile(String fileName, RecodeInfo recodeInfo) throws IOException {
-// anco 1.6 try with resources        
-//        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));) {
-       BufferedWriter writer = null; 
-       try {writer = new BufferedWriter(new FileWriter(fileName));  
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {            
             if (!recodeInfo.getMissing1().equals("") || !recodeInfo.getMissing2().equals("")) {
                 writer.write("<MISSING> " + recodeInfo.getMissing1() + " " + recodeInfo.getMissing2() + "\n");
             }
@@ -235,12 +228,9 @@ public class Variable implements Cloneable {
             }
             writer.write(recodeInfo.getRecodeData() + "\n");
         }
-       finally {writer.close();}
     }
 
         public void writeRecodeTreeFile(String fileName) throws IOException {
-// anco 1.6 try with resources        
-//        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));) {
          int[] isParent = new int[1];
          int[] isActive = new int[1];
          int[] isMissing = new int[1];
@@ -250,9 +240,8 @@ public class Variable implements Cloneable {
          String currentCode;
        int[] nc = new int[1]; int[]nac = new int[1]; 
        int i, j;
-       BufferedWriter writer = null; 
-       try {writer = new BufferedWriter(new FileWriter(fileName));  
-            writer.write("<TREERECODE>\n");
+       try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+           writer.write("<TREERECODE>\n");
 // write here the recoded tree   
             tauArgus.GetVarNumberOfCodes(index, nc, nac);
             for (i=0; i<nc[0]-1;i++){
@@ -266,7 +255,6 @@ public class Variable implements Cloneable {
                }   
             }
        }
-       finally {writer.close();}
     }
 
     public void recode(RecodeInfo recodeInfo) throws ArgusException {
@@ -302,8 +290,9 @@ public class Variable implements Cloneable {
 //Anco 1.6 try with resources     
 //overigens wordt de reader niet gesloten ???????        
 //        try (BufferedReader reader = new BufferedReader(new FileReader(new File(fileName)));) {        
-      BufferedReader reader = null;  
-      try {reader = new BufferedReader(new FileReader(new File(fileName)));                
+      //BufferedReader reader = null;  
+      try (BufferedReader reader = new BufferedReader(new FileReader(new File(fileName)))){
+      //{reader = new BufferedReader(new FileReader(new File(fileName)));                
             tauArgus.UndoRecode(index);
             String regel = reader.readLine();
             if (!StringUtils.equals(regel, "<TREERECODE>")) {
@@ -321,7 +310,6 @@ public class Variable implements Cloneable {
             tauArgus.DoActiveRecode(index);
         }
         catch (Exception ex) {
-            
             tauArgus.UndoRecode(index);
             throw new ArgusException("Error in reading tree status in recode file " + fileName + ": " + ex.getMessage());
         }
@@ -441,19 +429,24 @@ public class Variable implements Cloneable {
         Variable variable = (Variable)super.clone(); 
         
         if (requestCode != null) {
-            variable.requestCode = (String[])requestCode.clone();
+            //variable.requestCode = (String[])requestCode.clone();
+            variable.requestCode = requestCode.clone();
         }
         if (distanceFunction != null) {
-            variable.distanceFunction = (int[])distanceFunction.clone();
+            //variable.distanceFunction = (int[])distanceFunction.clone();
+            variable.distanceFunction = distanceFunction.clone();
         }
         if (hierLevels != null) {
-            variable.hierLevels = (int[])hierLevels.clone();
+            //variable.hierLevels = (int[])hierLevels.clone();
+            variable.hierLevels = hierLevels.clone();
         }
         if (missing != null) {
-            variable.missing = (String[])missing.clone();
+            //variable.missing = (String[])missing.clone();
+            variable.missing = missing.clone();
         }
         if (CKMepsilon != null){
-            variable.CKMepsilon = (double[])CKMepsilon.clone();
+            //variable.CKMepsilon = (double[])CKMepsilon.clone();
+            variable.CKMepsilon = CKMepsilon.clone();
         }
         variable.originalVariable = this;
         return variable;

@@ -61,14 +61,11 @@ import static tauargus.utils.TauArgusUtils.ShowWarningMessage;
 import tauargus.utils.Tokenizer;
 
 public class OptiSuppress {
-//TODO    Keuze moet noguit het options scherm/registry kommen
-
-    
     public static double JJZero, JJZero1, JJZero2, JJFeasTol, JJOptTol, JJMinViola, JJMaxSlack,CTATolerance;
     public static int JJInfinity, JJMaxColslp, JJMaxRowslp, JJMaxCutsPool, JJMaxCutsIter;
              
-    private static String solverName[]={"NO","XPRESS", "CPLEX", "SCIP" }; 
-    private static String dots = "....................";
+    private static final String solverName[]={"NO","XPRESS", "CPLEX", "SCIP" }; 
+    private static final String dots = "....................";
     private static final TauArgus tauArgus = Application.getTauArgusDll();    
     private static final HiTaSCtrl tauHitas = Application.getTauHitasDll();
     private static final RounderCtrl rounder = Application.getRounder();
@@ -79,41 +76,42 @@ public class OptiSuppress {
     private static final Logger logger = Logger.getLogger(OptiSuppress.class.getName());
     
     public static void loadJJParamFromRegistry(){
-      String hs;
-      //Initialize the JJ-parameters first, then get them from the registry.
-      //If getting them from the registry fials, they still have the default value.  
-      JJZero = 0.0000001;
-      JJZero1 = 0.0000001;
-      JJZero2 = 0.0000000001;
-      JJInfinity = 2140000000;
-      JJFeasTol = 0.000001;
-      JJOptTol = 0.000000001;
-      JJMaxSlack = 0.01;
+        //Initialize the JJ-parameters first, then get them from the registry.
+        //If getting them from the registry fails, they still have the default value.  
+        JJZero = 0.0000001;
+        JJZero1 = 0.0000001;
+        JJZero2 = 0.0000000001;
+        JJInfinity = 2140000000;
+        JJFeasTol = 0.000001;
+        JJMinViola = 0.0001;
+        JJOptTol = 0.000000001;
+        JJMaxSlack = 0.01;
       
-      JJMaxColslp = 50000;
-      JJMaxRowslp = 15000;
-      JJMaxCutsPool = 500000;
-      JJMaxCutsIter = 50;
-      CTATolerance  = 0.00001;
+        JJMaxColslp = 50000;
+        JJMaxRowslp = 15000;
+        JJMaxCutsPool = 500000;
+        JJMaxCutsIter = 50;
+        
+        CTATolerance  = 0.00001;
      
-      try{
-      hs = SystemUtils.getRegString("solveroptions", "zero", "0.0000001" );     JJZero = StrUtils.toDouble(hs);
-      hs = SystemUtils.getRegString("solveroptions", "zero1", "0.0000001" );    JJZero1 = StrUtils.toDouble(hs);
-      hs = SystemUtils.getRegString("solveroptions", "zero2", "0.0000000001" ); JJZero2 = StrUtils.toDouble(hs);
-      hs = SystemUtils.getRegString("solveroptions", "infinity", "2140000000" ); JJInfinity = StrUtils.toInteger(hs);
-      hs = SystemUtils.getRegString("solveroptions", "feastol", "0.000001" );  JJFeasTol = StrUtils.toDouble(hs);
-      hs = SystemUtils.getRegString("solveroptions", "opttol", "0.000000001" );   JJOptTol = StrUtils.toDouble(hs);
-      hs = SystemUtils.getRegString("solveroptions", "minviola", "0.0001" ); JJMinViola = StrUtils.toDouble(hs);
-      hs = SystemUtils.getRegString("solveroptions", "maxslack", "0.01" ); JJMaxSlack = StrUtils.toDouble(hs);
+        try{
+            JJZero = StrUtils.toDouble(SystemUtils.getRegString("solveroptions", "zero", "0.0000001"));
+            JJZero1 = StrUtils.toDouble(SystemUtils.getRegString("solveroptions", "zero1", "0.0000001"));
+            JJZero2 = StrUtils.toDouble(SystemUtils.getRegString("solveroptions", "zero2", "0.0000000001"));
+            JJInfinity = StrUtils.toInteger(SystemUtils.getRegString("solveroptions", "infinity", "2140000000"));
+            JJFeasTol = StrUtils.toDouble(SystemUtils.getRegString("solveroptions", "feastol", "0.000001"));
+            JJOptTol = StrUtils.toDouble(SystemUtils.getRegString("solveroptions", "opttol", "0.000000001"));
+            JJMinViola = StrUtils.toDouble(SystemUtils.getRegString("solveroptions", "minviola", "0.0001"));
+            JJMaxSlack = StrUtils.toDouble(SystemUtils.getRegString("solveroptions", "maxslack", "0.01"));
      
-      hs = SystemUtils.getRegString("solveroptions", "maxcolslp", "50000" ); JJMaxColslp = StrUtils.toInteger(hs);
-      hs = SystemUtils.getRegString("solveroptions", "maxrowslp", "15000"); JJMaxRowslp = StrUtils.toInteger(hs);
-      hs = SystemUtils.getRegString("solveroptions", "maxcutspool", "500000" ); JJMaxCutsPool = StrUtils.toInteger(hs);
-      hs = SystemUtils.getRegString("solveroptions", "maxcutsiter", "50" ); JJMaxCutsIter = StrUtils.toInteger(hs);
+            JJMaxColslp = StrUtils.toInteger(SystemUtils.getRegString("solveroptions", "maxcolslp", "50000"));
+            JJMaxRowslp = StrUtils.toInteger(SystemUtils.getRegString("solveroptions", "maxrowslp", "15000"));
+            JJMaxCutsPool = StrUtils.toInteger(SystemUtils.getRegString("solveroptions", "maxcutspool", "500000"));
+            JJMaxCutsIter = StrUtils.toInteger(SystemUtils.getRegString("solveroptions", "maxcutsiter", "50"));
       
-      hs = SystemUtils.getRegString("solveroptions", "ctatolerance", "0.00001" ); CTATolerance = StrUtils.toDouble(hs);
+            CTATolerance = StrUtils.toDouble(SystemUtils.getRegString("solveroptions", "ctatolerance", "0.00001"));
               
-      } catch (ArgusException ex){ }             
+        } catch (ArgusException ex){ }             
     }
     
     private static void setJJParamIntauHitas(){
@@ -121,15 +119,16 @@ public class OptiSuppress {
       tauHitas.SetJJconstantsDbl(102, JJZero1);
       tauHitas.SetJJconstantsDbl(103, JJZero2);
       tauHitas.SetJJconstantsDbl(104, JJInfinity);
-      tauHitas.SetJJconstantsDbl(111, JJFeasTol);
-      tauHitas.SetJJconstantsDbl(112, JJOptTol);
-      tauHitas.SetJJconstantsDbl(109, JJMinViola);
-      tauHitas.SetJJconstantsDbl(110, JJMaxSlack);
       tauHitas.SetJJconstantsInt(105, JJMaxColslp);
       tauHitas.SetJJconstantsInt(106, JJMaxRowslp);
       tauHitas.SetJJconstantsInt(107, JJMaxCutsPool);
       tauHitas.SetJJconstantsInt(108, JJMaxCutsIter);
-      
+      tauHitas.SetJJconstantsDbl(109, JJMinViola);
+      tauHitas.SetJJconstantsDbl(110, JJMaxSlack);
+      tauHitas.SetJJconstantsDbl(111, JJFeasTol);
+      tauHitas.SetJJconstantsDbl(112, JJOptTol);
+  
+//From hitas header file:      
 //#define JJZERO          101
 //#define JJZERO1         102
 //#define JJZERO2         103
@@ -142,8 +141,8 @@ public class OptiSuppress {
 //#define JJMAXSLACK      110
 //#define JJFEASTOL       111
 //#define JJOPTTOL        112        
-        
     }
+    
 /**
  * The network solution is only possible for 2-dim tables and 
  * only the first RespVar can be hierarchical 
@@ -185,28 +184,24 @@ public class OptiSuppress {
          hs = SystemUtils.getApplicationDirectory(OptiSuppress.class).getCanonicalPath();
          } 
        catch (Exception ex) {}
-//       hs = "\"" + hs + "\\main1H2D.exe\" \"" + Application.getTempFile("NetInH.tmp") + "\" "+ 
-//             "\"" + temp + "\" ";
        hs = "\"" + hs + "/main1H2D.exe\"";
        commandline.add(StrUtils.unQuote(hs));
        commandline.add(Application.getTempFile("NetInH.tmp"));
        commandline.add(temp);
        
        if (tableSet.networkSolverType == 2) {
-           //hs = hs + " -s  d ";
            commandline.add("-s");
            commandline.add("d");
        }
-       if (tableSet.networkPrimariesOrder == 2) { //hs = hs + " -m  a ";}
+       if (tableSet.networkPrimariesOrder == 2) {
            commandline.add("-m");
            commandline.add("a");
        }
-       if (tableSet.networkPrimariesOrder == 3) {//hs = hs + " -m  d ";}
+       if (tableSet.networkPrimariesOrder == 3) {
            commandline.add("-m");
            commandline.add("d");      
        }
        TauArgusUtils.writeBatchFileForExec("RunNetwork", commandline);
-//       result = ExecUtils.execCommand(hs, temp, false, "Run Network");
        result = ExecUtils.execCommand(commandline, Application.getTempDir(),false,"Run Network program");
        if (result != 0) { //something wrong
          if ((result >= -6) && (result < 0 )){
@@ -250,7 +245,6 @@ public class OptiSuppress {
         try {
         BufferedWriter out = new BufferedWriter(new FileWriter(Application.getTempFile("Anneke.txt")));
         out.write(Application.getTempFile("Anneke.JJ")); out.newLine();
-        //out.write ("C:/Lokaler_Datenbereich/xpress/bin/mosel"); out.newLine();
         out.write ("NoLongerNeeded"); out.newLine();
         out.write (Application.getTempFile("Anneke.Out")); out.newLine();
         out.write (Application.getTempFile("Anneke.txt")); out.newLine();
@@ -274,7 +268,6 @@ public class OptiSuppress {
             out.write (TauArgusUtils.GetCplexLicenceFile());}
         else{out.write ("NoLicenceSpecified");}
         out.newLine();
-//        out.write ("C:\\Lokaler Datenbereich\\xpress\\bin\\mosel\""); out.newLine();
         out.close();
         }        
         catch (IOException ex){
@@ -291,66 +284,59 @@ public class OptiSuppress {
           commandline.add(Application.getTempFile("Anneke.txt"));
           commandline.add(Application.getTempFile("Audit.log"));
           TauArgusUtils.writeBatchFileForExec("RunAudit", commandline);
-//          hs = StrUtils.quote(hs) + " " + StrUtils.quote(Application.getTempFile("Anneke.txt")) + " "+ 
-//                                          StrUtils.quote(Application.getTempFile("audit.log"));
-//          BufferedWriter out = new BufferedWriter(new FileWriter(Application.getTempFile("runAudit.bat")));
-//          out.write(hs); out.newLine();
-//          out.write ("pause"); out.newLine();
-//          out.close();
           } 
         catch (IOException ex){}
         //Run the intervalle program
-          result = ExecUtils.execCommand(commandline, Application.getTempDir(),false, "Run Audit program");
-//        result = ExecUtils.execCommand(hs, Application.getTempDir(),false, "Run Audit program");
+        result = ExecUtils.execCommand(commandline, Application.getTempDir(),false, "Run Audit program");
         
         if (result !=0){ throw new ArgusException("The audit program was not completed successfully");}
         if (!TauArgusUtils.ExistFile(Application.getTempFile("Anneke.Out"))){
-           throw new ArgusException("The audit program was not completed successfully\nNo output file found");} 
-        
-         try{
-          BufferedReader in = new BufferedReader(new FileReader(Application.getTempFile("Anneke.Out")));
-          Tokenizer tokenizer = new Tokenizer(in);
-          BufferedWriter out = new BufferedWriter(new FileWriter(Application.getTempFile("audit_"+tabNo+ ".html")));
-          //KopHTML
-          int lineNumber = 0;
-          for (i=0;i<4;i++){hs = tokenizer.nextLine();}  //first 4 lines are skipped
-          SaveTable.writeKopHtml(tableSet, out, false);
-          out.write("<!--XXXXXXXXXXXXXX-->"); out.newLine();
-          out.write("<h2>Overview of not-properly protected cells</h2>"); out.newLine();
+            throw new ArgusException("The audit program was not completed successfully\nNo output file found");
+        } 
+        try{
+            BufferedReader in = new BufferedReader(new FileReader(Application.getTempFile("Anneke.Out")));
+            Tokenizer tokenizer = new Tokenizer(in);
+            BufferedWriter out = new BufferedWriter(new FileWriter(Application.getTempFile("audit_"+tabNo+ ".html")));
+            //KopHTML
+            int lineNumber = 0;
+            for (i=0;i<4;i++){hs = tokenizer.nextLine();}  //first 4 lines are skipped
+            SaveTable.writeKopHtml(tableSet, out, false);
+            out.write("<!--XXXXXXXXXXXXXX-->"); out.newLine();
+            out.write("<h2>Overview of not-properly protected cells</h2>"); out.newLine();
             while ((tokenizer.nextLine()) != null) {
                 hs = tokenizer.nextField(";");
                 cn = Integer.parseInt(hs);
-//              cn = Integer.parseInt(tokenizer.nextField(";"));
-              lpl = Double.parseDouble(tokenizer.nextField(";"));
-              upl = Double.parseDouble(tokenizer.nextField(";"));
-              cVal = Double.parseDouble(tokenizer.nextField(";"));
-              oke = tauArgus.SetRealizedLowerAndUpper(tabNo, cn, upl, lpl);
-              if (!oke){throw new ArgusException("An error has occurred when reading the audit results for cell: "+cn);}
-               if (tokenizer.getLine().equals("u;1")){
-               lineNumber++;
-               if(lineNumber==1){
-                 out.write("<table>"); out.newLine();
-                 out.write("  <tr>"); out.newLine();
-                 for (i=0;i<tableSet.expVar.size();i++) {
-                   out.write("    <td>"+tableSet.expVar.get(i).name  +"</td>"); out.newLine();
-                 }
-                 out.write("    <td>Lower Prot.</td>");out.newLine();
-                 out.write("    <td>Cell value</td>");out.newLine();
-                 out.write("    <td>Upper Prot.</td> ");out.newLine();
-                 out.write("    <td>Exact</td>"); out.newLine();
-                 out.write("  </tr>"); out.newLine();
-               }
-               hs = TableService.IndexToCodesString(tableSet, cn);
-               hs = hs.replace(",", "</td><td align=\"Right\">");
-               hs = "  <tr><td align=\"Right\">" + hs;
-               hs = hs + "<td align=\"Right\">"+lpl + 
-                         "</td><td align=\"Right\">" + cVal + 
-                         "</td><td align=\"Right\">" + upl + "</td><td>";
-               if ((cVal == lpl) && (cVal == upl)){ hs = hs + "YES"; tableSet.auditExactDisclosure++;}   
-                                             else {hs = hs +"&nbsp;";tableSet.auditPartialDisclosure++;}
-               hs = hs + "</td></tr>";
-               out.write(hs); out.newLine();
-              }
+                lpl = Double.parseDouble(tokenizer.nextField(";"));
+                upl = Double.parseDouble(tokenizer.nextField(";"));
+                cVal = Double.parseDouble(tokenizer.nextField(";"));
+                oke = tauArgus.SetRealizedLowerAndUpper(tabNo, cn, upl, lpl);
+                if(!oke){throw new ArgusException("An error has occurred when reading the audit results for cell: "+cn);}
+                if (tokenizer.getLine().equals("u;1")){
+                    lineNumber++;
+                    if(lineNumber==1){
+                        out.write("<table>"); out.newLine();
+                        out.write("  <tr>"); out.newLine();
+                        for (i=0;i<tableSet.expVar.size();i++) {
+                            out.write("    <td>"+tableSet.expVar.get(i).name  +"</td>"); out.newLine();
+                        }
+                        out.write("    <td>Lower Prot.</td>");out.newLine();
+                        out.write("    <td>Cell value</td>");out.newLine();
+                        out.write("    <td>Upper Prot.</td> ");out.newLine();
+                        out.write("    <td>Exact</td>"); out.newLine();
+                        out.write("  </tr>"); out.newLine();
+                    }
+                    hs = TableService.IndexToCodesString(tableSet, cn);
+                    hs = hs.replace(",", "</td><td align=\"Right\">");
+                    hs = "  <tr><td align=\"Right\">" + hs;
+                    hs = hs + "<td align=\"Right\">"+lpl + 
+                             "</td><td align=\"Right\">" + cVal + 
+                             "</td><td align=\"Right\">" + upl + "</td><td>";
+                    if ((cVal == lpl) && (cVal == upl)){ hs = hs + "YES"; tableSet.auditExactDisclosure++;}   
+                    else {hs = hs +"&nbsp;";tableSet.auditPartialDisclosure++;}
+                    
+                    hs = hs + "</td></tr>";
+                    out.write(hs); out.newLine();
+                }
             }
             if(lineNumber>0){out.write("</table>"); out.newLine();}
             out.write("<!--XXXXXXXXXXXXXX-->"); out.newLine();
@@ -365,9 +351,8 @@ public class OptiSuppress {
             diff = diff / 1000;
             //tableSet.processingTime = (int) diff;
             tokenizer.close(); 
-         }
-         catch(IOException ex){throw new ArgusException ("An error has occurred when retrieving the audit results");}
-       
+        }
+        catch(IOException ex){throw new ArgusException ("An error has occurred when retrieving the audit results");}
     }
     
     public static void RunCTA (TableSet tableSet, boolean doExpert)throws ArgusException, FileNotFoundException, IOException{
@@ -388,19 +373,15 @@ public class OptiSuppress {
         } catch (Exception ex) {}
 
         if (doExpert){ // clean possible output files
-          for(i=0;i<solverNames.length;i++){TauArgusUtils.DeleteFile(Application.getTempFile("CTA_"+solverNames[i]+".sol"));}
-//            TauArgusUtils.DeleteFileWild ("CTA*.sol",Application.getTempDir());
-//            TauArgusUtils.DeleteFileWild ("CTA*.log",Application.getTempDir());
+            for(i=0;i<solverNames.length;i++){TauArgusUtils.DeleteFile(Application.getTempFile("CTA_"+solverNames[i]+".sol"));}
         }
-        if (SystemUtils.isWindows()) 
-        {
-        if (doExpert){command = "\"" + command + "/GUICTA.exe\"";}
-        else         {command = "\"" + command + "/mainCTA.exe\"";}
+        if (SystemUtils.isWindows()){
+            if (doExpert){command = "\"" + command + "/GUICTA.exe\"";}
+            else         {command = "\"" + command + "/mainCTA.exe\"";}
         }
-        else // For the moment this is assumed to be Linux
-        {
-        if (doExpert){command = "\"" + command + "/GUICTA\"";}
-        else         {command = "\"" + command + "/main_CTA\"";}
+        else{ // For the moment this is assumed to be Linux
+            if (doExpert){command = "\"" + command + "/GUICTA\"";}
+            else         {command = "\"" + command + "/main_CTA\"";}
         }   
         
         if (!TauArgusUtils.ExistFile(StrUtils.unQuote(command))){ throw new ArgusException("CTA-program could not be found");}
@@ -411,27 +392,29 @@ public class OptiSuppress {
         commandline.add(Application.getTempDir());
         eps = CTATolerance;
         if (!doExpert){
-          tolStr = Double.toString(CTATolerance); //   "1.0E-5";
-          command = command + " -e " + tolStr;
-          commandline.add("-e");
-          commandline.add(tolStr);
+            tolStr = Double.toString(CTATolerance); //   "1.0E-5";
+            command = command + " -e " + tolStr;
+            commandline.add("-e");
+            commandline.add(tolStr);
           
-          commandline.add("-s");
-          switch (Application.solverSelected){
-              case Application.SOLVER_CPLEX:  
-                  commandline.add("c");
-                  command = command + " -s c"; 
-                  solver = "cplex";  break;
-              case Application.SOLVER_XPRESS: 
-                  commandline.add("x");
-                  commandline.add("-M");
-                  commandline.add("d");
-                  command = command + " -s x -M d"; solver = "xpress"; break; // OEM Xpress has no barrier
-              case Application.SOLVER_SOPLEX: 
-                  commandline.add("b");
-                  command = command + " -s b"; solver = "cbc";   break;//CBC gekozen ipv Soplex
-              case Application.SOLVER_NO: throw new ArgusException("No solver has been selected so CTA cannot be applied");            
-          }
+            commandline.add("-s");
+            switch (Application.solverSelected){
+                case Application.SOLVER_CPLEX:  
+                     commandline.add("c");
+                     command = command + " -s c"; 
+                     solver = "cplex";  break;
+                case Application.SOLVER_XPRESS: 
+                     commandline.add("x");
+                     commandline.add("-M");
+                     commandline.add("d");
+                     command = command + " -s x -M d"; 
+                     solver = "xpress"; break; // OEM Xpress has no barrier
+                case Application.SOLVER_SOPLEX: 
+                     commandline.add("b");
+                     command = command + " -s b"; 
+                     solver = "cbc";   break;//CBC gekozen ipv Soplex
+                case Application.SOLVER_NO: throw new ArgusException("No solver has been selected so CTA cannot be applied");            
+            }
         }
         BufferedWriter out = new BufferedWriter(new FileWriter(Application.getTempFile("CTA.bat")));
         out.write(command); out.newLine();
@@ -457,57 +440,57 @@ public class OptiSuppress {
 //#define CTA_OTHERWISE 10 // other situations from solver with no feasible solution
 //1 3 5 6 are reasonable OK return values
         if (!doExpert){
-          if ( !((result == 1)||(result == 3)||(result == 5)||(result == 6)) ){
-            throw new ArgusException("Incorrect end of CTA-program; Error code: "+ result);           
-          }
-          if (result == 1) {hs = "CTA_optimal solution (within tolerance) found";}
-          if (result == 3) {hs = "CTA_time limit exhausted with feasible solution";}
-          if (result == 5) {hs = "CTA_feasible solution found, likely  not optimal";} 
-          if (result == 6) {hs = "CTA_first feasible solution found, likely not optimal";} 
-          SystemUtils.writeLogbook(hs);
-          tableSet.suppressINFO = "Standard CTA solution has been applied<br>" +
-                                  "Solver used : " + solver + "<br>" + hs;
+            if ( !((result == 1)||(result == 3)||(result == 5)||(result == 6)) ){
+                throw new ArgusException("Incorrect end of CTA-program; Error code: "+ result);           
+            }
+            if (result == 1) {hs = "CTA_optimal solution (within tolerance) found";}
+            if (result == 3) {hs = "CTA_time limit exhausted with feasible solution";}
+            if (result == 5) {hs = "CTA_feasible solution found, likely  not optimal";} 
+            if (result == 6) {hs = "CTA_first feasible solution found, likely not optimal";} 
+            SystemUtils.writeLogbook(hs);
+            tableSet.suppressINFO = "Standard CTA solution has been applied<br>" +
+                                    "Solver used : " + solver + "<br>" + hs;
         }
         if (doExpert){ // try to find a solutions file;  we take the first non-empty one
-          solFile = ""; long lastTime, lt;
-          lastTime = 0;
-          for(i=0;i<solverNames.length;i++){
-            hs = Application.getTempFile("CTA_"+solverNames[i]+".sol");  
-            if (TauArgusUtils.ExistFile(hs)){
-              hs = Application.getTempFile("CTA_"+solverNames[i]+".sol"); 
-              if (TauArgusUtils.FileLength(hs)>0) {
-                lt = TauArgusUtils.FileLastModified(hs);
-                if (lt > lastTime){
-                  lastTime = lt;  
-                  solFile = hs;   
-                  solver = solverNames[i];
-                }
-              }
-            }  
-          }
-          if (solFile.equals("")) {throw new ArgusException("No solution file of CTA-program found");}
-          tableSet.suppressINFO = "Expert CTA solution has been applied<br>" +
-                                  "Solver used : " + solver+ "<br>";
+            solFile = ""; long lastTime, lt;
+            lastTime = 0;
+            for(i=0;i<solverNames.length;i++){
+                hs = Application.getTempFile("CTA_"+solverNames[i]+".sol");  
+                if (TauArgusUtils.ExistFile(hs)){
+                    hs = Application.getTempFile("CTA_"+solverNames[i]+".sol"); 
+                    if (TauArgusUtils.FileLength(hs)>0) {
+                        lt = TauArgusUtils.FileLastModified(hs);
+                        if (lt > lastTime){
+                            lastTime = lt;  
+                            solFile = hs;   
+                            solver = solverNames[i];
+                        }
+                    }
+                }  
+            }
+            if (solFile.equals("")) {throw new ArgusException("No solution file of CTA-program found");}
+            tableSet.suppressINFO = "Expert CTA solution has been applied<br>" +
+                                    "Solver used : " + solver+ "<br>";
         }
         if (TauArgusUtils.FileLength(solFile)==0){ throw new ArgusException("Solution file of CTA-program is empty");}
         
         //Read rthe results back
         nSec[0]=0;
-// anco 1.6 try with resources verwijderd. finally toegevoegd        
-//         try (BufferedReader reader = new BufferedReader(new FileReader(solFile));) {
-         BufferedReader reader = null;       
-         try { reader = new BufferedReader(new FileReader(solFile)); 
-           Tokenizer tokenizer = new Tokenizer(reader);
-           while ((tokenizer.nextLine()) != null) {
-             cn = Integer.parseInt(tokenizer.nextToken());
-             orgVal = Double.parseDouble(tokenizer.nextToken());
-             ctaVal = Double.parseDouble(tokenizer.nextToken());
-             if (Math.abs(orgVal-ctaVal) < eps){ctaVal = orgVal;}
-             tauArgus.SetCTAValues(tabNo, cn, orgVal, ctaVal, nSec);
-          }
-          tokenizer.close();
-         }
-         finally {reader.close();}
+
+        BufferedReader reader = null;       
+        try{ 
+            reader = new BufferedReader(new FileReader(solFile)); 
+            Tokenizer tokenizer = new Tokenizer(reader);
+            while ((tokenizer.nextLine()) != null) {
+                cn = Integer.parseInt(tokenizer.nextToken());
+                orgVal = Double.parseDouble(tokenizer.nextToken());
+                ctaVal = Double.parseDouble(tokenizer.nextToken());
+                if (Math.abs(orgVal-ctaVal) < eps){ctaVal = orgVal;}
+                tauArgus.SetCTAValues(tabNo, cn, orgVal, ctaVal, nSec);
+            }
+            tokenizer.close();
+        }
+        finally {reader.close();}
          
         Date endDate = new Date();
         long diff = endDate.getTime()-startDate.getTime();
@@ -517,63 +500,61 @@ public class OptiSuppress {
         tableSet.ctaProtect = true; 
         tableSet.suppressed = TableSet.SUP_CTA;
         i = tableSet.CountSecondaries();
-        tableSet.nSecond = tableSet.nSecond+ i;  //eigenijk onzin
-     // .Inverseweight = (ChkInverseWeight.Value = vbChecked)
-        batch.reportProgress("CTA run successfully completed\n"+
-                             "Number of secondaries" + tableSet.suppressed + 
-                                 "Processing time:"+ StrUtils.timeToString(tableSet.processingTime));
+        tableSet.nSecond = tableSet.nSecond + i;  //does this make sense?
+        batch.reportProgress("CTA run successfully completed\n" +
+                             "Number of secondaries: " + tableSet.suppressed + 
+                             "Processing time: " + StrUtils.timeToString(tableSet.processingTime));
     } 
    
     private static void verdubbelHitasTxt(){
-      /*
-       Add an articificial secodn dimension in Hitastab
-       Add HitasV2.txt
-       Modify NFS.txt
-       */  
-      File fileKlad = new File(Application.getTempFile("Hitastab.kld"));
-      File fileHitas = new File(Application.getTempFile("Hitastab.txt"));
-      if (fileKlad.exists()) { fileKlad.delete();}
-      fileHitas.renameTo(new File(Application.getTempFile("Hitastab.kld")));  
-      String hs, kop, zeroline = "0.0 z 0 0";
-      int aant;
-      try{
-       BufferedWriter out = new BufferedWriter(new FileWriter(Application.getTempFile("Hitastab.txt")));
-       BufferedReader in =  new BufferedReader(new FileReader(Application.getTempFile("Hitastab.kld")));
-       //while (in.ready()){
-       try {
-           hs = in.readLine();
-       } catch (IOException ex){
-           hs = null;
-       }
-       aant = hs.substring(12).indexOf(' ') + 6;
-       while (hs != null){
-         kop = hs.substring(0, 11);
-         out.write(kop.substring(0, 6) + "    0 " + hs.substring(12)); out.newLine();
-         out.write(kop.substring(0, 6) + "    1 " + hs.substring(12)); out.newLine();
-         out.write(kop.substring(0, 6) + "    2 " + zeroline.format("%" + aant + "s",zeroline)); out.newLine();
-         //out.write(kop.substring(0, 6) + "    2             0.0 z 0 0"); out.newLine();
-         try {
-           hs = in.readLine();
-         } catch (IOException ex){
-           hs = null;
-         }
-       }
-      in.close();
-      out.close();
-      out = new BufferedWriter(new FileWriter(Application.getTempFile("hitasv2.txt")));
-      out.write("var_2"); out.newLine();
-      out.write(".0");out.newLine();
-      out.write(".1");out.newLine();
-      out.close();
-      out = new BufferedWriter(new FileWriter(Application.getTempFile("NFS.txt")));
-      out.write("2");out.newLine();
-      out.write (Application.getTempFile("hitasv1.txt")); out.newLine();
-      out.write (Application.getTempFile("hitasv2.txt")); out.newLine();
-      out.write (Application.getTempFile("Hitastab.txt")); out.newLine();
-      out.write (Application.getTempFile("hitassec.txt")); out.newLine();
-      out.close();
-      }
-      catch (Exception ex){}
+        /*
+            Add an articificial secodn dimension in Hitastab
+            Add HitasV2.txt
+            Modify NFS.txt
+        */  
+        File fileKlad = new File(Application.getTempFile("Hitastab.kld"));
+        File fileHitas = new File(Application.getTempFile("Hitastab.txt"));
+        if (fileKlad.exists()) { fileKlad.delete();}
+        fileHitas.renameTo(new File(Application.getTempFile("Hitastab.kld")));  
+        String hs, kop, zeroline = "0.0 z 0 0";
+        int aant;
+        try{
+            BufferedWriter out = new BufferedWriter(new FileWriter(Application.getTempFile("Hitastab.txt")));
+            BufferedReader in =  new BufferedReader(new FileReader(Application.getTempFile("Hitastab.kld")));
+            //while (in.ready()){
+            try {
+                hs = in.readLine();
+            } catch (IOException ex){
+                hs = null;
+            }
+            aant = hs.substring(12).indexOf(' ') + 6;
+            while (hs != null){
+                kop = hs.substring(0, 11);
+                out.write(kop.substring(0, 6) + "    0 " + hs.substring(12)); out.newLine();
+                out.write(kop.substring(0, 6) + "    1 " + hs.substring(12)); out.newLine();
+                out.write(kop.substring(0, 6) + "    2 " + zeroline.format("%" + aant + "s",zeroline)); out.newLine();
+                try {
+                    hs = in.readLine();
+                } catch (IOException ex){
+                    hs = null;
+                }
+            }
+            in.close();
+            out.close();
+            out = new BufferedWriter(new FileWriter(Application.getTempFile("hitasv2.txt")));
+            out.write("var_2"); out.newLine();
+            out.write(".0");out.newLine();
+            out.write(".1");out.newLine();
+            out.close();
+            out = new BufferedWriter(new FileWriter(Application.getTempFile("NFS.txt")));
+            out.write("2");out.newLine();
+            out.write (Application.getTempFile("hitasv1.txt")); out.newLine();
+            out.write (Application.getTempFile("hitasv2.txt")); out.newLine();
+            out.write (Application.getTempFile("Hitastab.txt")); out.newLine();
+            out.write (Application.getTempFile("hitassec.txt")); out.newLine();
+            out.close();
+        }
+        catch (Exception ex){}
     }
     
     /**
@@ -601,110 +582,104 @@ public class OptiSuppress {
      */
     
     public static boolean rewriteHitasv(int expVarNo, int VarNo ) throws ArgusException {
-      int i, n, l; 
-      String hs;
-      char dot = dots.charAt(0);
-      hs = "hitasv" + Integer.toString(VarNo+1);
-      File fileKlad = new File(Application.getTempFile(hs+".kld"));
-      File fileHitasVtxt = new File(Application.getTempFile(hs+".txt"));
-      if (fileKlad.exists()) { fileKlad.delete();}
-      fileHitasVtxt.renameTo(new File(Application.getTempFile(hs+".kld")));  
+        int i, n, l; 
+        String hs;
+        char dot = dots.charAt(0);
+        hs = "hitasv" + Integer.toString(VarNo+1);
+        File fileKlad = new File(Application.getTempFile(hs+".kld"));
+        File fileHitasVtxt = new File(Application.getTempFile(hs+".txt"));
+        if (fileKlad.exists()) { fileKlad.delete();}
+        fileHitasVtxt.renameTo(new File(Application.getTempFile(hs+".kld")));  
 
-      try{
-
-       BufferedWriter out = new BufferedWriter(new FileWriter(Application.getTempFile(hs+".txt")));
-       BufferedReader in =  new BufferedReader(new FileReader(Application.getTempFile(hs+".kld")));
-       while (in.ready()){
-         hs = in.readLine();
-         l = hs.length();
-         i=0;
-         while ( (i<l) && (hs.charAt(i) == dot)) {i++;}
-         hs = hs.substring(i);
-         hs = hs.replace (".", "_");
-         hs = dots.substring(0, i) + hs;
-         out.write(hs);
-         out.newLine();
-         }
-         out.close();
-         in.close();
-         if (fileKlad.exists() && !Application.isAnco()) { fileKlad.delete();}
+        try{
+            BufferedWriter out = new BufferedWriter(new FileWriter(Application.getTempFile(hs+".txt")));
+            BufferedReader in =  new BufferedReader(new FileReader(Application.getTempFile(hs+".kld")));
+            while (in.ready()){
+                hs = in.readLine();
+                l = hs.length();
+                i=0;
+                while ( (i<l) && (hs.charAt(i) == dot)) {i++;}
+                hs = hs.substring(i);
+                hs = hs.replace (".", "_");
+                hs = dots.substring(0, i) + hs;
+                out.write(hs);
+                out.newLine();
+            }
+            out.close();
+            in.close();
+            if (fileKlad.exists() && !Application.isAnco()) { fileKlad.delete();}
         }
-      catch (IOException ex){
-         throw new ArgusException("A problem was encountered when rewriting the file hitasv");}  
+        catch (IOException ex){
+            throw new ArgusException("A problem was encountered when rewriting the file hitasv");
+        }  
 
-     return true;
+        return true;
     }
     
     public static boolean runModular(TableSet tableSet, final PropertyChangeListener propertyChangeListener) throws ArgusException, FileNotFoundException, IOException{
-        boolean Oke; int i; String hs; Variable variable; BufferedWriter out ;
+        boolean Oke; 
+        int i, returnValue; 
+        String hs; 
+        Variable variable; 
+        BufferedWriter tmpOut ;
         final PropertyChangeSupport pcs = new PropertyChangeSupport(TableService.class);
         pcs.addPropertyChangeListener(propertyChangeListener);
         IProgressListener progressListener = new IProgressListener(){
-                    @Override
-                    public void UpdateGroups(final int percentage) {
-                    pcs.firePropertyChange("progressMain", null, percentage);
-                    }
-                    @Override
-                    public void UpdateTables(final int percentage) {
-                    pcs.firePropertyChange("progressDetail", null, percentage);
-                    }
+            @Override
+            public void UpdateGroups(final int percentage) {
+                pcs.firePropertyChange("progressMain", null, percentage);
+            }
+            @Override
+            public void UpdateTables(final int percentage) {
+                pcs.firePropertyChange("progressDetail", null, percentage);
+            }
         };
         tauHitas.SetProgressListener(progressListener);
         pcs.firePropertyChange("activityMain", null, "Groups");
         pcs.firePropertyChange("progressMain", null, 0);
         pcs.firePropertyChange("activityDetail", null, "Tables");
         pcs.firePropertyChange("progressDetail", null, 0);
-//        try{
+
         Date startDate = new Date();  
         SystemUtils.writeLogbook("Start of the modular protection for table " + TableService.getTableDescription(tableSet));
- //       if (tableSet.expVar.size()> 4 && !Application.isProtectCoverTable()) {
- //           hs = "The table has more than 4 dimensions.\n" + 
- //                "Running Modular can take a lot of time and is error-prone.\n" +
- //                "Please check the results carefully.\n";
- //          int warningResult = ShowWarningMessage(hs);
- //          if (warningResult == 0 ) {
- //             throw new ArgusException(hs); //overlapString);
- //         }
- //       }
-        
- // checking for too many dimensions and additivity
+
+        // checking for too many dimensions and additivity
         if (!Application.isProtectCoverTable()){
-           if (tableSet.expVar.size()== 4) {
-              hs = "The table has 4 dimensions.\n" + 
-                 "Running Modular can take a lot of time and maybe it is difficult to obtain a correct result.\n" +
-                 "Please check the results carefully.\n";
-             int warningResult = ShowWarningMessage(hs);
-             if (warningResult == 0 ) {
-                throw new ArgusException("Modular has not been completed"); //overlapString); 
-             }
-          }
+            if (tableSet.expVar.size()== 4) {
+                hs = "The table has 4 dimensions.\n" + 
+                     "Running Modular can take a lot of time and maybe it is difficult to obtain a correct result.\n" +
+                     "Please check the results carefully.\n";
+                int warningResult = ShowWarningMessage(hs);
+                if (warningResult == 0 ) {
+                    throw new ArgusException("Modular has not been completed"); 
+                }
+            }
             
             if (tableSet.expVar.size() > 4 ) {
-             if (Application.isAnco()) {
-               hs = "The table has more than 4 dimensions.\n" + 
-                 "Running Modular can take a lot of time and is error-prone.\n" +
-                 "Please check the results carefully.\n";
-              int warningResult = ShowWarningMessage(hs);
-              if (warningResult == 0 ) {
-                throw new ArgusException("Modular has not been completed"); //overlapString);
+                if (Application.isAnco()) {
+                    hs = "The table has more than 4 dimensions.\n" + 
+                         "Running Modular can take a lot of time and is error-prone.\n" +
+                         "Please check the results carefully.\n";
+                    int warningResult = ShowWarningMessage(hs);
+                    if (warningResult == 0 ) {
+                        throw new ArgusException("Modular has not been completed"); //overlapString);
+                    }
                 }
-              }
-             else{
-               hs = "The table has more than 4 dimensions.\n" + 
-                    "Running Modular is not possible.\n";   
-               throw new ArgusException(hs); //overlapString);
-             }
-        
-          }
-          if (tableSet.additivity == TableSet.ADDITIVITY_NOT_REQUIRED){
-               hs = "The table might be not additive.\n" + 
-                 "Running Modular successfully Is not guaranteed.\n";
-              int warningResult = ShowWarningMessage(hs);
-              if (warningResult == 0 ) {
-                throw new ArgusException(hs); //overlapString);
-              }
-              
-          }
+                else{
+                    hs = "The table has more than 4 dimensions.\n" + 
+                         "Running Modular is not possible.\n";   
+                    throw new ArgusException(hs); //overlapString);
+                }
+            }
+            
+            if (tableSet.additivity == TableSet.ADDITIVITY_NOT_REQUIRED){
+                hs = "The table might be not additive.\n" + 
+                     "Running Modular successfully Is not guaranteed.\n";
+                int warningResult = ShowWarningMessage(hs);
+                if (warningResult == 0 ) {
+                    throw new ArgusException(hs); //overlapString);
+                }
+            }
         }
 
     
@@ -715,59 +690,56 @@ public class OptiSuppress {
         // Note that this procedure will faill if the code starts with a dot!!!!
         // Ideally this is coorrected in the TauArgus dll itself
         for(i=0;i<tableSet.expVar.size();i++){
-          rewriteHitasv(tableSet.expVar.get(i).index, i); 
+            rewriteHitasv(tableSet.expVar.get(i).index, i); 
         }
         int n= tableSet.respVar.nDecimals;
         try{
-         out = new BufferedWriter(new FileWriter(Application.getTempFile("NPF.txt"), true));
+            tmpOut = new BufferedWriter(new FileWriter(Application.getTempFile("NPF.txt"), true));
       
-        out.write("DECIMALS=" + n);       out.newLine();
-        // TODO vogelen voor PQ regel
-        out.write ("MAXWEIGHT="+ tableSet.maxScaleCost);       out.newLine();       out.newLine();
-        out.write ("MINTABVAL="+ tableSet.minTabVal);       out.newLine();
-        out.write ("MAXTABVAL="+ tableSet.maxTabVal);       out.newLine();       out.newLine();
-        if (tableSet.costFunc == TableSet.COST_DIST){
-            out.write("[Distance cost function]");       out.newLine();
-            out.write("DISTANCE = 1");       out.newLine();
-            for(i=0;i<tableSet.expVar.size();i++){
-                variable = tableSet.expVar.get(i);
-                hs = "D"+Integer.toString(i+1).trim() + " =";
-                out.write(hs);                
-                if (variable.hasDistanceFunction ){
-                    for (int j=0;j<Variable.MAX_NUMBER_OF_DIST;j++){
-                        out.write(" "+variable.distanceFunction[j]);
-                    }  
+            tmpOut.write("DECIMALS=" + n);       tmpOut.newLine();
+            // TODO vogelen voor PQ regel
+            tmpOut.write ("MAXWEIGHT="+ tableSet.maxScaleCost); tmpOut.newLine(); tmpOut.newLine();
+            tmpOut.write ("MINTABVAL="+ tableSet.minTabVal); tmpOut.newLine();
+            tmpOut.write ("MAXTABVAL="+ tableSet.maxTabVal); tmpOut.newLine(); tmpOut.newLine();
+            if (tableSet.costFunc == TableSet.COST_DIST){
+                tmpOut.write("[Distance cost function]"); tmpOut.newLine();
+                tmpOut.write("DISTANCE = 1"); tmpOut.newLine();
+                for(i=0;i<tableSet.expVar.size();i++){
+                    variable = tableSet.expVar.get(i);
+                    hs = "D" + Integer.toString(i+1).trim() + " =";
+                    tmpOut.write(hs);                
+                    if (variable.hasDistanceFunction ){
+                        for (int j=0;j<Variable.MAX_NUMBER_OF_DIST;j++){
+                            tmpOut.write(" "+variable.distanceFunction[j]);
+                        }  
                     }
-                else {
-                    out.write(" 1 1 1 1 1");
+                    else {
+                        tmpOut.write(" 1 1 1 1 1");
+                    }
+                    tmpOut.newLine();
                 }
-                out.newLine();
-                }
-             }        
-           out.close();
-           }
+            }        
+            tmpOut.close();
+        }
         catch (IOException ex){
-            throw new ArgusException("A problem was encountered when writing the file NPF");}  
+            throw new ArgusException("A problem was encountered when writing the file NPF");
+        }  
         if (tableSet.expVar.size() == 1){}
 //TODO Dummy variable toevoegen voor HITAS  (SjoemelBestandenVoorHitas1)          
-        ControleerHITAStabtxt(tableSet); 
-        if (tableSet.expVar.size() == 1) {verdubbelHitasTxt();}
+            ControleerHITAStabtxt(tableSet); 
+            if (tableSet.expVar.size() == 1) {verdubbelHitasTxt();}
        
-        TauArgusUtils.DeleteFile(Application.getTempFile("bt.dat"));
-        TauArgusUtils.DeleteFile(Application.getTempFile("jjuit.dat"));
-        TauArgusUtils.DeleteFile(Application.getTempFile("infeas.dat"));
-        TauArgusUtils.DeleteFile(Application.getTempFile("hitassec.txt"));
-        TauArgusUtils.DeleteFile(Application.getTempFile("hitas.log")); //op verzoek van Helen
-        TauArgusUtils.DeleteFile(Application.getTempFile("csp.bra"));  //op verzoek van Helen
-        TauArgusUtils.DeleteFile(Application.getTempFile("CPWProb.log")); //op verzoek van Helen
-        TauArgusUtils.DeleteFile(Application.getTempFile("sdcnet.lp")); //op verzoek van Helen
-        TauArgusUtils.DeleteFile(Application.getTempFile("hierinfo.dat")); //op verzoek van Helen
-//          
+            TauArgusUtils.DeleteFile(Application.getTempFile("bt.dat"));
+            TauArgusUtils.DeleteFile(Application.getTempFile("jjuit.dat"));
+            TauArgusUtils.DeleteFile(Application.getTempFile("infeas.dat"));
+            TauArgusUtils.DeleteFile(Application.getTempFile("hitassec.txt"));
+            TauArgusUtils.DeleteFile(Application.getTempFile("hitas.log")); //op verzoek van Helen
+            TauArgusUtils.DeleteFile(Application.getTempFile("csp.bra"));  //op verzoek van Helen
+            TauArgusUtils.DeleteFile(Application.getTempFile("CPWProb.log")); //op verzoek van Helen
+            TauArgusUtils.DeleteFile(Application.getTempFile("sdcnet.lp")); //op verzoek van Helen
+            TauArgusUtils.DeleteFile(Application.getTempFile("hierinfo.dat")); //op verzoek van Helen
+
         //Run Hitas
-        // "./access.ilm"
-    //    hs = Application.getTempDir();
-        //hs = tauargus.utils.ExecUtils.getApplicationDirectory(OptiSuppress.class).getCanonicalPath()+"\\access.ilm";  
-        //hs = ExecUtils.getRegString("optimal", "cplexlicensefile", ExecUtils.getApplicationDirectory(OptiSuppress.class).getCanonicalPath()+"\\access.ilm");
         hs = "";
         if (Application.solverSelected == Application.SOLVER_CPLEX) hs = TauArgusUtils.GetCplexLicenceFile();
         
@@ -778,50 +750,48 @@ public class OptiSuppress {
         loadJJParamFromRegistry();
         setJJParamIntauHitas();
       
-       i= tauHitas.AHiTaS(Application.getTempFile("NPF.txt"), Application.getTempFile("NFS.txt"), tableSet.maxHitasTime, 
-                hs, Application.getTempDir()+"/", solverName[Application.solverSelected], tableSet.singletonSingletonCheck, tableSet.singletonMultipleCheck,
-                tableSet.minFreqCheck);
-        if (i > 0) {        
-          hs = tauHitas.GetErrorString(i);
-        //  XPRESS or CPLEX or SCIP
-       if (i !=0) {throw new ArgusException ("Error in modular suppression procedure\n" + hs);}
-         }
+        returnValue = tauHitas.AHiTaS(Application.getTempFile("NPF.txt"), Application.getTempFile("NFS.txt"), tableSet.maxHitasTime, 
+                                        hs, Application.getTempDir()+"/", solverName[Application.solverSelected], 
+                                        tableSet.singletonSingletonCheck, tableSet.singletonMultipleCheck, tableSet.minFreqCheck);
+        if (returnValue > 0) {        
+            hs = tauHitas.GetErrorString(returnValue);
+            //XPRESS or CPLEX or SCIP
+            //if (returnValue != 0) {throw new ArgusException ("Error in modular suppression procedure\n" + hs);}
+            throw new ArgusException ("Error in modular suppression procedure\n" + hs);
+        }
         ReadSecondaries(tableSet);
         tableSet.suppressINFO = ReadHitasINFO("hitas.log");
         if (tableSet.expVar.size() == 1) {tableSet.nSecond = tableSet.nSecond /2;}
         Date endDate = new Date();
         long diff = endDate.getTime()-startDate.getTime();
         diff = diff / 1000;
-        //if ( diff == 0){ diff = 1;}
         tableSet.processingTime = (int) diff;
         SystemUtils.writeLogbook("End of modular protection. Time used "+ diff+ " seconds\n" + 
                                  "Number of suppressions: " +tableSet.nSecond); 
         tauHitas.SetProgressListener(null);
         pcs.removePropertyChangeListener(propertyChangeListener);
         return true;
-//    } catch (Exception ex)  {
-//        return false;
-//      }
     }
 
     public static String ReadHitasINFO (String fn){
-       String hs, regel;
-       try{ 
-       BufferedReader  in  = new BufferedReader(new FileReader(Application.getTempFile(fn))); 
-       regel = in.readLine(); hs = "";
-       regel = in.readLine();
-       while (!regel.contains("Start at")){
-         hs = hs + regel + "<br>";  
-         regel = in.readLine();
-       }
-       while  (hs.endsWith("<br>")) {hs = hs.substring(0, hs.length()-4);}
-       return hs;
-       }
-       catch (IOException ex){return "";}
+        String hs, regel;
+        try{ 
+            BufferedReader  in  = new BufferedReader(new FileReader(Application.getTempFile(fn))); 
+            regel = in.readLine(); hs = "";
+            regel = in.readLine();
+            while (!regel.contains("Start at")){
+                hs = hs + regel + "<br>";  
+                regel = in.readLine();
+            }
+            while  (hs.endsWith("<br>")) {hs = hs.substring(0, hs.length()-4);}
+            return hs;
+        }
+        catch (IOException ex){return "";}
     }
 
     private static void ReadSecondaries(TableSet tableSet) throws ArgusException{
-        int[] nSecondaries = new int[1]; boolean oke;
+        int[] nSecondaries = new int[1]; 
+        boolean oke;
         File fileSecondaries = new File(Application.getTempFile("hitassec.txt"));
         if (! fileSecondaries.exists() ) {throw new ArgusException("Error in modular;\nNo outputfile found");}
         oke = tauArgus.SetSecondaryHITAS(tableSet.index , nSecondaries);
@@ -831,191 +801,185 @@ public class OptiSuppress {
     }
     
     private static void ControleerHITAStabtxt(TableSet tableSet){
-        
-    String regelOut,token, status, freq, totalstring; 
-    int  i;
-    Double respVal, lpl, epsilon, x;
-    int[] GTIndex = new int[tableSet.expVar.size()];
-    for (i=0;i<tableSet.expVar.size();i++){
-        GTIndex[i] = 0;
-    }
+        String regelOut,token, status, freq; 
+        int  i;
+        Double respVal, lpl, epsilon, x;
+        int[] GTIndex = new int[tableSet.expVar.size()];
+        for (i=0;i<tableSet.expVar.size();i++){
+            GTIndex[i] = 0;
+        }
     
-    DecimalFormatSymbols symbols = new DecimalFormatSymbols();
-    symbols.setDecimalSeparator('.');
-    symbols.setGroupingSeparator(',');
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setDecimalSeparator('.');
+        symbols.setGroupingSeparator(',');
     
-    DecimalFormat normalPrecision = new DecimalFormat();
-    DecimalFormat extraPrecision = new DecimalFormat();
-// first rename Hitastab.txt
-    File fileKlad = new File(Application.getTempFile("Hitastab.kld"));
-    File fileHitas = new File(Application.getTempFile("Hitastab.txt"));
-    if (fileKlad.exists()) { fileKlad.delete();}
-    fileHitas.renameTo(new File(Application.getTempFile("Hitastab.kld")));
+        DecimalFormat normalPrecision = new DecimalFormat();
+        DecimalFormat extraPrecision = new DecimalFormat();
+        // first rename Hitastab.txt
+        File fileKlad = new File(Application.getTempFile("Hitastab.kld"));
+        File fileHitas = new File(Application.getTempFile("Hitastab.txt"));
+        if (fileKlad.exists()) { fileKlad.delete();}
+        fileHitas.renameTo(new File(Application.getTempFile("Hitastab.kld")));
     
-    i = tableSet.respVar.nDecimals;
-    normalPrecision.setMinimumFractionDigits(i);
-    normalPrecision.setMaximumFractionDigits(i);
-    extraPrecision.setMinimumFractionDigits(i+3);
-    extraPrecision.setMaximumFractionDigits(i+3);
-    extraPrecision.setDecimalFormatSymbols(symbols);
-    normalPrecision.setDecimalFormatSymbols(symbols);
-    extraPrecision.setGroupingUsed(false);
-    normalPrecision.setGroupingUsed(false);
+        i = tableSet.respVar.nDecimals;
+        normalPrecision.setMinimumFractionDigits(i);
+        normalPrecision.setMaximumFractionDigits(i);
+        extraPrecision.setMinimumFractionDigits(i+3);
+        extraPrecision.setMaximumFractionDigits(i+3);
+        extraPrecision.setDecimalFormatSymbols(symbols);
+        normalPrecision.setDecimalFormatSymbols(symbols);
+        extraPrecision.setGroupingUsed(false);
+        normalPrecision.setGroupingUsed(false);
     
-    epsilon = 1.0 / ( 10^(i+1));
-    try{
-       BufferedWriter out = new BufferedWriter(new FileWriter(Application.getTempFile("Hitastab.txt")));
+        epsilon = 1.0 / ( 10^(i+1));
+        try{
+            BufferedWriter out = new BufferedWriter(new FileWriter(Application.getTempFile("Hitastab.txt")));
   
-    Tokenizer tokenizer;
-    tokenizer = null;
-    try{
-       tokenizer = new Tokenizer(new BufferedReader(new FileReader(Application.getTempFile("Hitastab.kld"))));
-       } catch (Exception ex) {}
+            Tokenizer tokenizer;
+            tokenizer = null;
+            try{
+                tokenizer = new Tokenizer(new BufferedReader(new FileReader(Application.getTempFile("Hitastab.kld"))));
+            } catch (Exception ex) {}
     
-    // Get number of characters of largest value, not necessary the total general
-    // This value is only used to write HitasTab a bit more readable   
-    double x1, x2;
-    x1 = Math.abs(tableSet.maxTabVal);
-    x2 = Math.abs(tableSet.minTabVal);
-    x1 = Math.max(x1,x2);
-    int aant = (int) Math.ceil((Math.log(x1)/Math.log(10)));
-    if (x2<0) {aant = aant + 1;}
-//    int aant = (int) Math.ceil((Math.log(tableSet.getCell(GTIndex).response)/Math.log(10)));
-    if (tableSet.respVar.nDecimals > 0)
-        aant = aant + tableSet.respVar.nDecimals + 1;
+            // Get number of characters of largest value, not necessary the total general
+            // This value is only used to write HitasTab a bit more readable   
+            double x1, x2;
+            x1 = Math.abs(tableSet.maxTabVal);
+            x2 = Math.abs(tableSet.minTabVal);
+            x1 = Math.max(x1,x2);
+            int aant = (int) Math.ceil((Math.log(x1)/Math.log(10)));
+            if (x2<0) 
+                aant = aant + 1;
+            if (tableSet.respVar.nDecimals > 0)
+                aant = aant + tableSet.respVar.nDecimals + 1;
         
-    while (tokenizer.nextLine() != null) {
-       regelOut = "";
-       for (i=0;i<tableSet.expVar.size();i++){
-           token = tokenizer.nextToken();
-           regelOut = regelOut +token.format("%6s", token);
-       }
-       if (tableSet.expVar.size()==1){regelOut=regelOut+regelOut;}
-       regelOut=regelOut.substring(1);
-       token = tokenizer.nextToken();  //Value
-       respVal = Double.parseDouble(token);
-       regelOut = regelOut + " " + token.format("%" + aant + "s", token);
-       status = tokenizer.nextToken();  //Status
-       freq = tokenizer.nextToken();
-       if ( (respVal == 0) && status.equals("z") ){
-         //if ( tableSet.additivity == TableSet.ADDITIVITY_NOT_REQUIRED || Application.isProtectCoverTable()){
-          if ( Application.isProtectCoverTable()){
-             if (tokenizer.getLine().equals("0")) {regelOut = regelOut + " n ";}
-             else                                   {regelOut = regelOut + " z ";}              
-          } else {     regelOut = regelOut + " z ";}
-          regelOut = regelOut + freq + " "+ tokenizer.getLine(); 
-          tokenizer.clearLine();
-       }
-       else
-       {
-           regelOut = regelOut + " "+ status;
-           if (status.equals("u")){ //check LPL UPL
-               token = freq;
-               lpl = Double.parseDouble(token);
-               x = respVal - tableSet.minTabVal;
-               if (x < 0 ) {x = 0.0;} // should not occur
-               if (lpl + epsilon > x) {lpl = x - epsilon;}
-               if (lpl < 0 ) {lpl = 0.0;}
-               regelOut = regelOut + " "+ extraPrecision.format(lpl);
-               regelOut = regelOut + " " + tokenizer.nextToken(); //UPL
-               freq = tokenizer.nextToken();
-           }
-           regelOut = regelOut + " " + freq; //Freq
-           token = tokenizer.nextToken();
-           if (token.substring(0,1)=="-") {token = token.substring(1);}
-//           token = token.replace("-", " ");
-           regelOut = regelOut + " " + token; //Cost
-       }
-
-       out.write (regelOut);
-       out.newLine();
-           
-       }
-    tokenizer.close();
-    out.close();
-    }
-    catch (Exception ex){}
-       
+            while (tokenizer.nextLine() != null) {
+                regelOut = "";
+                for (i=0;i<tableSet.expVar.size();i++){
+                    token = tokenizer.nextToken();
+                    regelOut = regelOut +token.format("%6s", token);
+                }
+                if (tableSet.expVar.size()==1){regelOut=regelOut+regelOut;}
+                regelOut=regelOut.substring(1);
+                token = tokenizer.nextToken();  //Value
+                respVal = Double.parseDouble(token);
+                regelOut = regelOut + " " + token.format("%" + aant + "s", token);
+                status = tokenizer.nextToken();  //Status
+                freq = tokenizer.nextToken();
+                if ( (respVal == 0) && status.equals("z") ){
+                    if ( Application.isProtectCoverTable()){
+                        if (tokenizer.getLine().equals("0")) {regelOut = regelOut + " n ";}
+                        else {regelOut = regelOut + " z ";}              
+                    } 
+                    else {regelOut = regelOut + " z ";}
+                    regelOut = regelOut + freq + " "+ tokenizer.getLine(); 
+                    tokenizer.clearLine();
+                }
+                else{
+                    regelOut = regelOut + " "+ status;
+                    if (status.equals("u")){ //check LPL UPL
+                        token = freq;
+                        lpl = Double.parseDouble(token);
+                        x = respVal - tableSet.minTabVal;
+                        if (x < 0 ) {x = 0.0;} // should not occur
+                        if (lpl + epsilon > x) {lpl = x - epsilon;}
+                        if (lpl < 0 ) {lpl = 0.0;}
+                        regelOut = regelOut + " "+ extraPrecision.format(lpl);
+                        regelOut = regelOut + " " + tokenizer.nextToken(); //UPL
+                        freq = tokenizer.nextToken();
+                    }
+                    regelOut = regelOut + " " + freq; //Freq
+                    token = tokenizer.nextToken();
+                    if ("-".equals(token.substring(0,1))) {token = token.substring(1);}
+                    regelOut = regelOut + " " + token; //Cost
+                }
+                out.write (regelOut);
+                out.newLine();
+            }
+            tokenizer.close();
+            out.close();
+        }
+        catch (Exception ex){}
     }
     
     public static void runUWE(TableSet tableSet)throws ArgusException, IOException{
-      String hs;
-      int[] nSec = new int[1];
-      ArrayList<String> commandline = new ArrayList<>();
-      Date startDate = new Date();  
-      SystemUtils.writeLogbook("Start UWE protection for table:"+tableSet.toString());
-      SaveTable.writeJJ(tableSet, Application.getTempFile("UWE.jj"), false, true, tableSet.minFreq[0], false, false);
-      TauArgusUtils.DeleteFile(Application.getTempFile("s.txt"));
-      TauArgusUtils.DeleteFile(Application.getTempFile("s1.txt"));
-      hs = SystemUtils.getApplicationDirectory(OptiSuppress.class).getCanonicalPath();
-      hs = hs + "/EXP_ExternalUnpickerOnJJ.exe";
-      commandline.add(hs);
-      if (!TauArgusUtils.ExistFile(hs)) {
-          throw new ArgusException("The UWE unpick program could not be found");}
-//      hs = StrUtils.quote(hs) + "  " + StrUtils.quote(Application.getTempFile("UWE")) + " Orig";
-      commandline.add(Application.getTempFile("UWE"));
-      commandline.add("Orig");
-      TauArgusUtils.writeBatchFileForExec("UWE1", commandline);
-      int result = ExecUtils.execCommand(commandline, Application.getTempDir(),false, "Run UWE program step 1");
-      if (result !=0){
-          throw new ArgusException("The first step of UWE failed");}
-      //step 2
-      commandline.clear();
-      hs = SystemUtils.getApplicationDirectory(OptiSuppress.class).getCanonicalPath();
-      hs = hs + "/COIN_LargeTables.exe";
-      if (!TauArgusUtils.ExistFile(hs)) {
-          throw new ArgusException("The UWE unpick program could not be found");}
-      commandline.add(hs);
-//      hs = StrUtils.quote(hs) + " UWE GroupedLP";
-      commandline.add("UWE");
-      commandline.add("GroupedLP");
-      TauArgusUtils.writeBatchFileForExec("UWE2", hs);
-      result = ExecUtils.execCommand(commandline, Application.getTempDir(),false, "Run UWE program step 2");
-      if (result !=0){
-          throw new ArgusException("The second step of UWE failed");}
-      if (!TauArgusUtils.ExistFile(Application.getTempFile("s.txt")) ){
-          throw new ArgusException("The second step of UWE did not produce a file with secondaries.\n"+
-                  "File: "+Application.getTempFile("s.txt")+" could not be found");
-      }
-      //modify the output for reading the secondaries
-      BufferedReader  in  = new BufferedReader(new FileReader(Application.getTempFile("s.txt"))); 
-      BufferedWriter out = new BufferedWriter(new FileWriter(Application.getTempFile("s1.txt")));
-      out.write("fop"); out.newLine();
-      out.write("fop"); out.newLine();
-      while ( (hs = in.readLine()) != null){
-          hs = hs + " m";
-          out.write(hs); out.newLine();
-      }
-      in.close(); out.close();
+        String hs;
+        int[] nSec = new int[1];
+        ArrayList<String> commandline = new ArrayList<>();
+        Date startDate = new Date();  
+        SystemUtils.writeLogbook("Start UWE protection for table:"+tableSet.toString());
+        SaveTable.writeJJ(tableSet, Application.getTempFile("UWE.jj"), false, true, tableSet.minFreq[0], false, false);
+        TauArgusUtils.DeleteFile(Application.getTempFile("s.txt"));
+        TauArgusUtils.DeleteFile(Application.getTempFile("s1.txt"));
+        hs = SystemUtils.getApplicationDirectory(OptiSuppress.class).getCanonicalPath();
+        hs = hs + "/EXP_ExternalUnpickerOnJJ.exe";
+        commandline.add(hs);
+        if (!TauArgusUtils.ExistFile(hs)) {
+            throw new ArgusException("The UWE unpick program could not be found");
+        }
+        commandline.add(Application.getTempFile("UWE"));
+        commandline.add("Orig");
+        TauArgusUtils.writeBatchFileForExec("UWE1", commandline);
+        int result = ExecUtils.execCommand(commandline, Application.getTempDir(),false, "Run UWE program step 1");
+        if (result !=0){
+            throw new ArgusException("The first step of UWE failed");
+        }
+        //step 2
+        commandline.clear();
+        hs = SystemUtils.getApplicationDirectory(OptiSuppress.class).getCanonicalPath();
+        hs = hs + "/COIN_LargeTables.exe";
+        if (!TauArgusUtils.ExistFile(hs)) {
+            throw new ArgusException("The UWE unpick program could not be found");
+        }
+        commandline.add(hs);
+        commandline.add("UWE");
+        commandline.add("GroupedLP");
+        TauArgusUtils.writeBatchFileForExec("UWE2", hs);
+        result = ExecUtils.execCommand(commandline, Application.getTempDir(),false, "Run UWE program step 2");
+        if (result !=0){
+            throw new ArgusException("The second step of UWE failed");
+        }
+        if (!TauArgusUtils.ExistFile(Application.getTempFile("s.txt")) ){
+            throw new ArgusException("The second step of UWE did not produce a file with secondaries.\n"+
+                                     "File: "+Application.getTempFile("s.txt")+" could not be found");
+        }
+        //modify the output for reading the secondaries
+        BufferedReader  in = new BufferedReader(new FileReader(Application.getTempFile("s.txt"))); 
+        BufferedWriter out = new BufferedWriter(new FileWriter(Application.getTempFile("s1.txt")));
+        out.write("fop"); out.newLine();
+        out.write("fop"); out.newLine();
+        while ( (hs = in.readLine()) != null){
+            hs = hs + " m";
+            out.write(hs); out.newLine();
+        }
+        in.close(); out.close();
       
-      result = tauArgus.SetSecondaryJJFORMAT(tableSet.index, Application.getTempFile("s1.txt"), false, nSec);
+        result = tauArgus.SetSecondaryJJFORMAT(tableSet.index, Application.getTempFile("s1.txt"), false, nSec);
 
-      tableSet.nSecond = nSec[0];
-      Date endDate = new Date();
-      long diff = endDate.getTime()-startDate.getTime();
-      diff = diff / 1000;
-      tableSet.processingTime = (int) diff;
-      tableSet.suppressed = TableSet.SUP_UWE;
-      SystemUtils.writeLogbook("End of UWE protection. Time used "+ diff+ " seconds\n" + 
-                                   "Number of suppressions: " +tableSet.nSecond);     
-  }
+        tableSet.nSecond = nSec[0];
+        Date endDate = new Date();
+        long diff = endDate.getTime()-startDate.getTime();
+        diff = diff / 1000;
+        tableSet.processingTime = (int) diff;
+        tableSet.suppressed = TableSet.SUP_UWE;
+        SystemUtils.writeLogbook("End of UWE protection. Time used " + diff + " seconds\n" + 
+                                 "Number of suppressions: " + tableSet.nSecond);     
+    }
   
-//Now invoke the renameTo() method on the reference, oldFile in this case///  
-       
-/**
- * Calls the JJ-Rounder for the tableSet.\n
- * First writes a JJ file, using SaveTable.writeJJ\n
- * Checks a bit the JJ file and optionally replaces the weight/cost to unity, using correctRoundJJ\n
- * If required it will partitionate the JJ-file in smaller pieces using splitJJ,  
- * using the first spanning variable as the blocking variable.\n
- * Then the JJ rounder is called and the result is given back to the engine.
- * 
- * @param tableSet
- * @throws ArgusException
- * @throws IOException 
- */
+    /**
+    * Calls the JJ-Rounder for the tableSet.\n
+    * First writes a JJ file, using SaveTable.writeJJ\n
+    * Checks a bit the JJ file and optionally replaces the weight/cost to unity, using correctRoundJJ\n
+    * If required it will partitionate the JJ-file in smaller pieces using splitJJ,  
+    * using the first spanning variable as the blocking variable.\n
+    * Then the JJ rounder is called and the result is given back to the engine.
+    * 
+    * @param tableSet
+    * @param propertyChangeListener
+    * @throws ArgusException
+    * @throws IOException 
+    */
     
-//    public static void runRounder(TableSet tableSet) throws ArgusException, IOException{
     public static void runRounder(TableSet tableSet, final PropertyChangeListener propertyChangeListener) throws ArgusException, IOException{
         DialogStopTime rdialog = new DialogStopTime(null,true);
         RCallback jRCallback = new RCallback(){
@@ -1032,7 +996,7 @@ public class OptiSuppress {
 
         
         int i, j, j1, nPart=0; 
-        String solutionString, hs, xs, solverName, LicenceFile;
+        String solutionString, hs, xs, Solvername, LicenceFile;
         int solutionType, maxRoundTime, result;
         double[] upperBound = new double[] { 1.0E40 }; 
         double[] lowerBound = new double[] { 0.0 };
@@ -1044,156 +1008,148 @@ public class OptiSuppress {
         final PropertyChangeSupport pcs = new PropertyChangeSupport(TableService.class);
         pcs.addPropertyChangeListener(propertyChangeListener);
         RProgressListener progressListener = new RProgressListener(){
-                    @Override
-                    public void UpdateLowerBound(final double val) {
-                    pcs.firePropertyChange("lower", null, val);
-                    DLB = val;
-                    }
-                    @Override
-                    public void UpdateUpperBound(final double val) {
-                    pcs.firePropertyChange("upper", null, val);
-                    DUB = val;
-                    }
-                    @Override
-                    public void UpdateNumberOpenSubProb(final int val) {
-                    pcs.firePropertyChange("open", null, val);
-                    }
-                    @Override
-                    public void UpdateNumberClosedSubProb(final int val) {
-                    pcs.firePropertyChange("closed", null, val);
-                    }            
+            @Override
+            public void UpdateLowerBound(final double val) {
+                pcs.firePropertyChange("lower", null, val);
+                DLB = val;
+            }
+            @Override
+            public void UpdateUpperBound(final double val) {
+                pcs.firePropertyChange("upper", null, val);
+                DUB = val;
+            }
+            @Override
+            public void UpdateNumberOpenSubProb(final int val) {
+                pcs.firePropertyChange("open", null, val);
+            }
+            @Override
+            public void UpdateNumberClosedSubProb(final int val) {
+                pcs.firePropertyChange("closed", null, val);
+            }            
         };
         rounder.SetProgressListener(progressListener);
         rounder.SetCallback(jRCallback);
         
         //TODO test on MaxTableValue
         Date startDate = new Date();
-        solverName = Application.getSolverName(Application.solverSelected);
+        Solvername = Application.getSolverName(Application.solverSelected);
         hs = "Start of the rounding procedure for table: " + tableSet.toString();
         if(tableSet.roundPartitions > 0){hs = hs + " (with partitions)";}
         SystemUtils.writeLogbook(hs);
         try{
-          //if (tableSet.maxTabVal > Integer.MAX_VALUE)
-             //{ throw new ArgusException ("Max cellvalue ("+ tableSet.maxTabVal  +") is too large for the rounding porcedure");}
-          if (tableSet.roundPartitions > 0){TauArgusUtils.DeleteFileWild("JJ*.IN", Application.getTempDir());}  
-           SaveTable.writeJJ(tableSet, Application.getTempFile("JJ.IN"), true, false, 0, false, false);
-           tableSet.roundedInfo = "";
-           tableSet.roundTime = 0;
-           tableSet.roundJumps = 0;
-           tableSet.roundMaxJump += 0;
-           tableSet.roundJumps = 0;
-           //maxRoundTime = tableSet.roundMaxTime * 60;
-           maxRoundTime = tableSet.roundMaxTime; // Argument of DoRound is in minutes, just like tableSet.roundMaxTime
-           for (i=0;i<2;i++){tableSet.roundSolType[i] = 0;}
-           correctRoundJJ(Application.getTempFile("JJ.IN"), tableSet.roundBase, (tableSet.roundPartitions==0), tableSet.roundUnitCost);
-           if(tableSet.roundPartitions>0){ nPart = splitJJ(tableSet);}
+            if (tableSet.roundPartitions > 0){TauArgusUtils.DeleteFileWild("JJ*.IN", Application.getTempDir());}  
+            SaveTable.writeJJ(tableSet, Application.getTempFile("JJ.IN"), true, false, 0, false, false);
+            tableSet.roundedInfo = "";
+            tableSet.roundTime = 0;
+            tableSet.roundJumps = 0;
+            tableSet.roundMaxJump += 0;
+            tableSet.roundJumps = 0;
+            
+            maxRoundTime = tableSet.roundMaxTime; // Argument of DoRound is in minutes, just like tableSet.roundMaxTime
+            for (i=0;i<2;i++){tableSet.roundSolType[i] = 0;}
+            correctRoundJJ(Application.getTempFile("JJ.IN"), tableSet.roundBase, (tableSet.roundPartitions==0), tableSet.roundUnitCost);
+            if(tableSet.roundPartitions>0){ nPart = splitJJ(tableSet);}
 
-// Files ready to round           
-           
-/* oud           
-            ActivityListener activityListener = new ActivityListener() {
-            @Override
-            public int TAUmessage(double lb, double ub, double rapid, int nodedone, int nodeleft) {
-                System.out.println(lb + " " + ub + " " + rapid + " " + nodedone + " " + nodeleft);
-                return 0;
-              }
-            };
-*/
-           /*
+            // Files ready to round           
+            /*
              #define JJZERO          101
              #define JJINF           102
              #define JJMINVIOLA      103
              #define JJMAXSLACK      104
              #define JJMAXTIME	105
             */
-           double jjRoundZero = SystemUtils.getRegDouble("optimal", "jjRoundZero", 0.0000001);
-           rounder.SetDoubleConstant(101, jjRoundZero);
-           double jjRoundInf = SystemUtils.getRegDouble("optimal", "jjRoundInf", 21400000000000.0);
-           rounder.SetDoubleConstant(102, jjRoundInf);
-           double jjRoundMinViola = SystemUtils.getRegDouble("optimal", "jjRoundMinViola", 0.0001);
-           rounder.SetDoubleConstant(103, jjRoundMinViola);
-           double jjRoundMaxSlack = SystemUtils.getRegDouble("optimal", "jjRoundMaxSlack", 0.01);
-           rounder.SetDoubleConstant(104, jjRoundMaxSlack);               
+            double jjRoundZero = SystemUtils.getRegDouble("optimal", "jjRoundZero", 0.0000001);
+            rounder.SetDoubleConstant(101, jjRoundZero);
+            double jjRoundInf = SystemUtils.getRegDouble("optimal", "jjRoundInf", 21400000000000.0);
+            rounder.SetDoubleConstant(102, jjRoundInf);
+            double jjRoundMinViola = SystemUtils.getRegDouble("optimal", "jjRoundMinViola", 0.0001);
+            rounder.SetDoubleConstant(103, jjRoundMinViola);
+            double jjRoundMaxSlack = SystemUtils.getRegDouble("optimal", "jjRoundMaxSlack", 0.01);
+            rounder.SetDoubleConstant(104, jjRoundMaxSlack);               
 
-           double X = (int) tableSet.roundBase;
-           solutionString = "";
-           LicenceFile = "";
-           if (Application.solverSelected == Application.SOLVER_CPLEX) LicenceFile = TauArgusUtils.GetCplexLicenceFile();
+            double X = tableSet.roundBase;
+            solutionString = "";
+            LicenceFile = "";
+            if (Application.solverSelected == Application.SOLVER_CPLEX) LicenceFile = TauArgusUtils.GetCplexLicenceFile();
            
-           if (tableSet.roundPartitions > 0){ //round all the partitions
-             j1 = 1;  
-             solutionString = "<h2>Rounding procedure was applied with partitioning";
-             if (tableSet.roundPartitions == 2){solutionString = solutionString + "<br>with artificial totals added";}
-             if (tableSet.roundPartitions == 3){ j1 = 0;
-                solutionString = solutionString + "<br>with " + tableSet.roundNumberofBlocks + " blocks";}
-             hs = "</h2>\n<table>\n" ;
-             hs = hs +  "<tr><th width=\"10%\" height=\"11\">No</th>\n";
-             hs = hs +  "    <th width=\"15%\" height=\"11\">Sol. type</th>\n";
-             hs = hs +  "    <th width=\"15%\" height=\"11\">Time</th>\n";
-             hs = hs +  "    <th width=\"15%\" height=\"11\">LowerBound</th>\n";
-             hs = hs +  "    <th width=\"15%\" height=\"11\">UpperBound</th>\n";
-             hs = hs +  "    <th width=\"15%\" height=\"11\">Number of Jumps</th>\n";
-             hs = hs +  "    <th width=\"15%\" height=\"11\">Max. Jump</th></tr>\n";
-             solutionString = solutionString + hs;
-             tableSet.processingTime =0;
-             for(j=j1;j<nPart;j++){
-               Date startDatePart = new Date();
-               xs = Integer.toString(j);
-               TauArgusUtils.DeleteFile(Application.getTempFile("JJ"+xs+".OUT"));
-               TauArgusUtils.DeleteFile(Application.getTempFile("JJ"+xs+".OUT.RAPID"));
-               TauArgusUtils.DeleteFile(Application.getTempFile("JJRound"+xs+".OUT"));
-               TauArgusUtils.DeleteFile(Application.getTempFile("JJStat"+xs+".OUT"));
-               result = rounder.DoRound(solverName, Application.getTempFile("JJ"+xs+".IN"), X, upperBound, lowerBound, 0,  
-                                  Application.getTempFile("JJ"+xs+".OUT"), 
-                                  Application.getTempFile("JJstat"+xs+".OUT"),
-                                  LicenceFile, 
-                                  Application.getTempFile("JJRound"+xs+".log"),
-                                  maxRoundTime, 0,
-                                  Application.getTempDir()+"/",
-                                   maxJump, numberJump , usedTime, errorCode); //, activityListener );
-               // Only Optimal is implemented currently, so set manually solutionType = 0;
-               solutionType = 0; 
-               //if (solutionType > 2) {throw new ArgusException("Rounding error code = "+tauArgus.GetErrorString(errorCode[0]) + "\noccured in subtable "+j);}             
-               if (result > 0) {throw new ArgusException("Rounding error code = "+tauArgus.GetErrorString(errorCode[0]) + "\noccured in subtable "+j);}
-               tableSet.roundMaxJump = Math.max(tableSet.roundMaxJump, maxJump[0]);
-               tableSet.roundJumps = Math.max(tableSet.roundJumps,numberJump[0]);
-               if (maxJump[0] > tableSet.roundMaxJump){tableSet.roundMaxJump = maxJump[0];}
-               //SOLUTION TYPE IS ZOEK!!!!!!!!!!!!! Ik neem aan dat de retrun valeu nu de solution type is
-               //NEE DUS!!!!!!!!
-               //return value > 0 is error; has nothing to do with solutionType !!!!!
-               if (solutionType  > 2){
-                if (TauArgusUtils.ExistFile(Application.getTempFile("JJRound"+xs+".OUT.RAPID"))){
-                 TauArgusUtils.renameFile(Application.getTempFile("JJRound"+xs+".OUT.RAPID"),Application.getTempFile("JJRound"+xs+".OUT"));
+            if (tableSet.roundPartitions > 0){ //round all the partitions
+                j1 = 1;  
+                solutionString = "<h2>Rounding procedure was applied with partitioning";
+                if (tableSet.roundPartitions == 2){
+                    solutionString = solutionString + "<br>with artificial totals added";
                 }
-               }
-               tableSet.roundSolType[solutionType]++;
-               hs =  "<tr><td align=\"Right\">" + xs + "</td><td align=\"Right\">";
-               if (solutionType == 2){hs = hs + "Rapid";}
-               if (solutionType == 1){hs = hs + "Feasible";}
-               if (solutionType == 0){hs = hs + "Optimal";}
-               Date endDate = new Date();
-               long diff = endDate.getTime()-startDatePart.getTime();
-               diff = diff / 1000;
-               hs = hs + "</td><td align=\"Right\">" + diff + 
-                 "</td><td align=\"Right\">" + upperBound[0] + 
-                 "</td><td align=\"Right\">" + lowerBound[0] + 
-                 "</td><td align=\"Right\">" + numberJump[0] + 
-                 "</td><td align=\"Right\">" + maxJump[0] +
-                 "</td></tr>\n\r";
-               solutionString = solutionString + hs;
-             }
-             solutionString = solutionString + "</table>"; 
-             joinRounded(tableSet,nPart);
-           }
-           else{ // round as a single table
-                result = rounder.DoRound(solverName, Application.getTempFile("JJ.IN"), X, upperBound, lowerBound, 0,  
-                                  Application.getTempFile("JJ.OUT"), 
-                                  Application.getTempFile("JJstat.OUT"),
-                                  LicenceFile,
-                                  Application.getTempFile("JJRound.log"),
-                                  maxRoundTime, 0,  //Max time,zero restricted
-                                  Application.getTempDir()+"/",   // NamePathExe
-                                  maxJump, numberJump , usedTime, errorCode); //, activityListener );
+                if (tableSet.roundPartitions == 3){ 
+                    j1 = 0;
+                    solutionString = solutionString + "<br>with " + tableSet.roundNumberofBlocks + " blocks";
+                }
+                hs = "</h2>\n<table>\n" ;
+                hs = hs +  "<tr><th width=\"10%\" height=\"11\">No</th>\n";
+                hs = hs +  "    <th width=\"15%\" height=\"11\">Sol. type</th>\n";
+                hs = hs +  "    <th width=\"15%\" height=\"11\">Time</th>\n";
+                hs = hs +  "    <th width=\"15%\" height=\"11\">LowerBound</th>\n";
+                hs = hs +  "    <th width=\"15%\" height=\"11\">UpperBound</th>\n";
+                hs = hs +  "    <th width=\"15%\" height=\"11\">Number of Jumps</th>\n";
+                hs = hs +  "    <th width=\"15%\" height=\"11\">Max. Jump</th></tr>\n";
+                solutionString = solutionString + hs;
+                tableSet.processingTime = 0;
+                for(j=j1;j<nPart;j++){
+                    Date startDatePart = new Date();
+                    xs = Integer.toString(j);
+                    TauArgusUtils.DeleteFile(Application.getTempFile("JJ"+xs+".OUT"));
+                    TauArgusUtils.DeleteFile(Application.getTempFile("JJ"+xs+".OUT.RAPID"));
+                    TauArgusUtils.DeleteFile(Application.getTempFile("JJRound"+xs+".OUT"));
+                    TauArgusUtils.DeleteFile(Application.getTempFile("JJStat"+xs+".OUT"));
+                    result = rounder.DoRound(Solvername, Application.getTempFile("JJ"+xs+".IN"), X, upperBound, lowerBound, 0,  
+                                              Application.getTempFile("JJ"+xs+".OUT"), 
+                                              Application.getTempFile("JJstat"+xs+".OUT"),
+                                              LicenceFile, 
+                                              Application.getTempFile("JJRound"+xs+".log"),
+                                              maxRoundTime, 0,
+                                              Application.getTempDir()+"/",
+                                               maxJump, numberJump , usedTime, errorCode); //, activityListener );
+                    // Only Optimal is implemented currently, so set manually solutionType = 0;
+                    solutionType = 0; 
+                    //if (solutionType > 2) {throw new ArgusException("Rounding error code = "+tauArgus.GetErrorString(errorCode[0]) + "\noccured in subtable "+j);}             
+                    if (result > 0) {throw new ArgusException("Rounding error code = "+tauArgus.GetErrorString(errorCode[0]) + "\noccured in subtable "+j);}
+                    tableSet.roundMaxJump = Math.max(tableSet.roundMaxJump, maxJump[0]);
+                    tableSet.roundJumps = Math.max(tableSet.roundJumps,numberJump[0]);
+                    if (maxJump[0] > tableSet.roundMaxJump){tableSet.roundMaxJump = maxJump[0];}
+                    //SOLUTION TYPE IS ZOEK!!!!!!!!!!!!! Ik neem aan dat de retrun valeu nu de solution type is
+                    //NEE DUS!!!!!!!!
+                    //return value > 0 is error; has nothing to do with solutionType !!!!!
+                    if (solutionType  > 2){
+                        if (TauArgusUtils.ExistFile(Application.getTempFile("JJRound"+xs+".OUT.RAPID"))){
+                            TauArgusUtils.renameFile(Application.getTempFile("JJRound"+xs+".OUT.RAPID"),Application.getTempFile("JJRound"+xs+".OUT"));
+                        }
+                    }
+                    tableSet.roundSolType[solutionType]++;
+                    hs =  "<tr><td align=\"Right\">" + xs + "</td><td align=\"Right\">";
+                    if (solutionType == 2){hs = hs + "Rapid";}
+                    if (solutionType == 1){hs = hs + "Feasible";}
+                    if (solutionType == 0){hs = hs + "Optimal";}
+                    Date endDate = new Date();
+                    long diff = endDate.getTime()-startDatePart.getTime();
+                    diff = diff / 1000;
+                    hs = hs + "</td><td align=\"Right\">" + diff + 
+                              "</td><td align=\"Right\">" + upperBound[0] + 
+                              "</td><td align=\"Right\">" + lowerBound[0] + 
+                              "</td><td align=\"Right\">" + numberJump[0] + 
+                              "</td><td align=\"Right\">" + maxJump[0] +
+                              "</td></tr>\n\r";
+                    solutionString = solutionString + hs;
+                }
+                solutionString = solutionString + "</table>"; 
+                joinRounded(tableSet,nPart);
+            }
+            else{ // round as a single table
+                result = rounder.DoRound(Solvername, Application.getTempFile("JJ.IN"), X, upperBound, lowerBound, 0,  
+                                          Application.getTempFile("JJ.OUT"), 
+                                          Application.getTempFile("JJstat.OUT"),
+                                          LicenceFile,
+                                          Application.getTempFile("JJRound.log"),
+                                          maxRoundTime, 0,  //Max time,zero restricted
+                                          Application.getTempDir()+"/",   // NamePathExe
+                                          maxJump, numberJump , usedTime, errorCode); //, activityListener );
                 solutionType = 0; // Only Optimal is currently implemented
                 //SOLUTION TYPE IS ZOEK!!!!!!!!!!!!! Ik neem aan dat de return value nu de solution type is
                 //NEE DUS!!!!!!!!
@@ -1215,26 +1171,24 @@ public class OptiSuppress {
                 solutionString=solutionString+"</b>" + 
                      "; LowerBound:" + StrUtils.formatDouble(lowerBound[0], tableSet.respVar.nDecimals) +
                      ", UpperBound: "+ StrUtils.formatDouble(lowerBound[0], tableSet.respVar.nDecimals) + "<br>";
-           }
-           Date endDate = new Date();
-           long diff = endDate.getTime()-startDate.getTime();
-           diff = diff / 1000;
-           tableSet.processingTime = (int)diff;  
+            }
+            Date endDate = new Date();
+            long diff = endDate.getTime()-startDate.getTime();
+            diff = diff / 1000;
+            tableSet.processingTime = (int)diff;  
 
-           tauArgus.SetRoundedResponse(Application.getTempFile("JJ.OUT"), tableSet.index);
-           tableSet.roundedInfo = solutionString;
-           tableSet.rounded = true;
-           tableSet.suppressed = TableSet.SUP_ROUNDING;
-           tableSet.solverUsed = Application.solverSelected;
-           hs = "";
-           if (tableSet.roundUnitCost){ hs = "\nUnit cost function has been used.";}
-           SystemUtils.writeLogbook("Table has been rounded.\n" + 
-                                    "Rounding base:   "+ tableSet.roundBase + ".\n"+
-                                    "Max jump:        " + StrUtils.formatDouble(tableSet.roundMaxJump, tableSet.respVar.nDecimals) + ".\n"+
-                                    "Number of steps: " + tableSet.roundJumps + ".");
-           SystemUtils.writeLogbook("End of the rounding procedure");
-            
-                
+            tauArgus.SetRoundedResponse(Application.getTempFile("JJ.OUT"), tableSet.index);
+            tableSet.roundedInfo = solutionString;
+            tableSet.rounded = true;
+            tableSet.suppressed = TableSet.SUP_ROUNDING;
+            tableSet.solverUsed = Application.solverSelected;
+//            hs = ""; Not used????
+//            if (tableSet.roundUnitCost){ hs = "\nUnit cost function has been used.";} Not used????
+            SystemUtils.writeLogbook("Table has been rounded.\n" + 
+                                        "Rounding base:   "+ tableSet.roundBase + ".\n"+
+                                        "Max jump:        " + StrUtils.formatDouble(tableSet.roundMaxJump, tableSet.respVar.nDecimals) + ".\n"+
+                                        "Number of steps: " + tableSet.roundJumps + ".");
+            SystemUtils.writeLogbook("End of the rounding procedure");
         } catch(Exception ex){ 
             throw new ArgusException("Error in the rounding procedure\n" + ex.getMessage());
         }
@@ -1242,112 +1196,109 @@ public class OptiSuppress {
             rdialog.dispose();
             jRCallback.delete();
         }
- 
     } 
-         
     
     private static boolean correctRoundJJ(String fn, double base, boolean noPartitions, boolean unitCost) throws ArgusException{
-        String regelUit, hs; int i, n, p; double cellValue;
+        String regelUit, hs; 
+        int i, n, p; 
+        double cellValue;
         String[] regel = new String[1];
         TauArgusUtils.renameFile (fn, Application.getTempFile("klad"));
         try{
-        BufferedReader in = new BufferedReader(new FileReader(Application.getTempFile("klad")));
-        BufferedWriter out = new BufferedWriter(new FileWriter(fn));
-        regel[0] = in.readLine(); out.write(regel[0]); out.newLine();
-        regel[0] = in.readLine(); out.write(regel[0]); out.newLine();
-        n = Integer.parseInt(regel[0]);
-        for (i=0;i<n;i++){
-           regel[0] = in.readLine(); 
-           p = regel[0].indexOf("u");
-           if (p > 0 ){ 
-             regelUit = ""; // regel[0].substring(0,p+1);
-             hs = TauArgusUtils.GetSimpleToken(regel);
-             regelUit = regelUit + hs + " ";
-             hs = TauArgusUtils.GetSimpleToken(regel);
-             regelUit = regelUit + hs + " ";             
-             cellValue = Double.parseDouble(hs);
-             hs = TauArgusUtils.GetSimpleToken(regel);
-             if (unitCost) {hs ="1";}
-             regelUit = regelUit + hs + " ";             
-             regelUit = regelUit + TauArgusUtils.GetSimpleToken(regel) + "  ";
-             regelUit = regelUit + " " + TauArgusUtils.GetSimpleToken(regel);
-             regelUit = regelUit + " " + TauArgusUtils.GetSimpleToken(regel);
-//somehow the protection interval should be in [0,base], but what about negative values?             
-             if (cellValue < base) {
-               regelUit = regelUit +  " " + cellValue;
-               cellValue = base = cellValue;
-               regelUit = regelUit +  " " + cellValue + " 0";
-             } else{
-               regelUit = regelUit + " "+ regel[0];  
-             }
-             out.write(regelUit); out.newLine();
-           } else{
-               if (unitCost) {
-                 regelUit = ""; // regel[0].substring(0,p+1);
-                 hs = TauArgusUtils.GetSimpleToken(regel);
-                 regelUit = regelUit + hs + " ";
-                 hs = TauArgusUtils.GetSimpleToken(regel);
-                 regelUit = regelUit + hs + " ";             
-                 hs = TauArgusUtils.GetSimpleToken(regel);
-                 if (unitCost) {hs ="1";}
-                 regelUit = regelUit + hs + " ";
-                 out.write (regelUit + regel[0]);
-               }
-               else {out.write(regel[0]); 
-               }
-               out.newLine();
-               }
-       } //end loop over the cells
-        if (noPartitions){
-        regel[0] = in.readLine();
-        if (regel[0].trim().equals("1")){  //somehow JJ does not like one restriction only
-          out.write("2");  out.newLine(); 
-          regel[0] = in.readLine();
-          out.write(regel[0]); out.newLine();
-          out.write(regel[0]); out.newLine();
+            BufferedReader in = new BufferedReader(new FileReader(Application.getTempFile("klad")));
+            BufferedWriter out = new BufferedWriter(new FileWriter(fn));
+            regel[0] = in.readLine(); out.write(regel[0]); out.newLine();
+            regel[0] = in.readLine(); out.write(regel[0]); out.newLine();
+            n = Integer.parseInt(regel[0]);
+            for (i=0;i<n;i++){
+                regel[0] = in.readLine(); 
+                p = regel[0].indexOf("u");
+                if (p > 0 ){ 
+                    regelUit = ""; // regel[0].substring(0,p+1);
+                    hs = TauArgusUtils.GetSimpleToken(regel);
+                    regelUit = regelUit + hs + " ";
+                    hs = TauArgusUtils.GetSimpleToken(regel);
+                    regelUit = regelUit + hs + " ";             
+                    cellValue = Double.parseDouble(hs);
+                    hs = TauArgusUtils.GetSimpleToken(regel);
+                    if (unitCost) {hs ="1";}
+                    regelUit = regelUit + hs + " ";             
+                    regelUit = regelUit + TauArgusUtils.GetSimpleToken(regel) + "  ";
+                    regelUit = regelUit + " " + TauArgusUtils.GetSimpleToken(regel);
+                    regelUit = regelUit + " " + TauArgusUtils.GetSimpleToken(regel);
+                    //somehow the protection interval should be in [0,base], but what about negative values?             
+                    if (cellValue < base) {
+                        regelUit = regelUit +  " " + cellValue;
+                        cellValue = base = cellValue;
+                        regelUit = regelUit +  " " + cellValue + " 0";
+                    } else{
+                        regelUit = regelUit + " "+ regel[0];  
+                    }
+                    out.write(regelUit); out.newLine();
+                } else{
+                    if (unitCost) {
+                        regelUit = ""; // regel[0].substring(0,p+1);
+                        hs = TauArgusUtils.GetSimpleToken(regel);
+                        regelUit = regelUit + hs + " ";
+                        hs = TauArgusUtils.GetSimpleToken(regel);
+                        regelUit = regelUit + hs + " ";             
+                        hs = TauArgusUtils.GetSimpleToken(regel);
+                        if (unitCost) {hs ="1";}
+                        regelUit = regelUit + hs + " ";
+                        out.write (regelUit + regel[0]);
+                    }
+                    else {out.write(regel[0]);}
+                    out.newLine();
+                }
+            } //end loop over the cells
+            if (noPartitions){
+                regel[0] = in.readLine();
+                if (regel[0].trim().equals("1")){  //somehow JJ does not like one restriction only
+                    out.write("2");  out.newLine(); 
+                    regel[0] = in.readLine();
+                    out.write(regel[0]); out.newLine();
+                    out.write(regel[0]); out.newLine();
+                }
+                out.write(regel[0]); out.newLine();
+                regel[0] = in.readLine();
+                while (regel[0] != null){
+                    out.write(regel[0]); out.newLine();
+                    regel[0] = in.readLine();            
+                }          
+            }
+            else{ //Partitions but what about the single restiction problem?? 
+                regel[0] = in.readLine();
+                while (regel[0] != null){
+                    out.write(regel[0]); out.newLine();
+                    regel[0] = in.readLine();            
+                }    
+            }
+            in.close();
+            out.close();
+            return true;
         }
-        out.write(regel[0]); out.newLine();
-        regel[0] = in.readLine();
-        while (regel[0] != null){
-          out.write(regel[0]); out.newLine();
-          regel[0] = in.readLine();            
-          }          
+        catch(Exception ex){ 
+            throw new ArgusException("Error in checking the JJ file for rounding");
         }
-        else{ //Partitions but what about the single restiction problem?? 
-        regel[0] = in.readLine();
-        while (regel[0] != null){
-          out.write(regel[0]); out.newLine();
-          regel[0] = in.readLine();            
-          }    
-        }
-        in.close();
-        out.close();
-        return true;
-        }
-        catch(Exception ex){ throw new ArgusException("Error in checking the JJ file for rounding");
-           }
     }
     
     private static void openOut(int i, boolean append){
        String hs;
        hs = Integer.toString(i);
-//       if(restrictions){ hs = hs + "R";}
-//       else {
        if (!append) {TauArgusUtils.DeleteFile(Application.getTempFile("JJ"+ hs + ".IN"));}
-//   }
        try{ out  = new BufferedWriter(new FileWriter(Application.getTempFile("JJ"+ hs + ".IN"), true));}            
        catch (IOException ex){}
-   }
+    }
    
     private static void closeOut(){
        try{ out.close();}
        catch (IOException ex){}
-   }
+    }
    
    
     private static int splitJJ(TableSet tableSet) throws ArgusException {
         Variable EV1; String hs;
-        int i, j, k, deci, nRest, p, q;
+        int i, j, k, nRest, p, q;
         int nRel, nRelTot;
         int[] nc = new int[1]; int[]nac = new int[1];
         BufferedReader in;
@@ -1355,7 +1306,7 @@ public class OptiSuppress {
             in = new BufferedReader(new FileReader(Application.getTempFile("jj.in")));
             EV1 = tableSet.expVar.get(0);
             tauArgus.GetVarNumberOfCodes (EV1.index, nc, nac);
-            deci = tableSet.respVar.nDecimals;
+            //deci = tableSet.respVar.nDecimals; Not used ????
             hs = in.readLine();
             hs = in.readLine();
             j = StrUtils.toInteger(hs);
@@ -1384,7 +1335,7 @@ public class OptiSuppress {
             j = StrUtils.toInteger(hs);
             //The restrictions
             String hs1, hs2;
-            nRel = 0; nRelTot =0;
+            nRel = 0; nRelTot = 0;
             if ((tableSet.roundPartitions==1)||(tableSet.roundPartitions==2)){
                 if (EV1.hierarchical==Variable.HIER_NONE){  
                     for (i=0;i<nRest;i++){hs = in.readLine();}
@@ -1394,7 +1345,8 @@ public class OptiSuppress {
                     BufferedWriter jjRelTot = new BufferedWriter(new FileWriter(Application.getTempFile("JJRELTOT.IN")));
                     jjRel.write(j+" "); jjRel.newLine(); 
                     for (i=0;i<nRest;i++){
-                        jjRelTot.write("0 3 :" +i + " (-1)" +(nRest + i) + " (1)" + (2 * nRest + i) + " (1)"); jjRelTot.newLine(); nRelTot++;
+                        jjRelTot.write("0 3 :" +i + " (-1)" +(nRest + i) + " (1)" + (2 * nRest + i) + " (1)"); jjRelTot.newLine(); 
+                        nRelTot++;
                     }                              
 
                     i = 0;
@@ -1403,8 +1355,10 @@ public class OptiSuppress {
                         q = hs.indexOf("(");
                         j = StrUtils.toInteger(hs.substring(p+1,q).trim());
                         if(j<nRest){
-                            jjRel.write(hs); jjRel.newLine();  nRel++;
-                            jjRelTot.write(hs); jjRelTot.newLine();  nRelTot++;
+                            jjRel.write(hs); jjRel.newLine();  
+                            nRel++;
+                            jjRelTot.write(hs); jjRelTot.newLine();  
+                            nRelTot++;
                             i++;
                             p = hs.indexOf(":");
                             hs1 = hs.substring(0, p+1);
@@ -1425,7 +1379,7 @@ public class OptiSuppress {
                     }
                     jjRel.close();
                     jjRelTot.close();
-                    //Add the relations to aal the JJ files
+                    //Add the relations to the JJ files
                     for (i=0;i<nac[0];i++){
                         openOut(i,true);
                         BufferedReader relIn = new BufferedReader(new FileReader(Application.getTempFile("JJREL.IN")));
@@ -1507,17 +1461,19 @@ public class OptiSuppress {
             }
         };
 
-        int i,result; double apBound = 0.5; String hs;
+        int result; 
+        //double apBound = 0.5; Not used ????
+        String hs;
         int[] nSecondary = new int[1]; int maxTimeAllowed;
         // First check for the max. dimension of the table. 
         if (tableSet.expVar.size() > 4 ) {
             if (Application.isAnco()) {
                 hs = "The table has more than 4 dimensions.\n" + 
-                 "Running Optimal can take a lot of time and is error-prone.\n" +
-                 "Please check the results carefully.\n";
+                     "Running Optimal can take a lot of time and is error-prone.\n" +
+                     "Please check the results carefully.\n";
                 int warningResult = ShowWarningMessage(hs);
                 if (warningResult == 0) {
-                    throw new ArgusException("Optimal has not been completed"); //overlapString);
+                    throw new ArgusException("Optimal has not been completed");
                 }
             }
             else{
@@ -1568,7 +1524,6 @@ public class OptiSuppress {
         TauArgusUtils.DeleteFile(Application.getTempFile("JJ.OUT"));//DeleteFile (Temp + "\JJ.OUT")
         TauArgusUtils.DeleteFile(Application.getTempFile("JJ2.OUT"));//DeleteFile (Temp + "\JJ2.OUT") 
               
-// frmModularOptions.FreqRule = True
         if(!externalJJFile){
             SaveTable.writeJJ(tableSet, Application.getTempFile("JJ.IN"), false, true, tableSet.minFreq[0], false, inverseWeight);
             maxTimeAllowed =  tableSet.maxTimeOptimal;
@@ -1576,13 +1531,8 @@ public class OptiSuppress {
         else {
             maxTimeAllowed = maxTime;   
         }
-                
-//  PQQ = TableSetStruct(SelectedTable).PQQ(1)
-//  If PQQ = 0 Then PQQ = TableSetStruct(SelectedTable).PQQ(3)
-//  TauFunctions.AprioryWeightJJ TempDir + "\jj.in", TempDir,   PQQ, 2
-// End If 
         result = 9998;
-//        hs = SystemUtils.getRegString("optimal", "cplexlicensefile", "");
+
         if (Application.solverSelected == Application.SOLVER_CPLEX) hs = TauArgusUtils.GetCplexLicenceFile();
         else hs ="";
         tauHitas.SetDebugMode(Application.SaveDebugHiTaS);
@@ -1591,11 +1541,11 @@ public class OptiSuppress {
         setJJParamIntauHitas();
         
         result = tauHitas.FullJJ(Application.getTempFile("JJ.IN"), Application.getTempFile("JJ.OUT"), 
-                            maxTimeAllowed, hs, Application.getTempDir()+"/", solverName[Application.solverSelected]);
+                                    maxTimeAllowed, hs, Application.getTempDir()+"/", solverName[Application.solverSelected]);
         if (result > 1){
             if (result == 8000 || result == 8001) {throw new ArgusException(tauArgus.GetErrorString(result));}
-            throw new ArgusException("No optimal solutionfound/n"+tauArgus.GetErrorString(result)+
-                                     "see also file: "+ Application.getTempFile("FullJJ.log"));
+            throw new ArgusException("No optimal solutionfound/n"+tauArgus.GetErrorString(result) +
+                                     "see also file: " + Application.getTempFile("FullJJ.log"));
         }
         try{ 
             BufferedReader  in  = new BufferedReader(new FileReader(Application.getTempFile("JJ.OUT")));    
@@ -1622,13 +1572,13 @@ public class OptiSuppress {
         Date endDate = new Date();
         long diff = endDate.getTime()-startDate.getTime();
         diff = diff / 1000;
-  //        if ( diff == 0){ diff = 1;}
+  
         tableSet.processingTime = (int) diff;
         tableSet.suppressed = TableSet.SUP_JJ_OPT;
         tableSet.solverUsed = Application.solverSelected;
         tableSet.inverseWeight = inverseWeight;
-        SystemUtils.writeLogbook("End of Optimal protection. Time used "+ diff+ " seconds\n" + 
-                                 "Number of suppressions: " +tableSet.nSecond); 
+        SystemUtils.writeLogbook("End of Optimal protection. Time used " + diff + " seconds\n" + 
+                                 "Number of suppressions: " + tableSet.nSecond); 
         tauHitas.SetProgressListener(null);
         pcs.removePropertyChangeListener(propertyChangeListener);
     }
@@ -1636,28 +1586,28 @@ public class OptiSuppress {
     public static void ProtectJJFormat (String JJInputFile) {
 // Run the JJ file        
         final SwingWorker <Integer, Void> worker = new ProgressSwingWorker<Integer, Void>(ProgressSwingWorker.DOUBLE,"Modular approach") {
-                @Override
-                protected Integer doInBackground() throws ArgusException, Exception{
-                    super.doInBackground(); 
-                    try{
-                        OptiSuppress.runOptimal(null, new PropertyChangeListener(){
-                            @Override
-                            public void propertyChange(PropertyChangeEvent evt){}
-                            }, false, true, 1);
-                    }
-                    catch (IOException ex) {}                    
-                    return null;
+            @Override
+            protected Integer doInBackground() throws ArgusException, Exception{
+                super.doInBackground(); 
+                try{
+                    OptiSuppress.runOptimal(null, new PropertyChangeListener(){
+                        @Override
+                        public void propertyChange(PropertyChangeEvent evt){}
+                    }, false, true, 1);
                 }
+                catch (IOException ex) {}                    
+                return null;
+            }
 
-                @Override
-                protected void done(){
-                    super.done();
-                    try{
-                        get();
-                    }
-                    catch (InterruptedException ex) {logger.log(Level.SEVERE, null, ex);} 
-                    catch (ExecutionException ex) {JOptionPane.showMessageDialog(null, ex.getCause().getMessage());}
+            @Override
+            protected void done(){
+                super.done();
+                try{
+                    get();
                 }
+                catch (InterruptedException ex) {logger.log(Level.SEVERE, null, ex);} 
+                catch (ExecutionException ex) {JOptionPane.showMessageDialog(null, ex.getCause().getMessage());}
+            }
         };
         worker.execute();
         while (!worker.isDone()){
@@ -1719,20 +1669,14 @@ public class OptiSuppress {
         int result;
         Variable var = tableSet.respVar;
 
-        if (var.CKMseparation){ 
-            result = tauArgus.SetCellKeyValuesCont(tableSet.index, tableSet.cellkeyVar.metadata.getFilePath(PTableFileCont), 
-                        tableSet.cellkeyVar.metadata.getFilePath(PTableFileSep), var.CKMType, var.CKMTopK,
-                        var.zerosincellkey, var.CKMapply_even_odd, var.CKMseparation, var.CKMm1squared, var.CKMscaling,
-                        var.CKMsigma0, var.CKMsigma1, var.CKMxstar, var.CKMq, var.CKMepsilon, var.muC);
-        }
-        else{
-            result = tauArgus.SetCellKeyValuesCont(tableSet.index, tableSet.cellkeyVar.metadata.getFilePath(PTableFileCont), 
-                        "", var.CKMType, var.CKMTopK, var.zerosincellkey, var.CKMapply_even_odd, var.CKMseparation, 
-                        var.CKMm1squared, var.CKMscaling, var.CKMsigma0, var.CKMsigma1, var.CKMxstar, var.CKMq, var.CKMepsilon, var.muC);
-        }
+        result = tauArgus.SetCellKeyValuesCont(tableSet.index, tableSet.cellkeyVar.metadata.getFilePath(PTableFileCont), 
+                                var.CKMseparation ? tableSet.cellkeyVar.metadata.getFilePath(PTableFileSep) : "", 
+                                var.CKMType, var.CKMTopK, var.zerosincellkey, var.CKMapply_even_odd, var.CKMseparation, 
+                                var.CKMm1squared, var.CKMscaling, var.CKMsigma0, var.CKMsigma1, var.CKMxstar, var.CKMq, 
+                                var.CKMepsilon, var.muC);
 
         if (result <= -90){ // error 
-            throw new ArgusException("Some error in call of SetCellKeyValuesCont(...) result = "+result);
+            throw new ArgusException("Some error in call of SetCellKeyValuesCont(...) result = " + result);
         }
 
         long endTime = new Date().getTime();
@@ -1776,5 +1720,4 @@ public class OptiSuppress {
         
         return true;
     }
-      
 }

@@ -68,12 +68,11 @@ public class DialogSpecifyTablesTabular extends DialogBase {
         textFieldRange.setInputVerifier(integerInputVerifier);
         textFieldZeroMargin.setInputVerifier(doubleInputVerifier);
         textFieldManualSafetyRange.setInputVerifier(integerInputVerifier);
-
-        setLocationRelativeTo(parent);
     }
 
     public int showDialog(Metadata metadata) {
         load(metadata);
+        setLocationRelativeTo(this.getParent());
         setVisible(true);
         return returnValue;
     }
@@ -826,7 +825,7 @@ public class DialogSpecifyTablesTabular extends DialogBase {
         radioButtonUseGivenStatus.setEnabled(labelStatusVar.isEnabled());
         radioButtonUseSafetyRules.setEnabled(labelTopNVarCount.isEnabled() || labelFrequencyVar.isEnabled());
 
-        //forceren als er maar eentje is
+        // Auto choose when there is only one available
         if (radioButtonUseGivenStatus.isEnabled() && !radioButtonUseSafetyRules.isEnabled())  {
             radioButtonUseGivenStatus.setSelected(true);
         }

@@ -41,8 +41,6 @@ public class DialogSelectRowColumn extends javax.swing.JDialog {
         initComponents();
         listVariables.setSelectionModel(new SingleListSelectionModel());
         listVariables.setCellRenderer(new VariableNameCellRenderer());
-        
-        setLocationRelativeTo(parent);
     }
     
     public int showDialog(final TableSet table) {
@@ -60,7 +58,7 @@ public class DialogSelectRowColumn extends javax.swing.JDialog {
         listVariables.setSelectedIndex(0);
         
         organise();
-        
+        setLocationRelativeTo(this.getParent());        
         setVisible(true);
         
         return returnValue;

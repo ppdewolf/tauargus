@@ -24,7 +24,7 @@ public enum CellStatusCategory {
     PRIMARY_UNSAFE("U"), 
     SECONDARY_UNSAFE("M");
     
-    private String symbol;
+    private final String symbol;
 
     private CellStatusCategory(String symbol) {
         this.symbol = symbol;

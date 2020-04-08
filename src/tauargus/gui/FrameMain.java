@@ -77,8 +77,7 @@ public class FrameMain extends javax.swing.JFrame {
                 
                 //If the datafile is a SAV file, then we assume the file is a SPSS systemfile
                 //and so we will first read the SPSS metadata
-                
-                
+              
                 if (!metadata.metaFile.trim().equals(""))
                 {
                     try {
@@ -200,6 +199,7 @@ public class FrameMain extends javax.swing.JFrame {
         try {
             if (LinkedTables.TestLinkedPossible()){
                 DialogLinkedTables dialog = new DialogLinkedTables(FrameMain.this, true);
+                dialog.setLocationRelativeTo(FrameMain.this);
                 dialog.setVisible(true);
         
                 panelTable.setTable(currentTable);
@@ -216,6 +216,7 @@ public class FrameMain extends javax.swing.JFrame {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             DialogAPriori dialog = new DialogAPriori(FrameMain.this, true);
+            dialog.setLocationRelativeTo(FrameMain.this);
             dialog.setVisible(true);
         }        
     };
@@ -246,6 +247,7 @@ public class FrameMain extends javax.swing.JFrame {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             DialogOptions dialog = new DialogOptions(FrameMain.this, true);
+            dialog.setLocationRelativeTo(FrameMain.this);
             dialog.setVisible(true);
             if (TableService.numberOfTables() != 0) {panelTable.enableHiddenFeatures(Application.isAnco());}
         }
@@ -283,24 +285,6 @@ public class FrameMain extends javax.swing.JFrame {
         jScrollPane1.getViewport().setScrollMode(SIMPLE_SCROLL_MODE);
         fileChooser = new javax.swing.JFileChooser();
         
-//        panelTable.setVisible(false);
-
-        // TODO Remove this after testing period.
-//        if (Application.numberOfMetadatas() == 0) {
-//            DataFilePair dataFilePair = new DataFilePair("C:\\Users\\Gebruiker\\Projects\\TauArgusVB\\Data\\tau_testW.asc", "C:\\Users\\Gebruiker\\Projects\\TauArgusVB\\Data\\tau_testW.rda");
-//            Metadata metadata = new Metadata(false);
-//            metadata.metaFile = dataFilePair.getMetaFileName();
-//            metadata.dataFile = dataFilePair.getDataFileName();
-//            Application.clearMetadatas();
-//            try {
-//                metadata.readMicroMetadata();
-//                Application.addMetadata(metadata);
-//            } 
-//            catch (Exception ex) {
-//                JOptionPane.showMessageDialog(this, ex.getMessage());
-//            }
-//        }
-        
         if (TableService.numberOfTables() > 0) {
             currentTable = TableService.getTable(0);
             panelTable.setTable(currentTable);
@@ -310,7 +294,7 @@ public class FrameMain extends javax.swing.JFrame {
         organise();
     }
     
-    public void organise() {
+    private void organise() {
         specifyMetadataAction.setEnabled(Application.numberOfMetadatas() > 0);
         specifyTablesAction.setEnabled((Application.numberOfMetadatas() > 0) && (Application.getMetadatas().get(0).containsExplanatoryVariable()));
 
@@ -329,14 +313,16 @@ public class FrameMain extends javax.swing.JFrame {
         panelTable.setVisible(TableService.numberOfTables() != 0);
         if (TableService.numberOfTables() != 0) {panelTable.enableHiddenFeatures(Application.isAnco());}
     }
+    
+    public void organiseAnco(){
+        organise();
+    }
 
     @Override
     public List<Image> getIconImages() {
         URL url = FrameMain.class.getResource("/tauargus/resources/Tau32.png");
         Image image = Toolkit.getDefaultToolkit().getImage(url);
-// Anco 1.6
-//        ArrayList<Image> imageList = new ArrayList<>();
-        ArrayList<Image> imageList = new ArrayList<Image>();
+        ArrayList<Image> imageList = new ArrayList<>();
         imageList.add(image);
         return imageList;
     }
@@ -844,7 +830,6 @@ public class FrameMain extends javax.swing.JFrame {
     private void menuItemAncoNewsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemAncoNewsActionPerformed
         DialogHtmlViewer dialog = new DialogHtmlViewer(FrameMain.this, true);
         JOptionPane.showMessageDialog(FrameMain.this, "The Anco news file tobe implemented"); 
-//        dialog.showDialog("Anco News", FrameMain.class.getResource("/tauargus/resources/NewsAnco.html"));
     }//GEN-LAST:event_menuItemAncoNewsActionPerformed
 
     private void menuItemSaveTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemSaveTableActionPerformed
@@ -852,35 +837,15 @@ public class FrameMain extends javax.swing.JFrame {
     }//GEN-LAST:event_menuItemSaveTableActionPerformed
 
     private void menuItemGenerateAprioryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemGenerateAprioryActionPerformed
-//        DialogAPriori dialog = new DialogAPriori(FrameMain.this, true);
-//        dialog.setVisible(true);
+        // TODO add your handling code here:
     }//GEN-LAST:event_menuItemGenerateAprioryActionPerformed
 
     private void menuItemOptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemOptionsActionPerformed
-//        DialogOptions dialog = new DialogOptions(FrameMain.this, true);
-//        dialog.setVisible(true);
-//        if (TableService.numberOfTables() != 0) {panelTable.enableHiddenFeatures(Application.isAnco());}
         // TODO add your handling code here:
     }//GEN-LAST:event_menuItemOptionsActionPerformed
 
     private void menuItemLinkedTablesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemLinkedTablesActionPerformed
-//       if (TableService.numberOfTables()<2){
-//           JOptionPane.showMessageDialog(FrameMain.this, "Unable to run the linked tables procedure;\n"+
-//                                                          "a minimum of 2 tables is needed");           
-//       }else{
-        
-/*        try {
-            if (LinkedTables.TestLinkedPossible()){
-                DialogLinkedTables dialog = new DialogLinkedTables(FrameMain.this, true);
-                dialog.setVisible(true);
-        
-                panelTable.setTable(currentTable);
-                organise();
-            }
-        }
-        catch (ArgusException ex){
-                 JOptionPane.showMessageDialog(FrameMain.this, ex.getMessage());}
-        // TODO add your handling code here:*/
+        // TODO add your handling code here:
     }//GEN-LAST:event_menuItemLinkedTablesActionPerformed
 
     private void menuItemOpenBatchProcessActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemOpenBatchProcessActionPerformed
@@ -926,11 +891,13 @@ public class FrameMain extends javax.swing.JFrame {
 
     private void menuItemSolverOptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemSolverOptionsActionPerformed
         DialogSolverOptions dialog = new DialogSolverOptions(FrameMain.this,true);
+        dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
     }//GEN-LAST:event_menuItemSolverOptionsActionPerformed
 
     private void menuItemWriteBatchFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemWriteBatchFileActionPerformed
         DialogWriteBatchFile dialog = new DialogWriteBatchFile(FrameMain.this,true);
+        dialog.setLocationRelativeTo(FrameMain.this);
         dialog.setVisible(true);
     }//GEN-LAST:event_menuItemWriteBatchFileActionPerformed
 
@@ -940,8 +907,8 @@ public class FrameMain extends javax.swing.JFrame {
 
     private void menuItemProtectJJFormatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemProtectJJFormatActionPerformed
         DialogProtectJJFormat dialog = new DialogProtectJJFormat(FrameMain.this,true);
+        dialog.setLocationRelativeTo(FrameMain.this);
         dialog.setVisible(true);       
-        
     }//GEN-LAST:event_menuItemProtectJJFormatActionPerformed
 
     private void menuItemContentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemContentActionPerformed

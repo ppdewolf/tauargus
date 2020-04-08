@@ -27,7 +27,6 @@ public class Cell {
     public static final int PEEP_CODE2 = 2;
     
     public double response; // original value of chosen response variable
-    //public int roundedResponse; // value of response after rounding suppression
     public double roundedResponse;
     public double CTAValue; // value of response after CTA suppression
     public double CKMValue; // value of response after cell key method application
@@ -62,6 +61,4 @@ public class Cell {
         }
         this.status = CellStatus.findByValue(status);
     }
-    
-    
 }

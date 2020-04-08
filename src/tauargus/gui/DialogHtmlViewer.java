@@ -29,7 +29,6 @@ public class DialogHtmlViewer extends javax.swing.JDialog {
     public DialogHtmlViewer(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        setLocationRelativeTo(parent);
     }
 
     public void showDialog(String title, String url) {
@@ -40,6 +39,7 @@ public class DialogHtmlViewer extends javax.swing.JDialog {
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
+        setLocationRelativeTo(this.getParent());        
         setVisible(true);
     }
     /**

@@ -33,10 +33,10 @@ public class DialogOpenTable extends DialogBase {
     public DialogOpenTable(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        setLocationRelativeTo(parent);
     }
     
     public int showDialog() {
+        setLocationRelativeTo(this.getParent());
         setVisible(true);
         return returnValue;
     }

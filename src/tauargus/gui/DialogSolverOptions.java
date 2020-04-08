@@ -26,10 +26,10 @@ import argus.utils.SystemUtils;
  */
 public class DialogSolverOptions extends javax.swing.JDialog {
 
-    /**
+    /*
      * Creates new form DialogSolverOptions
      * Mode ideally the defaults are set once (e.g. in OptiSuppress)
-     */
+    */ 
     public DialogSolverOptions(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
@@ -57,8 +57,6 @@ public class DialogSolverOptions extends javax.swing.JDialog {
         jTextFieldRounderInfinity.setText(SystemUtils.getRegString("optimal", "jjRoundInf",  "21400000000000"));
         jTextFieldRounderMinViola.setText(SystemUtils.getRegString("optimal", "jjRoundMinViola", "0.0001"));
         jTextFieldRounderMaxSlack.setText(SystemUtils.getRegString("optimal", "jjRoundMaxSlack", "0.01"));
-        
-        setLocationRelativeTo(parent);
     }
 
     /**
@@ -463,7 +461,6 @@ public class DialogSolverOptions extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOKActionPerformed
-        // TODO add your handling code here:
         SystemUtils.putRegString("solveroptions", "zero", jTextFieldZero.getText());
         SystemUtils.putRegString("solveroptions", "zero1", jTextFieldZero1.getText());
         SystemUtils.putRegString("solveroptions", "zero2", jTextFieldZero2.getText());
@@ -484,16 +481,12 @@ public class DialogSolverOptions extends javax.swing.JDialog {
         SystemUtils.putRegString("optimal", "jjRoundInf", jTextFieldRounderInfinity.getText());
         SystemUtils.putRegString("optimal", "jjRoundMinViola", jTextFieldRounderMinViola.getText());
         SystemUtils.putRegString("optimal", "jjRoundMaxSlack", jTextFieldRounderMaxSlack.getText());
-           
-        
-//        ExecUtils.putRegBoolean("solveroptions", "applyscaling", jCheckBoxApplyScaling.isSelected());
-        
+
         setVisible(false);
         dispose();
     }//GEN-LAST:event_jButtonOKActionPerformed
 
     private void jButtonDefaultsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDefaultsActionPerformed
-        // TODO add your handling code here:
         jTextFieldZero.setText("0.0000001");
         jTextFieldZero1.setText("0.0000001");
         jTextFieldZero2.setText("0.0000000001");
@@ -509,9 +502,6 @@ public class DialogSolverOptions extends javax.swing.JDialog {
         jTextFieldMaxCutsIter.setText("50");
         
         jTextFieldCTATolerance.setText("0.00001");
-        
-//        jCheckBoxApplyScaling.setSelected(false);
-
     }//GEN-LAST:event_jButtonDefaultsActionPerformed
 
     private void jTextFieldRounderMinViolaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldRounderMinViolaActionPerformed

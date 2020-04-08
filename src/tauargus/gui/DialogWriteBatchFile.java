@@ -17,8 +17,6 @@
 
 package tauargus.gui;
 
-//import java.awt.image.ImageObserver;
-//import java.io.BufferedReader;
 import argus.utils.StrUtils;
 import argus.utils.SystemUtils;
 import java.io.BufferedWriter;
@@ -45,14 +43,13 @@ public class DialogWriteBatchFile extends DialogBase {
 
     private String batchFile;
     private TableSet tableSet;
-    /**
+    /*
      * Creates new form DialogWriteBatchFile
      */
     public DialogWriteBatchFile(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         batchFile = "";
-        setLocationRelativeTo(parent);
     }
 
     /**
@@ -144,58 +141,36 @@ public class DialogWriteBatchFile extends DialogBase {
 
     private void jButtonSearchBatchFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSearchBatchFileActionPerformed
         // TODO add your handling code here:
-      boolean oke;  
-//      String hs = SystemUtils.getRegString("general", "datadir", "");
-//      if (!hs.equals("")){
-//          File file = new File(hs);
-//          jFileChooser1.setCurrentDirectory(file);
-//       }
-       TauArgusUtils.getDataDirFromRegistry(jFileChooser1);
-        // TODO add your handling code here:
+        boolean oke;  
+        TauArgusUtils.getDataDirFromRegistry(jFileChooser1);
+ 
         jFileChooser1.setDialogTitle("Safe file name");
         jFileChooser1.setSelectedFile(new File(""));
         jFileChooser1.resetChoosableFileFilters();
 
         // filters are shown in order of declaration, setFileFilter sets the default filter
-       batchFile = ""; oke = false;       
-       jFileChooser1.setFileFilter(new FileNameExtensionFilter("Argus batch file (*.arb)", "arb"));
-//     do{
+        batchFile = ""; oke = false;       
+        jFileChooser1.setFileFilter(new FileNameExtensionFilter("Argus batch file (*.arb)", "arb"));
+
         if (jFileChooser1.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
             batchFile=jFileChooser1.getSelectedFile().toString();}
-//         if (batchFile.equals("")){ oke = true;}
-//         else { if (TauArgusUtils.ExistFile(batchFile)) { //ask for overwrite
-//           int result = JOptionPane.showConfirmDialog(DialogWriteBatchFile.this, "The file "+batchFile+" exists already.\n"+
-//                     "Do you want to overwrite?", "",JOptionPane.YES_NO_OPTION);
-//           if (result == JOptionPane.YES_OPTION){ oke = true;}
-//           else                                 { batchFile = ""; oke = false;}             
-//          }             
-//         }
-//        } while (oke = false);     
-          
+        
         if (FilenameUtils.getExtension(batchFile).equals("") && !batchFile.equals("")) {
             batchFile = batchFile+ ".arb";}
 
-       textBatchFileName.setText(batchFile);
-       TauArgusUtils.putDataDirInRegistry(batchFile);
-       
- //      jButtonWriteBatch.setEnabled(!batchFile.equals(""));
-      
+        textBatchFileName.setText(batchFile);
+        TauArgusUtils.putDataDirInRegistry(batchFile);
     }//GEN-LAST:event_jButtonSearchBatchFileActionPerformed
 
     private void textBatchFileNamePropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_textBatchFileNamePropertyChange
-        // TODO add your handling code here:
- //     jButtonWriteBatch.setEnabled(!textBatchFileName.getText().equals(""));  
-        batchFile = textBatchFileName.getText();
+         batchFile = textBatchFileName.getText();
     }//GEN-LAST:event_textBatchFileNamePropertyChange
 
     private void textBatchFileNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textBatchFileNameActionPerformed
         // TODO add your handling code here:
-
     }//GEN-LAST:event_textBatchFileNameActionPerformed
 
     private void jButtonWriteBatchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonWriteBatchActionPerformed
-        // TODO add your handling code here:
-     
       if (batchFile.equals("")){
           JOptionPane.showMessageDialog(DialogWriteBatchFile.this, "No batch file name specified");
       return;
@@ -216,7 +191,6 @@ public class DialogWriteBatchFile extends DialogBase {
     }//GEN-LAST:event_jButtonWriteBatchActionPerformed
 
     private void textBatchFileNameFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_textBatchFileNameFocusLost
-        // TODO add your handling code here:
         batchFile = textBatchFileName.getText();
         Metadata metadata = Application.getMetadata(0);
         batchFile = TauArgusUtils.addPathExt(batchFile, metadata.dataFile, ".arb");
@@ -227,167 +201,173 @@ public class DialogWriteBatchFile extends DialogBase {
         // This is only possible and feasible interactively so the code is specified here
         String hs; Variable variable; int i,j,k,t;
         try{
-         BufferedWriter batch = new BufferedWriter(new FileWriter(batchFile));  
-         batch.write("//This batch file was generated by Tau-ARGUS"); batch.newLine();
-         Date date = new Date();
-         hs = date.toString();
-         batch.write("//Date "+ hs); batch.newLine();
-         batch.write("//"); batch.newLine();
-         for ( i = 0; i < Application.numberOfMetadatas(); i++) {
-          Metadata metadata = Application.getMetadata(i);
-          String dataFile = metadata.dataFile;
-          String metafile = metadata.metaFile;
-          if (metadata.dataOrigin == Metadata.DATA_ORIGIN_MICRO){batch.write("<OPENMICRODATA>   ");} 
-                                                            else{batch.write("<OPENTABLEDATA> ");}
-          batch.write(" \""  +dataFile+"\""); batch.newLine();
-          batch.write("<OPENMETADATA>     \""  +metafile+"\""); batch.newLine();
-          if ((i==0) && (metadata.dataOrigin == Metadata.DATA_ORIGIN_MICRO) ){ //microdata tables
-          for (t=0; t<TableService.numberOfTables();t++){
-            tableSet= TableService.getTable(t);
-            hs = "<SPECIFYTABLE>     ";
-            for (k=0;k<tableSet.expVar.size();k++){
-              variable = tableSet.expVar.get(k);  
-              hs = hs + StrUtils.quote(variable.name); 
-            }
-            variable = tableSet.respVar;
-            hs = hs + "|";
-            if (variable!=null){ hs = hs + StrUtils.quote(variable.name); } 
-            variable = tableSet.shadowVar;
-            hs = hs + "|";
-            if (variable!=null){ hs = hs + StrUtils.quote(variable.name); } 
-            variable = tableSet.costVar;
-            hs = hs + "|";
-            if (tableSet.costFunc == TableSet.COST_VAR){ if (variable!=null){ hs = hs + StrUtils.quote(variable.name);} 
-            } else if (tableSet.costFunc == TableSet.COST_UNITY) { hs = hs + "-2";
-            } else if (tableSet.costFunc == TableSet.COST_FREQ) { hs = hs + "-1";
-            } else if (tableSet.costFunc == TableSet.COST_DIST) {hs = hs + "-3";
-            }
-            if (tableSet.lambda!=1) hs = hs + "|" + Double.toString(tableSet.lambda);
-            batch.write(hs); batch.newLine();
-         
-            hs = "<SAFETYRULE>       ";
-            k=2;if(tableSet.holding){k=4;}
-            if (tableSet.domRule){
-              for (j=0;j<k;j++){
-                hs = hs + "NK("+Integer.toString(tableSet.domN[j])+ "," +Integer.toString(tableSet.domK[j])+ ")|";
-              }  
-            }
-            if(tableSet.pqRule){
-              for (j=0;j<k;j++){
-                hs = hs+ "P("+Integer.toString(tableSet.pqP[j])+ "," + Integer.toString(tableSet.pqQ[j]) + "," + 
-                           Integer.toString(tableSet.pqN[j]) + ")|" ; 
-              }  
-            }
-            if (tableSet.zeroUnsafe){hs = hs + "ZERO("+Double.toString(tableSet.zeroRange)+")|";}
-            k=1;if(tableSet.holding){k=2;}
-            if ((tableSet.minFreq[0] !=0) || (tableSet.minFreq[1] !=0)){
-              for (j=0;j<k;j++){  
-                hs = hs + "FREQ("+Integer.toString(tableSet.minFreq[j])+"," + Integer.toString(tableSet.frequencyMarge[j])+")|";
-              }
-            }
-            if (tableSet.piepRule[0]){
-              hs = hs + "REQ("+ Integer.toString(tableSet.piepPercentage[0])+"," +
-                                Integer.toString(tableSet.piepPercentage[1])+","+ 
-                                Integer.toString(tableSet.piepMinFreq[0])+","+ 
-                                Integer.toString(tableSet.piepMarge[0])+")|";                  
-             } 
-            if (tableSet.piepRule[1]){
-              hs = hs + "REQ("+ Integer.toString(tableSet.piepPercentage[2])+"," +
-                                Integer.toString(tableSet.piepPercentage[3])+","+ 
-                                Integer.toString(tableSet.piepMinFreq[1])+","+ 
-                                Integer.toString(tableSet.piepMarge[1])+")|";                  
-            } 
-            if (tableSet.weighted){
-                hs = hs + "WGT(1)|";
-            }
-            if (tableSet.missingIsSafe){
-                hs = hs + "MIS(1)|";
-            }
-            hs = hs.substring(0, hs.length()-1);
-            batch.write(hs); batch.newLine();
-          }
-        }
-        if (metadata.dataOrigin == Metadata.DATA_ORIGIN_MICRO){  
-           batch.write("<READMICRODATA>"); batch.newLine();            
-        } else{ // tabular input
-           batch.write("<READTABLE>");
-           tableSet= TableService.getTable(0);
-           if(tableSet.computeTotals){ batch.write(" 1");}
-           batch.newLine(); 
-        }
+            BufferedWriter batch = new BufferedWriter(new FileWriter(batchFile));  
+            batch.write("//This batch file was generated by Tau-ARGUS"); batch.newLine();
+            Date date = new Date();
+            hs = date.toString();
+            batch.write("//Date "+ hs); batch.newLine();
+            batch.write("//"); batch.newLine();
+            for ( i = 0; i < Application.numberOfMetadatas(); i++) {
+                Metadata metadata = Application.getMetadata(i);
+                String dataFile = metadata.dataFile;
+                String metafile = metadata.metaFile;
+                if (metadata.dataOrigin == Metadata.DATA_ORIGIN_MICRO){batch.write("<OPENMICRODATA>   ");} 
+                else{batch.write("<OPENTABLEDATA> ");}
+                batch.write(" \""  +dataFile+"\""); batch.newLine();
+                batch.write("<OPENMETADATA>     \""  +metafile+"\""); batch.newLine();
+                if ((i==0) && (metadata.dataOrigin == Metadata.DATA_ORIGIN_MICRO) ){ //microdata tables
+                    for (t=0; t<TableService.numberOfTables();t++){
+                        tableSet= TableService.getTable(t);
+                        hs = "<SPECIFYTABLE>     ";
+                        for (k=0;k<tableSet.expVar.size();k++){
+                            variable = tableSet.expVar.get(k);  
+                            hs = hs + StrUtils.quote(variable.name); 
+                        }
+                        variable = tableSet.respVar;
+                        hs = hs + "|";
+                        if (variable!=null){ hs = hs + StrUtils.quote(variable.name); } 
+                        variable = tableSet.shadowVar;
+                        hs = hs + "|";
+                        if (variable!=null){ hs = hs + StrUtils.quote(variable.name); } 
+                        variable = tableSet.costVar;
+                        hs = hs + "|";
+                        switch (tableSet.costFunc) {
+                            case TableSet.COST_VAR:
+                                if (variable!=null){ hs = hs + StrUtils.quote(variable.name);}
+                                break;
+                            case TableSet.COST_UNITY:
+                                hs = hs + "-2";
+                                break;
+                            case TableSet.COST_FREQ:
+                                hs = hs + "-1";
+                                break;
+                            case TableSet.COST_DIST:
+                                hs = hs + "-3";
+                                break;
+                            default:
+                                break;
+                        }
+                        if (tableSet.lambda!=1) hs = hs + "|" + Double.toString(tableSet.lambda);
+                        batch.write(hs); batch.newLine();
 
-          for (t=0; t<TableService.numberOfTables();t++){
-            tableSet= TableService.getTable(t); 
-            hs = "<SUPPRESS>         ";
-            switch (tableSet.suppressed) {
-            case TableSet.SUP_NO: hs = ""; break; //nothing
-            case TableSet.SUP_JJ_OPT:hs = hs + "OPT(" + Integer.toString(t+1)+ ")" ;
-                          break;  
-            case TableSet.SUP_GHMITER: hs = hs + "GH(" + Integer.toString(t+1)+ "," +
-                          Integer.toString(tableSet.ghMiterAprioryPercentage) + ","+ 
-                          Integer.toString(tableSet.ghMiterSize)+","+
-                          Integer.toString((tableSet.ghMiterApplySingleton) ? 1 : 0)+ ")";
-                          break;
+                        hs = "<SAFETYRULE>       ";
+                        k=2;if(tableSet.holding){k=4;}
+                        if (tableSet.domRule){
+                            for (j=0;j<k;j++){
+                                hs = hs + "NK("+Integer.toString(tableSet.domN[j])+ "," +Integer.toString(tableSet.domK[j])+ ")|";
+                            }  
+                        }
+                        if(tableSet.pqRule){
+                            for (j=0;j<k;j++){
+                                hs = hs+ "P("+Integer.toString(tableSet.pqP[j])+ "," + Integer.toString(tableSet.pqQ[j]) + "," + 
+                                        Integer.toString(tableSet.pqN[j]) + ")|" ; 
+                            }  
+                        }
+                        if (tableSet.zeroUnsafe){hs = hs + "ZERO("+Double.toString(tableSet.zeroRange)+")|";}
+                        k=1;if(tableSet.holding){k=2;}
+                        if ((tableSet.minFreq[0] !=0) || (tableSet.minFreq[1] !=0)){
+                            for (j=0;j<k;j++){  
+                                hs = hs + "FREQ("+Integer.toString(tableSet.minFreq[j])+"," + Integer.toString(tableSet.frequencyMarge[j])+")|";
+                            }
+                        }
+                        if (tableSet.piepRule[0]){
+                            hs = hs + "REQ("+ Integer.toString(tableSet.piepPercentage[0])+"," +
+                                                Integer.toString(tableSet.piepPercentage[1])+","+ 
+                                                Integer.toString(tableSet.piepMinFreq[0])+","+ 
+                                                Integer.toString(tableSet.piepMarge[0])+")|";                  
+                        } 
+                        if (tableSet.piepRule[1]){
+                            hs = hs + "REQ("+ Integer.toString(tableSet.piepPercentage[2])+"," +
+                                                Integer.toString(tableSet.piepPercentage[3])+","+ 
+                                                Integer.toString(tableSet.piepMinFreq[1])+","+ 
+                                                Integer.toString(tableSet.piepMarge[1])+")|";                  
+                        } 
+                        if (tableSet.weighted){
+                            hs = hs + "WGT(1)|";
+                        }
+                        if (tableSet.missingIsSafe){
+                            hs = hs + "MIS(1)|";
+                        }
+                        hs = hs.substring(0, hs.length()-1);
+                        batch.write(hs); batch.newLine();
+                    }
+                }
+                if (metadata.dataOrigin == Metadata.DATA_ORIGIN_MICRO){  
+                    batch.write("<READMICRODATA>"); batch.newLine();            
+                } else{ // tabular input
+                    batch.write("<READTABLE>");
+                    tableSet= TableService.getTable(0);
+                    if(tableSet.computeTotals){ batch.write(" 1");}
+                    batch.newLine(); 
+                }
+
+                for (t=0; t<TableService.numberOfTables();t++){
+                    tableSet= TableService.getTable(t); 
+                    hs = "<SUPPRESS>         ";
+                    switch (tableSet.suppressed) {
+                        case TableSet.SUP_NO: hs = ""; break; //nothing
+                        case TableSet.SUP_JJ_OPT:hs = hs + "OPT(" + Integer.toString(t+1)+ ")" ;
+                            break;  
+                        case TableSet.SUP_GHMITER: hs = hs + "GH(" + Integer.toString(t+1)+ "," +
+                                                        Integer.toString(tableSet.ghMiterAprioryPercentage) + ","+ 
+                                                        Integer.toString(tableSet.ghMiterSize)+","+
+                                                        Integer.toString((tableSet.ghMiterApplySingleton) ? 1 : 0)+ ")";
+                            break;
                   //if size = 2 add 2 parameters
-            case TableSet.SUP_HITAS: hs = hs + "MOD(" + Integer.toString(t+1)+ "," ;
-                     hs = hs + Integer.toString(tableSet.maxHitasTime)+ "," ;
-                     hs = hs + Integer.toString((tableSet.singletonSingletonCheck ) ? 1 : 0)+ "," ;
-                     hs = hs + Integer.toString((tableSet.singletonMultipleCheck) ? 1 : 0)+ "," ;
-                     hs = hs + Integer.toString((tableSet.minFreqCheck) ? 1 : 0)+ ")" ;
-                     break;
-            case TableSet.SUP_NETWORK: hs = hs + "NET(" + Integer.toString(t+1)+ ")" ; break;
-            case TableSet.SUP_SINGLETON: hs = ""; break;
-            case TableSet.SUP_ROUNDING: hs = hs + "RND("  + Integer.toString(t+1)+ "," ;
-            // Structure differs from what's read when running a batch-file: therefore commented out
-                     hs = hs + Integer.toString(tableSet.roundBase) + ",";
-                     hs = hs + Integer.toString(tableSet.roundMaxStep) + ",";
-                     //hs = hs + "1,";
-                     hs = hs + Integer.toString(tableSet.roundMaxTime) + ",";
-                     hs = hs + Integer.toString(tableSet.roundPartitions) + ",";
-                     //hs = hs + Integer.toString(tableSet.roundNumberofBlocks) + ",";
-                     //hs = hs + Integer.toString(tableSet.roundStoppingRule) + ",";
-                     hs = hs + Integer.toString(tableSet.roundStoppingRule) + ")";
-                     //hs = hs + Integer.toString(tableSet.roundPartitions) + ")";                     
-                     break;
-            case TableSet.SUP_MARGINAL: hs = ""; break;
-            case TableSet.SUP_UWE: hs = ""; break;
-            case TableSet.SUP_CTA: hs = ""; break;
-            case TableSet.SUP_CKM: hs = hs + "CKM(" + Integer.toString(t+1)+ ")";
-                                   if (!tableSet.respVar.isResponse()){ // Should be frequency table
-                                       hs = hs + " " + 
-                                               StrUtils.quote(metadata.getFilePath(tableSet.cellkeyVar.PTableFile));
-                                   }
-                                   else{
-                                       hs = hs + " " + 
-                                               StrUtils.quote(metadata.getFilePath(tableSet.cellkeyVar.PTableFileCont)) + 
-                                               " | " + 
-                                               StrUtils.quote(metadata.getFilePath(tableSet.cellkeyVar.PTableFileSep)) +
-                                               " | " +
-                                               ((tableSet.respVar.muC > 0) ? Double.toString(tableSet.respVar.muC) : "");
-                                   }
-                                   break;
+                        case TableSet.SUP_HITAS: hs = hs + "MOD(" + Integer.toString(t+1)+ "," ;
+                            hs = hs + Integer.toString(tableSet.maxHitasTime)+ "," ;
+                            hs = hs + Integer.toString((tableSet.singletonSingletonCheck ) ? 1 : 0)+ "," ;
+                            hs = hs + Integer.toString((tableSet.singletonMultipleCheck) ? 1 : 0)+ "," ;
+                            hs = hs + Integer.toString((tableSet.minFreqCheck) ? 1 : 0)+ ")" ;
+                            break;
+                        case TableSet.SUP_NETWORK: hs = hs + "NET(" + Integer.toString(t+1)+ ")" ; break;
+                        case TableSet.SUP_SINGLETON: hs = ""; break;
+                        case TableSet.SUP_ROUNDING: hs = hs + "RND("  + Integer.toString(t+1)+ "," ;
+                    // Structure differs from what's read when running a batch-file: therefore commented out
+                            hs = hs + Integer.toString(tableSet.roundBase) + ",";
+                            hs = hs + Integer.toString(tableSet.roundMaxStep) + ",";
+                            //hs = hs + "1,";
+                            hs = hs + Integer.toString(tableSet.roundMaxTime) + ",";
+                            hs = hs + Integer.toString(tableSet.roundPartitions) + ",";
+                            //hs = hs + Integer.toString(tableSet.roundNumberofBlocks) + ",";
+                            //hs = hs + Integer.toString(tableSet.roundStoppingRule) + ",";
+                            hs = hs + Integer.toString(tableSet.roundStoppingRule) + ")";
+                            //hs = hs + Integer.toString(tableSet.roundPartitions) + ")";                     
+                            break;
+                        case TableSet.SUP_MARGINAL: hs = ""; break;
+                        case TableSet.SUP_UWE: hs = ""; break;
+                        case TableSet.SUP_CTA: hs = ""; break;
+                        case TableSet.SUP_CKM: hs = hs + "CKM(" + Integer.toString(t+1)+ ")";
+                            if (!tableSet.respVar.isResponse()){ // Should be frequency table
+                                hs = hs + " " + StrUtils.quote(metadata.getFilePath(tableSet.cellkeyVar.PTableFile));
+                            }
+                            else{
+                                hs = hs + " " + StrUtils.quote(metadata.getFilePath(tableSet.cellkeyVar.PTableFileCont)) + 
+                                               " | " + StrUtils.quote(metadata.getFilePath(tableSet.cellkeyVar.PTableFileSep)) +
+                                               " | " + ((tableSet.respVar.muC > 0) ? Double.toString(tableSet.respVar.muC) : "");
+                                }
+                            break;
+                    }
+                    if(!hs.equals("")){batch.write(hs); batch.newLine();}
+                }
+                for (t=0; t<TableService.numberOfTables();t++){
+                    tableSet= TableService.getTable(t); 
+                    if(!tableSet.safeFileName.equals("")){
+                        hs = "<WRITETABLE>      (" + Integer.toString(t+1)+ "," + 
+                                    Integer.toString(tableSet.safeFileFormat+1)+ "," + 
+                                    tableSet.safeFileOptions + "," + StrUtils.quote(tableSet.safeFileName)+ ")";
+                        batch.write(hs); batch.newLine();
+                    }
+                }
+                batch.write("<GOINTERACTIVE>"); batch.newLine();
             }
-            if(!hs.equals("")){batch.write(hs); batch.newLine();}
-          }
-          for (t=0; t<TableService.numberOfTables();t++){
-            tableSet= TableService.getTable(t); 
-            if(!tableSet.safeFileName.equals("")){
-                hs = "<WRITETABLE>      (" + Integer.toString(t+1)+ "," + 
-                        Integer.toString(tableSet.safeFileFormat+1)+ "," + 
-                        tableSet.safeFileOptions + "," + StrUtils.quote(tableSet.safeFileName)+ ")";
-                batch.write(hs); batch.newLine();
-            }
-          }
-          batch.write("<GOINTERACTIVE>"); batch.newLine();
-         }
-               
                  
-         batch.close();
-         SystemUtils.writeLogbook("Batchfile: " + batchFile + " has been written");
-       }
-       catch(IOException ex) {
-         throw new ArgusException("An error occured when writing the batchfile: "+batchFile);    
-       }
+            batch.close();
+            SystemUtils.writeLogbook("Batchfile: " + batchFile + " has been written");
+        }
+        catch(IOException ex) {
+            throw new ArgusException("An error occured when writing the batchfile: "+batchFile);    
+        }
     }
 //    /**
 //     * @param args the command line arguments

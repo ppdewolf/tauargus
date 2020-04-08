@@ -72,11 +72,11 @@ public class batch {
         reportProgressInfo(s);
     }   
     
-        static public void reportProgressInfo(String s){
+    static public void reportProgressInfo(String s){
         if(Application.windowInfoIsOpen){
             Application.windowInfo.addText(s);
         } else {
-          System.out.println(s);            
+            System.out.println(s);            
         }    
     }  
     
@@ -127,7 +127,9 @@ public class batch {
  * @return the result of the batch run. (the BATCH_ parameters specified above)
  */
     public static int runBatchProcess(String batchFile){
-        String token; boolean tabularInput; int status; boolean firstCommand, silent; 
+        String token; 
+        boolean tabularInput, firstCommand, silent; 
+        int status;
         String dataFile, metaDataFile, hs; 
         String currentCommand = "";
         dataFile = ""; metaDataFile = ""; tabularInput = false;
@@ -146,15 +148,15 @@ public class batch {
         clearVariables();
         try{
             tokenizer = new Tokenizer(new BufferedReader(new FileReader(batchFile)));
-        } catch (Exception ex) {
+        }catch (Exception ex) {
             if (Application.batchType() == Application.BATCH_FROMMENU){
-                JOptionPane.showMessageDialog(null, "Argus batch file ("+batchFile+") could not be opened");
+                JOptionPane.showMessageDialog(null, "Argus batch file (" + batchFile + ") could not be opened");
             } else{
-                SystemUtils.writeLogbook("Argus batch file ("+batchFile+") could not be opened");  
+                SystemUtils.writeLogbook("Argus batch file (" + batchFile + ") could not be opened");  
             }
             return BATCH_NORMAL_ERROR;       
         }
-        SystemUtils.writeLogbook("Start of batch procedure; file: "+ batchFile);
+        SystemUtils.writeLogbook("Start of batch procedure; file: " + batchFile);
 //status 0 Start
 //       1 Data/Tablefile found
 //       2 Metafile found
@@ -164,91 +166,96 @@ public class batch {
             while (tokenizer.nextLine() != null) {
                 currentCommand = tokenizer.getLine();
                 reportProgress(currentCommand);
-                token = tokenizer.nextToken();  //.toUpperCase() niet nodig
-                if (token.startsWith("\\\\")||token.startsWith("//") ){token="<COMMENT>";}
+                token = tokenizer.nextToken();
+                if (token.startsWith("\\\\") || token.startsWith("//")){token="<COMMENT>";}
                 else{//test for first command to be silent
                     if ( firstCommand && !token.equals("<SILENT>")){
-                        firstCommand = false; silent = false;  
+                        firstCommand = false; 
+                        silent = false;  
                         //do sometning to initiate a progress window
                     }  
                 }
                 switch (token) {
-                    case "<COMMENT>":break;
-                    case "<ANCO>":{ Application.setAnco(true); break;}
+                    case "<COMMENT>":
+                        break;
+                    case "<ANCO>": 
+                        Application.setAnco(true); 
+                        break;
                     case ("<JJ>"): //TODO Run a JJ file}
-                           {break;}
-                    case ("<OPENMICRODATA>"):{
+                        reportProgress("<JJ> not yet implemented. Skipping this command.");
+                        break;
+                    case ("<OPENMICRODATA>"):
                         dataFile =  tokenizer.nextToken();                  
                         tabularInput = false;
-                        if (status !=0){ throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
+                        if (status != 0){ throw new ArgusException ("This keyword (" + token + ") is not allowed in this position"); }
                         status = 1;
                         dataFile = giveRightFile(dataFile);
-                        break;}
-                    case ("<OPENTABLEDATA>"):  {
+                        break;
+                    case ("<OPENTABLEDATA>"):
                         dataFile =  tokenizer.nextToken();
                         tabularInput = true;
-                        if (!(status == 0 || status == 4)){ throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
+                        if (!(status == 0 || status == 4)){ throw new ArgusException ("This keyword (" + token + ") is not allowed in this position"); }
                         dataFile = giveRightFile(dataFile);
                         status = 1;    
-                        break;}
-                    case "<OPENMETADATA>":{   
+                        break;
+                    case "<OPENMETADATA>":   
                         metaDataFile =  tokenizer.nextToken();
                         if (dataFile.equals("")){ throw new ArgusException ("A data file must be specified first"); }                       
-                        if (status !=1){ throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
+                        if (status != 1){ throw new ArgusException ("This keyword (" + token + ") is not allowed in this position"); }
                         status = 2;
                         metaDataFile = giveRightFile(metaDataFile);
                         Metadata.createMetadata(tabularInput, dataFile, metaDataFile);
                         dataFile = "";
-                        break;}
-                    case("<SPECIFYTABLE>"):{
-                        if ( status !=2 && status != 4){ throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
-                        if (! specifyTableBatch ()){ }
+                        break;
+                    case("<SPECIFYTABLE>"):
+                        if (status != 2 && status != 4){ throw new ArgusException ("This keyword (" + token + ") is not allowed in this position"); }
+                        if (!specifyTableBatch ()){throw new ArgusException ("Something wrong in specifyTableBatch()");}
                         status = 3;
-                        break;}
-                    case ("<CLEAR>"):{
+                        break;
+                    case ("<CLEAR>"):
                         TableService.clearTables();
                         tauArgus.CleanAll();
                         clearMetadatas();
                         clearVariables();
                         status = 0;
-                        break;}
-                    case ("<SAFETYRULE>"):{
-                        if ( status != 3)  { throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
-                        if (! readSafetyRuleBatch()) {}
+                        break;
+                    case ("<SAFETYRULE>"):
+                        if (status != 3)  { throw new ArgusException ("This keyword (" + token + ") is not allowed in this position"); }
+                        if (!readSafetyRuleBatch()) {throw new ArgusException ("Something wrong in readSafetyRuleBatch()");}
                         status = 4;
-                        break;}
-                    case ("<READMICRODATA>"): { 
-                        if ( status != 4) { throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
-                        if (!readMicrodataBatch()) {}
+                        break;
+                    case ("<READMICRODATA>"):  
+                        if (status != 4) { throw new ArgusException ("This keyword (" + token + ") is not allowed in this position"); }
+                        if (!readMicrodataBatch()) {throw new ArgusException ("Something wrong in readMicrodataBatch()");}
                         reportProgress("Tables from microdata have been read");
-                        break;}
-                    case ("<READTABLE>"): {
+                        break;
+                    case ("<READTABLE>"): 
                         if (status == 3) { throw new ArgusException ("TODO Add automatic Use Status"); }
-                        if (status != 4){ throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
+                        if (status != 4){ throw new ArgusException ("This keyword (" + token + ") is not allowed in this position"); }
                         token = tokenizer.nextToken();
                         if (token.equals("")){token = "0";}
-                        if ( !token.equals("0") && !token.equals("1") && !token.equals("2")) { 
-                            throw new ArgusException ("Illegal parameter ("+token+") for ReadTable");}
+                        if (!token.equals("0") && !token.equals("1") && !token.equals("2")) { 
+                            throw new ArgusException ("Illegal parameter (" + token + ") for ReadTable");}
                         int computeTotals = 0;
                         if ( token.equals("1")){computeTotals = 1;}
                         if ( token.equals("2")){computeTotals = 2;}
-                        if (!readTablesBatch(computeTotals)) {}
+                        if (!readTablesBatch(computeTotals)) {throw new ArgusException ("Something wrong in readTablesBatch()");}
                         reportProgress("Tables have been read");
-                        break;}
+                        break;
                     case ("<APRIORY>"): 
-                    case ("<APRIORI>"): {
+                    case ("<APRIORI>"): 
                         //“Filename”, TabNo, Separator
                         boolean expandBogus = false, ignoreError = true;
                         String fName = tokenizer.nextToken();
                         hs = batchFilePath + fName;
                         if (!TauArgusUtils.ExistFile(fName) && TauArgusUtils.ExistFile(hs)){fName = hs;}                        
-                        if (!TauArgusUtils.ExistFile(fName)){ throw new ArgusException ("Apriori file: "+ fName + " could not be found");}
+                        if (!TauArgusUtils.ExistFile(fName)){ throw new ArgusException ("Apriori file: " + fName + " could not be found");}
                         hs = tokenizer.nextChar();
                         if (!hs.equals(",")){throw new ArgusException ("a , was expected here");}
                         hs = tokenizer.nextField(",");
                         int tabno = StrUtils.toInteger(hs);
                         if ((tabno <= 0) || (tabno > TableService.numberOfTables() ) ){
-                            throw new  ArgusException ("Illegal table number found: "+ hs);}
+                            throw new  ArgusException ("Illegal table number found: " + hs);}
                         tabno = tabno - 1;
                         if (!tokenizer.testNextChar().equals("\"")){
                             throw new ArgusException ("A quote was expected here before the separator");}
@@ -261,7 +268,7 @@ public class batch {
                             if(!hs.equals("")){
                                 if (hs.equals("1")){ignoreError=true;}
                                 else if (hs.equals("0")){ignoreError=false;}
-                                     else {throw new ArgusException("Illegal field ("+hs+") for ignore error was specified");}
+                                    else {throw new ArgusException("Illegal field (" + hs + ") for ignore error was specified");}
                             }
                             hs =tokenizer.nextField(",");
                             if (!hs.equals("")){expandBogus = hs.equals("1");}
@@ -270,39 +277,34 @@ public class batch {
                         try{ TableSet.processAprioryFile(fName, tabno, sep, ignoreError, expandBogus, true, aPrioryStatus);}
                         catch (ArgusException ex ) {
                             TableSet.CloseAprioriFiles(expandBogus, aPrioryStatus);                            
-                            throw new ArgusException ("An error has occurred when processing apriori file "+fName  );  //+ "\n" + ex.getMessage()
+                            throw new ArgusException ("An error has occurred when processing apriori file " + fName  );
                         }  
-                        reportProgress("Apriori file "+fName+" has been read");
-                        break;}
-                    case ("<COVER>"): {// ProtectCoverTable = True
-                        //Should only be used to protect the cver table  
+                        reportProgress("Apriori file " + fName + " has been read");
+                        break;
+                    case ("<COVER>"): // ProtectCoverTable = True
+                        //Should only be used to protect the cover table  
                         //When TAU creates a batch sub-process to protect the cover table  
                         //Not for normal users; not in the manual.  
                         Application.setProtectCoverTable(true);
                         TableSet tableSet = TableService.getTable(0);
                         tableSet.additivity = TableSet.ADDITIVITY_NOT_REQUIRED;              
-                        break;}
-    //Recode is not described in tehmanual, so we skip it here
-    //                 case ("<RECODE>"):   
-    //                    { break;}
-    // Case "<RECODE>": BatchRecode (Staart)
-                    case ("<SUPPRESS>"):  {
-                        if ( status != 4) { throw new ArgusException ("This keyword ("+token+") is not allowed in this position"); }
+                        break;
+                    case ("<SUPPRESS>"):  
+                        if (status != 4) {throw new ArgusException ("This keyword (" + token + ") is not allowed in this position");}
                         suppressBatch();
-                        break;}
-                    
-    // Case "<LINKMOD>": If Not BatchLinkedModular Then GoTo FOUTEINDE
-    // LINKEDMOD is niet nodog als we tabel 0 kunnen onderdrukken.                      
-                    case ("<WRITETABLE>"): {
+                        break;
+                    case ("<WRITETABLE>"): 
                         writeTableBatch();
-                        break;}    
-                    case ("<REPORTSTR>"):   
-                        { break;}    
+                        break;  
+    //Was used by Space Time Research, no longer supported
+    //              case ("<REPORTSTR>"):   
+    //                  break;    
     // Case "<REPORTSTR>": If Not ReportSTR(Staart) Then GoTo FOUTEINDE
-                          // Something special for Space Time Reserach
+    // Something special for Space Time Reserach
                     case ("<RECODE>"):
-                        { break; }
-                    case ("<SOLVER>"): {
+                        reportProgress("<RECODE> not yet implemented. Skipping this command.");
+                        break;
+                    case ("<SOLVER>"):
                         hs = tokenizer.nextField(",");
                         if (hs.equalsIgnoreCase("XPRESS")){
                             Application.solverSelected = Application.SOLVER_XPRESS;  
@@ -316,7 +318,7 @@ public class batch {
                                     Application.solverSelected = Application.SOLVER_SOPLEX;                            
                                 }
                                 else{
-                                    throw new ArgusException("Illegal solver ("+hs+") selected");
+                                    throw new ArgusException("Unknown solver (" + hs + ") selected");
                                 }
                         }
                         // check for license file
@@ -324,27 +326,26 @@ public class batch {
                         if (!hs.isEmpty()){
                             hs = StrUtils.unQuote(hs);
                             if (!TauArgusUtils.ExistFile(hs)){
-                                throw new ArgusException("Cplex License file ("+hs+") does not exist");                               
+                                throw new ArgusException("Cplex License file (" + hs + ") does not exist");                               
                             }
                             hs = TauArgusUtils.getFullFileName(hs);
                             SystemUtils.putRegString("optimal", "cplexlicensefile", hs); 
                         }
                         break;
-                    }
                     case ("<GOINTERACTIVE>"):   
-                        { return 1; }    
-                    case ("<LOGBOOK>"): {
+                        return 1;     
+                    case ("<LOGBOOK>"): 
                         hs = StrUtils.unQuote(tokenizer.getLine());
                         SystemUtils.setLogbook(hs);
                         tokenizer.clearLine();
-                        break;}    
-                    case ("<VERSIONINFO>"): {
+                        break;    
+                    case ("<VERSIONINFO>"): 
                         hs = StrUtils.unQuote(tokenizer.getLine());
                         writeVersionInfo(hs);
                         tokenizer.clearLine();
-                        break;}                   
-                    default:{
-                        throw  new ArgusException ("Illegal keyword "+ token);} // {throw { new ArgusException ("Illegal keyword"+ token); }
+                        break;                   
+                    default:
+                        throw new ArgusException ("Unknown keyword " + token);
                 }   // end switch
             }
             tokenizer.close();
@@ -352,34 +353,30 @@ public class batch {
         catch (ArgusException ex) {
             if (Application.batchType()== Application.BATCH_FROMMENU) {
                 SystemUtils.writeLogbook("Error in batch file");   
-                JOptionPane.showMessageDialog(null, "Error in batch file\nCommand: " + currentCommand +"\n"+ex.getMessage());
+                JOptionPane.showMessageDialog(null, "Error in batch file\nCommand: " + currentCommand + "\n" + ex.getMessage());
             }
-            else { SystemUtils.writeLogbook("Error in batch file");}
+            else {SystemUtils.writeLogbook("Error in batch file");}
             return BATCH_NORMAL_ERROR;                  
         }
         finally {if (Application.batchType()== Application.BATCH_FROMMENU){Application.openInfoWindow(false);}}
- //       if (Application.batchType()== Application.BATCH_FROMMENU){Application.openInfoWindow(false);}  
         return BATCH_OK;
     }
 
 
     static void writeVersionInfo (String f) throws ArgusException{
-        if (!f.contains(":")&&!f.contains("\\")&&!f.contains("/")){
+        if (!f.contains(":") && !f.contains("\\") && !f.contains("/")){
             if (batchDataPath.equals("")){
                 f = batchFilePath + f;
             } else {
                 f = getBatchDataPath() + f;
             }
         }
-        try{
-            BufferedWriter out = new BufferedWriter(new FileWriter(f));
+        try(BufferedWriter out = new BufferedWriter(new FileWriter(f))){
             out.write("TAU-ARGUS version: " + Application.getFullVersion() + "; build: " + Application.BUILD);
-            out.close();        
         } 
         catch(IOException ex){throw new ArgusException ("An error occurred when writing the version info file");}          
     }
    
-  
    /**
    * Writes a table in batch. 
    * Reads the commend and all its parameters.
@@ -392,23 +389,23 @@ public class batch {
         tail[0]=tokenizer.getLine(); Integer tabNo, outputType;
         tokenizer.clearLine();
         hs = nextChar(tail);
-        if ( !hs.equals("(") ) {throw new ArgusException("( expected; not a "+ hs + "");}
+        if ( !hs.equals("(") ) {throw new ArgusException("( expected; not a " + hs + "");}
         hs = nextToken(tail);   
         tabNo = Integer.parseInt(hs);
         if (tabNo > TableService.numberOfTables()){throw new ArgusException("Illegal Table number");}
         tabNo = tabNo -1;
         hs = nextChar(tail);
-        if ( !hs.equals(",") ) {throw new ArgusException(", expected; not a "+ hs + "");}
+        if ( !hs.equals(",") ) {throw new ArgusException(", expected; not a " + hs + "");}
         hs = nextToken(tail);
         // OutputType as specified (start counting from 1)
         // 1: CSV, 2: CSV for pivot, 3: Code Value, 4: SBS, 5: Intermediate, 6: JJ, 7: CKM
         outputType = Integer.parseInt(hs);
-        if (outputType < 1 || outputType > 7) {throw new ArgusException("Unknown output type ("+ hs + ":");}
+        if (outputType < 1 || outputType > 7) {throw new ArgusException("Unknown output type (" + hs + ":");}
         // OutputType for internal use (start counting from 0)
         // 0: CSV, 1: CSV for pivot, 2: Code Value, 3: SBS, 4: Intermediate, 5: JJ, 6: CKM
         outputType--;
         hs = nextChar(tail);
-        if ( !hs.equals(",") ) {throw new ArgusException(", expected; not a "+ hs + "");}
+        if ( !hs.equals(",") ) {throw new ArgusException(", expected; not a " + hs + "");}
         //First the defaults:
         SaveTable.writeAddStatus = false;
         SaveTable.writeSupppressEmpty = false;
@@ -425,12 +422,12 @@ public class batch {
         hs = nextToken(tail).toUpperCase();
         //loop over the different options
         while (! hs.equals("")){
-            if (hs.length()< 2){throw new ArgusException("Unknown output type ("+ hs + ")");}
+            if (hs.length() < 2){throw new ArgusException("Unknown output type (" + hs + ")");}
             optString = hs.substring(0,2);
             hs = hs.substring(2).trim();
             plusMin =  hs.substring(0,1);
             hs = hs.substring(1).trim();
-            if (!plusMin.equals("+") &&!plusMin.equals("-") ){throw new ArgusException("+ or - expected; not a "+ plusMin + "");}
+            if (!plusMin.equals("+") && !plusMin.equals("-")){throw new ArgusException("+ or - expected; not a " + plusMin + "");}
             switch (optString){
                 case "HL": {SaveTable.writeSBSHierarchicalLevels = plusMin.equals("+");break;} //Add Hier level
                 case "SO": {SaveTable.writeIntermediateStatusOnly = plusMin.equals("+");break;} //Status Only
@@ -448,10 +445,10 @@ public class batch {
             }
         }
         hs = nextChar(tail);
-        if ( !hs.equals(",") ) {throw new ArgusException(", expected; not a "+ hs + "");}
+        if ( !hs.equals(",") ) {throw new ArgusException(", expected; not a " + hs + "");}
         hs = nextToken(tail);
         tableSet = TableService.getTable(tabNo);
-        if (!hs.contains(":")&&!hs.contains("\\")&&!hs.contains("/")){
+        if (!hs.contains(":") && !hs.contains("\\") && !hs.contains("/")){
             if (batchDataPath.equals("")){
                 hs = batchFilePath + hs;
             } else {
@@ -461,29 +458,27 @@ public class batch {
         tableSet.safeFileName = hs;
         if (((outputType == 3 || outputType == 4) && (tableSet.ckmProtect || tableSet.ctaProtect)) ||
             ((outputType == 5) && (tableSet.rounded)) || ((outputType == 6) && (!tableSet.ckmProtect))) 
-            {throw new ArgusException("Chosen output type "+Integer.toString(outputType+1)+" is not allowed for this type of protection\n");}
+            {throw new ArgusException("Chosen output type " + Integer.toString(outputType+1) + " is not allowed for this type of protection\n");}
         SaveTable.writeTable (tableSet, outputType);
         SaveTable.writeReport(tableSet);
     }
     
     static boolean readTablesBatch(int computeTotals)throws ArgusException{
-        int i; String hs;
-        TableSet tableSet;
-        hs = "";
         try{
             TableService.addAdditivityParamBatch(computeTotals);
-            TableService.readTables(null);}
-        catch (IOException ex){
-            throw new ArgusException ("\nError reading table"+hs);}
+            TableService.readTables(null);
+        }catch (IOException ex){
+            throw new ArgusException ("\nError reading tables.");
+        }
         return true;
     }
 
     static boolean readMicrodataBatch() throws ArgusException {
-        Date startDate = new Date(); long timeDiff;
+        Date startDate = new Date(); 
+        long timeDiff;
         TableService.readMicrodata(new PropertyChangeListener() {
             @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-            }
+            public void propertyChange(PropertyChangeEvent evt) {}
         });
         Date endDate = new Date();
         timeDiff = (endDate.getTime() - startDate.getTime()) / 1000;
@@ -497,8 +492,10 @@ public class batch {
  * @throws ArgusException 
  */
     static void suppressBatch() throws ArgusException{
-        String SuppressType, token; int i; boolean linked;
-        String[] tail = new String[1]; String hs;
+        String SuppressType, token, hs; 
+        int i;
+        boolean linked;
+        String[] tail = new String[1];
         final TableSet tableset;
   
         SuppressType = tokenizer.nextField("(").toUpperCase();        
@@ -506,10 +503,10 @@ public class batch {
         tokenizer.clearLine();
         token = nextToken(tail);
         int n = Integer.parseInt(token);
-        if (n < 0 || n > TableService.numberOfTables() ){throw new ArgusException("Wrong table number in Suppression");}
+        if (n < 0 || n > TableService.numberOfTables()){throw new ArgusException("Wrong table number in <SUPPRESS>");}
         linked = (n == 0);
         if (linked) {
-            if (!SuppressType.equals("GH") && !SuppressType.equals("MOD")){
+            if (!(SuppressType.equals("GH") || SuppressType.equals("MOD"))){
                 throw new ArgusException("Linked tables is only possible for Modular or Hypercube");
             }  
             for (i=0;i<TableService.numberOfTables();i++){TableService.undoSuppress(i);}
@@ -521,7 +518,7 @@ public class batch {
         }
         
         switch (SuppressType){
-            case "GH":{//TabNo, A priori Bounds Percentage, ModelSize, ApplySingleton) 
+            case "GH"://TabNo, A priori Bounds Percentage, ModelSize, ApplySingleton) 
                 token = nextChar(tail);
                 if (token.equals(",")){
                     token = nextToken(tail);
@@ -545,7 +542,7 @@ public class batch {
                     TableSet ts;
                     for (i=0;i<TableService.numberOfTables();i++){
                       ts = tauargus.service.TableService.getTable(i);
-                      hs = hs + ts.CountSecondaries()+ " cells have been suppressed in table "+(i+1)+"\n";
+                      hs = hs + ts.CountSecondaries()+ " cells have been suppressed in table " + (i+1) + "\n";
                     }
                     hs = hs.substring(0, hs.length()-1);                            
                 } 
@@ -553,9 +550,9 @@ public class batch {
                     GHMiter.RunGHMiter(tableset);
                     hs = tableset.CountSecondaries()+ " cells have been suppressed";
                 }  
-                reportProgress("The hypercube procedure has been applied\n"+ hs);
-                break;}
-            case "MOD":{//TabNo, MaxTimePerSubtable
+                reportProgress("The hypercube procedure has been applied\n" + hs);
+                break;
+            case "MOD"://TabNo, MaxTimePerSubtable
                 token = nextChar(tail);
                 if (token.equals(",")){
                     token = nextToken(tail);
@@ -574,13 +571,12 @@ public class batch {
                         case 3: tableset.minFreqCheck = token.equals("1"); break;
                     }
                     token = nextChar(tail);
-                    
                 }
                 if (linked){
                     LinkedTables.buildCoverTable();  
                     LinkedTables.runLinkedModular(null);
                 } 
-                else { // single table
+                else{ // single table
                     if (token.equals(",")){ //MSC specified
                         token = nextToken(tail);
                         tableset.maxScaleCost = StrUtils.toDouble(token);
@@ -591,19 +587,19 @@ public class batch {
                     try{ // Make sure that PropertyChanges are not processed in batch-mode by overriding propertyChange to do nothing
                         if (Application.batchType() == Application.BATCH_COMMANDLINE){  
                             OptiSuppress.runModular(tableset, new PropertyChangeListener(){
-                                        @Override
-                                        public void propertyChange(PropertyChangeEvent evt){ }});
-                        reportProgressInfo("The modular procedure has been applied\n"+ 
-                                            tableset.CountSecondaries()+ " cells have been suppressed");
+                                @Override
+                                public void propertyChange(PropertyChangeEvent evt){ }});
+                            reportProgressInfo("The modular procedure has been applied\n" + 
+                                                tableset.CountSecondaries() + " cells have been suppressed");
                         }
-                        else {
+                        else{
                             final SwingWorker <Integer, Void> worker = new ProgressSwingWorker<Integer, Void>(ProgressSwingWorker.DOUBLE,"Modular approach") {
                                 @Override
                                 protected Integer doInBackground() throws ArgusException, Exception{
                                     super.doInBackground();
                                     OptiSuppress.runModular(tableset, getPropertyChangeListener());
-                                    reportProgressInfo("The modular procedure has been applied\n"+ 
-                                        tableset.CountSecondaries()+ " cells have been suppressed");
+                                    reportProgressInfo("The modular procedure has been applied\n" + 
+                                                        tableset.CountSecondaries() + " cells have been suppressed");
                                     return null;
                                 }
                                 @Override
@@ -628,8 +624,8 @@ public class batch {
                         throw new ArgusException("Modular failed\n" + ex.getMessage());
                     }
                 }
-                break;}
-            case "OPT":{//TabNo, MaxComputingTime
+                break;
+            case "OPT"://TabNo, MaxComputingTime
                 if (n==0) {throw new ArgusException("Linked tables is not possible for Optimal");}
                 token = nextChar(tail);
                 if (token.equals(",")){
@@ -640,11 +636,10 @@ public class batch {
                 
                 if (Application.batchType() == Application.BATCH_COMMANDLINE){  
                     try{
-                    OptiSuppress.runOptimal(tableset, new PropertyChangeListener(){
-                                    @Override 
-                                    public void propertyChange(PropertyChangeEvent evt){} }, false, false, 1);
-                    }
-                    catch (IOException ex) {}
+                        OptiSuppress.runOptimal(tableset, new PropertyChangeListener(){
+                            @Override 
+                            public void propertyChange(PropertyChangeEvent evt){} }, false, false, 1);
+                    }catch (IOException ex) {}
                 }  
                 else { // From menu with swingworker
                     final SwingWorker <Integer, Void> worker = new ProgressSwingWorker<Integer, Void>(ProgressSwingWorker.DOUBLE,"Modular approach") {
@@ -653,8 +648,8 @@ public class batch {
                             super.doInBackground(); 
                             try{
                                 OptiSuppress.runOptimal(tableset, new PropertyChangeListener(){
-                                            @Override
-                                            public void propertyChange(PropertyChangeEvent evt){} }, false, false, 1);
+                                    @Override
+                                    public void propertyChange(PropertyChangeEvent evt){} }, false, false, 1);
                             }
                             catch (IOException ex) {}                    
                             return null;
@@ -674,17 +669,15 @@ public class batch {
                         catch (InterruptedException ex) {}
                     }  
                 }
-
-                //TODO
-                reportProgressInfo("The optimal procedure has been applied\n"+ 
-                                    tableset.CountSecondaries()+ " cells have been suppressed");
-                break;}
-            case "RND":{//TabNo, RoundingBase, Steps, Time, Partitions, StopRule
+                reportProgressInfo("The optimal procedure has been applied\n" + 
+                                    tableset.CountSecondaries() + " cells have been suppressed");
+                break;
+            case "RND"://TabNo, RoundingBase, Steps, Time, Partitions, StopRule
                         // OK after Roundbase: Default Step = 0 (no step), time = 10, Nopartitions part = 0, stoprule = 2(optimal)
                 if (n==0) {throw new ArgusException("Linked tables is not possible for Rounding");}
                 if (Application.solverSelected == Application.SOLVER_CPLEX)
-                    //{throw new ArgusException("Controlled rounding cannot be used when Cplex is selected as solver");}
-                    {reportProgressInfo("Whether controlled rounding can be used when Cplex is selected as solver, depends on your specific license.\n Incorrect license may cause errors.");}
+                    reportProgressInfo("Whether controlled rounding can be used when Cplex is selected as solver, " +
+                                       "depends on your specific license.\n Incorrect license may cause errors.");
                 token = nextChar(tail);
                 if (!token.equals(",")){throw new ArgusException("a komma(,) expected");}
                 token = nextToken(tail);
@@ -692,7 +685,7 @@ public class batch {
                 long mrb = TableSet.computeMinRoundBase(tableset);
                 if (tableset.roundBase < mrb){
                     throw new ArgusException("The rounding base is too small\n"+
-                                             "A minimum of "+ mrb + " is required");
+                                             "A minimum of " + mrb + " is required");
                 }
                 //set the defaults
                 tableset.roundMaxStep = 0;
@@ -712,7 +705,8 @@ public class batch {
                 if (token.equals(",")){ //max time
                     token = nextToken(tail);
                     tableset.roundMaxTime  = Integer.parseInt(token); 
-                    if (tableset.roundMaxTime <= 0){throw new ArgusException("Illegal value for max time: "+tableset.roundMaxTime );}
+                    if (tableset.roundMaxTime <= 0)
+                        throw new ArgusException("Illegal value for max time: " + tableset.roundMaxTime );
                     token = nextChar(tail); 
                 }else{
                     if (!token.equals(")"))throw new ArgusException("a komma(,) or \")\" expected");
@@ -721,7 +715,8 @@ public class batch {
                 if (token.equals(",")){ //partitions
                     token = nextToken(tail);
                     tableset.roundPartitions  = Integer.parseInt(token); 
-                    if (tableset.roundPartitions < 0||tableset.roundPartitions > 1){throw new ArgusException("Illegal value for partitions: "+tableset.roundPartitions );}
+                    if (tableset.roundPartitions < 0 || tableset.roundPartitions > 1)
+                        throw new ArgusException("Illegal value for partitions: " + tableset.roundPartitions );
                     token = nextChar(tail); 
                 }else{
                     if (!token.equals(")"))throw new ArgusException("a komma(,) or \")\" expected");
@@ -730,10 +725,11 @@ public class batch {
                 if (token.equals(",")){ //Stop rule
                     token = nextToken(tail);
                     tableset.roundStoppingRule  = Integer.parseInt(token); 
-                    if (tableset.roundStoppingRule <= 0||tableset.roundStoppingRule>2){throw new ArgusException("Illegal value for max time: "+tableset.roundStoppingRule );}
+                    if (tableset.roundStoppingRule <= 0 || tableset.roundStoppingRule > 2)
+                        throw new ArgusException("Illegal value for max time: " + tableset.roundStoppingRule );
                     token = nextChar(tail); 
                 }else{
-                    if (!token.equals(")"))throw new ArgusException("a komma(,) or \")\" expected");
+                    if (!token.equals(")")) throw new ArgusException("a komma(,) or \")\" expected");
                 }
                 
                 if (token.equals(",")){ //Unit cost function
@@ -744,7 +740,7 @@ public class batch {
                     else if (token.equals("0")){  
                         tableset.roundUnitCost = false;
                     }
-                    else {throw new ArgusException("Illegal value UnitCost parameter: only 0 or 1 allowed" );
+                    else {throw new ArgusException("Illegal value UnitCost parameter: only 0 or 1 allowed");
                     }
                     token = nextChar(tail); 
                 }else{
@@ -756,8 +752,7 @@ public class batch {
                     try{
                         OptiSuppress.runRounder(tableset, new PropertyChangeListener(){
                                                                     @Override
-                                                                    public void propertyChange(PropertyChangeEvent evt){
-                                                                    }
+                                                                    public void propertyChange(PropertyChangeEvent evt){}
                                                                 });
                     } catch (IOException ex) {throw new ArgusException(ex.getMessage());}
                 }
@@ -770,8 +765,7 @@ public class batch {
                         try{
                             OptiSuppress.runRounder(tableset, new PropertyChangeListener(){
                                                             @Override
-                                                            public void propertyChange(PropertyChangeEvent evt){
-                                                            }
+                                                            public void propertyChange(PropertyChangeEvent evt){}
                                                         });
                         }
                         catch (IOException ex) {}                    
@@ -800,23 +794,18 @@ public class batch {
                 reportProgressInfo("The table has been rounded\n" +
                                    "Number of steps: " + tableset.roundMaxStep + "\n" +
                                    "Max step: " + StrUtils.formatDouble(tableset.roundMaxJump, tableset.respVar.nDecimals));
-                break;}
-            case "CTA":{
-                 try{            
-                   OptiSuppress.RunCTA (tableset, false);
-                   reportProgress("CTA run completed");
-                 }
-                  catch (IOException ex){throw new ArgusException (ex.getMessage());}                
-             break;   
-            } 
-            case "NET":{
+                break;
+            case "CTA":
+                try{            
+                    OptiSuppress.RunCTA (tableset, false);
+                    reportProgress("CTA run completed");
+                }catch (IOException ex){throw new ArgusException (ex.getMessage());}                
+                break;   
+            case "NET":
                 OptiSuppress.TestNetwork(tableset);
-                
                 OptiSuppress.RunNetwork(tableset);
-                
-              break;
-            }
-            case "CKM":{
+                break;
+            case "CKM":
                 // For frequency count tbales: TabNo ptablefile (optional)
                 //      e.g., CKM(1) "ptableFREQ"
                 // For magnitude tables: TabNo ptablefileCONT | ptablefileSEP (optional) | muC (optional)
@@ -849,7 +838,7 @@ public class batch {
                             throw new ArgusException("\"ptable file (" + hs2 + ") does not exist\"");
                         }
                         if (OptiSuppress.RunCellKeyCont(tableset, hs1, hs2)){
-                            reportProgress("Using ptable files "+hs1+" and "+hs2);
+                            reportProgress("Using ptable files " + hs1 + " and " + hs2);
                         }
                     }
                     else{
@@ -866,11 +855,9 @@ public class batch {
                     throw new ArgusException(ex.getMessage());
                 }
                 break;  
-            }
             default: 
-                throw new ArgusException ("Unknown suppression method ("+SuppressType+") found");
+                throw new ArgusException ("Unknown suppression method (" + SuppressType + ") found");
         }   
-
     }
     
     /**
@@ -920,7 +907,7 @@ public class batch {
                         try{
                             respVar.muC = Double.parseDouble(tail[0]);
                         }catch(Exception ex){
-                            throw new ArgusException("muC = " + tail[0]+" is not a double");
+                            throw new ArgusException("muC = " + tail[0] + " is not a double");
                         }
                     }
                 }
@@ -935,148 +922,134 @@ public class batch {
                     cellkeyVar.PTableFile = hs;
             }
         }
-        
         return true;
     }
     
     static boolean readSafetyRuleBatch() throws ArgusException{
-       String token, ruleType;
-       String[] tail = new String[1];
-       int nPRule=0; int nNKRule = 0; int nFreqRule = 0; int nPiepRule = 0;
+        String token, ruleType;
+        String[] tail = new String[1];
+        int nPRule=0; int nNKRule = 0; int nFreqRule = 0; int nPiepRule = 0;
  //<SAFETYRULE>     P(25,100,1)|P(0,100,0)|FREQ(3,30)|       
-       TableSet tableset = tauargus.service.TableService.getTable(tauargus.service.TableService.numberOfTables()-1);
+        TableSet tableset = tauargus.service.TableService.getTable(tauargus.service.TableService.numberOfTables()-1);
 //       int TopN = tableset.metadata.numberOfTopNVariables();
 //TODO We need to check whetehr the different rules are possible, given the metadata       
-       ruleType = tokenizer.nextField("(").toUpperCase();
-       if (ruleType.equals("")) {// No safety ruleso use given status}
-           tableset.useStatusOnly = true;
-           return true;
-       }
-       tableset.useStatusOnly = true;
-       tail[0] = "("+tokenizer.getLine();
-       tokenizer.clearLine();
+        ruleType = tokenizer.nextField("(").toUpperCase();
+        if (ruleType.equals("")) {// No safety rule so use given status}
+            tableset.useStatusOnly = true;
+            return true;
+        }
+        tableset.useStatusOnly = true;
+        tail[0] = "("+tokenizer.getLine();
+        tokenizer.clearLine();
        
-       while (!ruleType.equals("")){
-         token = nextChar(tail);
-         if ( !token.equals("(") ){ throw new ArgusException ("A ( is expected here"); }
-         token = nextToken (tail); // everything should start with a (           
-         if (!ruleType.equals("MAN")){tableset.useStatusOnly = false;}
-         switch (ruleType) {
-           case "P":{ //P: (p,n) with the n optional. (default = 1). 
-              if (tableset.isFrequencyTable()){throw new ArgusException ("p% rule cannot be applied to a frequency table");} 
-              if (nPRule > 3) {throw new ArgusException ("Too many p% rules specified");}
-              tableset.pqRule = true;
-              tableset.pqP[nPRule]=Integer.parseInt(token);
-              tableset.pqQ[nPRule]=100;
-              tableset.pqN[nPRule]=1;
-              token = nextChar(tail);
-              if (token.equals(",")){
-                token = nextToken (tail);  
-                tableset.pqN[nPRule]=Integer.parseInt(token);                  
-                token = nextChar(tail);
-              }
-              if (token.equals(",")){
-                token = nextToken (tail);
-                tableset.pqQ[nPRule]=tableset.pqN[nPRule];
-                tableset.pqN[nPRule]=Integer.parseInt(token);                  
-                token = nextChar(tail);
-              }      
+        while (!ruleType.equals("")){
+            token = nextChar(tail);
+            if ( !token.equals("(") ){ throw new ArgusException ("A ( is expected here"); }
+            token = nextToken (tail); // everything should start with a (           
+            if (!ruleType.equals("MAN")){tableset.useStatusOnly = false;}
+            switch (ruleType) {
+                case "P": //P: (p,n) with the n optional. (default = 1). 
+                    if (tableset.isFrequencyTable()){throw new ArgusException ("p% rule cannot be applied to a frequency table");} 
+                    if (nPRule > 3) {throw new ArgusException ("Too many p% rules specified");}
+                    tableset.pqRule = true;
+                    tableset.pqP[nPRule] = Integer.parseInt(token);
+                    tableset.pqQ[nPRule] = 100;
+                    tableset.pqN[nPRule] = 1;
+                    token = nextChar(tail);
+                    if (token.equals(",")){
+                        token = nextToken (tail);  
+                        tableset.pqN[nPRule] = Integer.parseInt(token);                  
+                        token = nextChar(tail);
+                    }
+                    if (token.equals(",")){
+                        token = nextToken (tail);
+                        tableset.pqQ[nPRule] = tableset.pqN[nPRule];
+                        tableset.pqN[nPRule] = Integer.parseInt(token);                  
+                        token = nextChar(tail);
+                    }      
+                    if ((nPRule > 1) && (tableset.pqP[nPRule]>0))
+                        tableset.holding = true;
+                    nPRule++;
+                    break;
+                case "NK": //NK: (n,k). A n,k-dominance rule 
+                    if (tableset.isFrequencyTable()){throw new ArgusException ("Dominance rule cannot be applied to a frequency table");} 
+                    if (nNKRule > 3) {throw new ArgusException("Too many nk rules specified");}
+                    tableset.domRule = true;
+                    tableset.domN[nNKRule] = Integer.parseInt(token);  
+                    token = nextChar(tail);
+                    if ( !token.equals(",") ) { throw new ArgusException ("A \",\" is expected here"); }
+                    token = nextToken (tail); 
+                    tableset.domK[nNKRule] = Integer.parseInt(token);  
+                    if ((nNKRule > 1) && (tableset.domK[nNKRule]>0)) 
+                        tableset.holding = true;
+                    nNKRule++;
+                    token = nextChar(tail);
+                    break;
+                case "FREQ": //FREQ:(MinFreq, FrequencySafetyRange)
+                    if (nFreqRule > 1) {throw new ArgusException("Too many frequency rules specified");}
+                    tableset.frequencyRule = true;
+                    tableset.minFreq[nFreqRule] = Integer.parseInt(token);  
+                    token = nextChar(tail);
+                    if ( !token.equals(",") ) { throw new ArgusException ("A \",\" is expected here"); }
+                    token = nextToken (tail); 
+                    tableset.frequencyMarge[nFreqRule] = Integer.parseInt(token);  
+                    if ((nFreqRule > 0) && (tableset.minFreq[nFreqRule]>0))
+                        tableset.holding = true;
+                    nFreqRule++;
+                    token = nextChar(tail);
+                    break;
+                case "ZERO": //ZERO: (ZeroSafetyRange)
+                    if (tableset.isFrequencyTable()){throw new ArgusException ("Zero rule cannot be applied to a frequency table");} 
+                    tableset.zeroUnsafe = true;
+                    tableset.zeroRange = Double.parseDouble(token);
+                    token = nextChar(tail);
+                    break;
+                case "REQ": //REQ: (Percent1, Percent2, MinFreq, SafetyMargin)
+                    if (tableset.isFrequencyTable()){throw new ArgusException ("Request rule cannot be applied to a frequency table");} 
+                    if (nPiepRule > 1) {throw new ArgusException("Too many request rules specified");}
+                    tableset.piepRule[nPiepRule] = true;
+                    tableset.piepPercentage[2*nPiepRule] = Integer.parseInt(token);   
+                    token = nextChar(tail);
+                    if ( !token.equals(",") ) { throw new ArgusException ("A \",\" is expected here"); }
+                    token = nextToken (tail); 
+                    tableset.piepPercentage[2*nPiepRule+1] = Integer.parseInt(token);   
+                    token = nextChar(tail);
+                    if ( !token.equals(",") ){ throw new ArgusException ("A \",\" is expected here"); }
+                    token = nextToken (tail); 
+                    tableset.piepMinFreq[nPiepRule] = Integer.parseInt(token);                 
+                    token = nextChar(tail);
+                    if ( !token.equals(",") ) { throw new ArgusException ("A \",\" is expected here"); }
+                    token = nextToken (tail);
+                    tableset.piepMarge[nPiepRule] = Integer.parseInt(token);   
               
-              if ((nPRule > 1) && (tableset.pqP[nPRule]>0))
-                  tableset.holding = true;
-              
-              nPRule++;
-              break;
-          }
-          case "NK": {//NK: (n,k). A n,k-dominance rule 
-              if (tableset.isFrequencyTable()){throw new ArgusException ("Dominance rule cannot be applied to a frequency table");} 
-              //if (nNKRule > 3) {return false;}
-              if (nNKRule > 3) {throw new ArgusException("Too many nk rules specified");}
-              tableset.domRule = true;
-              tableset.domN[nNKRule]=Integer.parseInt(token);  
-              token = nextChar(tail);
-              if ( !token.equals(",") ) { throw new ArgusException ("A \",\" is expected here"); }
-              token = nextToken (tail); 
-              tableset.domK[nNKRule]=Integer.parseInt(token);  
-              if ((nNKRule > 1) && (tableset.domK[nNKRule]>0)) 
-                  tableset.holding = true;
-              nNKRule++;
-              token = nextChar(tail);
-              //if (nNKRule > 3) {return false;}
-              break;
-          }
-          case "FREQ":{ //FREQ:(MinFreq, FrequencySafetyRange)
-              //if (nFreqRule > 1) {return false;}   
-              if (nFreqRule > 1) {throw new ArgusException("Too many frequency rules specified");}
-              tableset.frequencyRule = true;
-              tableset.minFreq[nFreqRule]=Integer.parseInt(token);  
-              token = nextChar(tail);
-              if ( !token.equals(",") ) { throw new ArgusException ("A \",\" is expected here"); }
-              token = nextToken (tail); 
-              tableset.frequencyMarge[nFreqRule]=Integer.parseInt(token);  
-              if ((nFreqRule > 0) && (tableset.minFreq[nFreqRule]>0))
-                   tableset.holding = true;
-              nFreqRule++;
-              token = nextChar(tail);
-              break;
-          }
-          case "ZERO":{ //ZERO: (ZeroSafetyRange)
-             if (tableset.isFrequencyTable()){throw new ArgusException ("Zero rule cannot be applied to a frequency table");} 
-              tableset.zeroUnsafe = true;
-              tableset.zeroRange = Double.parseDouble(token);
-              token = nextChar(tail);
-              break;
-          } 
-          case "REQ": {//REQ: (Percent1, Percent2, MinFreq, SafetyMargin)
-              if (tableset.isFrequencyTable()){throw new ArgusException ("Request rule cannot be applied to a frequency table");} 
-              //if (nPiepRule > 1) {return false;}
-              if (nPiepRule > 1) {throw new ArgusException("Too many request rules specified");}
-              tableset.piepRule[nPiepRule] = true;
-              tableset.piepPercentage[2*nPiepRule] = Integer.parseInt(token);   
-              token = nextChar(tail);
-              if ( !token.equals(",") ) { throw new ArgusException ("A \",\" is expected here"); }
-              token = nextToken (tail); 
-              tableset.piepPercentage[2*nPiepRule+1] = Integer.parseInt(token);   
-              token = nextChar(tail);
-              if ( !token.equals(",") ){ throw new ArgusException ("A \",\" is expected here"); }
-              token = nextToken (tail); 
-              tableset.piepMinFreq[nPiepRule] = Integer.parseInt(token);                 
-              token = nextChar(tail);
-              if ( !token.equals(",") ) { throw new ArgusException ("A \",\" is expected here"); }
-              token = nextToken (tail);
-              tableset.piepMarge[nPiepRule] = Integer.parseInt(token);   
-              
-              if ((nPiepRule > 0) && (tableset.piepPercentage[2*nPiepRule] > 0))
-                  tableset.holding = true;
-              nPiepRule++;
-              token = nextChar(tail);
-              break;
-          }
-          case "WGT":{ //WGT: 0 no weights are used,  1 = apply weights 
-              if (! (token.equals("1") || token.equals("0"))) { throw new ArgusException ("A 0 or a 1 is expected here"); }
-              tableset.weighted = token.equals("1");
-              token = nextChar(tail);
-              break;
-          }
-          case "MIS":{ //MIS: 0 = cells with a missing code are unsafe if the safety-rules are violated; 1 = these cells are always safe. 
-              if (! (token.equals("1") || token.equals("0"))) { throw new ArgusException ("A 0 or a 1 is expected here"); }
-              tableset.missingIsSafe = token.equals("1");
-              token = nextChar(tail);
-              break;
-          }
-          case "MAN": {//MAN: (Manual safety margin). 
-              tableset.manualMarge = Integer.parseInt(token); 
-              token = nextChar(tail);
-              break;
-          }
-           default: { throw new ArgusException ("Unknown rule ("+ruleType+") found"); }
-       } //end switch
-       if (! token.equals(")")) { throw new ArgusException ("A \")\" is expected here"); }
-       token = nextChar(tail);
-       if (! (token.equals("|") || token.equals("")) ) { throw new ArgusException ("A \"|\" is expected here"); }
+                    if ((nPiepRule > 0) && (tableset.piepPercentage[2*nPiepRule] > 0))
+                        tableset.holding = true;
+                    nPiepRule++;
+                    token = nextChar(tail);
+                    break;
+                case "WGT": //WGT: 0 no weights are used,  1 = apply weights 
+                    if (!(token.equals("1") || token.equals("0"))) { throw new ArgusException ("A 0 or a 1 is expected here"); }
+                    tableset.weighted = token.equals("1");
+                    token = nextChar(tail);
+                    break;
+                case "MIS": //MIS: 0 = cells with a missing code are unsafe if the safety-rules are violated; 1 = these cells are always safe. 
+                    if (!(token.equals("1") || token.equals("0"))) { throw new ArgusException ("A 0 or a 1 is expected here"); }
+                    tableset.missingIsSafe = token.equals("1");
+                    token = nextChar(tail);
+                    break;
+                case "MAN": //MAN: (Manual safety margin). 
+                    tableset.manualMarge = Integer.parseInt(token); 
+                    token = nextChar(tail);
+                    break;
+                default:  throw new ArgusException ("Unknown rule ("+ruleType+") found");
+            } //end switch
+         
+            if (! token.equals(")")) { throw new ArgusException ("A \")\" is expected here"); }
+            token = nextChar(tail);
+            if (! (token.equals("|") || token.equals("")) ) { throw new ArgusException ("A \"|\" is expected here"); }
        
-       ruleType = nextToken (tail).toUpperCase();
-       } // end while
+            ruleType = nextToken (tail).toUpperCase();
+        } // end while
        return true;
     }
   
@@ -1090,15 +1063,15 @@ public class batch {
         int[] p = new int[4]; int i, pMin; String hs;
         hs = "";
         if(! tail[0].equals("")){
-          p[0] = tail[0].indexOf("(");
-          p[1] = tail[0].indexOf(",");
-          p[2] = tail[0].indexOf(")");
-          p[3] = tail[0].indexOf("|");
-          pMin = 100000;
-          for (i=0;i<4;i++){ if (p[i] >=0 && pMin > p[i]){pMin = p[i];}}
-          hs = tail[0].substring(0,pMin).trim();
-          tail[0]=tail[0].substring(pMin).trim();
-          if (pMin == 100000){throw new ArgusException("No separator found in string "+ tail[0]);}
+            p[0] = tail[0].indexOf("(");
+            p[1] = tail[0].indexOf(",");
+            p[2] = tail[0].indexOf(")");
+            p[3] = tail[0].indexOf("|");
+            pMin = 100000;
+            for (i=0;i<4;i++){ if (p[i] >=0 && pMin > p[i]){pMin = p[i];}}
+            hs = tail[0].substring(0,pMin).trim();
+            tail[0]=tail[0].substring(pMin).trim();
+            if (pMin == 100000){throw new ArgusException("No separator found in string "+ tail[0]);}
         }
         if (hs.startsWith("\"") && hs.endsWith("\"")){hs = hs.substring(1, hs.length()-1);}
         return hs;
@@ -1108,13 +1081,13 @@ public class batch {
     private static boolean testNextToken( String[] tail )throws ArgusException{
         int[] p = new int[4]; int i, pMin;
         if(! tail[0].equals("")){
-          p[0] = tail[0].indexOf("(");
-          p[1] = tail[0].indexOf(",");
-          p[2] = tail[0].indexOf(")");
-          p[3] = tail[0].indexOf("|");
-          pMin = 100000;
-          for (i=0;i<4;i++){ if (p[i] >=0 && pMin > p[i]){pMin = p[i];}}
-          if (pMin == 100000){return false;}
+            p[0] = tail[0].indexOf("(");
+            p[1] = tail[0].indexOf(",");
+            p[2] = tail[0].indexOf(")");
+            p[3] = tail[0].indexOf("|");
+            pMin = 100000;
+            for (i=0;i<4;i++){ if (p[i] >=0 && pMin > p[i]){pMin = p[i];}}
+            if (pMin == 100000){return false;}
         }
         return true;
     }
@@ -1125,121 +1098,101 @@ public class batch {
      * @return 
      */
     private static String nextChar (String[] tail){
-      /*String hs;
-      hs = "";
-      if(! tail[0].equals("")){
-       hs =  tail[0].substring(0,1);       
-       tail[0]=tail[0].substring(1);
-      } 
-      return hs;*/
-      return nextChar(tail, true);
+        return nextChar(tail, true);
     }
-    
     
     private static String nextChar (String[] tail, boolean strip){
-      String hs;
-      hs = "";
-      if(! tail[0].equals("")){
-       hs =  tail[0].substring(0,1);
-       if (strip) tail[0] = tail[0].substring(1);
-      } 
-      return hs;
+        String hs;
+        hs = "";
+        if(! tail[0].equals("")){
+            hs =  tail[0].substring(0,1);
+            if (strip) tail[0] = tail[0].substring(1);
+        } 
+        return hs;
     }
 
-       /**
+    /**
      * Processes the <SPECIFYTABLES> batch command.
      * reads the expl. variables, the response variable etc.
      * @return
      * @throws ArgusException 
-     */
+    */
     static boolean specifyTableBatch() throws ArgusException{
-       String hs; int p;
-       metadata = Application.getMetadata(Application.numberOfMetadatas()-1);
-       TableSet tableSet = new TableSet(metadata);
-       TableService.addTable(tableSet);
+        String hs; 
+        int p;
+        metadata = Application.getMetadata(Application.numberOfMetadatas()-1);
+        TableSet tableSet = new TableSet(metadata);
+        TableService.addTable(tableSet);
 
-       // If available, set variable that contains recordkey
-       tableSet.cellkeyVar = metadata.find(tauargus.model.Type.RECORD_KEY);
+        // If available, set variable that contains recordkey
+        tableSet.cellkeyVar = metadata.find(tauargus.model.Type.RECORD_KEY);
 
-       // Exp vars first
+        // Exp vars first
 
-       do{ hs = tokenizer.nextToken();
-         tableSet.expVar.add(metadata.find(hs));
-         if (! (tokenizer.testNextChar().equals("|") || tokenizer.testNextChar().equals("\""))){
-             throw new ArgusException ("A '|' or a '\"' is expected here");
-         }
-       }  
-       while (!tokenizer.testNextChar().equals("|"));  
+        do{ 
+            hs = tokenizer.nextToken();
+            tableSet.expVar.add(metadata.find(hs));
+            if (! (tokenizer.testNextChar().equals("|") || tokenizer.testNextChar().equals("\""))){
+                throw new ArgusException ("A '|' or a '\"' is expected here");
+            }
+        }  
+        while (!tokenizer.testNextChar().equals("|"));  
        //Respvar
-//       if (!hs.equals("|")){ throw new ArgusException ("A \"|\" is expected here"); }
-       hs = tokenizer.nextChar(); //we know it is correct
-       hs = tokenizer.nextField("|");
-       if (hs.equalsIgnoreCase("<FREQ>")) {
-           if (metadata.dataOrigin == DATA_ORIGIN_MICRO){
-               tableSet.respVar = Application.getFreqVar();
-           } else {
-//           tableSet.respVar = null;
-               tableSet.respVar = metadata.find(tauargus.model.Type.FREQUENCY);
-           }
-           tableSet.readFreqOnlyTable = true;
-       }
-       else {tableSet.respVar=metadata.find(hs);
-         if (!tableSet.respVar.isNumeric()){throw new ArgusException ("Response variable ("+hs+") is not numeric ");}
-         if (tableSet.respVar == null) {throw new ArgusException ("Response variable ("+hs+") not found ");}
-       }
-       if (tokenizer.getLine().equals("")) {return true;}
-       //hs = tokenizer.nextChar();
-       
-       //ShadowVar 
-//       if ( !hs.equals("|")  )  { throw new ArgusException ("A \"|\" is expected here"); }
-       hs = tokenizer.nextField("|");
-       if ( !  ( hs.equals("") || hs.equals("|") ) ){ //process Shadow
-         tableSet.shadowVar=metadata.find(hs);
-         if (tableSet.shadowVar == null) { throw new ArgusException ("Shadow variable ("+hs+") not found "); }
+        hs = tokenizer.nextChar(); //we know it is correct
+        hs = tokenizer.nextField("|");
+        if (hs.equalsIgnoreCase("<FREQ>")) {
+            if (metadata.dataOrigin == DATA_ORIGIN_MICRO){
+                tableSet.respVar = Application.getFreqVar();
+            } else {
+                tableSet.respVar = metadata.find(tauargus.model.Type.FREQUENCY);
+            }
+            tableSet.readFreqOnlyTable = true;
         }
-//       if (!hs.equals("|")){hs = tokenizer.nextChar();}
-       if (tokenizer.getLine().equals("")) {return true;}
+        else {tableSet.respVar=metadata.find(hs);
+            if (!tableSet.respVar.isNumeric()){throw new ArgusException ("Response variable (" + hs + ") is not numeric ");}
+            if (tableSet.respVar == null) {throw new ArgusException ("Response variable (" + hs + ") not found ");}
+        }
+        if (tokenizer.getLine().equals("")) {return true;}
+       
+        //ShadowVar 
+        hs = tokenizer.nextField("|");
+        if ( !( hs.equals("") || hs.equals("|")) ){ //process Shadow
+            tableSet.shadowVar=metadata.find(hs);
+            if (tableSet.shadowVar == null) { throw new ArgusException ("Shadow variable (" + hs + ") not found "); }
+        }
+        if (tokenizer.getLine().equals("")) {return true;}
 
-       //Costvar
-       // - 1= freq;-2 = unity; -3 = distance
-       hs = tokenizer.nextField(",");
-//       if ( ! hs.equals("|")  )   { throw new ArgusException ("A \"|\" is expected here"); }
-//       hs = tokenizer.nextToken();
-       if ( !  ( hs.equals("") || hs.equals("|") ) ){ //process costvar
-          if (hs.equals("-1")){ // freq
-            tableSet.costFunc = TableSet.COST_FREQ;   
-          }
-          else
-          if (hs.equals("-2")){ //unity
-            tableSet.costFunc = TableSet.COST_UNITY;                 
-          }
-          else
-          if (hs.equals("-3")){//distance
-            tableSet.costFunc = TableSet.COST_DIST;                 
-          }
-          else {
-            tableSet.costVar=metadata.find(hs);
-            tableSet.costFunc = TableSet.COST_VAR;
-            if (tableSet.costVar == null) { throw new ArgusException ("Cost variable ("+hs+") not found "); }
-          }
-          } 
-//       if (!hs.equals("|")){hs = tokenizer.nextToken();}
-       hs = tokenizer.getLine();
-       if (hs.equals ("") ) {return true;}
-//       if (tokenizer.getLine().equals("")) {return true;}
+        //Costvar
+        // - 1= freq;-2 = unity; -3 = distance
+        hs = tokenizer.nextField(",");
+        if ( !( hs.equals("") || hs.equals("|")) ){ //process costvar
+            if (hs.equals("-1")){ // freq
+                tableSet.costFunc = TableSet.COST_FREQ;   
+            }
+            else
+            if (hs.equals("-2")){ //unity
+                tableSet.costFunc = TableSet.COST_UNITY;                 
+            }
+            else
+            if (hs.equals("-3")){//distance
+                tableSet.costFunc = TableSet.COST_DIST;                 
+            }
+            else {
+                tableSet.costVar = metadata.find(hs);
+                tableSet.costFunc = TableSet.COST_VAR;
+                if (tableSet.costVar == null) { throw new ArgusException ("Cost variable (" + hs + ") not found "); }
+            }
+        } 
+        hs = tokenizer.getLine();
+        if (hs.equals ("") ) {return true;}
 
-
-      //lambda    
-      hs = tokenizer.getLine(); tokenizer.clearLine();
-//      if (!hs.equals("")){hs = tokenizer.nextToken();
-       if (!hs.equals("")){
-//          hs = tokenizer.nextToken();
-          tableSet.lambda=StrUtils.toDouble(hs);      
-      }
-       return true;
+        //lambda    
+        hs = tokenizer.getLine(); 
+        tokenizer.clearLine();
+        if (!hs.equals("")){
+            tableSet.lambda = StrUtils.toDouble(hs);      
+        }
+        return true;
     }       
-       
-       
-
-    }
+}
 

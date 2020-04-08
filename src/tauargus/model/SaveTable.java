@@ -22,11 +22,9 @@ import argus.utils.SystemUtils;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Arrays;
@@ -37,7 +35,6 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
-import org.jfree.chart.JFreeChart;
 import tauargus.extern.dataengine.TauArgus;
 import static tauargus.model.TableSet.MAX_GH_MITER_RATIO;
 import tauargus.service.TableService;
@@ -62,9 +59,9 @@ public class SaveTable {
     public static boolean writeCKMDifferences;
     public static boolean writeCKMCellKeys;
     
-    private static String[] HI = {"Individual", "Holding"};
+    private static final String[] HI = {"Individual", "Holding"};
     
-    private static TauArgus tauArgus = Application.getTauArgusDll();
+    private static final TauArgus tauArgus = Application.getTauArgusDll();
     /**
      * Writes a table in one of the 7 formats
      * @param tableSet
@@ -80,7 +77,7 @@ public class SaveTable {
     static public void writeTable(final TableSet tableSet, int selectedFormat)throws ArgusException{
         int respType = 0; 
         String hs;
-        Boolean oke= true;
+        //Boolean oke= true; Not used ????
         int[] dimSequence = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
         if (tableSet.rounded ){respType = 1;}
         if (tableSet.ctaProtect) {respType = 2;}
@@ -101,88 +98,75 @@ public class SaveTable {
         switch (selectedFormat) {
             case TableSet.FILE_FORMAT_CSV:
                 if (!tauArgus.WriteCSV(tableSet.index, tableSet.safeFileName, writeEmbedQuotes, dimSequence, respType)){
-                    throw new ArgusException ("An unexpected error occurred when writing the CVS file to "+
-                            tableSet.safeFileName);
-                    }
+                    throw new ArgusException ("An unexpected error occurred when writing the CVS file to " + tableSet.safeFileName);
+                }
                 break;
             case TableSet.FILE_FORMAT_PIVOT_TABLE:
                 hs = makeFirstLine(tableSet, respType);
                 if (!tauArgus.WriteCellRecords(tableSet.index, tableSet.safeFileName, 0,
-                        false, writeSupppressEmpty, hs, writeAddStatus, writeEmbedQuotes, respType)){
-                    throw new ArgusException ("An unexpected error occurred when writing the CVS file to "+
-                            tableSet.safeFileName);
-                    }
+                                                false, writeSupppressEmpty, hs, writeAddStatus, writeEmbedQuotes, respType)){
+                    throw new ArgusException ("An unexpected error occurred when writing the CVS file to " + tableSet.safeFileName);
+                }
                 break;
             case TableSet.FILE_FORMAT_CODE_VALUE:
                 if (writeVarnamesOnFirstLine) {
                     hs = makeFirstLine(tableSet, respType);
                 }
                 else {hs = "";}
-                if (!tauArgus.WriteCellRecords(tableSet.index, tableSet.safeFileName, 0,
-                        false, writeSupppressEmpty, hs, writeAddStatus, writeEmbedQuotes, respType)){
-                    throw new ArgusException ("An unexpected error occurred when writing the Code-value file to "+
-                            tableSet.safeFileName);
-                    }
+                if (!tauArgus.WriteCellRecords(tableSet.index, tableSet.safeFileName, 0, false, writeSupppressEmpty, hs, writeAddStatus, writeEmbedQuotes, respType)){
+                    throw new ArgusException ("An unexpected error occurred when writing the Code-value file to " + tableSet.safeFileName);
+                }
                 break;
             case TableSet.FILE_FORMAT_SBS:
-                if (!tauArgus.WriteCellRecords(tableSet.index, tableSet.safeFileName, 1,
-                        writeSBSHierarchicalLevels, true, "", true, writeEmbedQuotes, respType)){
-                    throw new ArgusException ("An unexpected error occurred when writing the SBSS file to "+
-                            tableSet.safeFileName);
-                    }
+                if (!tauArgus.WriteCellRecords(tableSet.index, tableSet.safeFileName, 1, writeSBSHierarchicalLevels, true, "", true, writeEmbedQuotes, respType)){
+                    throw new ArgusException ("An unexpected error occurred when writing the SBSS file to " + tableSet.safeFileName);
+                }
                 break;
             case TableSet.FILE_FORMAT_INTERMEDIATE: 
                 // The GUI thread (EDT) should not be used for long running tasks, 
                 // so use the SwingWorker class
-                //However  in batch this has been disabled.
+                // However  in batch this has been disabled.
                 if (Application.isBatch()){
                     try{
-                        tableSet.write(
-                                tableSet.safeFileName,
-                                writeSupppressEmpty,
-                                writeIntermediateStatusOnly,
-                                writeIntermediateUseHolding,
-                                writeIntermediateAddAudit,
-                                writeEmbedQuotes,
-                                null);
+                        tableSet.write(tableSet.safeFileName,
+                                        writeSupppressEmpty,
+                                        writeIntermediateStatusOnly,
+                                        writeIntermediateUseHolding,
+                                        writeIntermediateAddAudit,
+                                        writeEmbedQuotes,
+                                        null);
                         return;  
                     }
-                     catch (IOException ex) {
-                            // logger.log(Level.SEVERE, null, ex);
-                        }                            
+                    catch (IOException ex) {}                            
                 }
                 else{
-                  final SwingWorker<Void, Void> worker = new ProgressSwingWorker<Void, Void>(ProgressSwingWorker.SINGLE, "Saving table") {
-                    // called in a separate thread...
-                    @Override
-                    protected Void doInBackground() throws Exception {
-                        super.doInBackground();
-                        tableSet.write(
-                                tableSet.safeFileName,
-                                writeSupppressEmpty,
-                                writeIntermediateStatusOnly,
-                                writeIntermediateUseHolding,
-                                writeIntermediateAddAudit,
-                                writeEmbedQuotes,
-                                getPropertyChangeListener());
-                        return null;
-                    }
-
-                    // called on the GUI thread
-                    @Override
-                    public void done() {
-                        super.done();
-                        try {
-                            get();
-                        } catch (InterruptedException ex) {
-                            // logger.log(Level.SEVERE, null, ex);
-                        } catch (ExecutionException ex) {
-                            JOptionPane.showMessageDialog(null, ex.getCause().getMessage());
+                    final SwingWorker<Void, Void> worker = new ProgressSwingWorker<Void, Void>(ProgressSwingWorker.SINGLE, "Saving table") {
+                        // called in a separate thread...
+                        @Override
+                        protected Void doInBackground() throws Exception {
+                            super.doInBackground();
+                            tableSet.write(tableSet.safeFileName,
+                                            writeSupppressEmpty,
+                                            writeIntermediateStatusOnly,
+                                            writeIntermediateUseHolding,
+                                            writeIntermediateAddAudit,
+                                            writeEmbedQuotes,
+                                            getPropertyChangeListener());
+                            return null;
                         }
-                    }
-                };
 
-                worker.execute();
+                        // called on the GUI thread
+                        @Override
+                        public void done() {
+                            super.done();
+                            try {
+                                get();
+                            } 
+                            catch (InterruptedException ex) {} 
+                            catch (ExecutionException ex) {JOptionPane.showMessageDialog(null, ex.getCause().getMessage());}
+                        }
+                    };
+                    worker.execute();
                 }
                 break;
             case TableSet.FILE_FORMAT_JJ:
@@ -192,17 +176,14 @@ public class SaveTable {
                 try{
                     tableSet.writeCKM(writeCKMOriginalValues, writeCKMDifferences, writeCKMCellKeys, 
                                       writeSupppressEmpty, writeEmbedQuotes, null);
-                } catch (IOException ex) {
-                     // logger.log(Level.SEVERE, null, ex);
-                }                            
+                } catch (IOException ex) {}                            
                 break;                
-// TODO removequotes                        
-            }
+        }
         
         SystemUtils.writeLogbook("Table: " + tableSet.toString() + " has been written\n"+
                                  "Output file name: "+tableSet.safeFileName);
-                                 
     }
+    
     /**
      * writes the variable names  on the first line,needed fro pivot table and SBS
      * @param tableSet
@@ -215,7 +196,6 @@ public class SaveTable {
         if (writeEmbedQuotes) quote = "\"";
         hs = "";
         for (int i=0; i<tableSet.expVar.size();i++){
-            //hs = hs + "\""+tableSet.expVar.get(i).name+"\",";
             hs = hs + quote + tableSet.expVar.get(i).name + quote +",";
         }
         hs = hs.substring(0, hs.length()-1);
@@ -245,37 +225,34 @@ public class SaveTable {
     //      singleton = false
     //      withBogusRemoval = false
     //      inverseWeight = false
-    // xmin and xmax are not needed: for each cell aprioribound queals perturbed value +/- maxD
+    // xmin and xmax are not needed: for each cell aprioribound equals perturbed value +/- maxD
+    // STILL TO BE IMPLEMENTED CORRECTLY
     public static void writeJJforCKMaudit(TableSet tableSet, String fileName, boolean forRounding, 
-                               boolean singleton, int minFreq, boolean withBogusRemoval, boolean inverseWeight)throws ArgusException{
+                                            boolean singleton, int minFreq, boolean withBogusRemoval, 
+                                            boolean inverseWeight)throws ArgusException{
         double xMin, xMax;
         xMin = tableSet.minTabVal;
         xMax = tableSet.maxTabVal;
-        if (fileName == "") {fileName = tableSet.safeFileName;} 
+        if ("".equals(fileName)) {fileName = tableSet.safeFileName;} 
         if (!tauArgus.WriteJJFormat(tableSet.index, fileName, xMin, xMax, withBogusRemoval, false, forRounding)){
-         throw new ArgusException("An unexpected error occurred when writing the JJ-file");
+            throw new ArgusException("An unexpected error occurred when writing the JJ-file");
         }
-        //TODO OpschonenJJFormatforKomma.
-        //Extend for singletons
         if (singleton) {addSingletonToJJ(tableSet, fileName, minFreq);}
         opschonenJJFileforKomma(fileName, tableSet, inverseWeight);
-       
     }
         
     public static void writeJJ(TableSet tableSet, String fileName, boolean forRounding, 
-                               boolean singleton, int minFreq, boolean withBogusRemoval, boolean inverseWeight)throws ArgusException{
+                               boolean singleton, int minFreq, boolean withBogusRemoval, 
+                               boolean inverseWeight)throws ArgusException{
         double xMin, xMax;
         xMin = tableSet.minTabVal;
         xMax = tableSet.maxTabVal;
-        if (fileName == "") {fileName = tableSet.safeFileName;} 
+        if ("".equals(fileName)) {fileName = tableSet.safeFileName;} 
         if (!tauArgus.WriteJJFormat(tableSet.index, fileName, xMin, xMax, withBogusRemoval, false, forRounding)){
-         throw new ArgusException("An unexpected error occurred when writing the JJ-file");
+            throw new ArgusException("An unexpected error occurred when writing the JJ-file");
         }
-        //TODO OpschonenJJFormatforKomma.
-        //Extend for singletons
         if (singleton) {addSingletonToJJ(tableSet, fileName, minFreq);}
         opschonenJJFileforKomma(fileName, tableSet, inverseWeight);
-       
     }
     /**
      * For the singleton protection in Optimal and UWE artificial cells are added.
@@ -289,132 +266,135 @@ public class SaveTable {
      * @throws ArgusException 
      */
     public static void addSingletonToJJ(TableSet tableSet, String fileName, int minFreq)throws ArgusException{
-         String hs; int nRec, nr, d, i, j; double minLPL;
-         int nSing, nMult, nFreq, addRec;
-         boolean singTrick; String lb="", ub="";
-         DecimalFormatSymbols symbols = new DecimalFormatSymbols();
-         symbols.setDecimalSeparator('.');
-         symbols.setGroupingSeparator(',');
+        String hs; 
+        int nRec, nr, d, i, j; 
+        double minLPL;
+        int nSing, nMult, nFreq, addRec;
+        boolean singTrick; String lb="", ub="";
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setDecimalSeparator('.');
+        symbols.setGroupingSeparator(',');
     
-         DecimalFormat normalPrecision = new DecimalFormat();
-         normalPrecision.setMinimumFractionDigits(0);
-         normalPrecision.setMaximumFractionDigits(0);
-         normalPrecision.setDecimalFormatSymbols(symbols);
-         normalPrecision.setGroupingUsed(false);
+        DecimalFormat normalPrecision = new DecimalFormat();
+        normalPrecision.setMinimumFractionDigits(0);
+        normalPrecision.setMaximumFractionDigits(0);
+        normalPrecision.setDecimalFormatSymbols(symbols);
+        normalPrecision.setGroupingUsed(false);
         
-         File fileJJKlad = new File(Application.getTempFile("klad.jj"));
-         File fileJJ = new File(fileName);
-         if (fileJJKlad.exists()) { fileJJKlad.delete();}         
-         fileJJ.renameTo(new File(Application.getTempFile("klad.jj")));        
+        File fileJJKlad = new File(Application.getTempFile("klad.jj"));
+        File fileJJ = new File(fileName);
+        if (fileJJKlad.exists()) { fileJJKlad.delete();}         
+        fileJJ.renameTo(new File(Application.getTempFile("klad.jj")));        
          
-         Tokenizer JJKlad;
-         JJKlad = null;
-         try{
-             BufferedReader bf = new BufferedReader(new FileReader(Application.getTempFile("klad.jj")));
-             JJKlad = new Tokenizer(bf);
-          } catch (Exception ex) {}
+        Tokenizer JJKlad;
+        JJKlad = null;
+        try{
+            BufferedReader bf = new BufferedReader(new FileReader(Application.getTempFile("klad.jj")));
+            JJKlad = new Tokenizer(bf);
+        } catch (Exception ex) {}
          
-         try{
-           BufferedReader JJFreq = new BufferedReader(new FileReader(fileName + ".frq"));
-           BufferedWriter JJAddCell = new BufferedWriter(new FileWriter(Application.getTempFile("AddCell.jj")));
-           BufferedWriter JJAddRel = new BufferedWriter(new FileWriter(Application.getTempFile("AddRel.jj")));
-           JJKlad.nextLine();hs = JJKlad.getLine();
-           JJKlad.nextLine();hs = JJKlad.getLine();
-           nRec = Integer.parseInt(hs);
-           double[] XV = new double[nRec];
-           int[] FQ = new int[nRec];
-           String[] ST = new String[nRec];
-           int[] WT = new int[nRec];
-           d = tableSet.respVar.nDecimals;
-           normalPrecision.setMinimumFractionDigits(d);
-           normalPrecision.setMaximumFractionDigits(d);
-           minLPL = 1.0/(Math.pow(10,d));           
-           //Read cells
-           for(i=0;i<nRec;i++){
-               JJKlad.nextLine();
-               hs = JJKlad.nextToken();
-               XV[i] = Double.parseDouble(JJKlad.nextToken());
-               WT[i] = Integer.parseInt(JJKlad.nextToken());
-               ST[i] = JJKlad.nextToken();
-               hs = JJFreq.readLine().trim();
-               int space = hs.lastIndexOf(" ");
-               FQ[i]= Integer.parseInt(hs.substring(0,space));
-               if (i==0){ lb = JJKlad.nextToken(); ub = JJKlad.nextToken();}
-           }
-           JJKlad.nextLine();
-           nr = Integer.parseInt(JJKlad.nextToken());
-           addRec = 0;
-           //Read relations
-           String extraRel;  double x; int f; double pl;
-           for(i=0;i<nr;i++){              
-             extraRel="";  
-             JJKlad.nextLine();  
-             for (j=0;j<6;j++) {hs = JJKlad.nextToken();}
-               nSing = 0; nMult =0; nFreq = 0; x=0; f=0;
-               while ( !JJKlad.getLine().equals("")){
-               j = Integer.parseInt(JJKlad.nextToken());
-               hs = JJKlad.nextToken(); hs = JJKlad.nextToken();
-               if (ST[j].equals("u")){
-                  if (FQ[j] == 1){ nSing++; }
-                  else           { nMult++; }
-                  nFreq = nFreq + FQ[j];
-                  extraRel = extraRel + " "+ j+" (1)";
-                  x=x+XV[j]; f=f+FQ[j];
-                  }
-              }
-            singTrick = false;     
-            if ((nSing==2) && (nMult==0) && tableSet.singletonSingletonCheck) singTrick = true;
-            if ((nSing==1) && (nMult==1) && tableSet.singletonMultipleCheck) singTrick = true;
-            if ((nFreq<minFreq) && (nFreq>0) &&tableSet.minFreqCheck && (nSing+nMult>0)) singTrick = true;
-            if (singTrick) {
-              j = nRec + addRec;
-              extraRel = j + " (-1) " + extraRel;
-              j = nSing + nMult + 1;
-              extraRel =  "0 "+ j + " : "+ extraRel;
-              JJAddRel.write(extraRel); JJAddRel.newLine();
-              hs = String.valueOf(nRec + addRec) + " "+ normalPrecision.format(x);
-              hs = hs +  " 1 u " + lb + " "+ ub +" ";
-              pl = x * 0.0001;
-              if (pl < minLPL) {pl=minLPL;}
-              hs = hs + "0 "+  normalPrecision.format(pl) + " 0.0";
-              JJAddCell.write(hs); JJAddCell.newLine();
-              addRec++;
-              }  
-           }
-             JJAddRel.close(); JJAddCell.close();// bf.close();
-          //Bring everything together
-         BufferedWriter JJFile = new BufferedWriter(new FileWriter(fileName));
-         BufferedReader JJKladIn = new BufferedReader(new FileReader(Application.getTempFile("klad.jj")));
-         BufferedReader JJAddCellIn = new BufferedReader(new FileReader(Application.getTempFile("AddCell.jj")));
-         BufferedReader JJAddRelIn = new BufferedReader(new FileReader(Application.getTempFile("AddRel.jj")));
-         JJFile.write("0");   JJFile.newLine();
-         JJFile.write (nRec+addRec+""); JJFile.newLine();
-         hs = JJKladIn.readLine();hs = JJKladIn.readLine();
-         for (i=0;i<nRec;i++){
-             hs = JJKladIn.readLine();
-             JJFile.write (hs); JJFile.newLine();
-         }
-         for (i=0;i<addRec;i++){
-             hs = JJAddCellIn.readLine();
-             JJFile.write (hs); JJFile.newLine();
-         }
-         JJFile.write (nr+addRec+""); JJFile.newLine();
-         hs = JJKladIn.readLine();
-         for (i=0;i<nr;i++){
-             hs = JJKladIn.readLine();
-             JJFile.write (hs); JJFile.newLine();
-         }
-         for (i=0;i<addRec;i++){
-             hs = JJAddRelIn.readLine();
-             JJFile.write (hs); JJFile.newLine();
-         }
-         JJFile.close(); JJAddRelIn.close(); JJAddCellIn.close(); JJKladIn.close();
-         JJKlad.close();
-         }
-         catch (IOException ex) {
-             throw new ArgusException("An error occured when adding additional relations to the JJ file");
-         }
+        try{
+            BufferedReader JJFreq = new BufferedReader(new FileReader(fileName + ".frq"));
+            BufferedWriter JJAddCell = new BufferedWriter(new FileWriter(Application.getTempFile("AddCell.jj")));
+            BufferedWriter JJAddRel = new BufferedWriter(new FileWriter(Application.getTempFile("AddRel.jj")));
+            JJKlad.nextLine();hs = JJKlad.getLine();
+            JJKlad.nextLine();hs = JJKlad.getLine();
+            nRec = Integer.parseInt(hs);
+            double[] XV = new double[nRec];
+            int[] FQ = new int[nRec];
+            String[] ST = new String[nRec];
+            int[] WT = new int[nRec];
+            d = tableSet.respVar.nDecimals;
+            normalPrecision.setMinimumFractionDigits(d);
+            normalPrecision.setMaximumFractionDigits(d);
+            minLPL = 1.0/(Math.pow(10,d));           
+            //Read cells
+            for(i=0;i<nRec;i++){
+                JJKlad.nextLine();
+                hs = JJKlad.nextToken();
+                XV[i] = Double.parseDouble(JJKlad.nextToken());
+                WT[i] = Integer.parseInt(JJKlad.nextToken());
+                ST[i] = JJKlad.nextToken();
+                hs = JJFreq.readLine().trim();
+                int space = hs.lastIndexOf(" ");
+                FQ[i]= Integer.parseInt(hs.substring(0,space));
+                if (i==0){ lb = JJKlad.nextToken(); ub = JJKlad.nextToken();}
+            }
+            JJKlad.nextLine();
+            nr = Integer.parseInt(JJKlad.nextToken());
+            addRec = 0;
+            //Read relations
+            String extraRel;  double x; int f; double pl;
+            for(i=0;i<nr;i++){              
+                extraRel="";  
+                JJKlad.nextLine();  
+                for (j=0;j<6;j++) {hs = JJKlad.nextToken();}
+                nSing = 0; nMult =0; nFreq = 0; x=0; f=0;
+                while ( !JJKlad.getLine().equals("")){
+                    j = Integer.parseInt(JJKlad.nextToken());
+                    hs = JJKlad.nextToken(); hs = JJKlad.nextToken();
+                    if (ST[j].equals("u")){
+                        if (FQ[j] == 1){ nSing++; }
+                        else           { nMult++; }
+                        nFreq = nFreq + FQ[j];
+                        extraRel = extraRel + " "+ j+" (1)";
+                        x=x+XV[j]; f=f+FQ[j];
+                    }
+                }
+                singTrick = false;     
+                if ((nSing==2) && (nMult==0) && tableSet.singletonSingletonCheck) singTrick = true;
+                if ((nSing==1) && (nMult==1) && tableSet.singletonMultipleCheck) singTrick = true;
+                if ((nFreq<minFreq) && (nFreq>0) &&tableSet.minFreqCheck && (nSing+nMult>0)) singTrick = true;
+                if (singTrick) {
+                    j = nRec + addRec;
+                    extraRel = j + " (-1) " + extraRel;
+                    j = nSing + nMult + 1;
+                    extraRel =  "0 "+ j + " : "+ extraRel;
+                    JJAddRel.write(extraRel); JJAddRel.newLine();
+                    hs = String.valueOf(nRec + addRec) + " "+ normalPrecision.format(x);
+                    hs = hs +  " 1 u " + lb + " "+ ub +" ";
+                    pl = x * 0.0001;
+                    if (pl < minLPL) {pl=minLPL;}
+                    hs = hs + "0 "+  normalPrecision.format(pl) + " 0.0";
+                    JJAddCell.write(hs); JJAddCell.newLine();
+                    addRec++;
+                }  
+            }
+            JJAddRel.close(); JJAddCell.close();// bf.close();
+            //Bring everything together
+            BufferedWriter JJFile = new BufferedWriter(new FileWriter(fileName));
+            BufferedReader JJKladIn = new BufferedReader(new FileReader(Application.getTempFile("klad.jj")));
+            BufferedReader JJAddCellIn = new BufferedReader(new FileReader(Application.getTempFile("AddCell.jj")));
+            BufferedReader JJAddRelIn = new BufferedReader(new FileReader(Application.getTempFile("AddRel.jj")));
+            JJFile.write("0");   JJFile.newLine();
+            JJFile.write (nRec+addRec+""); JJFile.newLine();
+            hs = JJKladIn.readLine();hs = JJKladIn.readLine();
+            for (i=0;i<nRec;i++){
+                hs = JJKladIn.readLine();
+                JJFile.write (hs); JJFile.newLine();
+            }
+            for (i=0;i<addRec;i++){
+                hs = JJAddCellIn.readLine();
+                JJFile.write (hs); JJFile.newLine();
+            }
+            JJFile.write (nr+addRec+""); JJFile.newLine();
+            hs = JJKladIn.readLine();
+            for (i=0;i<nr;i++){
+                hs = JJKladIn.readLine();
+                JJFile.write (hs); JJFile.newLine();
+            }
+            for (i=0;i<addRec;i++){
+                hs = JJAddRelIn.readLine();
+                JJFile.write (hs); JJFile.newLine();
+            }
+            JJFile.close(); JJAddRelIn.close(); JJAddCellIn.close(); JJKladIn.close();
+            JJKlad.close();
+        }
+        catch (IOException ex) {
+            throw new ArgusException("An error occured when adding additional relations to the JJ file");
+        }
     }
+    
     /**
      * Some final checking of the JJ file. E.g. the true inequality LB <x-lpl < x < x+ulp < UB
      * is guaranteed by adding an epsilon in an extra decimal 
@@ -429,7 +409,7 @@ public class SaveTable {
         d = tableSet.respVar.nDecimals;
         double epsilon1 = 1.0/(Math.pow(10,d+1)); 
         double epsilon = 1.0/(Math.pow(10,d)); 
-        DecimalFormat normalFormat = SystemUtils.getInternalDecimalFormat(d);
+        //DecimalFormat normalFormat = SystemUtils.getInternalDecimalFormat(d); Not used ?????
         DecimalFormat normalFormat1 = SystemUtils.getInternalDecimalFormat(d+1);
         DecimalFormat normalFormat3 = SystemUtils.getInternalDecimalFormat(d+3);
     
@@ -441,178 +421,178 @@ public class SaveTable {
         Tokenizer JJKlad;
         JJKlad = null;
         try{
-             BufferedReader bf = new BufferedReader(new FileReader(Application.getTempFile("JJklad.jj")));
-             JJKlad = new Tokenizer(bf);
-          } catch (Exception ex) {}
+            BufferedReader bf = new BufferedReader(new FileReader(Application.getTempFile("JJklad.jj")));
+            JJKlad = new Tokenizer(bf);
+        } catch (Exception ex) {}
          
-         try{
-           BufferedWriter JJFile = new BufferedWriter(new FileWriter(fileName));
-           JJKlad.nextLine();hs = JJKlad.getLine(); JJFile.write(hs); JJFile.newLine();
-           JJKlad.nextLine();hs = JJKlad.getLine();JJFile.write(hs); JJFile.newLine();
-           nRec = Integer.parseInt(hs);
-           for (i=0;i<nRec;i++){
-               JJKlad.nextLine();
-               hs = JJKlad.nextToken();
-               regelOut = hs;// hs.format("%7s");
-               hs = JJKlad.nextToken();
-               resp = Double.parseDouble(hs);
-               regelOut = regelOut + " "+ hs;
-               hs = JJKlad.nextToken().replace("-", " ");  //cost
-               if (inverseWeight){
-                   cost = Double.parseDouble(hs);
-                   if(cost==0) cost = 1;
-                   cost = tableSet.maxScaleCost/cost;
-                   j = (int) cost;
-                   if (j == 0) j =1;
-                   hs = Integer.toString(j);
-               }                   
-               regelOut = regelOut + " "+ hs;
-               hs = JJKlad.nextToken(); //status
-               regelOut = regelOut + " "+ hs;
-               if (hs.equals("z")){
-                   regelOut = regelOut + " "+ JJKlad.getLine();
-               }else{
-                   for (j=0;j<4;j++){xx[j] = Double.parseDouble(JJKlad.nextToken());}  
-                   if ( xx[0] < tableSet.minTabVal){xx[0]= tableSet.minTabVal;} //check lbound
-                   if (resp-xx[2]< xx[0]) {xx[2]= resp - xx[0];} //check LPL  
+        try{
+            BufferedWriter JJFile = new BufferedWriter(new FileWriter(fileName));
+            JJKlad.nextLine();hs = JJKlad.getLine(); JJFile.write(hs); JJFile.newLine();
+            JJKlad.nextLine();hs = JJKlad.getLine();JJFile.write(hs); JJFile.newLine();
+            nRec = Integer.parseInt(hs);
+            for (i=0;i<nRec;i++){
+                JJKlad.nextLine();
+                hs = JJKlad.nextToken();
+                regelOut = hs;// hs.format("%7s");
+                hs = JJKlad.nextToken();
+                resp = Double.parseDouble(hs);
+                regelOut = regelOut + " "+ hs;
+                hs = JJKlad.nextToken().replace("-", " ");  //cost
+                if (inverseWeight){
+                    cost = Double.parseDouble(hs);
+                    if(cost==0) cost = 1;
+                    cost = tableSet.maxScaleCost/cost;
+                    j = (int) cost;
+                    if (j == 0) j =1;
+                    hs = Integer.toString(j);
+                }                   
+                regelOut = regelOut + " "+ hs;
+                hs = JJKlad.nextToken(); //status
+                regelOut = regelOut + " "+ hs;
+                if (hs.equals("z")){
+                    regelOut = regelOut + " "+ JJKlad.getLine();
+                }else{
+                    for (j=0;j<4;j++){xx[j] = Double.parseDouble(JJKlad.nextToken());}  
+                    if ( xx[0] < tableSet.minTabVal){xx[0]= tableSet.minTabVal;} //check lbound
+                    if (resp-xx[2]< xx[0]) {xx[2]= resp - xx[0];} //check LPL  
                     xx[2] = realLPL(xx[2], resp, epsilon1, tableSet.minTabVal);
                     xx[3] = realUPL(xx[3], epsilon);
                     for (j=0;j<2;j++){
                         regelOut = regelOut + " " + normalFormat1.format(xx[j]);
                     } 
                     for (j=2;j<4;j++){regelOut = regelOut + " " + normalFormat3.format(xx[j]);} 
-                   regelOut = regelOut + " " + JJKlad.getLine(); 
-                 }   
-               regelOut.replace(",", ".");
-               JJFile.write(regelOut); JJFile.newLine();
-               }
-         while (JJKlad.nextLine() != null) {
-             JJFile.write (JJKlad.getLine());JJFile.newLine();
-         } JJFile.close();
-         JJKlad.close();
-         } catch (Exception ex) {
-         throw new ArgusException ("An error occured when checking the JJ file");
-         }
-}
+                    regelOut = regelOut + " " + JJKlad.getLine(); 
+                }   
+                regelOut.replace(",", ".");
+                JJFile.write(regelOut); JJFile.newLine();
+            }
+            while (JJKlad.nextLine() != null) {
+                JJFile.write (JJKlad.getLine());JJFile.newLine();
+            } 
+            JJFile.close();
+            JJKlad.close();
+        } catch (Exception ex) {
+            throw new ArgusException ("An error occured when checking the JJ file");
+        }
+    }
 
 
 
-  static private double realLPL(double LPL, double resp, double epsilon, double minTabVal){
-      double x, rlpl;
-      rlpl = LPL;
-      x = resp - minTabVal; // The space below
-      if (x<0) {x=0;} // should not be possible
-      if (rlpl + epsilon> x){rlpl = x-epsilon;}
-      if (rlpl<0){rlpl=0;}
-      return rlpl;
-}
-  static private double realUPL (double UPL, double epsilon)  {
-      double rupl;  //vague/forgotten why this is needed
-      rupl = UPL;
-      if (rupl<epsilon){rupl = epsilon;}
-      return rupl;
-  }
-  
+    static private double realLPL(double LPL, double resp, double epsilon, double minTabVal){
+        double x, rlpl;
+        rlpl = LPL;
+        x = resp - minTabVal; // The space below
+        if (x<0) {x=0;} // should not be possible
+        if (rlpl + epsilon> x){rlpl = x-epsilon;}
+        if (rlpl<0){rlpl=0;}
+        return rlpl;
+    }
+    
+    static private double realUPL (double UPL, double epsilon)  {
+        double rupl;  //vague/forgotten why this is needed
+        rupl = UPL;
+        if (rupl<epsilon){rupl = epsilon;}
+        return rupl;
+    }
 
- /**
-  * Writes the first lines of an HTML file
-  * @param tableSet
-  * @param out
-  * @param kort 
-  */
+    /**
+    * Writes the first lines of an HTML file
+    * @param tableSet
+    * @param out
+    * @param kort 
+    */
     static public void writeKopHtml(TableSet tableSet, BufferedWriter out, boolean kort)  {
         String hs; int i;
         try {
-        out.write("<!DOCTYPE HTML PUBLIC \" -//W3C//DTD HTML 4.0 Transitional//EN\"   \"http://www.w3.org/TR/REC-html40/loose.dtd\">\n");
-        out.write ("<html>\n");        
-        out.write ("<head>\n");     
-        out.write("<title>&tau;-ARGUS report</title>\n");
-        hs = SystemUtils.getApplicationDirectory(SaveTable.class).getCanonicalPath();
-        hs = "file:///" +hs + "/tauARGUS.css";
-        hs = hs.replace("\\", "/");
-        out.write(" <link rel=\"stylesheet\" type=\"text/css\" href=\"" + hs + "\">\n");
-        out.write("</head>\n");
-        out.write("<body>\n");
-        if (kort) return;
-        out.write("<h1>&tau;-ARGUS Report </h1><p>\n");
-        Date date = new Date();
-//        hs = String.format("%<te %tB %<tY",  date);
-        hs = date.toString();
-        out.write(hs + "\n");
+            out.write("<!DOCTYPE HTML PUBLIC \" -//W3C//DTD HTML 4.0 Transitional//EN\"   \"http://www.w3.org/TR/REC-html40/loose.dtd\">\n");
+            out.write ("<html>\n");        
+            out.write ("<head>\n");     
+            out.write("<title>&tau;-ARGUS report</title>\n");
+            hs = SystemUtils.getApplicationDirectory(SaveTable.class).getCanonicalPath();
+            hs = "file:///" +hs + "/tauARGUS.css";
+            hs = hs.replace("\\", "/");
+            out.write(" <link rel=\"stylesheet\" type=\"text/css\" href=\"" + hs + "\">\n");
+            out.write("</head>\n");
+            out.write("<body>\n");
+            if (kort) return;
+            out.write("<h1>&tau;-ARGUS Report </h1><p>\n");
+            Date date = new Date();
+            hs = date.toString();
+            out.write(hs + "\n");
         
-        out.write("<table>\n");
-        out.write("<tr><td width=\"15%\" height=\"11\">Original file:</td>\n");
-        out.write("<td width=\"85%\" height=\"11\">");
-        out.write( tableSet.metadata.dataFile);
-        out.write( "</td></tr>\n");
-        out.write("<tr><td>Meta file:</td><td>");
-        out.write( tableSet.metadata.metaFile);
-        out.write( "</td></tr>\n");
-        if (!tableSet.safeFileName.equals("")){
-           out.write("<tr><td>Table file:</td><td>" + tableSet.safeFileName + "</td></tr>\n");
-        }
-        out.write("</table>\n");
-        out.write("<p>\n");     
-
-                if (tableSet.metadata.dataOrigin ==  Metadata.DATA_ORIGIN_MICRO) {
-           out.write ("<h2>Table generated from microdata</h2>\n");
-        }else{
-           out.write("<h2>Table read as table</h2>\n");
-        }
-           
-       out.write("<h2>Table structure</h2>"); out.newLine();
-       printTableInfo(tableSet, out);
-       
-       if (tableSet.linkSuppressed){
-         out.write("<h2>Table has been suppressed with the linked table procedure</h2>"); out.newLine();
-         out.write("The other tables:<br>"); out.newLine();
-         for (i=0;i<TableService.numberOfTables();i++){
-           if (i!=tableSet.index) { printTableInfo(TableService.getTable(i), out); }
-         }
-       }       
-
-    if ( tableSet.costFunc == TableSet.COST_DIST){
-       out.write("<h2>Distance function used</h2>\n");
-       out.write("<table>\n");
-       out.write("<tr><th width=\"40%\" height=\"11\">Var</th>\n");
-       for(i=1;i<tauargus.model.Variable.MAX_NUMBER_OF_DIST;i++){
-          out.write("<th width=\"10%\" height=\"11\">"+ i+ "</th>\n");
-       }
-       out.write("</tr>\n");
-       for (i=1; i<tableSet.expVar.size(); i++){
-         out.write("<tr><td>" +tableSet.expVar.get(i-1).name  + ":</td>\n");
-         if (tableSet.expVar.get(i-1).hasDistanceFunction){
-            for (int j=1;j< tauargus.model.Variable.MAX_NUMBER_OF_DIST;j++){
-              out.write("<td>"+tableSet.expVar.get(i-1).distanceFunction[j-1]+ "</td>\n");
-              } 
-         } else {
-            for (int j=1;j< tauargus.model.Variable.MAX_NUMBER_OF_DIST;j++){
-              out.write("<td>1</td>\n");            
-              }
+            out.write("<table>\n");
+            out.write("<tr><td width=\"15%\" height=\"11\">Original file:</td>\n");
+            out.write("<td width=\"85%\" height=\"11\">");
+            out.write( tableSet.metadata.dataFile);
+            out.write( "</td></tr>\n");
+            out.write("<tr><td>Meta file:</td><td>");
+            out.write( tableSet.metadata.metaFile);
+            out.write( "</td></tr>\n");
+            if (!tableSet.safeFileName.equals("")){
+                out.write("<tr><td>Table file:</td><td>" + tableSet.safeFileName + "</td></tr>\n");
             }
-         out.write("</tr>\n");
-         }
-       out.write("</table>\n");
+            out.write("</table>\n");
+            out.write("<p>\n");     
+
+            if (tableSet.metadata.dataOrigin ==  Metadata.DATA_ORIGIN_MICRO) {
+                out.write ("<h2>Table generated from microdata</h2>\n");
+            }else{
+                out.write("<h2>Table read as table</h2>\n");
+            }
+           
+            out.write("<h2>Table structure</h2>"); out.newLine();
+            printTableInfo(tableSet, out);
+       
+            if (tableSet.linkSuppressed){
+                out.write("<h2>Table has been suppressed with the linked table procedure</h2>"); out.newLine();
+                out.write("The other tables:<br>"); out.newLine();
+                for (i=0;i<TableService.numberOfTables();i++){
+                    if (i!=tableSet.index) { printTableInfo(TableService.getTable(i), out); }
+                }
+            }       
+
+            if ( tableSet.costFunc == TableSet.COST_DIST){
+                out.write("<h2>Distance function used</h2>\n");
+                out.write("<table>\n");
+                out.write("<tr><th width=\"40%\" height=\"11\">Var</th>\n");
+                for(i=1;i<tauargus.model.Variable.MAX_NUMBER_OF_DIST;i++){
+                    out.write("<th width=\"10%\" height=\"11\">"+ i+ "</th>\n");
+                }
+                out.write("</tr>\n");
+                for (i=1; i<tableSet.expVar.size(); i++){
+                    out.write("<tr><td>" +tableSet.expVar.get(i-1).name  + ":</td>\n");
+                    if (tableSet.expVar.get(i-1).hasDistanceFunction){
+                        for (int j=1;j< tauargus.model.Variable.MAX_NUMBER_OF_DIST;j++){
+                            out.write("<td>"+tableSet.expVar.get(i-1).distanceFunction[j-1]+ "</td>\n");
+                        } 
+                    } else {
+                        for (int j=1;j< tauargus.model.Variable.MAX_NUMBER_OF_DIST;j++){
+                            out.write("<td>1</td>\n");            
+                        }
+                    }
+                    out.write("</tr>\n");
+                }
+                out.write("</table>\n");
+            }
+            if (tableSet.lambda != 1) {
+                out.write("<br>Lambda transformation for cost function: "+tableSet.lambda+"\n" );  
+            }
+            if (tableSet.computeTotals){ 
+                out.write("<br>Missing totals have been computed\n");
+            }    
         }
-       if (tableSet.lambda != 1) {
-         out.write("<br>Lambda transformation for cost function: "+tableSet.lambda+"\n" );  
-       }
-       if (tableSet.computeTotals){ 
-        out.write("<br>Missing totals have been computed\n");
-       }    
-       }
         catch (IOException ex) {}
     }
-  
   
     static void writeStaartHTML(BufferedWriter out ){
         try{
-         out.write ("<br>&tau;-ARGUS version: " + Application.getFullVersion()+" (Build " + Application.BUILD + ")");  out.newLine();
-         out.write("</body>\n");
-         out.write("</html\n");
+            out.write ("<br>&tau;-ARGUS version: " + Application.getFullVersion()+" (Build " + Application.BUILD + ")");  out.newLine();
+            out.write("</body>\n");
+            out.write("</html\n");
         }
         catch (IOException ex) {}
     }
+    
     /**
      * This routine writes the report file for the produced safe table.
      * The name of the report file is the same as the safe file, except the extention, that will be changed into html 
@@ -718,7 +698,6 @@ public class SaveTable {
                     out.write("<h2>Modular (HITAS) Salazar solution</h2>\n");
                     out.write("<h2>Solver used: "+Application.getSolverName(tableSet.solverUsed) +"</h2>\n");
                     out.write("<h6>"+tableSet.suppressINFO+"</h6>\n");
-// Print #1, "<h3>(Modular ocx version: " + frmMain.XPhitasOCX.VersionInfo + " used)<br>"
                     out.write("<h3>Max time per subtable: " + tableSet.maxHitasTime + " minutes</h3>\n");
                     break;
                 case TableSet.SUP_ROUNDING : 
@@ -806,7 +785,6 @@ public class SaveTable {
                     }
                     break;
             }
-//    if (tableSet.inverseWeight){out.write("<h2>Inverse weight procedure has been applied</h2>\n");}
 
             if (tableSet.suppressed == TableSet.SUP_HITAS || tableSet.suppressed == TableSet.SUP_JJ_OPT ||
                 tableSet.suppressed == TableSet.SUP_UWE ) {
@@ -820,9 +798,6 @@ public class SaveTable {
                 out.write ("Additional Min. Frequency option has" + hs + "been used</h3>\n");
             }
     
-//If .ScalingUsed Then Print #1, "<h3>Scaling procedure has been applied</h3>"
-//
-    
             if (tableSet.suppressed == TableSet.SUP_GHMITER) {
                 int j = 0;
                 for (i=0;i<MAX_GH_MITER_RATIO;i++){j = j + tableSet.ghMiterRatio[i];}
@@ -831,7 +806,6 @@ public class SaveTable {
                     if (!tableSet.ghMiterMessage.equals("")){
                         out.write(tableSet.ghMiterMessage+ "<br>"); out.newLine();
                     }
-//           out.write("Sliding protection ratio corresponding to safety rule employed: R =" + tableSet.ghMiterRatio[0] + "<br>\n");
                     out.write("Sliding protection ratio corresponding to safety rule employed: R =" + StrUtils.formatDouble(tableSet.ratio, 3) + ".<br>\n");
                     out.write("This ratio had to be reduced in some cases,\n");
                     out.write("because otherwise no feasible solution could be found.<br><br>\n");
@@ -887,7 +861,6 @@ public class SaveTable {
                 }
             } 
 
-
             out.write("<h2>Summary of the table</h2>\n");
        
             if (!tableSet.ckmProtect){
@@ -903,12 +876,12 @@ public class SaveTable {
                 out.write("<th height=\"11\">Response value</th>\n");
                 out.write("<th height=\"11\">Cost value</th>\n");
                 out.write("</tr>\n");
-// StatLabel (i)
+
                 for (i=CellStatus.SAFE.getValue();i<=CellStatus.EMPTY.getValue()+1;i++){
                     if ( (i!=CellStatus.UNSAFE_SINGLETON.getValue()) && (i!=CellStatus.UNSAFE_SINGLETON_MANUAL.getValue()) ){
                         out.write("<tr><td align=\"Right\">"+ i+ "</td>");
                         if (i<CellStatus.EMPTY.getValue()+1){
-                        out.write("<td>" + CellStatus.findByValue(i).getDescription()+ "</td>");
+                            out.write("<td>" + CellStatus.findByValue(i).getDescription()+ "</td>");
                         } else {
                             out.write("<td>Total</td>");
                         }
@@ -970,18 +943,17 @@ public class SaveTable {
                 }
                 else out.write("<h3>To be implemented</h3>\n");
             }
-  //If SuperCross Then GoTo EINDE
-         
+           
             if (tableSet.historyUsed>0) {
-                BufferedReader outApriori, outStatus, outCost, outProtL,  outBound;           
+                BufferedReader outApriori, outStatus, outCost, outProtL;           
                 outApriori = new BufferedReader(new FileReader(Application.getTempFile("Apriori" + tableSet.index + ".htm")));  
                 outStatus  = new BufferedReader(new FileReader(Application.getTempFile("HistStat" + tableSet.index + ".htm")));
                 outCost    = new BufferedReader(new FileReader(Application.getTempFile("HistCost" + tableSet.index + ".htm")));
                 outProtL   = new BufferedReader(new FileReader(Application.getTempFile("HistPL" + tableSet.index + ".htm")));
-                outBound   = new BufferedReader(new FileReader(Application.getTempFile("HistAB" + tableSet.index + ".htm"))); 
+                //outBound   = new BufferedReader(new FileReader(Application.getTempFile("HistAB" + tableSet.index + ".htm"))); Not Used ?????
                 BufferedWriter outDetail;
                 reportfile = reportfile.substring(0, reportfile.length()-5)+"_apriori.html";
-                outDetail   = new BufferedWriter(new FileWriter(reportfile)); 
+                outDetail  = new BufferedWriter(new FileWriter(reportfile)); 
                 writeKopHtml(tableSet, outDetail, true);
                 outDetail.write("<h1>&tau;-ARGUS Apriory file Report </h1><p>");outDetail.newLine();
                 int p; boolean readFurther;
@@ -1060,7 +1032,6 @@ public class SaveTable {
                         }
                     }
                     outDetail.write("<br><br>"); outDetail.newLine();
-             
                 }
                 out.write("</p>\n");          
                 out.write("For more details click<a href=\"file:///"+reportfile+"\"> here</a>"); out.newLine(); 
@@ -1073,7 +1044,7 @@ public class SaveTable {
 
             for (i=1;i<=tableSet.expVar.size();i++){
                 int ind = tableSet.expVar.get(i-1).index; int n = 1;
-                String dots = " ..........";
+                final String dots = " ..........";
                 if(tableSet.expVar.get(i-1).hierarchical!= Variable.HIER_NONE){
                     out.write("<h2>Coding tree for variable " +tableSet.expVar.get(i-1).name + "</h2>\n");
                     if (tableSet.expVar.get(i-1).recoded){out.write("A recoding has been applied<br>"); out.newLine();}
@@ -1106,13 +1077,11 @@ public class SaveTable {
             out.write("</body>\n");
             out.write("</html\n");  
             out.close();
-        }catch (Exception ex) { JOptionPane.showMessageDialog(null, ex.getMessage());
-        }
+        }catch (Exception ex) { JOptionPane.showMessageDialog(null, ex.getMessage());}
     }
 
     static void printTableInfo(TableSet tableSet, BufferedWriter out){
         int j;
-//Dim Oke As Boolean
         try{
             out.write("<table>\n");
             out.write("<tr><th width=\"40%\" height=\"11\">Type</th>\n");
@@ -1120,7 +1089,7 @@ public class SaveTable {
             out.write("<th width=\"20%\" height=\"11\"># codes</th></tr>\n");
 
             out.write("<tr><td>Response var:</td>\n");
-            if (tableSet.respVar.name == "<freq>"){
+            if ("<freq>".equals(tableSet.respVar.name)){
                 out.write("<td>&lt;freq&gt;</td><td>&nbsp;</td></tr>\n"); 
             }
             else{
@@ -1139,36 +1108,7 @@ public class SaveTable {
             if (!(tableSet.costVar == null))
                 out.write("<tr><td>Shadow variable :</td><td>" + tableSet.costVar.name + "</td><td>&nbsp;</td></tr>\n");
             if (tableSet.holding) out.write("Used holding info<br>\n");
-//If .Holding Then
-// j = 0
-// For i = 1 To MetaDataStruct.NVars
-//  If MetaDataStruct.Varlist(i).HoldingVar Then j = i
-// Next i
-// If j > 0 Then
-//  Print #1, "<tr><td>Holding variable :</td>"
-//  Print #1, "    <td>" + VarName(j) + "</td><td>&nbsp;</td></tr>"
-// End If
-//End If
-            //if (tableSet.piepRule[0]) out.write("Request rule info<br>\n"); Is already mentioned under used safety rule
-//If .PiepRule(1) Or .PiepRule(2) Then
-// For i = 1 To MetaDataStruct.NVars
-// If MetaDataStruct.Varlist(i).Piep Then
-//  Print #1, "<tr><td>Request variable :</td>"
-//  Print #1, "    <td>" + VarName(i) + "</td><td>&nbsp;</td></tr>"
-// End If
-// Next i
-//End If
-//If .Weighted Then
-// For i = 1 To MetaDataStruct.NVars
-// If MetaDataStruct.Varlist(i).Weight Then
-//  Print #1, "<tr><td>Weight variable :</td>"
-//  Print #1, "    <td>" + VarName(i) + "</td><td>&nbsp;</td></tr>"
-// End If
-// Next i
-//End If
-
             out.write("</table>\n");
-     
         }catch (Exception ex) { }
     }
 
@@ -1214,128 +1154,127 @@ public class SaveTable {
             DR = "DRnonempty";
         }
         try{
-                if (UseEmpty) out.write("<h2><b>Additional information loss measures, calculated over all cells</b></h2>\n");
-                else out.write("<h2><b>Additional information loss measures, calculated over non-empty cells</b></h2>\n");
+            if (UseEmpty) out.write("<h2><b>Additional information loss measures, calculated over all cells</b></h2>\n");
+            else out.write("<h2><b>Additional information loss measures, calculated over non-empty cells</b></h2>\n");
+               
+            out.write("<table>\n");
+            out.write("<tr><th align=\"Left\">AD</th><td>Absolute Difference</td><td>|pert - orig|</td></tr>\n");
+            out.write("<tr><th align=\"Left\">RAD</th><td>Relative Absolute Difference</td><td>|pert - orig|/orig</td></tr>\n");
+            out.write("<tr><th align=\"Left\">DR</th><td>Absolute Difference of square Roots</td><td>|sqrt(pert) - sqrt(orig)|</td></tr>\n");
+            out.write("</table>\n");
+            out.write("<p>\n");
                 
-                out.write("<table>\n");
-                out.write("<tr><th align=\"Left\">AD</th><td>Absolute Difference</td><td>|pert - orig|</td></tr>\n");
-                out.write("<tr><th align=\"Left\">RAD</th><td>Relative Absolute Difference</td><td>|pert - orig|/orig</td></tr>\n");
-                out.write("<tr><th align=\"Left\">DR</th><td>Absolute Difference of square Roots</td><td>|sqrt(pert) - sqrt(orig)|</td></tr>\n");
-                out.write("</table>\n");
-                out.write("<p>\n");
+            out.write("<b>Descriptives</b><br>\n");
+            out.write("<table>\n");
+            out.write("<tr><td></td><th>AD</th><th>RAD</th><th>DR</th></tr>\n");
+            out.write("<tr><td>Mean</td>\n");
+            out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMean(AD))+"</td>");
+            out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMean(RAD))+"</td>");
+            out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMean(DR))+"</td></tr>\n");
+            out.write("<tr><td>Median</td>\n");
+            out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMedian(AD))+"</td>");
+            out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMedian(RAD))+"</td>");
+            out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMedian(DR))+"</td></tr>\n");
+            out.write("<tr><td>Max</td>\n");
+            out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMaxs(AD))+"</td>");
+            out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMaxs(RAD))+"</td>");
+            out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMaxs(DR))+"</td></tr>\n");
+            out.write("</table><br>\n");
                 
-                out.write("<b>Descriptives</b><br>\n");
-                out.write("<table>\n");
-                out.write("<tr><td></td><th>AD</th><th>RAD</th><th>DR</th></tr>\n");
-                out.write("<tr><td>Mean</td>\n");
-                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMean(AD))+"</td>");
-                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMean(RAD))+"</td>");
-                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMean(DR))+"</td></tr>\n");
-                out.write("<tr><td>Median</td>\n");
-                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMedian(AD))+"</td>");
-                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMedian(RAD))+"</td>");
-                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMedian(DR))+"</td></tr>\n");
-                out.write("<tr><td>Max</td>\n");
-                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMaxs(AD))+"</td>");
-                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMaxs(RAD))+"</td>");
-                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetMaxs(DR))+"</td></tr>\n");
-                out.write("</table><br>\n");
+            out.write("<b>Percentiles</b><br>\n");
+            final String[] Percents = {"P10","P20","P30","P40","P50","P60","P70","P80","P90","P95","P99"};
+            out.write("<table>\n");
+            out.write("<tr><td></td><th>AD</th><th>RAD</th><th>DR</th></tr>\n");
+            for (i=0;i<Percents.length;i++){
+                out.write("<tr><td>"+Percents[i]+"</td>");
+                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetPercentiles(AD)[i])+"</td>");
+                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetPercentiles(RAD)[i])+"</td>");
+                out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetPercentiles(DR)[i])+"</td></tr>\n");
+            }
+            out.write("</table>\n");
+            out.write("<p>\n");
                 
-                out.write("<b>Percentiles</b><br>\n");
-                String[] Percents = {"P10","P20","P30","P40","P50","P60","P70","P80","P90","P95","P99"};
-                out.write("<table>\n");
-                out.write("<tr><td></td><th>AD</th><th>RAD</th><th>DR</th></tr>\n");
-                for (i=0;i<Percents.length;i++){
-                    out.write("<tr><td>"+Percents[i]+"</td>");
-                    out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetPercentiles(AD)[i])+"</td>");
-                    out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetPercentiles(RAD)[i])+"</td>");
-                    out.write("<td align=\"Right\">"+String.format("%7.5f",InfoLoss.GetPercentiles(DR)[i])+"</td></tr>\n");
-                }
-                out.write("</table>\n");
-                out.write("<p>\n");
+            hs = report.substring(0, report.length()-5);
+            double step = UseEmpty ? 1.0/InfoLoss.GetNumberOfCells() : 1.0/(InfoLoss.GetNumberOfCells() - InfoLoss.GetNumberOfEmpty());
                 
-                hs = report.substring(0, report.length()-5);
-                double step = UseEmpty ? 1.0/InfoLoss.GetNumberOfCells() : 1.0/(InfoLoss.GetNumberOfCells() - InfoLoss.GetNumberOfEmpty());
-                
-                ECDFGraphBuilder builder = new ECDFGraphBuilder();
-                ChartPanel cp = UseEmpty ? builder.CreateChart("AD", InfoLoss.GetDiffs("AD"), step) :
+            ECDFGraphBuilder builder = new ECDFGraphBuilder();
+            ChartPanel cp = UseEmpty ? builder.CreateChart("AD", InfoLoss.GetDiffs("AD"), step) :
                                     builder.CreateChart("AD", Arrays.copyOfRange(InfoLoss.GetDiffs("AD"),InfoLoss.GetNumberOfEmpty(),InfoLoss.GetDiffs("AD").length), step);
-                ChartUtilities.saveChartAsPNG(new File(hs+"_ECDF_"+AD+".png"), cp.getChart(), 600, 300);
+            ChartUtilities.saveChartAsPNG(new File(hs+"_ECDF_"+AD+".png"), cp.getChart(), 600, 300);
                 
-                cp = UseEmpty ? builder.CreateChart("RAD", InfoLoss.GetDiffs("RAD"), step) :
+            cp = UseEmpty ? builder.CreateChart("RAD", InfoLoss.GetDiffs("RAD"), step) :
                                     builder.CreateChart("RAD", Arrays.copyOfRange(InfoLoss.GetDiffs("RAD"),InfoLoss.GetNumberOfEmpty(),InfoLoss.GetDiffs("AD").length), step);
-                ChartUtilities.saveChartAsPNG(new File(hs+"_ECDF_"+RAD+".png"),cp.getChart(), 600, 300);
+            ChartUtilities.saveChartAsPNG(new File(hs+"_ECDF_"+RAD+".png"),cp.getChart(), 600, 300);
                 
-                cp = UseEmpty ? builder.CreateChart("DR", InfoLoss.GetDiffs("DR"), step) :
+            cp = UseEmpty ? builder.CreateChart("DR", InfoLoss.GetDiffs("DR"), step) :
                                     builder.CreateChart("DR", Arrays.copyOfRange(InfoLoss.GetDiffs("DR"),InfoLoss.GetNumberOfEmpty(),InfoLoss.GetDiffs("AD").length), step);
-                ChartUtilities.saveChartAsPNG(new File(hs+"_ECDF_"+DR+".png"),cp.getChart(), 600, 300);
+            ChartUtilities.saveChartAsPNG(new File(hs+"_ECDF_"+DR+".png"),cp.getChart(), 600, 300);
                 
-                hs = hs.substring(hs.lastIndexOf("\\")+1,hs.length());
+            hs = hs.substring(hs.lastIndexOf("\\")+1,hs.length());
                 
-                out.write("<b>Empirical Cumulative Distribution Functions (ECDF)</b><br>\n");
-                out.write("Number and fraction of cells with Difference less than or equal to Value<br>\n");
-                out.write("<div>\n<div style=\"float:left\">\n");
-                out.write("<table>\n");
-                out.write("<tr><th colspan=\"3\" algn=\"Left\"><b>AD</b></th></tr>\n");
-                out.write("<tr><td>Value</td><td>Count</td><td>Fraction (%)</td></tr>\n");
+            out.write("<b>Empirical Cumulative Distribution Functions (ECDF)</b><br>\n");
+            out.write("Number and fraction of cells with Difference less than or equal to Value<br>\n");
+            out.write("<div>\n<div style=\"float:left\">\n");
+            out.write("<table>\n");
+            out.write("<tr><th colspan=\"3\" algn=\"Left\"><b>AD</b></th></tr>\n");
+            out.write("<tr><td>Value</td><td>Count</td><td>Fraction (%)</td></tr>\n");
 
-                totalcount = UseEmpty ? InfoLoss.GetNumberOfCells() : InfoLoss.GetNumberOfCells() - InfoLoss.GetNumberOfEmpty();
+            totalcount = UseEmpty ? InfoLoss.GetNumberOfCells() : InfoLoss.GetNumberOfCells() - InfoLoss.GetNumberOfEmpty();
                 
-                for (i=0;i<InfoLoss.GetECDFcounts("AD").getBreaks().length;i++){
-                    out.write("<tr><td align=\"Right\">"+String.format("%.2f",InfoLoss.GetECDFcounts("AD").getBreaks()[i])+"</td>");
-                    counts = UseEmpty ? InfoLoss.GetECDFcounts("AD").getCounts()[i] : InfoLoss.GetECDFcounts("AD").getCounts()[i] - InfoLoss.GetNumberOfEmpty();
-                    out.write("<td align=\"Right\">"+String.format("%d", counts) + "</td>");
-                    out.write("<td align=\"Right\">"+String.format("%.2f",100.0*((double)counts/(double)totalcount))+"</td></tr>\n");
-                }
-                out.write("<tr><td align=\"Right\">Inf</td>");
-                out.write("<td align=\"Right\">"+String.format("%d",totalcount)+"</td>");
-                out.write("<td align=\"Right\">"+String.format("%.2f",100.0)+"</td></tr>\n");
-                out.write("</table>\n");
-                out.write("</div>\n");
-                out.write("<div>\n");
-                out.write("<img border=\"0\" src=\""+hs+"_ECDF_"+AD+".png\" width=\"600\" height=\"300\"/>\n");
-                out.write("</div></div><br><br>\n");
+            for (i=0;i<InfoLoss.GetECDFcounts("AD").getBreaks().length;i++){
+                out.write("<tr><td align=\"Right\">"+String.format("%.2f",InfoLoss.GetECDFcounts("AD").getBreaks()[i])+"</td>");
+                counts = UseEmpty ? InfoLoss.GetECDFcounts("AD").getCounts()[i] : InfoLoss.GetECDFcounts("AD").getCounts()[i] - InfoLoss.GetNumberOfEmpty();
+                out.write("<td align=\"Right\">"+String.format("%d", counts) + "</td>");
+                out.write("<td align=\"Right\">"+String.format("%.2f",100.0*((double)counts/(double)totalcount))+"</td></tr>\n");
+            }
+            out.write("<tr><td align=\"Right\">Inf</td>");
+            out.write("<td align=\"Right\">"+String.format("%d",totalcount)+"</td>");
+            out.write("<td align=\"Right\">"+String.format("%.2f",100.0)+"</td></tr>\n");
+            out.write("</table>\n");
+            out.write("</div>\n");
+            out.write("<div>\n");
+            out.write("<img border=\"0\" src=\""+hs+"_ECDF_"+AD+".png\" width=\"600\" height=\"300\"/>\n");
+            out.write("</div></div><br><br>\n");
                 
-                out.write("<div>\n<div style=\"float:left\">\n");                
-                out.write("<table>\n");
-                out.write("<tr><th colspan=\"3\" algn=\"Left\"><b>RAD</b></th></tr>\n");
-                out.write("<tr><td>Value</td><td>Count</td><td>Fraction (%)</td></tr>\n");
-                for (i=0;i<InfoLoss.GetECDFcounts("RAD").getBreaks().length;i++){
-                    out.write("<tr><td align=\"Right\">"+String.format("%.2f",InfoLoss.GetECDFcounts("RAD").getBreaks()[i])+"</td>");
-                    counts = UseEmpty ? InfoLoss.GetECDFcounts("RAD").getCounts()[i] : InfoLoss.GetECDFcounts("RAD").getCounts()[i] - InfoLoss.GetNumberOfEmpty();
-                    out.write("<td align=\"Right\">"+String.format("%d",counts)+"</td>");
-                    out.write("<td align=\"Right\">"+String.format("%.2f",100.0*((double)counts/(double)totalcount))+"</td></tr>\n");
-                }
-                out.write("<tr><td align=\"Right\">Inf</td>");
-                out.write("<td align=\"Right\">"+String.format("%d",totalcount)+"</td>");
-                out.write("<td align=\"Right\">"+String.format("%.2f",100.0)+"</td></tr>\n");
-                out.write("</table>\n");
-                out.write("</div>\n");
-                out.write("<div>\n");
-                out.write("<img border=\"0\" src=\""+hs+"_ECDF_"+RAD+".png\" width=\"600\" height=\"300\"/>\n");
-                out.write("</div></div><br><br>\n");
+            out.write("<div>\n<div style=\"float:left\">\n");                
+            out.write("<table>\n");
+            out.write("<tr><th colspan=\"3\" algn=\"Left\"><b>RAD</b></th></tr>\n");
+            out.write("<tr><td>Value</td><td>Count</td><td>Fraction (%)</td></tr>\n");
+            for (i=0;i<InfoLoss.GetECDFcounts("RAD").getBreaks().length;i++){
+                out.write("<tr><td align=\"Right\">"+String.format("%.2f",InfoLoss.GetECDFcounts("RAD").getBreaks()[i])+"</td>");
+                counts = UseEmpty ? InfoLoss.GetECDFcounts("RAD").getCounts()[i] : InfoLoss.GetECDFcounts("RAD").getCounts()[i] - InfoLoss.GetNumberOfEmpty();
+                out.write("<td align=\"Right\">"+String.format("%d",counts)+"</td>");
+                out.write("<td align=\"Right\">"+String.format("%.2f",100.0*((double)counts/(double)totalcount))+"</td></tr>\n");
+            }
+            out.write("<tr><td align=\"Right\">Inf</td>");
+            out.write("<td align=\"Right\">"+String.format("%d",totalcount)+"</td>");
+            out.write("<td align=\"Right\">"+String.format("%.2f",100.0)+"</td></tr>\n");
+            out.write("</table>\n");
+            out.write("</div>\n");
+            out.write("<div>\n");
+            out.write("<img border=\"0\" src=\""+hs+"_ECDF_"+RAD+".png\" width=\"600\" height=\"300\"/>\n");
+            out.write("</div></div><br><br>\n");
                 
-                out.write("<div>\n<div style=\"float:left\">\n");                
-                out.write("<table>\n");
-                out.write("<tr><th colspan=\"3\" algn=\"Left\"><b>DR</b></th></tr>\n");
-                out.write("<tr><td>Value</td><td>Count</td><td>Fraction (%)</td></tr>\n");
-                for (i=0;i<InfoLoss.GetECDFcounts("DR").getBreaks().length;i++){
-                    out.write("<tr><td align=\"Right\">"+String.format("%.2f",InfoLoss.GetECDFcounts("DR").getBreaks()[i])+"</td>");
-                    counts = UseEmpty ? InfoLoss.GetECDFcounts("DR").getCounts()[i] : InfoLoss.GetECDFcounts("DR").getCounts()[i] - InfoLoss.GetNumberOfEmpty();
-                    out.write("<td align=\"Right\">"+String.format("%d",counts)+"</td>");
-                    out.write("<td align=\"Right\">"+String.format("%.2f",100.0*((double)counts/(double)totalcount))+"</td></tr>\n");
-                }
-                out.write("<tr><td align=\"Right\">Inf</td>");
-                out.write("<td align=\"Right\">"+String.format("%d",totalcount)+"</td>");
-                out.write("<td align=\"Right\">"+String.format("%.2f",100.0)+"</td></tr>\n");                
-                out.write("</table>\n");
-                out.write("</div>\n");
-                out.write("<div>\n");
-                out.write("<img border=\"0\" src=\""+hs+"_ECDF_"+DR+".png\" width=\"600\" height=\"300\"/>\n");
-                out.write("</div></div><br><br>\n");
-                out.write("<p>\n");
+            out.write("<div>\n<div style=\"float:left\">\n");                
+            out.write("<table>\n");
+            out.write("<tr><th colspan=\"3\" algn=\"Left\"><b>DR</b></th></tr>\n");
+            out.write("<tr><td>Value</td><td>Count</td><td>Fraction (%)</td></tr>\n");
+            for (i=0;i<InfoLoss.GetECDFcounts("DR").getBreaks().length;i++){
+                out.write("<tr><td align=\"Right\">"+String.format("%.2f",InfoLoss.GetECDFcounts("DR").getBreaks()[i])+"</td>");
+                counts = UseEmpty ? InfoLoss.GetECDFcounts("DR").getCounts()[i] : InfoLoss.GetECDFcounts("DR").getCounts()[i] - InfoLoss.GetNumberOfEmpty();
+                out.write("<td align=\"Right\">"+String.format("%d",counts)+"</td>");
+                out.write("<td align=\"Right\">"+String.format("%.2f",100.0*((double)counts/(double)totalcount))+"</td></tr>\n");
+            }
+            out.write("<tr><td align=\"Right\">Inf</td>");
+            out.write("<td align=\"Right\">"+String.format("%d",totalcount)+"</td>");
+            out.write("<td align=\"Right\">"+String.format("%.2f",100.0)+"</td></tr>\n");                
+            out.write("</table>\n");
+            out.write("</div>\n");
+            out.write("<div>\n");
+            out.write("<img border=\"0\" src=\""+hs+"_ECDF_"+DR+".png\" width=\"600\" height=\"300\"/>\n");
+            out.write("</div></div><br><br>\n");
+            out.write("<p>\n");
         }
         catch(Exception ex){}
     }
-    
 }

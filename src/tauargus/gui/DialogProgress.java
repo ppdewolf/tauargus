@@ -42,7 +42,6 @@ public class DialogProgress extends JDialog implements PropertyChangeListener{
     public DialogProgress(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        setLocationRelativeTo(parent);
     }
     
     public void showDialog(int version) {
@@ -79,6 +78,7 @@ public class DialogProgress extends JDialog implements PropertyChangeListener{
                 jLabel7.setVisible(true);
         }
         pack();
+        setLocationRelativeTo(this.getParent());
         setVisible(true);
     }
 
@@ -86,13 +86,13 @@ public class DialogProgress extends JDialog implements PropertyChangeListener{
     public void propertyChange(PropertyChangeEvent evt) {
         switch (evt.getPropertyName()) {
             case "progressMain":
-                progressBarMain.setValue(((Integer) evt.getNewValue()).intValue());
+                progressBarMain.setValue(((Integer) evt.getNewValue()));
                 break;
             case "activityMain":
                 labelActivityMain.setText((String) evt.getNewValue());
                 break;
             case "progressDetail":
-                progressBarDetail.setValue(((Integer) evt.getNewValue()).intValue());
+                progressBarDetail.setValue(((Integer) evt.getNewValue()));
                 break;
             case "activityDetail":
                 labelActivityDetail.setText((String) evt.getNewValue());
@@ -110,17 +110,17 @@ public class DialogProgress extends JDialog implements PropertyChangeListener{
                 label4.setText((String) evt.getNewValue());
                 break;
             case "value1":
-                value1.setText(Integer.toString(((Integer) evt.getNewValue()).intValue()));
+                value1.setText(Integer.toString(((Integer) evt.getNewValue())));
                 break;
             case "value2":
-                value2.setText(Integer.toString(((Integer) evt.getNewValue()).intValue()));
+                value2.setText(Integer.toString(((Integer) evt.getNewValue())));
                 break;
             case "value3":
-                value3.setText(String.format("%9.5f",((Double) evt.getNewValue()).doubleValue()));
+                value3.setText(String.format("%9.5f", ((Double) evt.getNewValue())));
                 jLabel7.setText("%");
                 break;
             case "value4":
-                value4.setText(CalculateHHMMSS(((Integer) evt.getNewValue()).intValue()));
+                value4.setText(CalculateHHMMSS(((Integer) evt.getNewValue())));
         }
     }
 

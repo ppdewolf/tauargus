@@ -20,18 +20,22 @@ package tauargus.model;
 import tauargus.extern.dataengine.TauArgus;
 
 public class VarCode {
-    private TauArgus tauArgus = Application.getTauArgusDll();
+    private final TauArgus tauArgus = Application.getTauArgusDll();
     
-    private int[] codeType = new int[1];
-    private String[] codeString = new String[1];
-    private int[] missing = new int[1];
-    private int[] level = new int[1];
+    private final int[] codeType = new int[1];
+    private final String[] codeString = new String[1];
+    private final int[] missing = new int[1];
+    private final int[] level = new int[1];
     
     public VarCode() {
     }
     
     public VarCode(int varIndex, int codeIndex) {
-        setCode(varIndex, codeIndex);
+        initiateCode(varIndex, codeIndex);
+    }
+    
+    private boolean initiateCode(int varIndex, int codeIndex){
+        return setCode(varIndex, codeIndex);
     }
     
     public boolean setCode(int varIndex, int codeIndex) {

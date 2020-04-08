@@ -45,7 +45,6 @@ public class DialogOptions extends javax.swing.JDialog {
     public DialogOptions(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        setLocationRelativeTo(null); 
         fileChooser = new javax.swing.JFileChooser();
         jCheckBoxDebugHiTaS.setSelected(Application.SaveDebugHiTaS);
         if (Application.isAnco()) {jLabelAnco.setText("Anco");
@@ -66,7 +65,6 @@ public class DialogOptions extends javax.swing.JDialog {
         
         i = SystemUtils.getRegInteger("optimal", "solverused", Application.solverSelected);
         switch (i) {
-//            case Application.SOLVER_NO: {jRadioButtonNoSolver.setSelected(true); break;}
             case Application.SOLVER_XPRESS : {jRadioButtonXPress.setSelected(true); break;}
             case Application.SOLVER_CPLEX: {jRadioButtonCPlex.setSelected(true); break;}
             case Application.SOLVER_SOPLEX : {jRadioButtonSCIP.setSelected(true); break;}
@@ -287,7 +285,6 @@ public class DialogOptions extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jLabelAncoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabelAncoMouseClicked
-        // TODO add your handling code here:
         if (jLabelAnco.getText().equals("Anco")) { // Anco options off
             Application.setAnco(false);
             jLabelAnco.setText("      ");
@@ -303,7 +300,7 @@ public class DialogOptions extends javax.swing.JDialog {
         }
         
       FrameMain parent = getParentFrame(); // To have menu items updated when returning to FrameMain
-      parent.organise();
+      parent.organiseAnco();
     }//GEN-LAST:event_jLabelAncoMouseClicked
 
     private void jButtonLogFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonLogFileActionPerformed
@@ -319,7 +316,6 @@ public class DialogOptions extends javax.swing.JDialog {
             String hs = fileChooser.getSelectedFile().toString();
             TauArgusUtils.putDataDirInRegistry(hs);
         }
-               // TODO add your handling code here:
     }//GEN-LAST:event_jButtonLogFileActionPerformed
 
     private void jButtonOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOKActionPerformed
@@ -345,7 +341,6 @@ public class DialogOptions extends javax.swing.JDialog {
     }//GEN-LAST:event_jButtonOKActionPerformed
 
     private void jRadioButtonCPlexItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jRadioButtonCPlexItemStateChanged
-        // TODO add your handling code here:
         jLabelCplexLicenseFile.setVisible(jRadioButtonCPlex.isSelected());
         jTextCplexLicenseFile.setVisible(jRadioButtonCPlex.isSelected());
         jButtonCplexLicenseFile.setVisible(jRadioButtonCPlex.isSelected());

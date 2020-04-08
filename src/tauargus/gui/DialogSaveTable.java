@@ -32,11 +32,10 @@ import tauargus.utils.TauArgusUtils;
 public class DialogSaveTable extends DialogBase {
 
     private TableSet tableSet;
-    private String[] extensions = {"csv", "csv", "txt","sbs","tab","jj","tab"};
+    private final String[] extensions = {"csv", "csv", "txt","sbs","tab","jj","tab"};
     public DialogSaveTable(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        setLocationRelativeTo(parent);
     }
 
     public void showDialog(TableSet tableSet){
@@ -45,9 +44,9 @@ public class DialogSaveTable extends DialogBase {
         if (tableSet.ckmProtect || tableSet.ctaProtect){
             this.jRadioIntermediate.setEnabled(false);
             this.jRadioSBSFormat.setEnabled(false);
-            //this.jRadioJJFormat.setEnabled(false);
         }
         if (tableSet.rounded) this.jRadioJJFormat.setEnabled(false);
+        setLocationRelativeTo(this.getParent());        
         setVisible(true);
     };
 
@@ -455,6 +454,7 @@ public class DialogSaveTable extends DialogBase {
         if (jRadioCKMFormat.isSelected())   {i= TableSet.FILE_FORMAT_CKM;}
         return i;          
     }
+    
     private void buttonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCancelActionPerformed
         tableSet.safeFileName = "";
         setVisible(false);
@@ -462,22 +462,14 @@ public class DialogSaveTable extends DialogBase {
     }//GEN-LAST:event_buttonCancelActionPerformed
 
     private void jButtonChooseSafeFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonChooseSafeFileActionPerformed
-      int selectedFormat;  
-      selectedFormat = whichFormat();
-//        String hs = SystemUtils.getRegString("general", "datadir", "");
-//        if (!hs.equals("")){
-//            File file = new File(hs); 
-//            jFileChooser1.setCurrentDirectory(file);
-//        }
+        int selectedFormat;  
+        selectedFormat = whichFormat();
         TauArgusUtils.getDataDirFromRegistry(jFileChooser1);
-        // TODO add your handling code here:
         jFileChooser1.setDialogTitle("Safe file name");
         jFileChooser1.setSelectedFile(new File(""));
         jFileChooser1.resetChoosableFileFilters();
-//        jFileChooser1.setCurrentDirectory("");
-        // filters are shown in order of declaration, setFileFilter sets the default filter
         jFileChooser1.setFileFilter(new FileNameExtensionFilter("Safe file name (*."+ 
-                this.extensions[selectedFormat] +")", this.extensions[selectedFormat]));
+                                            this.extensions[selectedFormat] +")", this.extensions[selectedFormat]));
         if (jFileChooser1.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
             tableSet.safeFileName=jFileChooser1.getSelectedFile().toString();
             textFieldSaveFileName.setText(tableSet.safeFileName);
@@ -486,33 +478,28 @@ public class DialogSaveTable extends DialogBase {
     }//GEN-LAST:event_jButtonChooseSafeFileActionPerformed
 
     private void jRadioCSVPivotItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jRadioCSVPivotItemStateChanged
-        // TODO add your handling code here:
         jCheckBoxVarNamesOnFirstRow.setSelected(jRadioCSVPivot.isSelected());
         jCheckBoxEmbedSpanningVarQuotes.setSelected(jRadioCSVPivot.isSelected());
         enableGeneralOptions();
     }//GEN-LAST:event_jRadioCSVPivotItemStateChanged
 
     private void jRadioCodeValueItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jRadioCodeValueItemStateChanged
-        // TODO add your handling code here:
         jCheckBoxEmbedSpanningVarQuotes.setSelected(jRadioCodeValue.isSelected());
         enableGeneralOptions();
     }//GEN-LAST:event_jRadioCodeValueItemStateChanged
 
     private void jRadioCSVFormatItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jRadioCSVFormatItemStateChanged
-        // TODO add your handling code here:
         jCheckBoxEmbedSpanningVarQuotes.setSelected(jRadioCSVFormat.isSelected());
         enableGeneralOptions();
     }//GEN-LAST:event_jRadioCSVFormatItemStateChanged
 
     private void jRadioSBSFormatItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jRadioSBSFormatItemStateChanged
-        // TODO add your handling code here:
         jCheckBoxAddHierarchicalLevels.setEnabled(jRadioSBSFormat.isSelected());
         jCheckBoxEmbedSpanningVarQuotes.setSelected(jRadioSBSFormat.isSelected());
         enableGeneralOptions();
     }//GEN-LAST:event_jRadioSBSFormatItemStateChanged
 
     private void jRadioIntermediateItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jRadioIntermediateItemStateChanged
-        // TODO add your handling code here:
         checkBoxStatusOnly.setEnabled(jRadioIntermediate.isSelected());
         checkBoxAddAuditResults.setEnabled(jRadioIntermediate.isSelected());
         checkBoxUseHoldingInfo.setEnabled(jRadioIntermediate.isSelected());
@@ -521,14 +508,12 @@ public class DialogSaveTable extends DialogBase {
     }//GEN-LAST:event_jRadioIntermediateItemStateChanged
 
     private void jRadioJJFormatItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jRadioJJFormatItemStateChanged
-        // TODO add your handling code here:
         jCheckBoxremoveTrivialLevels.setEnabled(jRadioJJFormat.isSelected());
         jCheckBoxEmbedSpanningVarQuotes.setSelected(false);
         enableGeneralOptions();
     }//GEN-LAST:event_jRadioJJFormatItemStateChanged
 
     private void jRadioCKMFormatItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jRadioCKMFormatItemStateChanged
-        // TODO add your handling code here:
         jCheckBoxAddOrigVal.setEnabled(jRadioCKMFormat.isSelected());
         jCheckBoxAddDiff.setEnabled(jRadioCKMFormat.isSelected());
         jCheckBoxAddCellKey.setEnabled(jRadioCKMFormat.isSelected());
@@ -537,7 +522,7 @@ public class DialogSaveTable extends DialogBase {
     
     private  void enableGeneralOptions(){
         jCheckBoxAddStatus.setEnabled(jRadioCSVPivot.isSelected() ||
-                                      jRadioCodeValue.isSelected()  );
+                                      jRadioCodeValue.isSelected() );
         jCheckBoxEmbedSpanningVarQuotes.setEnabled(jRadioCSVPivot.isSelected() ||
                                                    jRadioCodeValue.isSelected()||
                                                    jRadioIntermediate.isSelected() ||
@@ -549,12 +534,7 @@ public class DialogSaveTable extends DialogBase {
                                                 jRadioIntermediate.isSelected() ||
                                                 jRadioSBSFormat.isSelected() ||
                                                 jRadioCKMFormat.isSelected() );
-        jCheckBoxVarNamesOnFirstRow.setEnabled(//jRadioCSVPivot.isSelected() ||
-                                                jRadioCodeValue.isSelected() //||
-                                                //jRadioIntermediate.isSelected() ||
-                                                //jRadioSBSFormat.isSelected()
-                                                );
-//jCheckBoxVarNamesOnFirstRow.setSelected(jRadioCSVPivot.isSelected());
+        jCheckBoxVarNamesOnFirstRow.setEnabled(jRadioCodeValue.isSelected() );
     }
 //    /**
 //     * @param args the command line arguments

@@ -104,8 +104,8 @@ public class PanelTable extends javax.swing.JPanel {
     private Code[][] codeList;
     private Code singleColumnCode;
 
-    private DecimalFormat doubleFormatter = new DecimalFormat();
-    private DecimalFormat integerFormatter = new DecimalFormat();
+    private final DecimalFormat doubleFormatter = new DecimalFormat();
+    private final DecimalFormat integerFormatter = new DecimalFormat();
 
     private int[] expVarPermutation;
     private int rowExpVarIndex = 0;
@@ -158,7 +158,8 @@ public class PanelTable extends javax.swing.JPanel {
 
     private Color getCKMBackgroundColor(Cell cell, Code code){
         if (tableSet.ckmProtect){
-            float maxColor = (float) Math.max(Math.abs(tableSet.minDiff), Math.abs(tableSet.maxDiff));
+            float maxColor = Math.max(Math.abs(tableSet.minDiff), Math.abs(tableSet.maxDiff));
+            //float maxColor = (float) Math.max(Math.abs(tableSet.minDiff), Math.abs(tableSet.maxDiff));
             float diff = (float) Math.abs(cell.CKMValue - cell.response);
             if (diff >= maxColor) diff = maxColor;
             int R, G, B = 255; // darkest: (85,85,255) brightest: (235,235,255)
@@ -340,7 +341,7 @@ public class PanelTable extends javax.swing.JPanel {
      * Create arrays of component so we can easier handle them as a group
      */
     private void initComponentArrays() {
-        comboBoxSpan = new ArrayList<javax.swing.JComboBox<String>>();
+        comboBoxSpan = new ArrayList<>();
         comboBoxSpan.add(comboBoxSpan0);
         comboBoxSpan.add(comboBoxSpan1);
         comboBoxSpan.add(comboBoxSpan2);
@@ -460,7 +461,7 @@ public class PanelTable extends javax.swing.JPanel {
     }
     
     public void setRowColumnVariables(Variable rowVariable, Variable columnVariable) {
-        int VarDepth=1;
+        int VarDepth;
         int MaxLevelChoice;
         isAdjusting = true;
         rowExpVarIndex = indexOfVariable(rowVariable);
@@ -539,8 +540,8 @@ public class PanelTable extends javax.swing.JPanel {
             if (tableSet.expVar.get(expVarPermutation[i + 2]).recoded) labelSpan[i].setText(tableSet.expVar.get(expVarPermutation[i + 2]).name + "(R)");
             int expvarIndex = expVarPermutation[i + 2];
             comboBoxSpan.get(i).removeAllItems();
-            for (int j = 0; j < codeList[expvarIndex].length; j++) {
-                comboBoxSpan.get(i).addItem(codeList[expvarIndex][j].label);
+            for (Code item : codeList[expvarIndex]) {
+                comboBoxSpan.get(i).addItem(item.label);
             }
             comboBoxSpan.get(i).setSelectedIndex(0);
         }
@@ -624,7 +625,7 @@ public class PanelTable extends javax.swing.JPanel {
     public void updateSuppressButtons() {
         int s = tableSet.suppressed; 
         int radioSelect = 0; 
-        boolean CKMpossible = false;
+        boolean CKMpossible;
         String hs = "";
         try {
            hs = SystemUtils.getApplicationDirectory(PanelTable.class).getCanonicalPath();
@@ -759,8 +760,7 @@ public class PanelTable extends javax.swing.JPanel {
         int count = 0;
         boolean collapsedMode = false;
         int collapsedLevel = 0;
-        for (int codeIndex = 0; codeIndex < codeList.length; codeIndex++) {
-            Code code = codeList[codeIndex];
+        for (Code code : codeList) {
             if (collapsedMode && code.level <= collapsedLevel) {
                 collapsedMode = false;
             }
@@ -773,7 +773,7 @@ public class PanelTable extends javax.swing.JPanel {
             }
         }
 
-        int[] rowCodeIndex = new int[count];
+        int[] TmpRowCodeIndex = new int[count];
         int index = 0;
         collapsedMode = false;
         collapsedLevel = 0;
@@ -783,14 +783,14 @@ public class PanelTable extends javax.swing.JPanel {
                 collapsedMode = false;
             }
             if (!collapsedMode) {
-                rowCodeIndex[index++] = codeIndex;
+                TmpRowCodeIndex[index++] = codeIndex;
                 if (code.state == Code.COLLAPSED) {
                     collapsedMode = true;
                     collapsedLevel = code.level;
                 }
             }
         }
-        return rowCodeIndex;
+        return TmpRowCodeIndex;
     }
     
     private void createRowIndices() {
@@ -850,7 +850,6 @@ public class PanelTable extends javax.swing.JPanel {
         if (isSingleColumn){return dimArray;}
         dimArray[columnExpVarIndex] = columnToColumnCodeIndex(column);
         for (int i = 2; i < n; i++) {
-            //dimArray[expVarPermutation[i]] = comboBoxSpan[i - 2].getSelectedIndex();
             dimArray[expVarPermutation[i]] = comboBoxSpan.get(i-2).getSelectedIndex();
         }
                 
@@ -1564,8 +1563,6 @@ public class PanelTable extends javax.swing.JPanel {
     }//GEN-LAST:event_checkBoxThousandSeparatorActionPerformed
 
     private void buttonSetStatusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSetStatusActionPerformed
-// Anco 1.6
-//        Map<javax.swing.JButton, CellStatus> statusMap = new HashMap<>();
         Map<javax.swing.JButton, CellStatus> statusMap = new HashMap<>();
         statusMap.put(buttonSafe, CellStatus.SAFE_MANUAL);
         statusMap.put(buttonUnsafe, CellStatus.UNSAFE_MANUAL);
@@ -1671,7 +1668,7 @@ public class PanelTable extends javax.swing.JPanel {
                 }
             }
         }
-        // Is eigenlijk onzin !!!!!!!
+        // This does not make sense ????!!!!!!!
         table.minTabVal = x;
         //if (xMax[0]<0) {xMax[0] = 0;}
         //table.maxTabVal = 1.5 * xMax[0];
@@ -1684,12 +1681,11 @@ public class PanelTable extends javax.swing.JPanel {
         int oldRowExpVarIndex = rowExpVarIndex;
         int oldColumnExpVarIndex = columnExpVarIndex;
         Variable RowVar= null, ColVar = null;
-        // SetTanle resets rowExpVarIndex and columnExpVarIndex to 0 and 1.
+        // SetTable resets rowExpVarIndex and columnExpVarIndex to 0 and 1.
         setTable(tableSet);
         if (oldRowExpVarIndex != -1) RowVar = tableSet.expVar.get(oldRowExpVarIndex);
         if (oldColumnExpVarIndex != -1) ColVar = tableSet.expVar.get(oldColumnExpVarIndex);
-        //setRowColumnVariables(tableSet.expVar.get(oldRowExpVarIndex), tableSet.expVar.get(oldColumnExpVarIndex));
-       setRowColumnVariables(RowVar,ColVar);
+        setRowColumnVariables(RowVar,ColVar);
     }//GEN-LAST:event_buttonRecodeActionPerformed
 
     private void checkBoxOutputViewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxOutputViewActionPerformed
@@ -1744,14 +1740,6 @@ public class PanelTable extends javax.swing.JPanel {
        dialog.SetAprioyTable(tableSet.index);
        dialog.ShowDialog();  
       ((AbstractTableModel)table.getModel()).fireTableDataChanged();
-    
-        
-   /*     try{
-            TableSet.processAprioryFile(Application.getTempFile("temp0.hst"),0 , ";", true, true, true);
-        } catch (ArgusException ex) {
-           JOptionPane.showMessageDialog(this, ex.getMessage());
-        }
-     */   
     }//GEN-LAST:event_buttonPrioryActionPerformed
 
     private void checkBoxColoredViewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxColoredViewActionPerformed
@@ -1760,12 +1748,10 @@ public class PanelTable extends javax.swing.JPanel {
     }//GEN-LAST:event_checkBoxColoredViewActionPerformed
 
     private void radioButtonCellKeyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioButtonCellKeyActionPerformed
-        // TODO add your handling code here:
         updateSuppressButtons();
     }//GEN-LAST:event_radioButtonCellKeyActionPerformed
 
     private void radioButtonNetworkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioButtonNetworkActionPerformed
-        // TODO add your handling code here:
         updateSuppressButtons();
     }//GEN-LAST:event_radioButtonNetworkActionPerformed
 
@@ -2209,7 +2195,6 @@ public class PanelTable extends javax.swing.JPanel {
     }//GEN-LAST:event_radioButtonModularActionPerformed
 
     private void radioButtonHyperCubeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioButtonHyperCubeActionPerformed
-        // TODO add your handling code here:
         updateSuppressButtons();
     }//GEN-LAST:event_radioButtonHyperCubeActionPerformed
 

@@ -32,11 +32,11 @@ public class DialogRounderProgress extends JDialog implements PropertyChangeList
      */
     public DialogRounderProgress(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
-        initComponents();
-        setLocationRelativeTo(parent);        
+        initComponents();       
     }
     
     public void showDialog() {
+        setLocationRelativeTo(this.getParent());         
         setVisible(true);
     }
     

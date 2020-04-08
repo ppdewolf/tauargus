@@ -1,8 +1,19 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+* Argus Open Source
+* Software to apply Statistical Disclosure Control techniques
+* 
+* Copyright 2014 Statistics Netherlands
+* 
+* This program is free software; you can redistribute it and/or 
+* modify it under the terms of the European Union Public Licence 
+* (EUPL) version 1.1, as published by the European Commission.
+* 
+* You can find the text of the EUPL v1.1 on
+* https://joinup.ec.europa.eu/software/page/eupl/licence-eupl
+* 
+* This software is distributed on an "AS IS" basis without 
+* warranties or conditions of any kind, either express or implied.
+*/
 package tauargus.gui;
 
 import java.awt.BorderLayout;
@@ -24,7 +35,6 @@ public class ShowECDFGraph extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         this.setTitle("Plot of the Empirical Cumulative Distribution Function");
-        setLocationRelativeTo(parent);
     }
     
     public void showChart(String Name, double[] X, int N) {
@@ -33,6 +43,7 @@ public class ShowECDFGraph extends javax.swing.JDialog {
             this.jPanelChart.revalidate();
         }
 
+        setLocationRelativeTo(this.getParent());
         ECDFGraphBuilder builder = new ECDFGraphBuilder();
         this.jPanelChart.setLayout(new BorderLayout());
         this.cp = builder.CreateChart(Name, X, 1.0/N);

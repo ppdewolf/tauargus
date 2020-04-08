@@ -127,15 +127,15 @@ public class TauArgusUtils {
     }
     
     public static boolean DeleteFile (String Fn){
-    File f1 = new File(Fn);
-    boolean Oke = f1.delete();
-    return Oke;
+        File f1 = new File(Fn);
+        boolean Oke = f1.delete();
+        return Oke;
     }
     
     public static boolean ExistFile (String Fn){
-    File f1 = new File(Fn);
-    boolean Oke = f1.exists();
-    return Oke;
+        File f1 = new File(Fn);
+        boolean Oke = f1.exists();
+        return Oke;
     }
     
     public static String getFilePath(String  Fn){

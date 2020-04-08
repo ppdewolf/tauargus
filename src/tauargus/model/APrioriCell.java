@@ -29,7 +29,7 @@ import tauargus.model.APriori.Mapping;
  */
 public class APrioriCell
 {
-    public List<String> Key = new ArrayList<String>();  //< The key of the cell 
+    public List<String> Key = new ArrayList<>();        //< The key of the cell 
     public CellStatus Status = CellStatus.UNKNOWN;      //< The status as derived by TauArgus
     private APriori parent = null;                      //< The parent APriori class
         
@@ -44,8 +44,6 @@ public class APrioriCell
                 s.trim().isEmpty();
     }
     
-    
-    
     /*!
         The number of columns of a cell
     */
@@ -57,9 +55,6 @@ public class APrioriCell
 
         return columnCount;
     }
-    
-    
-    
     
     /*!
         When generating an apriori (AP) file from a table T , the user can specify 
@@ -103,7 +98,6 @@ public class APrioriCell
             if( Omitted())
                 return false;
         }
-        
         return true;
     }
 
@@ -113,10 +107,7 @@ public class APrioriCell
     {
         Mapping m = parent.Mappings.get(Status.getValue()-1);
         return( m.newstat == APriori.ChangeStatus.Omit &&  !m.useCost);
-        
     }
-    
-    
     
     /*!
         Generate one (comma-separated) line of the apriory file:
@@ -129,25 +120,20 @@ public class APrioriCell
     */
     public String Output(String sep, int outDim)
     {
-        if( !MustBeIncluded() && !Omitted())
-            return "";
+        if( !MustBeIncluded() && !Omitted()) return "";
         
         String Result = "";
         
-        int ColumnCount = GetColumnCount();
-        ColumnCount = outDim;
+        int ColumnCount = outDim;
                 
-        List<String> newkey = new ArrayList<String>(ColumnCount);
+        List<String> newkey = new ArrayList<>(ColumnCount);
 
         for(int i=0; i<ColumnCount; i++)
               newkey.add("");
-        
                 
-        for(int i=0; i<ColumnCount; i++)  // i = index of the "new" keys
-        {
+        for(int i=0; i<ColumnCount; i++){  // i = index of the "new" keys
             int index = parent.ColumnMap.get(i+1); // return 1-based OLD column position ( 0 = Other)
-            if( index >0 ) // i.e. a chosen (and mapped) column
-            {
+            if( index >0 ){ // i.e. a chosen (and mapped) column
                 String val = Key.get(index-1);
                 if( IsTotal(val))
                     val = TotalString;
@@ -159,36 +145,32 @@ public class APrioriCell
         }
 
         String KeyStr = "";
-        for(String s : newkey)
-            KeyStr+=s+sep;
+        for(String s : newkey) KeyStr+=s+sep;
+        
         KeyStr = KeyStr.substring(0,KeyStr.length()-1);
         
         Mapping m = parent.Mappings.get(Status.getValue()-1);
 
         if(MustBeIncluded()){
-          if (m.newstat != APriori.ChangeStatus.Omit) {             
-            Result= KeyStr + sep + m.newstat.getSymbol();
-        }
-        
-          if( m.useCost)// cost must be written also id omitted
-            { if( !Result.equals(""))
-                Result+=System.lineSeparator();//"\n";
-              Result+=KeyStr + sep + "c" + sep + m.costValue.toString();
+            if (m.newstat != APriori.ChangeStatus.Omit) {             
+                Result= KeyStr + sep + m.newstat.getSymbol();
             }
+        
+            if( m.useCost){ // cost must be written also in case of Omitted()=true
+                if( !Result.equals(""))
+                    Result+=System.lineSeparator();
+                Result+=KeyStr + sep + "c" + sep + m.costValue.toString();
+            }  
         }
         
         return Result;
     }
-    
-    
     
     @Override 
     public String toString()
     {
         return Output(",", 1);
     }
-    
-    
     
     private String RemoveQuotes(String s)
     {
@@ -212,24 +194,24 @@ public class APrioriCell
         if( Parts.length==1 )//i.e. wrong separator
             throw new ArgusException("Invalid separator while reading reading safe file: '"+sep+"'");
                     
-        for(int col=0; col<FirstNumericField; col++)
-        {
-            boolean hasQuotes = Parts[col].indexOf('"')>=0;
+        for(int col=0; col<FirstNumericField; col++){
+            //boolean hasQuotes = Parts[col].indexOf('"')>=0; Not used????
             String pp = RemoveQuotes(Parts[col]);
             
             Key.add(pp);
         }
 
-        String cellValue = Parts[Key.size()];
+        //String cellValue = Parts[Key.size()]; Not used????
         
-        if( Parts.length - Key.size() ==2) // i.e. status is stored as well as the last value
+        if( Parts.length - Key.size() == 2) // i.e. status is stored as well as the last value
             Status = CellStatus.findByValue(Integer.parseInt(Parts[Parts.length-1]));
         
+/* Not used????
         if( Status == CellStatus.UNKNOWN)
         {
             int x = 2;
         }
-        
+*/        
         parent = p;
     }
 }

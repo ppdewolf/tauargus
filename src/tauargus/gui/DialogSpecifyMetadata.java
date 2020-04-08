@@ -266,18 +266,18 @@ public class DialogSpecifyMetadata extends DialogBase {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(buttonOK)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(buttonCancel))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
                         .addComponent(panelEdit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, 0)
-                        .addComponent(panelEditVariable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
+                        .addComponent(panelEditVariable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(10, 10, 10))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(buttonOK)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(buttonCancel)
+                        .addGap(19, 19, 19))))
         );
 
         layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {buttonCancel, buttonOK});
@@ -300,6 +300,11 @@ public class DialogSpecifyMetadata extends DialogBase {
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttonOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonOKActionPerformed
+        
+        if (this.panelEditVariable.getScaleParamsTable().isEditing()){
+            if (!this.panelEditVariable.getScaleParamsTable().getCellEditor().stopCellEditing()) return;
+        }
+
         // Trigger a listvalue change so last edited variable data will be stored
         listVariables.clearSelection();
         
@@ -312,13 +317,6 @@ public class DialogSpecifyMetadata extends DialogBase {
                     break;
         }
         
-/*        int ft = comboBoxFormat.getSelectedIndex();
-        if (ft==0) {metadata.dataFileType  = Metadata.DATA_FILE_TYPE_FIXED;}
-        else
-         if (ft==1) {metadata.dataFileType  = Metadata.DATA_FILE_TYPE_FREE;}
-        else    
-         if (ft==2) {metadata.dataFileType  = Metadata.DATA_FILE_TYPE_SPSS;}
-*/            
         metadata.fieldSeparator = textFieldSeparator.getText();
         metadata.variables.clear();
         for (int i = 0; i < variableListModel.getSize(); i++) {

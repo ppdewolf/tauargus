@@ -39,12 +39,11 @@ public class DialogProtectJJFormat extends javax.swing.JDialog {
     /**
      * Creates new form DialogProtectJJFormat
      */
-    private javax.swing.JFileChooser fileChooser;
+    private final javax.swing.JFileChooser fileChooser;
     
     public DialogProtectJJFormat(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        setLocationRelativeTo(parent);
         fileChooser = new javax.swing.JFileChooser();
     }
 
@@ -212,23 +211,10 @@ public class DialogProtectJJFormat extends javax.swing.JDialog {
                     "Input file  " + jTextFieldJJInputFile.getText() + "\n"+
                     "Output file "+ jTextFieldJJInputFile.getText()+ "\n"+
                     nSec +" secondaries");              
-          }
-
-            
-  //  } catch (ArgusException ex){
-    //        JOptionPane.showMessageDialog(this, "No correct value for Max Time\n"+
-      //                                           ex.getMessage());
-
-        
+          }   
     }//GEN-LAST:event_jButtonProtectJJFileActionPerformed
 
     private void jButtonSearchJJInputFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSearchJJInputFileActionPerformed
-        // TODO add your handling code here:+
-//        String hs = SystemUtils.getRegString("general", "datadir", "");
-//        if (!hs.equals("")){
-//            File file = new File(hs); 
-//            fileChooser.setCurrentDirectory(file);
-//        }
         TauArgusUtils.getDataDirFromRegistry(fileChooser);
         fileChooser.setDialogTitle("Open JJ file");
         fileChooser.setSelectedFile(new File(""));
@@ -236,20 +222,13 @@ public class DialogProtectJJFormat extends javax.swing.JDialog {
         // filters are shown in order of declaration, setFileFilter sets the default filter
         fileChooser.setFileFilter(new FileNameExtensionFilter("JJ file (*.jj)", "jj"));
         if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
- //           textFieldMicrodata.setText(fileChooser.getSelectedFile().toString());
-          String hs = fileChooser.getSelectedFile().getPath();
-          jTextFieldJJInputFile.setText(hs);  
-          TauArgusUtils.putDataDirInRegistry(hs);
+            String hs = fileChooser.getSelectedFile().getPath();
+            jTextFieldJJInputFile.setText(hs);  
+            TauArgusUtils.putDataDirInRegistry(hs);
         }   
     }//GEN-LAST:event_jButtonSearchJJInputFileActionPerformed
 
     private void jButtonSearchJJOutputFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSearchJJOutputFileActionPerformed
-        // TODO add your handling code here:
-//        String hs = SystemUtils.getRegString("general", "datadir", "");
-//        if (!hs.equals("")){
-//            File file = new File(hs); 
-//            fileChooser.setCurrentDirectory(file);
-//        }
         TauArgusUtils.getDataDirFromRegistry(fileChooser);
         fileChooser.setDialogTitle("JJ output file");
         fileChooser.setSelectedFile(new File(""));
@@ -257,15 +236,13 @@ public class DialogProtectJJFormat extends javax.swing.JDialog {
         // filters are shown in order of declaration, setFileFilter sets the default filter
         fileChooser.setFileFilter(new FileNameExtensionFilter("JJ file (*.jj)", "jj"));
         if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
- //           textFieldMicrodata.setText(fileChooser.getSelectedFile().toString());
-          String hs = fileChooser.getSelectedFile().getPath();
-          jTextFieldJJOutputFile.setText(hs); 
-          TauArgusUtils.putDataDirInRegistry(hs); 
+            String hs = fileChooser.getSelectedFile().getPath();
+            jTextFieldJJOutputFile.setText(hs); 
+            TauArgusUtils.putDataDirInRegistry(hs); 
         }
     }//GEN-LAST:event_jButtonSearchJJOutputFileActionPerformed
 
     private void jButtonReadyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonReadyActionPerformed
-        // TODO add your handling code here:
           setVisible(false);
           dispose();
     }//GEN-LAST:event_jButtonReadyActionPerformed

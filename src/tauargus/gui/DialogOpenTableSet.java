@@ -36,10 +36,10 @@ public class DialogOpenTableSet extends DialogBase {
     public DialogOpenTableSet(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        setLocationRelativeTo(parent);
     }
 
     public int showDialog() {
+        setLocationRelativeTo(this.getParent());
         setVisible(true);
         return returnValue;
     }

@@ -171,9 +171,7 @@ public class DialogGlobalRecode extends DialogBase {
     private boolean fromTree;
     private MyDocumentListener documentListener;
 
-    /**
-     * Creates new form DialogGlobalRecode
-     */
+    // Creates new form DialogGlobalRecode
     public DialogGlobalRecode(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
@@ -213,6 +211,7 @@ public class DialogGlobalRecode extends DialogBase {
         ListSelectionModel selectionModel = new SingleListSelectionModel();
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         selectionModel.addListSelectionListener(new ListSelectionListener() {
+            @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (documentListener.isChanged()) {
                     documentListener.setChanged(false);
@@ -249,13 +248,8 @@ public class DialogGlobalRecode extends DialogBase {
                                     textFieldMissing2.setText(recodeInfo.getMissing2());
                                     textFieldCodelist.setText(recodeInfo.getCodeList());
                                 }
-// Anco 1.6
-                                //                            } catch (ArgusException | IOException ex) {
-                               } catch (ArgusException  ex) {
+                               } catch (ArgusException | IOException  ex) {
                                 JOptionPane.showMessageDialog(DialogGlobalRecode.this, ex.getMessage());}
-                                catch (IOException ex) {
-                                JOptionPane.showMessageDialog(DialogGlobalRecode.this, ex.getMessage());
-                            }
                         }
                         textAreaWarning.setText("");
                     }
@@ -289,6 +283,35 @@ public class DialogGlobalRecode extends DialogBase {
             }
         });
         
+//        addWindowListener(new WindowAdapter() {
+//            @Override
+//            public void windowClosing(WindowEvent e) {
+//                if (documentListener.isChanged()) {
+//                    documentListener.setChanged(false);
+//                    saveRecodeInfo(false);
+//                }
+//
+//                tauArgus.ApplyRecode();
+//            }
+//        });
+//
+//        setLocationRelativeTo(parent);
+    }
+
+    public void showDialog(TableSet tableSet) {
+        this.tableSet = tableSet;
+
+        tableVariables.setModel(new VariableTableModel(tableSet.expVar));
+        //TableColumnResizer.adjustColumnPreferredWidths(tableVariables, false);
+        tableVariables.getColumnModel().getColumn(0).setPreferredWidth(60);
+        tableVariables.getColumnModel().getColumn(0).setMaxWidth(60);
+        
+        if (!tableSet.expVar.isEmpty()) {
+            tableVariables.setRowSelectionInterval(0, 0);
+        }
+        
+        labelRecodeData.setText("Edit box for global recode");
+
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -301,22 +324,8 @@ public class DialogGlobalRecode extends DialogBase {
             }
         });
 
-        setLocationRelativeTo(parent);
-    }
-
-    public void showDialog(TableSet tableSet) {
-        this.tableSet = tableSet;
-
-        tableVariables.setModel(new VariableTableModel(tableSet.expVar));
-        //TableColumnResizer.adjustColumnPreferredWidths(tableVariables, false);
-        tableVariables.getColumnModel().getColumn(0).setPreferredWidth(60);
-        tableVariables.getColumnModel().getColumn(0).setMaxWidth(60);
+        setLocationRelativeTo(this.getParent());
         
-        if (tableSet.expVar.size() != 0) {
-            tableVariables.setRowSelectionInterval(0, 0);
-        }
-        
-        labelRecodeData.setText("Edit box for global recode");
         pack();
         setVisible(true);
     }
@@ -677,8 +686,8 @@ public class DialogGlobalRecode extends DialogBase {
         
         tauArgus.ApplyRecode();
         for (int i=0;i<TableService.numberOfTables();i++){
-            TableSet tableSet = TableService.getTable(i);
-            tableSet.clearHistory();
+            TableSet tmptableSet = TableService.getTable(i);
+            tmptableSet.clearHistory();
         }
         dispose();
     }//GEN-LAST:event_buttonCloseActionPerformed
@@ -898,7 +907,7 @@ public class DialogGlobalRecode extends DialogBase {
     }
     
     private void buildTree() {
-        int codeIndex = 0; int maxDepth = 0; int VarDepth = 0; int MaxLevelChoice = 0;
+        int codeIndex = 0; int maxDepth; int VarDepth; int MaxLevelChoice;
         VarCodeProperties properties = new VarCodeProperties(variable.index, codeIndex);
         CodeInfo codeInfo = new CodeInfo(codeIndex, properties.getCode(), properties.isMissing(), properties.isActive());
         DefaultMutableTreeNode topNode = new DefaultMutableTreeNode(codeInfo, properties.isParent());

@@ -17,7 +17,6 @@
 
 package tauargus.model;
 
-//import argus.model.SpssVariable;
 import argus.utils.StrUtils;
 import argus.utils.SystemUtils;
 import argus.utils.Tokenizer;
@@ -221,15 +220,14 @@ public class Metadata implements Cloneable {
   //                  JOptionPane.showMessageDialog(FrameMain.this, ex.getMessage());
                 } 
     }
- /**
+ /*
   * Read the metadata from the SPSS system file
   */
   
-  /**
+  /*
    * checks the metadata,read from the RDA file with the metadata, found in the SPSS  system file
-   * @return 
+   * 
    */  
-
     public void readMicroMetadata(BufferedReader reader) throws ArgusException {
         boolean CKMspecified = false;
         dataOrigin = DATA_ORIGIN_MICRO;
@@ -427,7 +425,7 @@ public class Metadata implements Cloneable {
                             throw new ArgusException("<INCLUDEZEROS> only allowed for numeric variables.");
                         }
                         break;
-                    case "<SCALING>": // Can much nicer and needs exception cheking!
+                    case "<SCALING>": // Can much nicer and needs exception checking!
                         if (!CKMspecified) throw new ArgusException("<SCALING> only allowed after <CKM> is specified.");
                         if (!variable.isResponse()) throw new ArgusException("<SCALING> tag only allowed for numeric variables.");
                         hs = tokenizer.nextField("(").toUpperCase();
@@ -487,16 +485,6 @@ public class Metadata implements Cloneable {
                     case "<SEPARATION>":
                         if (!CKMspecified) throw new ArgusException("<SEPARATION> only allowed after <CKM> is specified.");
                         if (!variable.isResponse()) throw new ArgusException("<SEPARATION> tag only allowed for numeric variables.");
-                        //hs = tokenizer.nextField("(").toUpperCase();
-                        //variable.CKMseparation = hs.equals("Y");
-                        //if (variable.CKMseparation){
-                        //  try{
-                        //        variable.CKMm1squared = Double.parseDouble(tokenizer.nextField(")"));
-                        //    }
-                        //    catch (NumberFormatException ex){
-                        //        throw new ArgusException("value in <SEPARATION> Y(value) should be double\n" + ex.getMessage());
-                        //    }
-                        //}
                         variable.CKMseparation = tokenizer.nextToken().equals("Y");
                         break;
                     default:
@@ -648,19 +636,6 @@ public class Metadata implements Cloneable {
                 }
             }
         }
-/* Wat een onzin om missings uit eigen beweging toe te voegen; Anco 1 7 2014
-        for (Variable var : variables) {
-            if (var.isCategorical()) {
-                for (int i = 0; i < 1; i++) {
-                    if (StringUtils.isEmpty(var.missing[i])) {
-                        var.missing[i] = "X";
-                        // throw new ArgusException("No missing value specified for variable (" + var.name + ")");
-                    }
-                    var.missing[i] = var.normaliseMissing(var.missing[i]);
-                }
-            }
-        }
-*/
         verify();
         tokenizer.close();
     }
@@ -670,11 +645,6 @@ public class Metadata implements Cloneable {
     }
     
     public void writeHrcFile(Variable variable, String fileName, String leadingString) throws IOException {
-// Anco 1.6 
-// try with resources verwijderd. writer nu apart gedeclareerd.        
-//        try (
-//            PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(fileName)))
-//        ) {
         PrintWriter writer = null;
         try {
             writer = new PrintWriter(new BufferedWriter(new FileWriter(fileName)));
@@ -785,7 +755,7 @@ public class Metadata implements Cloneable {
                                   writer.println(hs);
                                   break;
                         case "N": hs = "N(";
-                                  hs += Double.toString(variable.CKMsigma1) + ",";
+                                  hs += Double.toString(variable.CKMsigma1);
                                   for (int i=1; i<variable.CKMTopK; i++){
                                       hs += "," + variable.CKMepsilon[i];
                                   }
@@ -874,9 +844,6 @@ public class Metadata implements Cloneable {
     }
 
     public void write(String fileName, Writer w) throws IOException, ArgusException {
-// Anco 1.6
-// try with resources verwijderd.        
-//        try (PrintWriter writer = new PrintWriter(w)) {
         PrintWriter writer = null;
         try {  writer = new PrintWriter(w);
             if (dataFileType == DATA_FILE_TYPE_FREE) {
@@ -900,8 +867,6 @@ public class Metadata implements Cloneable {
     public void write(String fileName) {
         try {
             write(fileName, new BufferedWriter(new FileWriter(new File(fileName))));
-// anco 1            
-//        } catch (ArgusException | IOException ex) {
           } catch (ArgusException ex) {
             logger.log(Level.SEVERE, null, ex);
           } catch (IOException ex) {
@@ -958,10 +923,10 @@ public class Metadata implements Cloneable {
                     int e2 = b2 + variable2.varLen;
                     if (b2 < e1 && e2 > b1) {
 //                        throw new ArgusException("Variable " + variable.name + " and variable " + variable2.name + " overlap.");
-                    if (overlapFound) {overlapString = overlapString + "\n";} 
-                    overlapFound = true; 
-                    overlapString = overlapString + "Variable " + variable.name + " and variable " + variable2.name + " overlap.";                      
-                   }
+                        if (overlapFound) {overlapString = overlapString + "\n";} 
+                        overlapFound = true; 
+                        overlapString = overlapString + "Variable " + variable.name + " and variable " + variable2.name + " overlap.";                      
+                    }
                     if (StringUtils.equalsIgnoreCase(variable.name, variable2.name)) {
                         throw new ArgusException("Variable" + i + " and variable" + j + " have the same name.");
                     }
@@ -1038,12 +1003,6 @@ public class Metadata implements Cloneable {
     public void writeTableMetadata(String fileName, int NExpVar, Variable[] ExpVar, Variable RespVar, Variable ShadowVar, final int CostFunc, Variable CostVar, int TopN, boolean Simple, boolean WithAudit) throws IOException, ArgusException {
         int dataFileType = DATA_FILE_TYPE_FREE;
         int microTabularData = DATA_ORIGIN_TABULAR;
-// Anco 1.6 try withresources        
-//        try (
-//            FileWriter fw = new FileWriter(fileName);
-//            BufferedWriter bw = new BufferedWriter(fw);
-//            PrintWriter writer = new PrintWriter(bw)
-//        ) {
         FileWriter fw = null;
         BufferedWriter bw = null;
         PrintWriter writer = null;
@@ -1121,7 +1080,7 @@ public class Metadata implements Cloneable {
     }
 
     public void writeCKMMetadata(String fileName, int NExpVar, Variable[] ExpVar, Variable RespVar, boolean addOrig, boolean addDiff, boolean addCellKey) throws IOException, ArgusException {
-        int dataFileType = DATA_FILE_TYPE_FREE;
+        int tmpDataFileType = DATA_FILE_TYPE_FREE;
         int microTabularData = DATA_ORIGIN_TABULAR;
 
         FileWriter fw = null;
@@ -1134,10 +1093,10 @@ public class Metadata implements Cloneable {
             writer.println("   <SEPARATOR> " + StrUtils.quote(";"));
             for (int i = 0; i < NExpVar; i++) {
                 Variable variable = ExpVar[i];
-                writeVariable(dataFileType, microTabularData, fileName, writer, variable, Type.CATEGORICAL);
+                writeVariable(tmpDataFileType, microTabularData, fileName, writer, variable, Type.CATEGORICAL);
             }
 
-            writeVariable(dataFileType, microTabularData, fileName, writer, RespVar, Type.RESPONSE);
+            writeVariable(tmpDataFileType, microTabularData, fileName, writer, RespVar, Type.RESPONSE);
 
             if (addOrig){
                 writer.println("OrigVar");
@@ -1175,10 +1134,6 @@ public class Metadata implements Cloneable {
 
         for (int i = 0; i < files.length; i++) {
             File file = files[i];
-// Anco 1.6 try with resources
-//            try (
-//               BufferedReader reader = new BufferedReader(new FileReader(file))
-//            ) {
             BufferedReader reader = null;
             try {reader = new BufferedReader(new FileReader(file));
                 long fileLength = file.length();
@@ -1218,10 +1173,6 @@ public class Metadata implements Cloneable {
         for (Variable variable : variables) {
             if (variable.isCategorical() && variable.hierarchical==Variable.HIER_FILE) {
                 // Bij hierfile de lengte halen uit de hier-file
-// Anco 1.6, try with resources
-//                try (
-//                    BufferedReader reader = new BufferedReader(new FileReader(getFilePath(variable.hierFileName)))
-//                ) {
                 BufferedReader reader = null;
                 try {reader = new BufferedReader(new FileReader(getFilePath(variable.hierFileName)));
                     int length = variable.leadingString.length();
@@ -1287,7 +1238,6 @@ public class Metadata implements Cloneable {
     public Object clone() throws CloneNotSupportedException {
         Metadata metadata = (Metadata)super.clone(); 
 
-        //metadata.variables = (ArrayList<Variable>)((ArrayList<Variable>)variables).clone();
         metadata.variables = new ArrayList<>();
         for (Variable var : variables) metadata.variables.add(var);
         

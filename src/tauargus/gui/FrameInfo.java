@@ -29,7 +29,6 @@ public class FrameInfo extends javax.swing.JFrame {
     public FrameInfo() {
       super();
       initComponents();
-      setLocationRelativeTo(null); 
     }
 
     public void addText (String s){

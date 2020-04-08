@@ -18,11 +18,6 @@
 //TODO: test for String format and add the possibility to add/read/write date/time format
 package tauargus.model;;
 
-//import tauargus.model.ArgusException;
-//import argus.model.DataFilePair;
-//import argus.utils.StrUtils;
-//import argus.utils.Tokenizer;
-//import java.io.BufferedReader;
 import argus.model.SpssVariable;
 import com.ibm.statistics.plugin.Case;
 import com.ibm.statistics.plugin.Cursor;
@@ -54,17 +49,12 @@ public class SpssUtilsTau {
     public static File safFile;
     public static File safeSpssFile;// = new File("C:\\Users\\Gebruiker\\Desktop\\safe.sav");
     
-    /**
+    /*
      * Gets the variables from spss. For every variable an instance of the
      * SpssVariable class is made containing all the information of this
      * variable.
-     *
-     * @param metadata Metadata file.
-     * @param parent no longer needed
-     * @return List List containing the SpssVariable instances.
      */
-    public static boolean getVariablesFromSpss(String fileName) throws ArgusException{ //), Frame parent) {
-  //      getSpssInstallationDirectory(parent);
+    public static boolean getVariablesFromSpss(String fileName) throws ArgusException{
         try{
             StatsUtil.start();
             StatsUtil.stop();
@@ -78,9 +68,10 @@ public class SpssUtilsTau {
                 Cursor c = new Cursor();
                 for (int i = 0; i < StatsUtil.getVariableCount(); i++) {
                     SpssVariable variable = new SpssVariable(StatsUtil.getVariableName(i), StatsUtil.getVariableFormatDecimal(i),
-                            StatsUtil.getVariableFormatWidth(i), StatsUtil.getVariableMeasurementLevel(i),
-                            StatsUtil.getVariableType(i), StatsUtil.getVariableLabel(i), StatsUtil.getVariableAttributeNames(i),
-                            StatsUtil.getVariableFormat(i));
+                                                    StatsUtil.getVariableFormatWidth(i), StatsUtil.getVariableMeasurementLevel(i),
+                                                    StatsUtil.getVariableType(i), StatsUtil.getVariableLabel(i), 
+                                                    StatsUtil.getVariableAttributeNames(i),
+                                                    StatsUtil.getVariableFormat(i));
                     // set numeric or string missings & value labels
                     if (variable.getVariableType() == SpssUtilsTau.NUMERIC) {
                         variable.setNumericValueLabels(c.getNumericValueLabels(i));
@@ -91,7 +82,6 @@ public class SpssUtilsTau {
                     }
                     SpssUtilsTau.spssVariables.add(variable);
                 }
- //               metadata.setRecordCount(StatsUtil.getCaseCount());
                 StatsUtil.stop();
             } catch (StatsException e) {
               throw new ArgusException ("Reading the SPSS metadata failed\n" + e);              
@@ -101,38 +91,36 @@ public class SpssUtilsTau {
     }
 
     public static SpssVariable getSPSSVar (int i){
-      SpssVariable hVar = null;
-      if (i<spssVariables.size()){hVar = spssVariables.get(i);}
-      return hVar;              
+        SpssVariable hVar = null;
+        if (i<spssVariables.size()){hVar = spssVariables.get(i);}
+        return hVar;              
     }
     
        
     public static  int SpssVariableCount(){
-      return spssVariables.size()+1;
+        return spssVariables.size()+1;
     }
     
     public static  boolean checkSpssMeta(Metadata metadata) throws ArgusException{
-      int is, im, current = -1, isFound;
-      for (im=0;im<metadata.variables.size();im++){
-        isFound = -1;   
-        for(is=0;is<SpssVariableCount()-1;is++){
-          if (getSPSSVar(is).getName().equals(metadata.variables.get(im).name))
-            {isFound = is;}
-        }  
-        if (isFound == -1){throw new ArgusException 
-          ("Variable "+ metadata.variables.get(im).name+ " could not be found in the SPSS file" );}
-        if (isFound < current) {throw new ArgusException ("Wrong order of the variables ("+
-                                                           getSPSSVar(isFound).getName()+")");}
-        if (getSPSSVar(isFound).getVariableLength() != metadata.variables.get(im).varLen){
-           throw new ArgusException ("Wrong variable length for variable ("+
-                                                           getSPSSVar(isFound).getName()+")");  
+        int is, im, current = -1, isFound;
+        for (im=0;im<metadata.variables.size();im++){
+            isFound = -1;   
+            for(is=0;is<SpssVariableCount()-1;is++){
+                if (getSPSSVar(is).getName().equals(metadata.variables.get(im).name))
+                    {isFound = is;}
+            }  
+            if (isFound == -1){
+                throw new ArgusException("Variable "+ metadata.variables.get(im).name+ " could not be found in the SPSS file" );
+            }
+            if (isFound < current) {
+                throw new ArgusException ("Wrong order of the variables (" + getSPSSVar(isFound).getName()+")");
+            }
+            if (getSPSSVar(isFound).getVariableLength() != metadata.variables.get(im).varLen){
+                throw new ArgusException ("Wrong variable length for variable (" + getSPSSVar(isFound).getName()+")");  
+            }
+            current = isFound;
+            getSPSSVar(isFound).setSelected(true);
         }
-        current = isFound;
-
-        
-        getSPSSVar(isFound).setSelected(true);
-        }
-            
         return true;
     }
 
@@ -206,8 +194,6 @@ public class SpssUtilsTau {
  //           Logger.getLogger(SpssUtilsTau.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
- 
 
     // WARNING: this has not been properly tested
     /**

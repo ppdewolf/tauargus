@@ -52,20 +52,17 @@ public class DialogSpecifyTablesMicro extends DialogBase {
 
     private static final Logger logger = Logger.getLogger(DialogSpecifyTablesMicro.class.getName());
     
-    /**
-     * Creates new form DialogSpecifyTablesMicro
+     /*
+     Creates new form DialogSpecifyTablesMicro
      */
     public DialogSpecifyTablesMicro(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         createComponentArrays();
-       // loadDefaultsFromRegistry(); //Why load defaults here if it is done in ShowDialog as well?
         
         labelMSC.setVisible(Application.isAnco());
         textFieldMSC.setVisible(Application.isAnco());
-// Anco 1.6        
-//        explanatoryVariableListModel = new DefaultListModel<>();
-        explanatoryVariableListModel = new DefaultListModel<Variable>();
+        explanatoryVariableListModel = new DefaultListModel<>();
         listExplanatoryVariables.setModel(explanatoryVariableListModel);
         listExplanatoryVariables.setCellRenderer(new VariableNameCellRenderer());
         listExplanatoryVariables.addMouseListener(new MouseJListDoubleClickedListener<Variable>(listExplanatoryVariables) {
@@ -78,9 +75,7 @@ public class DialogSpecifyTablesMicro extends DialogBase {
                 }
             }
         });
-// Anco 1.6
-//        selectedExplanatoryVariableListModel = new DefaultListModel<>();
-        selectedExplanatoryVariableListModel = new DefaultListModel<Variable>();
+        selectedExplanatoryVariableListModel = new DefaultListModel<>();
         listSelectedExplanatoryVariables.setModel(selectedExplanatoryVariableListModel);
         listSelectedExplanatoryVariables.setCellRenderer(new VariableNameCellRenderer());
         listSelectedExplanatoryVariables.addMouseListener(new MouseJListDoubleClickedListener<Variable>(listSelectedExplanatoryVariables) {
@@ -90,9 +85,7 @@ public class DialogSpecifyTablesMicro extends DialogBase {
                 organiseDistanceOption();
             }
         });
-// Anco 1.6
-//        responseVariableListModel = new DefaultListModel<>();
-        responseVariableListModel = new DefaultListModel<Variable>();
+        responseVariableListModel = new DefaultListModel<>();
         listResponseVariables.setModel(responseVariableListModel);
         listResponseVariables.setCellRenderer(new VariableNameCellRenderer());
         listResponseVariables.setSelectionModel(new SingleListSelectionModel());
@@ -143,8 +136,6 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         }
         textFieldlZeroUnsafeRange.setInputVerifier(doubleInputVerifier);
         textFieldManualSafetyRange.setInputVerifier(integerInputVerifier);
-        
-        setLocationRelativeTo(parent);
     }
 
     public int showDialog(Metadata metadata) {
@@ -223,6 +214,7 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         }
         organiseAllOptions();
 
+        setLocationRelativeTo(this.getParent());        
         setVisible(true);
         return returnValue;
     }
@@ -232,24 +224,29 @@ public class DialogSpecifyTablesMicro extends DialogBase {
      */
     private void load(TableSet tableSet) {
         selectedExplanatoryVariableListModel.clear();
-        for (Variable variable : tableSet.expVar) {
+        tableSet.expVar.forEach((variable) -> {
             selectedExplanatoryVariableListModel.addElement(variable);
-        }
+        });
 
         setResponseVariable(tableSet.respVar);
         setShadowVariable(tableSet.shadowVar);
         textFieldCostVariable.setText("");
-        if (tableSet.costFunc == TableSet.COST_DIST) {
-            radioButtonDistanceFunction.setSelected(true);
-        } else if (tableSet.costFunc == TableSet.COST_UNITY) {
-            radioButtonUnity.setSelected(true);
-        } else if (tableSet.costFunc == TableSet.COST_FREQ) {
-            radioButtonFrequency.setSelected(true);
-        } else {
-            radioButtonVariable.setSelected(true);
-            setCostVariable(tableSet.costVar);
-            textFieldLambda.setText(Double.toString(tableSet.lambda));
-            textFieldMSC.setText(Double.toString(tableSet.maxScaleCost));
+        switch (tableSet.costFunc) {
+            case TableSet.COST_DIST:
+                radioButtonDistanceFunction.setSelected(true);
+                break;
+            case TableSet.COST_UNITY:
+                radioButtonUnity.setSelected(true);
+                break;
+            case TableSet.COST_FREQ:
+                radioButtonFrequency.setSelected(true);
+                break;
+            default:
+                radioButtonVariable.setSelected(true);
+                setCostVariable(tableSet.costVar);
+                textFieldLambda.setText(Double.toString(tableSet.lambda));
+                textFieldMSC.setText(Double.toString(tableSet.maxScaleCost));
+                break;
         }
 
         checkBoxApplyWeights.setSelected(tableSet.weighted);
@@ -258,7 +255,6 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         checkBoxDominanceRule.setSelected(tableSet.domRule);
         checkBoxPqRule.setSelected(tableSet.pqRule);
         checkBoxRequestRule.setSelected(tableSet.piepRule[0] || tableSet.piepRule[1]);
-        //checkBoxMinimumFrequency.setSelected((tableSet.minFreq[0] != 0) || (tableSet.minFreq[1] != 0));
         checkBoxMinimumFrequency.setSelected(tableSet.frequencyRule);
         checkBoxZeroUnsafe.setSelected(tableSet.zeroUnsafe);
 
@@ -283,7 +279,6 @@ public class DialogSpecifyTablesMicro extends DialogBase {
             if (tableSet.frequencyRule) textFieldMinFreq[i].setText(Integer.toString(tableSet.minFreq[i]));
         }
 
-        //loadDefaultsFromRegistry();
         organiseAllOptions();
 
         for (int i = 0; i < tabbedPaneRules.getTabCount(); i++) {
@@ -464,26 +459,14 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         tableSet.frequencyRule = checkBoxMinimumFrequency.isSelected();
         tableSet.zeroUnsafe = checkBoxZeroUnsafe.isSelected();
 
-        // Set dom rule, pq-rule and request rule parameters...
-        //int j = 4;
-        //if (!tableSet.holding) {
-        //    j = 2;
-        //}
         int j = (tableSet.holding && tableSet.metadata.containsHoldingVariable()) ? 4 : 2;
         for (int i=0; i<j; i++) {
-// if-tests are not needed: usage of rule is controlled by boolean when calling SetTableSafety-routine (from tauargus.extern.dataengine.TauArgus)
-            //if (tableSet.domRule) {
-                tableSet.domK[i] = Integer.parseInt(textFieldDomK[i].getText());
+               tableSet.domK[i] = Integer.parseInt(textFieldDomK[i].getText());
                 tableSet.domN[i] = Integer.parseInt(textFieldDomN[i].getText());
-            //}
-            //if (tableSet.pqRule) {
                 tableSet.pqP[i] = Integer.parseInt(textFieldPqP[i].getText());
                 tableSet.pqQ[i] = Integer.parseInt(textFieldPqQ[i].getText());
                 tableSet.pqN[i] = Integer.parseInt(textFieldPqN[i].getText());
-            //}
-            //if (checkBoxRequestRule.isSelected()) {
                 tableSet.piepPercentage[i] = Integer.parseInt(textFieldReq[i].getText());
-            //}
         }
         for (int i=0; i<2; i++) {
             tableSet.piepRule[i] = checkBoxRequestRule.isSelected() && 
@@ -1798,7 +1781,6 @@ public class DialogSpecifyTablesMicro extends DialogBase {
     private void buttonExplanatoryDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonExplanatoryDeleteActionPerformed
         // set the selection to an item that still exists after deletion
         // if not done before removal the remove button will loose focus
-//        int[] selectedIndices = listSelectedExplanatoryVariables.getSelectedIndices();
         List<Variable> selectedValues = listSelectedExplanatoryVariables.getSelectedValuesList();
         int selectedIndex = listSelectedExplanatoryVariables.getMaxSelectionIndex() + 1;
         while (selectedIndex >= 0
@@ -1806,13 +1788,10 @@ public class DialogSpecifyTablesMicro extends DialogBase {
             selectedIndex--;
         }
         listSelectedExplanatoryVariables.setSelectedIndex(selectedIndex);
-        for (Variable variable : selectedValues) {
+        selectedValues.forEach((variable) -> {
             selectedExplanatoryVariableListModel.removeElement(variable);
-        }
+        });
         organiseDistanceOption();
-//        for (int index : selectedIndices) {
-//            listSelectedExplanatoryVariables.remove(index);
-//        }
     }//GEN-LAST:event_buttonExplanatoryDeleteActionPerformed
 
     private void checkBoxRequestRuleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxRequestRuleActionPerformed
@@ -1956,7 +1935,7 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         }
         
        
-        // Alleen de freq-regel bij freq-tabellen!!!!
+        // Only freq-rule bij <freq>-tables!!!!
         if (checkBoxDominanceRule.isSelected() || checkBoxPqRule.isSelected() || checkBoxRequestRule.isSelected() || checkBoxZeroUnsafe.isSelected()) {
             if (responseVariable == freqVar) {
                 JOptionPane.showMessageDialog(this, "When using response variable <freq>, dominance rule and p%-rule are not allowed");
@@ -2080,7 +2059,6 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         }
 
         if (checkBoxZeroUnsafe.isSelected()) {
-            //if (Integer.parseInt(textFieldlZeroUnsafeRange.getText()) <= 0) {
             if (Double.parseDouble(textFieldlZeroUnsafeRange.getText()) <= 0) {
                 JOptionPane.showMessageDialog(this, "Illegal value for zero margin: " + textFieldlZeroUnsafeRange.getText() + "\nMust be positive");
                 textFieldlZeroUnsafeRange.requestFocusInWindow();
@@ -2097,7 +2075,6 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         return true;
     }
 
-    private TauArgus tauArgus = Application.getTauArgusDll();
     private Metadata metadata;
          
     private javax.swing.JLabel[] labelDom;
@@ -2121,10 +2098,10 @@ public class DialogSpecifyTablesMicro extends DialogBase {
     private javax.swing.JTextField[] textFieldRange;
     private javax.swing.JLabel[] labelMinFreqPercentage;
          
-    private DefaultListModel<Variable> explanatoryVariableListModel;
+    private final DefaultListModel<Variable> explanatoryVariableListModel;
     private DefaultListModel<Variable> selectedExplanatoryVariableListModel;
-    private DefaultListModel<Variable> responseVariableListModel;
-    private Variable freqVar;
+    private final DefaultListModel<Variable> responseVariableListModel;
+    private final Variable freqVar;
     private Variable responseVariable;
     private Variable shadowVariable;
     private Variable costVariable;

@@ -259,7 +259,6 @@ public class DialogStopTime extends javax.swing.JDialog{
     }// </editor-fold>//GEN-END:initComponents
 
     private void YESknopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_YESknopActionPerformed
-        // TODO add your handling code here:
         if (AddTimevalue.getText().isEmpty()) JOptionPane.showMessageDialog(null, "Please specify additional time", "Error", JOptionPane.ERROR_MESSAGE);
         else
         {
@@ -273,7 +272,6 @@ public class DialogStopTime extends javax.swing.JDialog{
     }//GEN-LAST:event_YESknopActionPerformed
 
     private void NOknopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NOknopActionPerformed
-        // TODO add your handling code here:
         AddTime = 0;
         setVisible(false);
         dispose();

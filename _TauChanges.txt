@@ -347,3 +347,18 @@ summary    : Bug fix starting with empty rda-file was not possible + slightly ad
 
 date	   : Mar 27, 2020
 summary    : Some refactoring, adding a lot of "dispose()", removing "main()" from many dialog classes
+
+daTE	   : Mar 30, 2020
+summary    : Replaced some "Thread()"s by "SwingWorker()"s, removing some display errors due to thread unsafe procedures 
+
+date	   : Apr 1, 2020
+summary    : Bugs fixed in CKM for magnitude tables using no flexfunction (in TauArgusJava.dll)
+
+date	   : Apr 2, 2020
+summary    : Bugs fixed in saving some metadata to the rda-file
+
+date	   : Apr 8, 2020
+summary    : Some refactoring
+
+above to be released in 4.2.0 build 5
+--------------------------------------------------------------

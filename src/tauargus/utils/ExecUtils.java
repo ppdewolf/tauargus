@@ -134,27 +134,21 @@ public class ExecUtils {
     public static int execCommand(String commandString, String workingDir, Boolean silent, String header) {
 
         if (!silent){
-          windowInfo = new FrameInfo();    
-//        windowInfo = new DialogInfo(FrameMain, false);
-          windowInfo.setVisible(true);
-//        windowInfo.requestFocusInWindow();
-//        windowInfo.setAlwaysOnTop(true);
-          windowInfo.addLabel (header); 
+            windowInfo = new FrameInfo();    
+            windowInfo.setVisible(true);
+            windowInfo.setLocationRelativeTo(null);
+            windowInfo.addLabel (header); 
           
         }
-//        frameInfo.repaint();
-//        frameInfo.validate();
 
         try {
             Process process;
             ProcessBuilder pb;
             if (workingDir == null) {
-                //process = Runtime.getRuntime().exec(commandString);
                 pb = new ProcessBuilder(commandString);
                 pb.environment().put("LD_LIBRARY_PATH", getApplicationDirectory(Application.class).getCanonicalPath());
                 process = pb.start();
             } else {
-                //process = Runtime.getRuntime().exec(commandString, null, new File(workingDir));
                 pb = new ProcessBuilder(commandString);
                 pb.environment().put("LD_LIBRARY_PATH", getApplicationDirectory(Application.class).getCanonicalPath());
                 pb.directory(new File(workingDir));
@@ -163,7 +157,6 @@ public class ExecUtils {
             eatStream(process.getInputStream(),silent);
             eatStream(process.getErrorStream(),silent);
             int exitCode = process.waitFor();
-            //windowInfo.setVisible(false);
             if (exitCode != 0) {
                 System.out.println("Process terminated with exit code " + exitCode);
             } else {
@@ -171,10 +164,8 @@ public class ExecUtils {
             }
             return exitCode;
         } catch (IOException ex) {
-            //windowInfo.setVisible(false);
             System.out.println("Unable to start: " + commandString);
         } catch (InterruptedException ex) {
-            //windowInfo.setVisible(false);
             System.out.println("Process is interrupted: " + commandString);
         } finally {
             if (!silent) {
@@ -204,12 +195,10 @@ public class ExecUtils {
     public static int execCommand(List<String> commandString, String workingDir, Boolean silent, String header) {
         String hs;
         if (!silent){
-          windowInfo = new FrameInfo();    
-//        windowInfo = new DialogInfo(FrameMain, false);
-          windowInfo.setVisible(true);
-//        windowInfo.requestFocusInWindow();
-//        windowInfo.setAlwaysOnTop(true);
-          windowInfo.addLabel (header); 
+            windowInfo = new FrameInfo();    
+            windowInfo.setLocationRelativeTo(null);
+            windowInfo.setVisible(true);
+            windowInfo.addLabel (header); 
           
         }
 // remove the .exe extension if not windows        

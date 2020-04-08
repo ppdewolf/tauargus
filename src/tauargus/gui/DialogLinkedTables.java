@@ -50,21 +50,17 @@ public class DialogLinkedTables extends DialogBase {
         return (JFrame)container;
     }
 
-    /**
-     * Creates new form DialogLinkedTables
-     */
+    // Creates new form DialogLinkedTables
     public DialogLinkedTables(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         initLists();
-        setLocationRelativeTo(parent);
     }
 
     private void initLists(){
         int i, n; Variable variable;
-        TableSet tableSet;
-//        DefaultListModel hulpModel1;
-//                , hulpModel2, hulpModel3, hulpModel4, hulpModel5, hulpModel6, hulpModel7;
+        TableSet tmptableSet;
+
         n = TableService.numberOfTables();
         labelTable1.setVisible(n>=1);
         labelTable2.setVisible(n>=2);
@@ -81,91 +77,72 @@ public class DialogLinkedTables extends DialogBase {
         listTable6.setVisible(n>=6);
         listTable7.setVisible(n>=7);
 
-        if (n>=1){tableSet=TableService.getTable(0);
+        if (n>=1){tmptableSet=TableService.getTable(0);
         DefaultListModel<String> hulpModel1 = new DefaultListModel<>();
         hulpModel1.clear();          
-        for (i=0;i<tableSet.expVar.size();i++){
-           variable = tableSet.expVar.get(i);
+        for (i=0;i<tmptableSet.expVar.size();i++){
+           variable = tmptableSet.expVar.get(i);
            hulpModel1.addElement(variable.name); 
           }
           listTable1.setModel(hulpModel1);}
 
-        if (n>=2){tableSet=TableService.getTable(1);
+        if (n>=2){tmptableSet=TableService.getTable(1);
         DefaultListModel<String> hulpModel2 = new DefaultListModel<>();
         hulpModel2.clear();          
-        for (i=0;i<tableSet.expVar.size();i++){
-           variable = tableSet.expVar.get(i);
+        for (i=0;i<tmptableSet.expVar.size();i++){
+           variable = tmptableSet.expVar.get(i);
            hulpModel2.addElement(variable.name); 
           }
           listTable2.setModel(hulpModel2);}
         
-        if (n>=3){tableSet=TableService.getTable(2);
+        if (n>=3){tmptableSet=TableService.getTable(2);
         DefaultListModel<String> hulpModel3 = new DefaultListModel<>();
         hulpModel3.clear();          
-        for (i=0;i<tableSet.expVar.size();i++){
-           variable = tableSet.expVar.get(i);
+        for (i=0;i<tmptableSet.expVar.size();i++){
+           variable = tmptableSet.expVar.get(i);
            hulpModel3.addElement(variable.name); 
           }
           listTable3.setModel(hulpModel3);}
 
-        if (n>=4){tableSet=TableService.getTable(3);
+        if (n>=4){tmptableSet=TableService.getTable(3);
         DefaultListModel<String> hulpModel4 = new DefaultListModel<>();
         hulpModel4.clear();          
-        for (i=0;i<tableSet.expVar.size();i++){
-           variable = tableSet.expVar.get(i);
+        for (i=0;i<tmptableSet.expVar.size();i++){
+           variable = tmptableSet.expVar.get(i);
            hulpModel4.addElement(variable.name); 
           }
           listTable4.setModel(hulpModel4);}
 
-       if (n>=5){tableSet=TableService.getTable(4);
+       if (n>=5){tmptableSet=TableService.getTable(4);
         DefaultListModel<String> hulpModel5 = new DefaultListModel<>();
         hulpModel5.clear();          
-        for (i=0;i<tableSet.expVar.size();i++){
-           variable = tableSet.expVar.get(i);
+        for (i=0;i<tmptableSet.expVar.size();i++){
+           variable = tmptableSet.expVar.get(i);
            hulpModel5.addElement(variable.name); 
           }
           listTable5.setModel(hulpModel5);}
 
-       if (n>=6){tableSet=TableService.getTable(5);
+       if (n>=6){tmptableSet=TableService.getTable(5);
         DefaultListModel<String> hulpModel6 = new DefaultListModel<>();
         hulpModel6.clear();          
-        for (i=0;i<tableSet.expVar.size();i++){
-           variable = tableSet.expVar.get(i);
+        for (i=0;i<tmptableSet.expVar.size();i++){
+           variable = tmptableSet.expVar.get(i);
            hulpModel6.addElement(variable.name); 
           }
           listTable6.setModel(hulpModel6);}
 
-        if (n>=7){tableSet=TableService.getTable(6);
+        if (n>=7){tmptableSet=TableService.getTable(6);
         DefaultListModel<String> hulpModel7 = new DefaultListModel<>();
         hulpModel7.clear();          
-        for (i=0;i<tableSet.expVar.size();i++){
-           variable = tableSet.expVar.get(i);
+        for (i=0;i<tmptableSet.expVar.size();i++){
+           variable = tmptableSet.expVar.get(i);
            hulpModel7.addElement(variable.name); 
           }
           listTable7.setModel(hulpModel7);}
 
-        
-//        if (n>=4){fillModel(3,hulpModel); 
-//           listTable4.setModel(hulpModel[3]);}
-//        if (n>=5){fillModel(4,hulpModel); 
-//           listTable5.setModel(hulpModel[4]);}
-//        if (n>=6){fillModel(5,hulpModel); 
-//           listTable6.setModel(hulpModel[5]);}
-//        if (n>=7){fillModel(6,hulpModel); 
-//           listTable7.setModel(hulpModel[6]);}
         LinkedTables.buildCoverTable();       
     }
     
-//    private void fillModel(int t, DefaultListModel[] hulpModel){
-//        int i; Variable variable;
-  
-//        tableSet=TableService.getTable(t); 
-//        hulpModel[t].clear();          
-//        for (i=0;i<tableSet.expVar.size();i++){
-//           variable = tableSet.expVar.get(i);
-//           hulpModel[t].addElement(variable.name); 
-             
-//    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -384,8 +361,8 @@ public class DialogLinkedTables extends DialogBase {
      * @param evt 
      */
     private void buttonSuppressModularActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSuppressModularActionPerformed
-        // TODO add your handling code here:
-      String hs = "", hs1 = "";  Boolean oke = true;
+      String hs = "", hs1;  
+      Boolean oke;
       JFrame parentFrame = getParentFrame();
       tableSet = TableService.getTable(0);
       DialogModularParameters paramsG = new DialogModularParameters(parentFrame, tableSet, false, true);

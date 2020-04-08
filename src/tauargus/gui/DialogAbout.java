@@ -29,9 +29,7 @@ public class DialogAbout extends javax.swing.JDialog {
 
     private static final Logger logger = Logger.getLogger(DialogAbout.class.getName());
 
-    /**
-     * Creates new form DialogAbout
-     */
+    // Creates new form DialogAbout
     public DialogAbout(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
@@ -47,10 +45,7 @@ public class DialogAbout extends javax.swing.JDialog {
         };
         KeyStroke stroke;
         stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
-        //buttonClose.registerKeyboardAction(actionListener, stroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
         stroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK);
-        //buttonClose.registerKeyboardAction(actionListener, stroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
-//        getRootPane().
 
         setLocationRelativeTo(parent);
     }

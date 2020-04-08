@@ -49,7 +49,6 @@ public class DialogReadApriori extends DialogBase {
         super(parent, modal);
         initComponents();
         jTable1.setVisible(false);
-        setLocationRelativeTo(parent);
         chkExpandTrivialLevels.setVisible(true);
     }
 
@@ -217,6 +216,7 @@ public class DialogReadApriori extends DialogBase {
     
     public void ShowDialog()
     {
+        setLocationRelativeTo(this.getParent());
         setVisible(true);
     }
     
@@ -231,11 +231,6 @@ public class DialogReadApriori extends DialogBase {
     }//GEN-LAST:event_buttonCancelActionPerformed
 
     private void btnSelectAprioriFilenameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectAprioriFilenameActionPerformed
-//        String hs = SystemUtils.getRegString("general", "datadir", "");
-//        if (!hs.equals("")){
-//            File file = new File(hs); 
-//            fileChooser.setCurrentDirectory(file);
-//        }
         TauArgusUtils.getDataDirFromRegistry(fileChooser);
         fileChooser.setDialogTitle("Select Apriori file");
         fileChooser.setSelectedFile(new File(""));
@@ -248,7 +243,6 @@ public class DialogReadApriori extends DialogBase {
             _Apriori = new APriori(aprioriFile);
             
             String hs = fileChooser.getSelectedFile().getPath();
-//            if (!hs.equals("")){SystemUtils.putRegString("general", "datadir", hs);}
             TauArgusUtils.putDataDirInRegistry(hs);
         }
     }//GEN-LAST:event_btnSelectAprioriFilenameActionPerformed

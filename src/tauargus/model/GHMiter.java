@@ -47,7 +47,7 @@ public class GHMiter {
     // private TauArgus tauArgus;
     private static final Logger logger = Logger.getLogger(GHMiter.class.getName());
     private static String Token;
-    private TableSet tableSet;
+    //private TableSet tableSet; Not used?????
     private static final TauArgus tauArgus = Application.getTauArgusDll();
     private static DecimalFormat ghMiterDecimalFormat;
     public static boolean ShowProto002;
@@ -119,7 +119,9 @@ public class GHMiter {
     }
     
     static void writeFrozen(int nDim ){
-        String hs, regel, EINGABEst = "", AUSGABEst; int i; double x;
+        String regel, EINGABEst = "", AUSGABEst; 
+        int i; 
+        double x;
         try{
             BufferedReader eingabe = new BufferedReader(new FileReader(Application.getTempFile("EINGABE")));  
             BufferedReader ausgabe = new BufferedReader(new FileReader(Application.getTempFile("AUSGABE")));  
@@ -147,14 +149,13 @@ public class GHMiter {
             eingabe.close();
             ausgabe.close();
         } 
-        catch(Exception ex){
-            hs = EINGABEst;
-        }      
+        catch(Exception ex){}      
     }
     
-    
     static void testProto003(TableSet tableSet)throws ArgusException {
-        int i, n, nt; String[] regel = new String[1]; String hs;
+        int i, nt; 
+        String[] regel = new String[1]; 
+        String hs;
         for (i=0;i<TableSet.MAX_GH_MITER_RATIO;i++) {tableSet.ghMiterRatio[i] = 0;} 
         if (!TauArgusUtils.ExistFile(Application.getTempFile("proto003"))){ return;}
         try{
@@ -178,10 +179,9 @@ public class GHMiter {
         try {
             GHMiter = SystemUtils.getApplicationDirectory(GHMiter.class).getCanonicalPath();
         } catch (Exception ex) {}
-//           throw new ArgusException("The hypercube program (GHMiter4) could not be found");}
+
         GHMiter = "\"" + GHMiter + "/Ghmiter4.exe\"";
         commandline.add(GHMiter);
-//      GHMiter = "D:\\TauJava\\tauargus\\GHMiter4.exe";
 
         TauArgusUtils.writeBatchFileForExec( "RunGH", commandline);       
         int result = ExecUtils.execCommand(commandline, Application.getTempDir(),false, "Run Hypercube");
@@ -258,8 +258,10 @@ public class GHMiter {
  
     static boolean SchrijfTABELLE (String FileTABELLE, int tIndex, 
         boolean Linked, Integer CoverDim) throws ArgusException {
-        Integer t1, t2, P1, P4, P5, NExpVar, D; int j, NA; 
-        String Hs; double CellResp, MinTVal;
+        Integer t1, t2, P1, P4, P5, NExpVar, D;
+        int j, NA; 
+        String Hs; 
+        double CellResp, MinTVal;
         TableSet tableSet;
         if (!Linked) { t1 = tIndex; t2=tIndex;}
         else { t1 = 0; t2= TableService.numberOfTables()-1; }
@@ -359,7 +361,7 @@ public class GHMiter {
         else {X = 0;  HS1 = " 0 0 0";}
         tableSet.ratio = X;
     
-        // ophalen info van de tabel-parameters.
+        // getting info on table-parameters
         HS = String.format(Locale.US,"%10.8f", X); // Using Locale.US to ensure the use decimalseparator = "."
         HS = HS + "  0.00";
         Integer OkeCode = tauArgus.WriteGHMITERSteuer(Application.getTempFile("STEUER"+number), HS, HS1, TableNumber);
@@ -367,27 +369,25 @@ public class GHMiter {
     }
     
 
-    static boolean CleanGHMiterFiles() {
-        boolean Oke;
-        Oke = TauArgusUtils.DeleteFileWild("PROTO*.*", Application.getTempDir());
-        Oke = TauArgusUtils.DeleteFile(Application.getTempFile("proto001"));
-        Oke = TauArgusUtils.DeleteFile(Application.getTempFile("proto002"));
-        Oke = TauArgusUtils.DeleteFile(Application.getTempFile("proto003"));
-        Oke = TauArgusUtils.DeleteFile(Application.getTempFile("AUSGABE"));
-        Oke = TauArgusUtils.DeleteFile(Application.getTempFile("Ft17f001"));
-        Oke = TauArgusUtils.DeleteFile(Application.getTempFile("Ft14f001"));
-        Oke = TauArgusUtils.DeleteFile(Application.getTempFile("Ft09file"));
-        Oke = TauArgusUtils.DeleteFile(Application.getTempFile("Ft10file"));
-        Oke = TauArgusUtils.DeleteFile(Application.getTempFile("Ft12file"));
-        Oke = TauArgusUtils.DeleteFileWild("Ft*fi*.*", Application.getTempDir());
-        Oke = TauArgusUtils.DeleteFileWild("Ft*f0*.*", Application.getTempDir());
-        Oke = TauArgusUtils.DeleteFile(Application.getTempFile("SCHNEID"));
-        Oke = TauArgusUtils.DeleteFile(Application.getTempFile("MAMPTABI"));
-        Oke = TauArgusUtils.DeleteFile(Application.getTempFile("VARIABLE"));
-        Oke = TauArgusUtils.DeleteFile(Application.getTempFile("AGGPOSRC"));
-        Oke = TauArgusUtils.DeleteFile(Application.getTempFile("ENDE"));
-        Oke = TauArgusUtils.DeleteFile(Application.getTempFile("frozen.txt"));
-        return Oke;
+    static void CleanGHMiterFiles() {
+        TauArgusUtils.DeleteFileWild("PROTO*.*", Application.getTempDir());
+        TauArgusUtils.DeleteFile(Application.getTempFile("proto001"));
+        TauArgusUtils.DeleteFile(Application.getTempFile("proto002"));
+        TauArgusUtils.DeleteFile(Application.getTempFile("proto003"));
+        TauArgusUtils.DeleteFile(Application.getTempFile("AUSGABE"));
+        TauArgusUtils.DeleteFile(Application.getTempFile("Ft17f001"));
+        TauArgusUtils.DeleteFile(Application.getTempFile("Ft14f001"));
+        TauArgusUtils.DeleteFile(Application.getTempFile("Ft09file"));
+        TauArgusUtils.DeleteFile(Application.getTempFile("Ft10file"));
+        TauArgusUtils.DeleteFile(Application.getTempFile("Ft12file"));
+        TauArgusUtils.DeleteFileWild("Ft*fi*.*", Application.getTempDir());
+        TauArgusUtils.DeleteFileWild("Ft*f0*.*", Application.getTempDir());
+        TauArgusUtils.DeleteFile(Application.getTempFile("SCHNEID"));
+        TauArgusUtils.DeleteFile(Application.getTempFile("MAMPTABI"));
+        TauArgusUtils.DeleteFile(Application.getTempFile("VARIABLE"));
+        TauArgusUtils.DeleteFile(Application.getTempFile("AGGPOSRC"));
+        TauArgusUtils.DeleteFile(Application.getTempFile("ENDE"));
+        TauArgusUtils.DeleteFile(Application.getTempFile("frozen.txt"));
     }
 
     static String GetToken(String St) {
@@ -409,7 +409,7 @@ public class GHMiter {
         String Hs;
         L = St.length();
         L = Len - L;
-        Hs = String.format(Locale.US,"%" + Len + "s", St);
+        Hs = String.format(Locale.US,"%" + Len + "s", St); //??? Shouldn't this be L instead of Len ????
         return Hs;
     }
 }

@@ -61,7 +61,8 @@ public class CodeList {
         }
     }
     
-    public int search(String code) {
+/*  Never used ??????
+public int search(String code) {
         code = code.trim();
         if (code.equals("")) {
             return 0;
@@ -74,6 +75,7 @@ public class CodeList {
             return -1;
         }
     }
+*/    
     
     public int[] bogusRange(int activeCodeIndex) {
         int[] DA = new int[1];

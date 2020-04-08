@@ -38,7 +38,7 @@ public enum CellStatus {
     EMPTY                   (14, CellStatusCategory.SAFE_PROTECTED,     "Empty",                       Color.black);
 
     private final int value;
-    private CellStatusCategory cellStatusCategory;
+    private final CellStatusCategory cellStatusCategory;
     private final String description;
     private final Color foreGroundColor;
     
@@ -86,7 +86,7 @@ public enum CellStatus {
         return this == EMPTY || this == EMPTY_NONSTRUCT;
     }
     
-    /** 
+    /*
      * Denotes if a cell's status is safe and may not be changed by secondary 
      * suppression 
      */
@@ -94,21 +94,21 @@ public enum CellStatus {
         return cellStatusCategory == CellStatusCategory.SAFE_PROTECTED;
     }
 
-    /** 
+    /*
      * Denotes if a cell is safe and may be used for secondary suppression 
      */
     public boolean isSafeNotProtected() {
         return cellStatusCategory == CellStatusCategory.SAFE_NOT_PROTECTED;
     }
 
-    /** 
+    /*
      * Denotes if a cell is suppressed by safety rules
      */
     public boolean isPrimaryUnsafe() {
         return cellStatusCategory == CellStatusCategory.PRIMARY_UNSAFE;
     }
 
-    /**
+    /*
      * Denotes if a cell is suppressed by a suppression method, so primary 
      * unsafe cells can't be recalculated
      */

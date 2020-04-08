@@ -45,9 +45,7 @@ public class DialogHypercubeParameters extends DialogBase {
     private int ghmSize;
     private TableSet tableset;
  
-    /**
-     * Creates new form DialogHypercubeParameters
-     */
+    // Creates new form DialogHypercubeParameters
     public DialogHypercubeParameters(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
@@ -56,12 +54,12 @@ public class DialogHypercubeParameters extends DialogBase {
         textFieldMaxSubCode.setInputVerifier(integerInputVerifier);
         textFieldMaxSubTable.setInputVerifier(integerInputVerifier);
         organizeAllOptions();
-        setLocationRelativeTo(parent);
     }
 
     public int showDialog(TableSet table) {
         checkBoxSingleton.setEnabled(table.hasRealFreq);
         this.tableset = table;
+        setLocationRelativeTo(this.getParent());
         setVisible(true);
 
         return returnValue;

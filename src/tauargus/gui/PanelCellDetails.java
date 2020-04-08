@@ -123,7 +123,7 @@ public class PanelCellDetails extends javax.swing.JPanel {
             textFieldContributions.setText(integerFormatter.format(cell.freq));
         }
         sb.append("</html>");
-        if (!cell.status.isEmpty() && !(table.respVar.name=="<freq>")){
+        if (!cell.status.isEmpty() && !"<freq>".equals(table.respVar.name)){
             labelTopNValue.setText(sb.toString());
         } else {
             labelTopNValue.setText("<html><p align=\"right\">-</p></html>");

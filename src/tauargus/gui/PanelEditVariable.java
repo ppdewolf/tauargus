@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JTable;
@@ -39,12 +40,14 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellEditor;
 import javax.swing.text.BadLocationException;
 import org.apache.commons.lang3.StringUtils;
 import tauargus.model.ArgusException;
 import tauargus.model.Metadata;
 import tauargus.model.Type;
 import tauargus.model.Variable;
+import tauargus.utils.ScaleCellEditor;
 import tauargus.utils.SwingUtils;
 import tauargus.utils.TauArgusUtils;
 
@@ -70,6 +73,17 @@ public class PanelEditVariable extends javax.swing.JPanel {
         
         setScaleTableModel();
         tableScaleParams.setDefaultRenderer(Object.class, new ScaleParamsCellRenderer());
+        tableScaleParams.setRowSelectionAllowed(false);
+        tableScaleParams.setColumnSelectionAllowed(false);
+        
+        TableCellEditor tableCellEditor = new ScaleCellEditor(new JTextField());
+        for (int i = tableScaleParams.getColumnCount()-1; i > -1; --i){
+            tableScaleParams.getColumnModel().getColumn(i).setCellEditor(tableCellEditor);
+        }
+        
+        tableScaleParams.setRowHeight(1, 20);
+        tableScaleParams.setRowHeight(3, 20);
+        
         textFieldCKMTopK.setInputVerifier(verifier);
         textFieldCKMTopK.addActionListener(verifier);
         createComponentArrays();
@@ -126,13 +140,13 @@ public class PanelEditVariable extends javax.swing.JPanel {
     
     public void setMetadata(Metadata metadata) {
         this.metadata = metadata;
-        for (Map.Entry<Type, javax.swing.JRadioButton> entry : buttonMap.entrySet()) {
+        buttonMap.entrySet().forEach((entry) -> {
             if (metadata.dataOrigin == Metadata.DATA_ORIGIN_MICRO) {
                 entry.getValue().setVisible(entry.getKey().isAvailableForMicrodata());
             } else {
                 entry.getValue().setVisible(entry.getKey().isAvailableForTabularData());
             }
-        }
+        });
     }
     
     public void setDataType(int dataType) {
@@ -228,21 +242,23 @@ public class PanelEditVariable extends javax.swing.JPanel {
                         textFieldDistanceFunction[i].setText(Integer.toString(variable.distanceFunction[i]));
                     }
                 }
-                // Hieracrhy...
-                if (variable.hierarchical == Variable.HIER_NONE) {
-                    radioButtonHierNone.setSelected(true);
-                } 
-                else if (variable.hierarchical == Variable.HIER_LEVELS) {
-                    radioButtonHierData.setSelected(true);
-                    for (int i = 0, nHierLevels = 0; nHierLevels < variable.hierLevelsSum; i++) {
-                        textFieldHierLevel[i].setText(Integer.toString(variable.hierLevels[i]));
-                        nHierLevels += variable.hierLevels[i];
-                    }
-                }
-                else {
-                    radioButtonHierFile.setSelected(true);
-                    textFieldLeadingString.setText(variable.leadingString);
-                    textFieldHierFileName.setText(variable.hierFileName);
+        // Hieracrhy...
+                switch (variable.hierarchical) {
+                    case Variable.HIER_NONE:
+                        radioButtonHierNone.setSelected(true);
+                        break;
+                    case Variable.HIER_LEVELS:
+                        radioButtonHierData.setSelected(true);
+                        for (int i = 0, nHierLevels = 0; nHierLevels < variable.hierLevelsSum; i++) {
+                            textFieldHierLevel[i].setText(Integer.toString(variable.hierLevels[i]));
+                            nHierLevels += variable.hierLevels[i];
+                        }
+                        break;
+                    default:
+                        radioButtonHierFile.setSelected(true);
+                        textFieldLeadingString.setText(variable.leadingString);
+                        textFieldHierFileName.setText(variable.hierFileName);
+                        break;
                 }
                 break;
 
@@ -420,21 +436,21 @@ public class PanelEditVariable extends javax.swing.JPanel {
             if (!variable.CKMType.equals("N")){
                 switch (variable.CKMscaling){
                     case "F":
-                        variable.CKMsigma0 = Double.parseDouble(tableScaleParams.getValueAt(1,0).toString());
-                        variable.CKMsigma1 = Double.parseDouble(tableScaleParams.getValueAt(1,1).toString());
-                        variable.CKMxstar = Double.parseDouble(tableScaleParams.getValueAt(1,2).toString());
-                        variable.CKMq = Double.parseDouble(tableScaleParams.getValueAt(1,3).toString());
-                        variable.CKMepsilon = new double[variable.CKMTopK];
-                        variable.CKMepsilon[0] = 1.0;
-                        for (int i=1; i<variable.CKMTopK;i++) 
-                            variable.CKMepsilon[i] = Double.parseDouble(tableScaleParams.getValueAt(3,i-1).toString());
+                            variable.CKMsigma0 = Double.parseDouble(tableScaleParams.getValueAt(1,0).toString());
+                            variable.CKMsigma1 = Double.parseDouble(tableScaleParams.getValueAt(1,1).toString());
+                            variable.CKMxstar = Double.parseDouble(tableScaleParams.getValueAt(1,2).toString());
+                            variable.CKMq = Double.parseDouble(tableScaleParams.getValueAt(1,3).toString());
+                            variable.CKMepsilon = new double[variable.CKMTopK];
+                            variable.CKMepsilon[0] = 1.0;
+                            for (int i=1; i<variable.CKMTopK;i++) 
+                                variable.CKMepsilon[i] = Double.parseDouble(tableScaleParams.getValueAt(3,i-1).toString());
                         break;
                     case "N":
-                        variable.CKMsigma1 = Double.parseDouble(tableScaleParams.getValueAt(1,0).toString());
-                        variable.CKMepsilon = new double[variable.CKMTopK];
-                        variable.CKMepsilon[0] = 1.0;
-                        for (int i=1; i<variable.CKMTopK;i++) 
-                            variable.CKMepsilon[i] = Double.parseDouble(tableScaleParams.getValueAt(3,i-1).toString());
+                            variable.CKMsigma1 = Double.parseDouble(tableScaleParams.getValueAt(1,0).toString());
+                            variable.CKMepsilon = new double[variable.CKMTopK];
+                            variable.CKMepsilon[0] = 1.0;
+                            for (int i=1; i<variable.CKMTopK;i++) 
+                                variable.CKMepsilon[i] = Double.parseDouble(tableScaleParams.getValueAt(3,i-1).toString());
                         break;
                 }
             }
@@ -447,6 +463,10 @@ public class PanelEditVariable extends javax.swing.JPanel {
         }
     }
 
+    public JTable getScaleParamsTable(){
+        return tableScaleParams;
+    }
+    
     /**
      * In the GUI designer we can't create arrays of components. We design the
      * individual components and this function will put them in arrays
@@ -1262,7 +1282,7 @@ public class PanelEditVariable extends javax.swing.JPanel {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        tableScaleParams.setColumnSelectionAllowed(true);
+        tableScaleParams.setCellSelectionEnabled(true);
         tableScaleParams.setGridColor(new java.awt.Color(200, 200, 200));
         tableScaleParams.setSurrendersFocusOnKeystroke(true);
         tableScaleParams.getTableHeader().setReorderingAllowed(false);
@@ -1343,7 +1363,7 @@ public class PanelEditVariable extends javax.swing.JPanel {
             .addGroup(panelCKMLayout.createSequentialGroup()
                 .addComponent(panelCKMType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(panelScaling, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(panelScaling, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
                 .addComponent(panelCKMadditional, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0))
@@ -1890,9 +1910,9 @@ public class PanelEditVariable extends javax.swing.JPanel {
             for (int i=NumEps; i<5;i++) tableScaleParams.setValueAt("",3,i-1);
     }
     
-    public void setScaleTableModel(){
+    private void setScaleTableModel(){
         tableScaleParams.setModel(new AbstractTableModel(){
-            private Object[][] values = {
+            private final Object[][] values = {
                 {"","","",""},
                 {"","","",""},
                 {"","","",""},                
@@ -1918,28 +1938,39 @@ public class PanelEditVariable extends javax.swing.JPanel {
    
             @Override
             public boolean isCellEditable(int rowIndex, int columnIndex){
-                return (rowIndex==1 || rowIndex==3);
+                boolean editable = false;
+                if (rowIndex==1 && !values[0][columnIndex].toString().isEmpty()) editable = true;
+                if (rowIndex==3 && !values[2][columnIndex].toString().isEmpty()) editable = true;
+                return editable;
             }
-            
         });
     }  
     
     private class ScaleParamsCellRenderer extends DefaultTableCellRenderer{
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                try{
-                    if ((row == 1) || (row == 3)){
-                        double parametervalue = Double.parseDouble(value.toString());
-                        if (parametervalue < 0)
-                            comp.setForeground(Color.red);
-                        else comp.setForeground(Color.black);
-                    }
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            try{
+                if (row==1 && table.getValueAt(0, column).toString().isEmpty()) setBorder(noFocusBorder);
+                if (row==3 && table.getValueAt(2, column).toString().isEmpty()) setBorder(noFocusBorder);
+                if ((row == 1) || (row == 3)){
+                    ((JLabel) comp).setHorizontalAlignment(RIGHT);
+                    comp.setBackground(Color.white);
+                    double parametervalue = Double.parseDouble(value.toString());
+                    if (parametervalue < 0)
+                        comp.setForeground(Color.red);
                     else comp.setForeground(Color.black);
                 }
-                catch (Exception ex){}
-                return comp;
+                else {
+                    ((JLabel) comp).setHorizontalAlignment(LEFT);
+                    setBorder(noFocusBorder);
+                    comp.setBackground(Color.lightGray);
+                    comp.setForeground(Color.black);
+                }
             }
+            catch (Exception ex){}
+            return comp;
+        }
     }
     
     private class MyVerifier extends InputVerifier implements ActionListener{

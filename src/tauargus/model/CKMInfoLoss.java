@@ -22,13 +22,13 @@ import java.util.TreeMap;
 // This class stores InformationLoss measures when applying 
 // noise addition with CKM
 public class CKMInfoLoss{
-    private TreeMap<String,Double> Means = new TreeMap<>();
-    private TreeMap<String,Double> Medians = new TreeMap<>();
-    private TreeMap<String,Double> Maxs = new TreeMap<>();
-    private TreeMap<String,Double> Mins = new TreeMap<>();
-    private TreeMap<String,double[]> Percentiles = new TreeMap<>();
-    private TreeMap<String,ECDF> ECDFcounts = new TreeMap<>();
-    private TreeMap<String,double[]> Diffs = new TreeMap<>();
+    private final TreeMap<String,Double> Means = new TreeMap<>();
+    private final TreeMap<String,Double> Medians = new TreeMap<>();
+    private final TreeMap<String,Double> Maxs = new TreeMap<>();
+    private final TreeMap<String,Double> Mins = new TreeMap<>();
+    private final TreeMap<String,double[]> Percentiles = new TreeMap<>();
+    private final TreeMap<String,ECDF> ECDFcounts = new TreeMap<>();
+    private final TreeMap<String,double[]> Diffs = new TreeMap<>();
     
     private int false_zeros;
     private int false_nonzeros;

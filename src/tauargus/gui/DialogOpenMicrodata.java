@@ -40,11 +40,11 @@ public class DialogOpenMicrodata extends DialogBase{ //javax.swing.JDialog {
     public DialogOpenMicrodata(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        setLocationRelativeTo(parent);
         textInfo.setVisible(false);
     }
     
     public int showDialog() {
+        setLocationRelativeTo(this.getParent());
         setVisible(true);
         return returnValue;
     }
@@ -190,24 +190,16 @@ public class DialogOpenMicrodata extends DialogBase{ //javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttonMicrodataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonMicrodataActionPerformed
-//        String hs = SystemUtils.getRegString("general", "datadir", "");
-//        if (!hs.equals("")){
-//            File file = new File(hs); 
-//            fileChooser.setCurrentDirectory(file);
-//        }
-         TauArgusUtils.getDataDirFromRegistry(fileChooser);
+        TauArgusUtils.getDataDirFromRegistry(fileChooser);
         fileChooser.setDialogTitle("Open Microdata");
         fileChooser.setSelectedFile(new File(""));
         fileChooser.resetChoosableFileFilters();
         // filters are shown in order of declaration, setFileFilter sets the default filter
         fileChooser.setFileFilter(new FileNameExtensionFilter("Microdata (*.asc, *.dat, *.csv)", "asc", "dat", "csv"));
-        //fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Microdata (*.dat, *.csv)", "dat", "csv"));
         fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("SPSS system file (*.sav)", "sav"));
         if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
             String hs = fileChooser.getSelectedFile().toString();
             textFieldMicrodata.setText(fileChooser.getSelectedFile().toString());
-//            hs = fileChooser.getSelectedFile().getPath();
-//            if (!hs.equals("")){SystemUtils.putRegString("general", "datadir", hs);}
             TauArgusUtils.putDataDirInRegistry(hs);
             setMetadataFileNameIfPossible();
         }
@@ -215,11 +207,6 @@ public class DialogOpenMicrodata extends DialogBase{ //javax.swing.JDialog {
     }//GEN-LAST:event_buttonMicrodataActionPerformed
 
     private void buttonMetadataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonMetadataActionPerformed
-//        String hs = SystemUtils.getRegString("general", "datadir", "");
-//        if (!hs.equals("")){
-//            File file = new File(hs); 
-//            fileChooser.setCurrentDirectory(file);
-//        }
         TauArgusUtils.getDataDirFromRegistry(fileChooser);
         fileChooser.setDialogTitle("Open Metadata");
         fileChooser.setSelectedFile(new File(""));
@@ -228,32 +215,30 @@ public class DialogOpenMicrodata extends DialogBase{ //javax.swing.JDialog {
         if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
             String hs = fileChooser.getSelectedFile().toString();
             textFieldMetadata.setText(fileChooser.getSelectedFile().toString());
- //           hs = fileChooser.getSelectedFile().getPath();
- //           if (!hs.equals("")){SystemUtils.putRegString("general", "datadir", hs);}
-            TauArgusUtils.putDataDirInRegistry(hs);
+             TauArgusUtils.putDataDirInRegistry(hs);
         }
         setInfo();
     }//GEN-LAST:event_buttonMetadataActionPerformed
 
     private void setInfo(){
         String hs = "";
-     if (!textFieldMicrodata.getText().equals("")){  
-        if  (textFieldMicrodata.getText().toUpperCase().trim().endsWith(".SAV")){
-          hs = "\n\nBut first the metadata from the SPSS file will be retrieved";   
+        if (!textFieldMicrodata.getText().equals("")){  
+            if  (textFieldMicrodata.getText().toUpperCase().trim().endsWith(".SAV")){
+                hs = "\n\nBut first the metadata from the SPSS file will be retrieved";   
+            }
+            textInfo.setVisible(true);     
+            if (textFieldMetadata.getText().equals("")){
+                textInfo.setText("As no metadata file has been specified\n" +
+                                "specify the metadata file too or\n" +
+                                "specify the metadata via Specify|Metadata"+hs);
+            } else{
+                textInfo.setText("For changing/inspecting the metadata go to Specify|Metadata\n"+
+                                "For specifying the table(s) go to Specify|Tables"+  hs);
+            }  
         }
-        textInfo.setVisible(true);     
-        if (textFieldMetadata.getText().equals("")){
-           textInfo.setText("As no metadata file has been specified\n" +
-                            "specify the metadata file too or\n" +
-                            "specify the metadata via Specify|Metadata"+hs);
-        } else{
-           textInfo.setText("For changing/inspecting the metadata go to Specify|Metadata\n"+
-                            "For specifying the table(s) go to Specify|Tables"+  hs);
+        else{
+            textInfo.setVisible(false);
         }  
-      }
-      else{
-        textInfo.setVisible(false);
-      }  
     }
     
     private void buttonOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonOKActionPerformed
@@ -281,13 +266,13 @@ public class DialogOpenMicrodata extends DialogBase{ //javax.swing.JDialog {
         String hs = textFieldMicrodata.getText();
         
         if (textFieldMicrodata.getText().toUpperCase().trim().endsWith(".SAV")) {
-           try{
-             Application.getSpssUtils().getVariablesFromSpss(hs);
-           }
-           catch (ArgusException e){
-             JOptionPane.showMessageDialog(this, e.getMessage()); 
-             return;
-           }           
+            try{
+                Application.getSpssUtils().getVariablesFromSpss(hs);
+            }
+            catch (ArgusException e){
+                JOptionPane.showMessageDialog(this, e.getMessage()); 
+                return;
+            }           
         }
         
         SystemUtils.writeLogbook("Microdata file: "+textFieldMicrodata.getText()+" has been opened");            

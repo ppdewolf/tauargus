@@ -31,13 +31,12 @@ import tauargus.utils.TableColumnResizer;
 public class ShowMoreInfoLoss extends javax.swing.JDialog {
 
     CKMInfoLoss InfoLoss;
-    /**
+    /*
      * Creates new form ShowMoreInfoLoss
      */
     public ShowMoreInfoLoss(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        setLocationRelativeTo(parent);
     }
     
     void showDialog(CKMInfoLoss InfoLoss){
@@ -73,6 +72,7 @@ public class ShowMoreInfoLoss extends javax.swing.JDialog {
         TableColumnResizer.adjustColumnPreferredWidths(ECDF_RAD, false);
         TableColumnResizer.adjustColumnPreferredWidths(ECDF_DR, false);
         
+        setLocationRelativeTo(this.getParent());
         setVisible(true);
     }
     

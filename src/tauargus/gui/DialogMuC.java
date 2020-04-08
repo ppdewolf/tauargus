@@ -1,10 +1,22 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+* Argus Open Source
+* Software to apply Statistical Disclosure Control techniques
+* 
+* Copyright 2014 Statistics Netherlands
+* 
+* This program is free software; you can redistribute it and/or 
+* modify it under the terms of the European Union Public Licence 
+* (EUPL) version 1.1, as published by the European Commission.
+* 
+* You can find the text of the EUPL v1.1 on
+* https://joinup.ec.europa.eu/software/page/eupl/licence-eupl
+* 
+* This software is distributed on an "AS IS" basis without 
+* warranties or conditions of any kind, either express or implied.
+*/
 package tauargus.gui;
 
+import javax.swing.JOptionPane;
 import tauargus.model.TableSet;
 
 /**
@@ -17,10 +29,9 @@ public class DialogMuC extends javax.swing.JDialog {
     public static final int APPROVE_OPTION = 0;
     
     private int returnValue = CANCEL_OPTION;    
-    private static TableSet tableSet;
-    /**
-     * Creates new form DialogMuC
-     */
+    private final TableSet tableSet;
+
+    // Creates new form DialogMuC
     public DialogMuC(java.awt.Frame parent, TableSet tableSet, boolean modal) {
         super(parent, modal);
         this.tableSet = tableSet;
@@ -29,11 +40,10 @@ public class DialogMuC extends javax.swing.JDialog {
         muCValue.setText(Double.toString(tableSet.respVar.muC));
         muCValue.requestFocusInWindow();
         muCValue.selectAll();
-        
-        setLocationRelativeTo(parent);
     }
 
     public int showDialog() {
+        setLocationRelativeTo(this.getParent());
         setVisible(true);
         return returnValue;
     }
@@ -110,7 +120,13 @@ public class DialogMuC extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOKActionPerformed
-        tableSet.respVar.muC = Double.parseDouble(muCValue.getText());
+        try{
+            tableSet.respVar.muC = Double.parseDouble(muCValue.getText());
+        }
+        catch(NumberFormatException ex){
+            JOptionPane.showMessageDialog(null,"mu_C should be numeric","Parameter warning",JOptionPane.WARNING_MESSAGE);
+            return;
+        }
         returnValue = APPROVE_OPTION;
         setVisible(false);
         dispose();
@@ -121,48 +137,6 @@ public class DialogMuC extends javax.swing.JDialog {
         setVisible(false);
         dispose();
     }//GEN-LAST:event_jButtonCancelActionPerformed
-
-//    /**
-//     * @param args the command line arguments
-//     */
-//    public static void main(String args[]) {
-//        /* Set the Nimbus look and feel */
-//        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-//        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-//         */
-//        try {
-//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-//                if ("Nimbus".equals(info.getName())) {
-//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-//                    break;
-//                }
-//            }
-//        } catch (ClassNotFoundException ex) {
-//            java.util.logging.Logger.getLogger(DialogMuC.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        } catch (InstantiationException ex) {
-//            java.util.logging.Logger.getLogger(DialogMuC.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        } catch (IllegalAccessException ex) {
-//            java.util.logging.Logger.getLogger(DialogMuC.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-//            java.util.logging.Logger.getLogger(DialogMuC.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        }
-//        //</editor-fold>
-//
-//        /* Create and display the dialog */
-//        java.awt.EventQueue.invokeLater(new Runnable() {
-//            public void run() {
-//                DialogMuC dialog = new DialogMuC(new javax.swing.JFrame(), tableSet, true);
-//                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-//                    @Override
-//                    public void windowClosing(java.awt.event.WindowEvent e) {
-//                        System.exit(0);
-//                    }
-//                });
-//                dialog.setVisible(true);
-//            }
-//        });
-//    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonCancel;

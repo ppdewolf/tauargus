@@ -16,6 +16,7 @@
 */
 
 package tauargus.gui;
+import javax.swing.JTextField;
 import tauargus.model.TableSet;
 
 public class DialogModularParameters extends javax.swing.JDialog {
@@ -27,27 +28,27 @@ public class DialogModularParameters extends javax.swing.JDialog {
     
     private int returnValue = CANCEL_OPTION;
     private static TableSet tableSet;
+    private boolean forOptimal;
 
-    /**
-     * Creates new form DialogModularParameters
-     */
+    // Creates new form DialogModularParameters
     public DialogModularParameters(java.awt.Frame parent, TableSet tableSet, boolean forOptimal, boolean modal) {
         super(parent, modal);
-        this.tableSet = tableSet;
+        DialogModularParameters.tableSet = tableSet;
         initComponents();
-        if (forOptimal)
-        {
-            labelModularParameters.setText("Options for the optimal suppression:");
-            setTitle("Optimal options");
-        }
+        this.forOptimal = forOptimal;
         jLabelmaxTimeOptimal.setVisible(forOptimal);
-        jTextmaxTimeOptimal.setHorizontalAlignment(jTextmaxTimeOptimal.RIGHT);
+        jTextmaxTimeOptimal.setHorizontalAlignment(JTextField.RIGHT);
         jTextmaxTimeOptimal.setVisible(forOptimal);
         jLabelMaxminutes.setVisible(forOptimal);
-        setLocationRelativeTo(parent);
+        
     }
 
     public int showDialog() {
+        if (forOptimal) {
+            setTitle("Optimal options");
+            labelModularParameters.setText("Options for the optimal suppression:");
+        }
+        setLocationRelativeTo(this.getParent());
         setVisible(true);
         return returnValue;
     }

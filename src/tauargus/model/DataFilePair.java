@@ -18,7 +18,9 @@
 package tauargus.model;
 
 public class DataFilePair {
-
+    private final String dataFileName;
+    private final String metaFileName;
+    
     public DataFilePair(String dataFileName, String metaFileName) {
         this.dataFileName = dataFileName;
         this.metaFileName = metaFileName;
@@ -31,7 +33,4 @@ public class DataFilePair {
     public String getMetaFileName() {
         return metaFileName;
     }
-
-    private String dataFileName;
-    private String metaFileName;
 }

@@ -46,7 +46,7 @@ public class Application {
     public static final int MAJOR = 4;
     public static final int MINOR = 2;
     public static final String REVISION = "0";
-    public static final int BUILD = 3;
+    public static final int BUILD = 5;
     
     // Error codes returned by functions in TauArgusJava dll
     public static final int ERR_CODENOTINCODELIST = 1017;
@@ -70,16 +70,10 @@ public class Application {
         System.loadLibrary("tauhitas");           
         System.loadLibrary("TauRounder");
         System.loadLibrary("TauArgusJava");                
- //        System.loadLibrary("XXRoundCom");
-//        System.loadLibrary("libTauRounder");
-//        System.loadLibrary("TauArgusJava");
  }
     private static TauArgus tauArgus = new TauArgus();
     private static HiTaSCtrl tauHitas = new HiTaSCtrl();
     private static RounderCtrl rounder = new RounderCtrl();
-// Anco 1.6    
-//    private static ArrayList<Variable> variables = new ArrayList<>();
-//    private static ArrayList<Metadata> metadatas = new ArrayList<>();
     private static ArrayList<Variable> variables = new ArrayList<Variable>();
     private static ArrayList<Metadata> metadatas = new ArrayList<Metadata>();
     private static boolean anco = false;
@@ -90,11 +84,8 @@ public class Application {
     public static boolean SaveDebugHiTaS = false;
     public static FrameInfo windowInfo = new FrameInfo();
     public static boolean windowInfoIsOpen = false;
-    //private static String manualPath = "C:/Users/Gebruiker/Desktop/MUmanual4.3.pdf";
     private static String manualPath;
-    //private static final String acrord32 = "acrord32.exe"; // finds the acrord32.exe
     public static String batchDataPath;
-
 
     private static Variable freqVar = new Variable(null);
     static {
@@ -110,7 +101,6 @@ public class Application {
     static {
         setTempDir(System.getProperty("java.io.tmpdir"));
     }
-
     
     public static String getFullVersion() {
         return "" + MAJOR + "." + MINOR + "." + REVISION; // + "; build: " + BUILD; build is shown separately in lower left corner
@@ -138,7 +128,6 @@ public class Application {
         }catch (IOException ex){System.out.print(ex.toString());}
     }
         
-    //private static final SpssUtilsTau spssUtils = new SpssUtilsTau();
     private static SpssUtilsTau spssUtils;
     
     /**
@@ -147,7 +136,6 @@ public class Application {
      * @return SpssUtils, or null if the Spss plugin cannot be loaded
      */
     public static SpssUtilsTau getSpssUtils() {
-//        return spssUtils;
         try {
             if (spssUtils == null) {
                 spssUtils = new SpssUtilsTau();
@@ -214,53 +202,33 @@ public class Application {
         }
     }
     
-   public static void showHelp(String namedDest) throws ArgusException {
-//        if (namedDest == null) {
-//            Launcher.main(new String[] {"-loadfile", manual.getAbsolutePath()});
-//        }
-//        else{
-//            Launcher.main(new String[] {"-loadfile", manual.getAbsolutePath(), "-nameddest", namedDest});
-//        }
-//    }
-        //try {            
-            ArrayList<String> args = new ArrayList<String>();
-            args.add("-loadfile");
-            args.add(manual.getAbsolutePath());
-            if (namedDest != null) {
+    public static void showHelp(String namedDest) throws ArgusException {
+        ArrayList<String> args = new ArrayList<>();
+        args.add("-loadfile");
+        args.add(manual.getAbsolutePath());
+        if (namedDest != null) {
             args.add("-nameddest");
             args.add(namedDest);
-            }
+        }
 
-            try {
+        try {
             execClass(
                     "org.icepdf.ri.viewer.Main",
                     "lib/ICEpdf.jar",
                     args);
-            }
-            catch (IOException | InterruptedException ex) {
+        }
+        catch (IOException | InterruptedException ex) {
  //               throw new ArgusException("Error trying to display help file");
-            }
+        }
     }
-            //String cmdString = "taskkill /IM " + acrord32;
-            //System.out.println(cmdString);
-            //Process p = Runtim.e.getRuntime().exec(cmdString);
-//        } catch (IOException ex) {
-//        } catch (Exception ex2) {
-//        }
-//        try {
-//            String cmdString = "cmd.exe /c start " + acrord32 + " /A \"nameddest=" + namedDest + "\" \"" + manual.getAbsolutePath() + "\"";
-//            Process p = Runtime.getRuntime().exec(cmdString);
-//        } catch (IOException ex) {
-//        } catch (Exception ex2) {
-//        }
 
-      public static void execClass(String className, String classPath, List<String> arguments) throws IOException,
+    public static void execClass(String className, String classPath, List<String> arguments) throws IOException,
                                                InterruptedException {
         if (helpViewerProcess != null) {
             helpViewerProcess.destroy();
             helpViewerProcess = null;
         }
-            String javaHome = System.getProperty("java.home");
+        String javaHome = System.getProperty("java.home");
         String javaBin = javaHome +
                 File.separator + "bin" +
                 File.separator + "java";
@@ -278,8 +246,8 @@ public class Application {
    
     public static void openInfoWindow(boolean openen){
         if (openen) {
-         //windowInfo = new FrameInfo(); 
          windowInfo.setVisible(true);
+         windowInfo.setLocationRelativeTo(null);
          windowInfoIsOpen = true; 
         } else { 
          windowInfo.setVisible(false);
@@ -339,18 +307,10 @@ public class Application {
     public static void setAnco(boolean anco) {
         Application.anco = anco;
         SystemUtils.putRegBoolean("general", "anco" , anco);
-//        Preferences p = Preferences.userRoot().node("tauargus/general");
-//        Preferences p = Preferences.userNodeForPackage(Application.class);
-//        p.putBoolean("anco", anco);
-//        Application.anco = p.getBoolean("anco", false);
     }
     
     public static void getAnco() {
-//        Boolean b = false;
-//        Preferences p = Preferences.userRoot().node("tauargus/general");
-//        Application.anco = p.getBoolean("anco", b);
         Application.anco = SystemUtils.getRegBoolean("general", "anco" , false);
-//        Application.anco = b;
     }
 
     public static boolean isProtectCoverTable() {
@@ -465,11 +425,13 @@ public class Application {
             // Batch processing...
             setBatch(BATCH_COMMANDLINE);
             
-                        //TODO Declare global
+            //TODO Declare global
             //the "/v" parameter is only used if the batch is called for linked tables
             //tau will then show some progress info
-            for (int i=0;i<args.length;i++){
-              if(args[i].equals("/v")){setBatch(BATCH_FROMMENU);}  
+            for (String arg : args) {
+                if (arg.equals("/v")) {  
+                    setBatch(BATCH_FROMMENU);
+                }
             }
             if (args.length > 1) {
               if(!args[1].equals("/v") && !args[1].equals("-")){SystemUtils.setLogbook(args[1]);}
@@ -483,8 +445,8 @@ public class Application {
                 if(!args[3].equals("/v")){tauargus.model.batch.setBatchDataPath(args[3]);}
                 //Checking on the validity of this path willbe donewhen invokingthe batch process
             }
-             boolean interActive = true;
-            int exitCode = 0;
+            boolean interActive;
+            int exitCode;
             
             // Do a lot of stuff...
             exitCode = tauargus.model.batch.runBatchProcess(args[0]);
@@ -505,8 +467,7 @@ public class Application {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-              new FrameMain().setVisible(true);
-//              SystemUtils.writeLogbook("End of TauArgus run");
+                new FrameMain().setVisible(true);
             }
         });
     }

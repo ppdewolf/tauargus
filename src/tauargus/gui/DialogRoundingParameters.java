@@ -31,7 +31,7 @@ public class DialogRoundingParameters extends DialogBase {
     public static final int CANCEL_OPTION = 1;
     public static final int APPROVE_OPTION = 0;
     
-    private TauArgus tauArgus = Application.getTauArgusDll();
+    private final TauArgus tauArgus = Application.getTauArgusDll();
 
     private TableSet tableSet;
     private boolean partitionAllowed;
@@ -40,14 +40,11 @@ public class DialogRoundingParameters extends DialogBase {
     private int SubTableSize;
     private int returnValue = CANCEL_OPTION;
 
-    /**
-     * Creates new form DialogRoundingParameters
-     */
+    // Creates new form DialogRoundingParameters
     public DialogRoundingParameters(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         organizePartitionOptions();
-        setLocationRelativeTo(parent);
     }
 
     public int showDialog(TableSet table) {
@@ -69,8 +66,6 @@ public class DialogRoundingParameters extends DialogBase {
         textFieldNumberOfBlocks.setVisible(false);
         
         checkBoxPartition.setSelected(false);
-//        checkBoxPartition.click();
-        // checkBoxPartition.setEnabled(true) //(table.expVar.get(0).hierarchical == HIER_NONE)
         if (table.expVar.get(0).hierarchical != Variable.HIER_NONE) {
             checkBoxTotals.setEnabled(false);
             checkBoxNumberOfBlocks.setEnabled(false);
@@ -96,11 +91,9 @@ public class DialogRoundingParameters extends DialogBase {
         }
         labelPartNumber.setText(NPart + " subtables");
         labelPartTableSize.setText(SubTableSize + " cells per subtable");
-//        PrepareRoundVar;
-//        TestSize();
         comboBoxNumSteps.setSelectedIndex(0);
-//        chkOKButton;
         organizePartitionOptions();
+        setLocationRelativeTo(this.getParent());        
         setVisible(true);
 
         return returnValue;
@@ -118,8 +111,6 @@ public class DialogRoundingParameters extends DialogBase {
         labelPartNumber.setEnabled(b);
         labelPartTableSize.setEnabled(b);
         panelPartitions.setVisible(b);
-//        labelPartNumber.setVisible(b);
-//        labelPartTableSize.setVisible(b);
     }
 
     /**
@@ -447,7 +438,6 @@ public class DialogRoundingParameters extends DialogBase {
             rb = StrUtils.toInteger(textFieldRoundingBase.getText());
           } 
           catch(Exception ex){}
-//          catch (ArgusException ex){}
         }
         return minRoundBase <= rb;
     }
@@ -483,16 +473,15 @@ public class DialogRoundingParameters extends DialogBase {
 }
     
     public long computeMinRoundBase(TableSet table) {
-        long minRoundBase;
-//        TableSet table = TableService.getTable(tableIndex);
+        long minRB;
         if (table.respVar == Application.getFreqVar()) {
-            minRoundBase = table.minFreq[table.holding ? 1 : 0];
+            minRB = table.minFreq[table.holding ? 1 : 0];
         }
         else {
-            minRoundBase = (long)tauArgus.MaximumProtectionLevel(table.index);
+            minRB = (long)tauArgus.MaximumProtectionLevel(table.index);
         }
-        if (minRoundBase < 1) minRoundBase = 1;
-        return minRoundBase;
+        if (minRB < 1) minRB = 1;
+        return minRB;
     }
     
 //    /**
