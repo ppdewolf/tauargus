@@ -17,6 +17,12 @@
 
 package tauargus.gui;
 
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author ahnl
@@ -30,7 +36,16 @@ public class FrameInfo extends javax.swing.JFrame {
       super();
       initComponents();
     }
-
+    
+    @Override
+    public List<Image> getIconImages() {
+        URL url = FrameMain.class.getResource("/tauargus/resources/Tau32.png");
+        Image image = Toolkit.getDefaultToolkit().getImage(url);
+        ArrayList<Image> imageList = new ArrayList<>();
+        imageList.add(image);
+        return imageList;
+    }
+    
     public void addText (String s){
         {
             jTextAreaProgress.append(s);
@@ -58,7 +73,6 @@ public class FrameInfo extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setFocusTraversalPolicyProvider(true);
-        setIconImages(null);
 
         jLabelHeader.setText("text");
 

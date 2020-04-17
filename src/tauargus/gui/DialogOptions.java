@@ -29,7 +29,7 @@ import tauargus.utils.TauArgusUtils;
  *
  * @author Hundepool
  */
-public class DialogOptions extends javax.swing.JDialog {
+public class DialogOptions extends DialogBase {
     private javax.swing.JFileChooser fileChooser;
     
     private FrameMain getParentFrame() {

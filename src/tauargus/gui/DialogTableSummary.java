@@ -36,7 +36,7 @@ import tauargus.model.Variable;
 import tauargus.utils.TableColumnResizer;
 import tauargus.utils.TauArgusUtils;
 
-public class DialogTableSummary extends javax.swing.JDialog {
+public class DialogTableSummary extends DialogBase {
 
     public CKMInfoLoss InfoLossMeasures = new CKMInfoLoss();
     

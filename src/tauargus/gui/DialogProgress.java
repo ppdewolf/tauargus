@@ -28,7 +28,7 @@ import javax.swing.JPanel;
  *
  * @author pwof
  */
-public class DialogProgress extends JDialog implements PropertyChangeListener{
+public class DialogProgress extends DialogBase implements PropertyChangeListener{
     
     public static final int SINGLE = 0;
     public static final int DOUBLE = 1;

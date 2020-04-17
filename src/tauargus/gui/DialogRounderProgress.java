@@ -19,15 +19,14 @@ package tauargus.gui;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import javax.swing.JDialog;
 
 /**
  *
  * @author Peter-Paul
  */
-public class DialogRounderProgress extends JDialog implements PropertyChangeListener{
+public class DialogRounderProgress extends DialogBase implements PropertyChangeListener{
 
-    /**
+    /*
      * Creates new form DialogRounderProgress
      */
     public DialogRounderProgress(java.awt.Frame parent, boolean modal) {

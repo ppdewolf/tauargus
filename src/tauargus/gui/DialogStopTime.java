@@ -23,7 +23,7 @@ import javax.swing.JOptionPane;
  *
  * @author Peter-Paul
  */
-public class DialogStopTime extends javax.swing.JDialog{
+public class DialogStopTime extends DialogBase {
     /**
      * Creates new form DialogStopTime
      */

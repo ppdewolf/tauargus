@@ -25,7 +25,7 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author ahnl
  */
-public class DialogSelectSPSSVar extends javax.swing.JDialog {
+public class DialogSelectSPSSVar extends DialogBase {
 
     /**
      * Creates new form DialogSelectSPSSVar

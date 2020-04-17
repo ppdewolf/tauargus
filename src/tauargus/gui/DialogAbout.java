@@ -22,10 +22,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.logging.Logger;
+import javax.swing.JComponent;
+import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
 import tauargus.model.Application;
 
-public class DialogAbout extends javax.swing.JDialog {
+public class DialogAbout extends DialogBase {
 
     private static final Logger logger = Logger.getLogger(DialogAbout.class.getName());
 

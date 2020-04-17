@@ -23,7 +23,7 @@ import tauargus.model.TableSet;
  *
  * @author Peter-Paul
  */
-public class DialogMuC extends javax.swing.JDialog {
+public class DialogMuC extends DialogBase {
     // ***** Dialog Return Values *****
     public static final int CANCEL_OPTION = 1;
     public static final int APPROVE_OPTION = 0;

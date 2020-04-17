@@ -29,7 +29,7 @@ import tauargus.model.ArgusException;
 import tauargus.model.DataFilePair;
 import tauargus.utils.TauArgusUtils;
 
-public class DialogOpenMicrodata extends DialogBase{ //javax.swing.JDialog {
+public class DialogOpenMicrodata extends DialogBase{
 
     private static final Logger logger = Logger.getLogger(DialogOpenMicrodata.class.getName());
 

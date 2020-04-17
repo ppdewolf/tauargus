@@ -24,7 +24,7 @@ import tauargus.model.ECDFGraphBuilder;
  *
  * @author pwof
  */
-public class ShowECDFGraph extends javax.swing.JDialog {
+public class ShowECDFGraph extends DialogBase {
 
     /**
      * Creates new form ShowECDFGraph

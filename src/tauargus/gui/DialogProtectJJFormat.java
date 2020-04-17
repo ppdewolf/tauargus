@@ -34,7 +34,7 @@ import tauargus.utils.TauArgusUtils;
  *
  * @author Hundepool
  */
-public class DialogProtectJJFormat extends javax.swing.JDialog {
+public class DialogProtectJJFormat extends DialogBase {
 
     /**
      * Creates new form DialogProtectJJFormat

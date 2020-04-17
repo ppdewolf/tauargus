@@ -23,7 +23,7 @@ import tauargus.model.TableSet;
 import tauargus.model.Variable;
 import tauargus.utils.SingleListSelectionModel;
 
-public class DialogSelectRowColumn extends javax.swing.JDialog {
+public class DialogSelectRowColumn extends DialogBase {
 
     // ***** Dialog Return Values *****
     public static final int CANCEL_OPTION = 1;

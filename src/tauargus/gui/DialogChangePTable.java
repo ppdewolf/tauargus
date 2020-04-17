@@ -27,7 +27,7 @@ import tauargus.utils.TauArgusUtils;
  *
  * @author pwof
  */
-public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
+public class DialogChangePTable extends DialogBase{
 
     private static final Logger logger = Logger.getLogger(DialogOpenMicrodata.class.getName());
     
@@ -38,13 +38,12 @@ public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
     private TableSet tmpTableSet;
     private String ptableFREQ, ptableCONT, ptableSEP;
     
-    /**
+    /*
      * Creates new form DialogChangePTable
      */
     public DialogChangePTable(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        setLocationRelativeTo(parent);
     }
     
     public int showDialog(TableSet tableSet){
@@ -85,6 +84,7 @@ public class DialogChangePTable extends DialogBase{ //javax.swing.JDialog {
         textFieldPTableSep.setVisible(!IsFrequency && tmpTableSet.respVar.CKMseparation);
         buttonPTableSep.setVisible(!IsFrequency && tmpTableSet.respVar.CKMseparation);
         pack();
+        setLocationRelativeTo(this.getParent());
         setVisible(true);
         return returnValue;
     }

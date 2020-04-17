@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class DialogHtmlViewer extends javax.swing.JDialog {
+public class DialogHtmlViewer extends DialogBase {
     
     private static final Logger logger = Logger.getLogger(DialogHtmlViewer.class.getName());
 

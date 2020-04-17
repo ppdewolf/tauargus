@@ -18,9 +18,15 @@
 package tauargus.gui;
 
 //import java.awt.Container;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import javax.swing.JComponent;
+import javax.swing.JRootPane;
+import javax.swing.KeyStroke;
 import tauargus.model.ArgusException;
 import tauargus.utils.TauArgusUtils;
 
@@ -28,7 +34,8 @@ import tauargus.utils.TauArgusUtils;
  *
  * @author ahnl
  */
-public class DialogInfo extends javax.swing.JDialog {
+//public class DialogInfo extends javax.swing.JDialog {
+public class DialogInfo extends DialogBase {
 
     /**
      * Creates new form DialogInfo
@@ -38,6 +45,22 @@ public class DialogInfo extends javax.swing.JDialog {
         initComponents();
         setLocationRelativeTo(null); 
    //     jButtonOK.setVisible(!modal);
+    }
+
+    @Override
+    protected JRootPane createRootPane() {
+        ActionListener actionListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                setVisible(false);
+                dispose();
+            }
+        };    
+ 
+        KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+        JRootPane rootPane = new JRootPane();
+        rootPane.registerKeyboardAction(actionListener, stroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+        return rootPane;
     }
 
     /**

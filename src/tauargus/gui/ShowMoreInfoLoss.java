@@ -28,7 +28,7 @@ import tauargus.model.CKMInfoLoss;
 import tauargus.utils.TableColumnResizer;
 
 
-public class ShowMoreInfoLoss extends javax.swing.JDialog {
+public class ShowMoreInfoLoss extends DialogBase {
 
     CKMInfoLoss InfoLoss;
     /*

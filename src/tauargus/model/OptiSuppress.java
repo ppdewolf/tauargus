@@ -1674,9 +1674,12 @@ public class OptiSuppress {
                                 var.CKMType, var.CKMTopK, var.zerosincellkey, var.CKMapply_even_odd, var.CKMseparation, 
                                 var.CKMm1squared, var.CKMscaling, var.CKMsigma0, var.CKMsigma1, var.CKMxstar, var.CKMq, 
                                 var.CKMepsilon, var.muC);
-
-        if (result <= -90){ // error 
-            throw new ArgusException("Some error in call of SetCellKeyValuesCont(...) result = " + result);
+        switch(result){ // Some error
+            case -90: throw new ArgusException("No ptable file for continuous CKM found (error -90)");
+            case -91: throw new ArgusException("No ptable file for small values found (error -91)");
+            case -92: throw new ArgusException("No ptable file for small values found (error -92)");
+            case -93: throw new ArgusException("No even and odd specified in ptable file, while asking for treating them differently (error -93)");
+            case -94: throw new ArgusException("No all specified in ptable file, while asking for not treating even and odd differently (error -94)");
         }
 
         long endTime = new Date().getTime();

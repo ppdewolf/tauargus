@@ -19,7 +19,7 @@ package tauargus.gui;
 import javax.swing.JTextField;
 import tauargus.model.TableSet;
 
-public class DialogModularParameters extends javax.swing.JDialog {
+public class DialogModularParameters extends DialogBase {
 
 
     // ***** Dialog Return Values *****

@@ -24,7 +24,7 @@ import argus.utils.SystemUtils;
  *
  * @author Peter-Paul
  */
-public class DialogSolverOptions extends javax.swing.JDialog {
+public class DialogSolverOptions extends DialogBase {
 
     /*
      * Creates new form DialogSolverOptions
