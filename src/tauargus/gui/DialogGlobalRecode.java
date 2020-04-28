@@ -20,6 +20,9 @@ package tauargus.gui;
 import argus.utils.SystemUtils;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -27,9 +30,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
+import javax.swing.JRootPane;
 import javax.swing.JTable;
 import javax.swing.JTree;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -58,6 +64,21 @@ import tauargus.utils.TreeUtils;
 
 public class DialogGlobalRecode extends DialogBase {
 
+    @Override
+    protected JRootPane createRootPane() {
+        ActionListener actionListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                buttonCloseActionPerformed(actionEvent);
+            }
+        };    
+ 
+        KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+        JRootPane tmpRootPane = new JRootPane();
+        tmpRootPane.registerKeyboardAction(actionListener, stroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+        return tmpRootPane;
+    }    
+    
     private static class CodeInfo {
         private final int codeIndex;
         private final String label;

@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
 import java.util.List;
 import tauargus.gui.FrameInfo;
 import tauargus.model.Application;
@@ -138,7 +139,6 @@ public class ExecUtils {
             windowInfo.setVisible(true);
             windowInfo.setLocationRelativeTo(null);
             windowInfo.addLabel (header); 
-          
         }
 
         try {
@@ -167,7 +167,10 @@ public class ExecUtils {
             System.out.println("Unable to start: " + commandString);
         } catch (InterruptedException ex) {
             System.out.println("Process is interrupted: " + commandString);
-        } finally {
+        } catch (URISyntaxException ex) {
+            System.out.println("Exception is thrown: " + ex.getMessage());
+        }
+        finally {
             if (!silent) {
                 windowInfo.setVisible(false);
                 windowInfo.dispose();
@@ -199,7 +202,6 @@ public class ExecUtils {
             windowInfo.setLocationRelativeTo(null);
             windowInfo.setVisible(true);
             windowInfo.addLabel (header); 
-          
         }
 // remove the .exe extension if not windows        
         if (!SystemUtils.isWindows()){
@@ -207,8 +209,6 @@ public class ExecUtils {
           if (hs.toUpperCase().endsWith(".EXE")){hs = hs.substring(0,hs.length()-4);}
           commandString.set(0,hs);
         }
-//        frameInfo.repaint();
-//        frameInfo.validate();
 
         try {
             Process process;
@@ -241,7 +241,10 @@ public class ExecUtils {
         } catch (InterruptedException ex) {
             //windowInfo.setVisible(false);
             System.out.println("Process is interrupted: " + commandString);
-        } finally {
+        } catch (URISyntaxException ex) {
+            System.out.println("Exception is thrown: " + ex.getMessage());
+        }
+        finally {
             if (!silent) {
                 windowInfo.setVisible(false);
                 windowInfo.dispose();

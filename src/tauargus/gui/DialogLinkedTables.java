@@ -20,13 +20,19 @@ package tauargus.gui;
 import argus.utils.StrUtils;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import javax.swing.DefaultListModel;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JRootPane;
+import javax.swing.KeyStroke;
 import tauargus.model.Application;
 import tauargus.model.ArgusException;
 import tauargus.model.LinkedTables;
@@ -41,8 +47,23 @@ import tauargus.service.TableService;
  * @author ahnl
  */
 public class DialogLinkedTables extends DialogBase {
+    @Override
+    protected JRootPane createRootPane() {
+        ActionListener actionListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                buttonReadyActionPerformed(actionEvent);
+            }
+        };    
+ 
+        KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+        JRootPane rootPane = new JRootPane();
+        rootPane.registerKeyboardAction(actionListener, stroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+        return rootPane;
+    }    
+    
     TableSet tableSet;
-        private JFrame getParentFrame() {
+    private JFrame getParentFrame() {
         Container container = this;
         while (!(container instanceof JFrame)) {
             container = container.getParent();
@@ -317,9 +338,9 @@ public class DialogLinkedTables extends DialogBase {
                         .addComponent(labelTable1))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(164, 164, 164)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(buttonSuppressHypercube, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                             .addComponent(buttonSuppressModular, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(buttonSuppressHypercube, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(buttonReady))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );

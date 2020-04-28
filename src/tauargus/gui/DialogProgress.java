@@ -21,14 +21,13 @@ import java.awt.Component;
 import java.awt.Container;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import javax.swing.JDialog;
 import javax.swing.JPanel;
 
 /**
  *
  * @author pwof
  */
-public class DialogProgress extends DialogBase implements PropertyChangeListener{
+public class DialogProgress extends javax.swing.JDialog implements PropertyChangeListener{
     
     public static final int SINGLE = 0;
     public static final int DOUBLE = 1;

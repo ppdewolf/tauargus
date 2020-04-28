@@ -84,10 +84,10 @@
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace min="-2" pref="164" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="buttonSuppressHypercube" min="-2" pref="150" max="-2" attributes="0"/>
-                          <Component id="buttonSuppressModular" min="-2" pref="150" max="-2" attributes="0"/>
-                          <Component id="buttonReady" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="2" attributes="0">
+                          <Component id="buttonSuppressModular" alignment="2" min="-2" pref="150" max="-2" attributes="0"/>
+                          <Component id="buttonSuppressHypercube" alignment="2" min="-2" pref="150" max="-2" attributes="0"/>
+                          <Component id="buttonReady" alignment="2" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
               </Group>

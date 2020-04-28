@@ -501,14 +501,18 @@ public class SaveTable {
     * @param out
     * @param kort 
     */
-    static public void writeKopHtml(TableSet tableSet, BufferedWriter out, boolean kort)  {
+    static public void writeKopHtml(TableSet tableSet, BufferedWriter out, boolean kort) throws ArgusException {
         String hs; int i;
         try {
             out.write("<!DOCTYPE HTML PUBLIC \" -//W3C//DTD HTML 4.0 Transitional//EN\"   \"http://www.w3.org/TR/REC-html40/loose.dtd\">\n");
             out.write ("<html>\n");        
             out.write ("<head>\n");     
             out.write("<title>&tau;-ARGUS report</title>\n");
-            hs = SystemUtils.getApplicationDirectory(SaveTable.class).getCanonicalPath();
+            try{
+                hs = SystemUtils.getApplicationDirectory(SaveTable.class).getCanonicalPath();
+            } catch (Exception ex){
+                throw new ArgusException("Exception thrown: "+ex.getMessage());
+            }
             hs = "file:///" +hs + "/tauARGUS.css";
             hs = hs.replace("\\", "/");
             out.write(" <link rel=\"stylesheet\" type=\"text/css\" href=\"" + hs + "\">\n");

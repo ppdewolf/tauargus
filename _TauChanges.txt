@@ -360,5 +360,14 @@ summary    : Bugs fixed in saving some metadata to the rda-file
 date	   : Apr 8, 2020
 summary    : Some refactoring
 
+date	   : Apr 17, 2020
+summary    : Now possible to use <ESC> to close Dialogs
+
+date	   : Apr 17, 2020
+summary    : Corrected return value in case of error in SetCellKeyValuesCont (in TauArgusJava.dll) + better handling those errors in Java
+
+date	   : Apr 24, 2020
+summary    : Should now be able to deal correctly with UNC paths
+
 above to be released in 4.2.0 build 5
 --------------------------------------------------------------

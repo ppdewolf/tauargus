@@ -31,6 +31,7 @@ import tauargus.utils.TauArgusUtils;
 
 public class DialogOpenMicrodata extends DialogBase{
 
+    private int returnValue = CANCEL_OPTION;
     private static final Logger logger = Logger.getLogger(DialogOpenMicrodata.class.getName());
 
     // ***** Dialog Return Values *****
@@ -283,7 +284,6 @@ public class DialogOpenMicrodata extends DialogBase{
     }//GEN-LAST:event_buttonOKActionPerformed
 
     private void buttonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCancelActionPerformed
-        returnValue = CANCEL_OPTION;
         setVisible(false);
         dispose();
     }//GEN-LAST:event_buttonCancelActionPerformed
@@ -370,6 +370,4 @@ public class DialogOpenMicrodata extends DialogBase{
     private javax.swing.JTextField textFieldMicrodata;
     private javax.swing.JTextArea textInfo;
     // End of variables declaration//GEN-END:variables
-    
-    private int returnValue = CANCEL_OPTION;
 }

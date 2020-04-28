@@ -24,7 +24,7 @@ import java.beans.PropertyChangeListener;
  *
  * @author Peter-Paul
  */
-public class DialogRounderProgress extends DialogBase implements PropertyChangeListener{
+public class DialogRounderProgress extends javax.swing.JDialog implements PropertyChangeListener{
 
     /*
      * Creates new form DialogRounderProgress

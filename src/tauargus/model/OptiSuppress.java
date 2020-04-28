@@ -285,7 +285,7 @@ public class OptiSuppress {
           commandline.add(Application.getTempFile("Audit.log"));
           TauArgusUtils.writeBatchFileForExec("RunAudit", commandline);
           } 
-        catch (IOException ex){}
+        catch (Exception ex){}
         //Run the intervalle program
         result = ExecUtils.execCommand(commandline, Application.getTempDir(),false, "Run Audit program");
         
@@ -911,7 +911,12 @@ public class OptiSuppress {
         SaveTable.writeJJ(tableSet, Application.getTempFile("UWE.jj"), false, true, tableSet.minFreq[0], false, false);
         TauArgusUtils.DeleteFile(Application.getTempFile("s.txt"));
         TauArgusUtils.DeleteFile(Application.getTempFile("s1.txt"));
-        hs = SystemUtils.getApplicationDirectory(OptiSuppress.class).getCanonicalPath();
+        try{
+            hs = SystemUtils.getApplicationDirectory(OptiSuppress.class).getCanonicalPath();
+        }
+        catch (Exception ex){
+            throw new ArgusException("Exception thrown: "+ex.getMessage());
+        }
         hs = hs + "/EXP_ExternalUnpickerOnJJ.exe";
         commandline.add(hs);
         if (!TauArgusUtils.ExistFile(hs)) {
@@ -926,7 +931,11 @@ public class OptiSuppress {
         }
         //step 2
         commandline.clear();
-        hs = SystemUtils.getApplicationDirectory(OptiSuppress.class).getCanonicalPath();
+        try{
+            hs = SystemUtils.getApplicationDirectory(OptiSuppress.class).getCanonicalPath();
+        } catch (Exception ex){
+            throw new ArgusException("Exception thrown: "+ex.getMessage());
+        }    
         hs = hs + "/COIN_LargeTables.exe";
         if (!TauArgusUtils.ExistFile(hs)) {
             throw new ArgusException("The UWE unpick program could not be found");
@@ -1615,7 +1624,8 @@ public class OptiSuppress {
             catch (InterruptedException ex) {}
         }    
     }
-    /**
+    
+    /*
      * Add the secondaries to a JJ file.
      * Only used for the option to protect a JJ file directly
      * @param JJInputFile

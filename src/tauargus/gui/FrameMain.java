@@ -818,7 +818,7 @@ public class FrameMain extends javax.swing.JFrame {
         String hs="";
         DialogHtmlViewer dialog = new DialogHtmlViewer(FrameMain.this, true);
         try{hs = SystemUtils.getApplicationDirectory(FrameMain.class).getCanonicalPath();}
-        catch (IOException ex){}
+        catch (Exception ex){}
         hs = hs +"/tauNews.html";
         if (TauArgusUtils.ExistFile(hs)){
         dialog.showDialog("News","file:////"+  hs);

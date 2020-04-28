@@ -312,10 +312,10 @@ public class TableService {
         batch.reportProgress("Start computing tables");
         int[] tableIndex = new int[]{0};
         for (int i = 0; i < TableService.numberOfTables(); i++) {
-          tableIndex[0] = i;
-         if (!tauArgus.ComputeTables(errorCode, tableIndex)) {
-            throw new ArgusException("Error occurred when computing table" + (tableIndex[0] + 1) + tauArgus.GetErrorString(errorCode[0]));
-          }
+            tableIndex[0] = i;
+            if (!tauArgus.ComputeTables(errorCode, tableIndex)) {
+                throw new ArgusException("Error occurred when computing table" + (tableIndex[0] + 1) + tauArgus.GetErrorString(errorCode[0]));
+            }
         } 
         for (int i = 0; i < TableService.numberOfTables(); i++) {
             double[] xMaxTemp = new double[]{0.0};

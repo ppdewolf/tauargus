@@ -29,6 +29,7 @@ public class DialogOpenTable extends DialogBase {
     // ***** Dialog Return Values *****
     public static final int CANCEL_OPTION = 1;
     public static final int APPROVE_OPTION = 0;
+    private int returnValue = CANCEL_OPTION;
 
     public DialogOpenTable(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
@@ -150,7 +151,6 @@ public class DialogOpenTable extends DialogBase {
     }//GEN-LAST:event_buttonOKActionPerformed
 
     private void buttonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCancelActionPerformed
-        returnValue = CANCEL_OPTION;
         setVisible(false);
         dispose();
     }//GEN-LAST:event_buttonCancelActionPerformed
@@ -204,6 +204,4 @@ public class DialogOpenTable extends DialogBase {
     private javax.swing.JButton buttonOK;
     private tauargus.gui.PanelSelectTableFiles panelSelectTable;
     // End of variables declaration//GEN-END:variables
-    
-    private int returnValue = CANCEL_OPTION;
 }

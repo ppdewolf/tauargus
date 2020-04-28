@@ -133,7 +133,6 @@ public class DialogMuC extends DialogBase {
     }//GEN-LAST:event_jButtonOKActionPerformed
 
     private void jButtonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCancelActionPerformed
-        returnValue = CANCEL_OPTION;
         setVisible(false);
         dispose();
     }//GEN-LAST:event_jButtonCancelActionPerformed

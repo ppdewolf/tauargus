@@ -59,9 +59,7 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         ActionListener actionListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                if (hasBeenModified)TableService.clearTables();
-                setVisible(false);
-                dispose();
+                buttonCancelActionPerformed(actionEvent);
             }
         };    
  

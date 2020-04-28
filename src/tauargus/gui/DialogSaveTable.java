@@ -19,9 +19,15 @@ package tauargus.gui;
 
 import argus.utils.SystemUtils;
 import java.awt.Cursor;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.YES_OPTION;
+import javax.swing.JRootPane;
+import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.commons.io.FilenameUtils;
 import tauargus.model.ArgusException;
@@ -30,7 +36,22 @@ import tauargus.model.TableSet;
 import tauargus.utils.TauArgusUtils;
 
 public class DialogSaveTable extends DialogBase {
-
+    @Override
+    protected JRootPane createRootPane() {
+        ActionListener actionListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                buttonCancelActionPerformed(actionEvent);
+            }
+        };    
+ 
+        KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+        JRootPane rootPane = new JRootPane();
+        rootPane.registerKeyboardAction(actionListener, stroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+        return rootPane;
+    }
+    
+    
     private TableSet tableSet;
     private final String[] extensions = {"csv", "csv", "txt","sbs","tab","jj","tab"};
     public DialogSaveTable(java.awt.Frame parent, boolean modal) {

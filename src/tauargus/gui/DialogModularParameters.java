@@ -180,7 +180,6 @@ public class DialogModularParameters extends DialogBase {
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCancelActionPerformed
-        returnValue = CANCEL_OPTION;
         setVisible(false);
         dispose();
     }//GEN-LAST:event_buttonCancelActionPerformed

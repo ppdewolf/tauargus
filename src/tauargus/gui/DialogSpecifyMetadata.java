@@ -39,11 +39,16 @@ import tauargus.utils.TauArgusUtils;
 
 public class DialogSpecifyMetadata extends DialogBase {
 
+    private Metadata oldMetadata;
+    private Metadata metadata;
+    private DefaultListModel<Variable> variableListModel; 
+    private Variable previousSelectedVariable;
     private static final Logger logger = Logger.getLogger(DialogSpecifyMetadata.class.getName());
 
     // ***** Dialog Return Values *****
     public static final int CANCEL_OPTION = 1;
     public static final int APPROVE_OPTION = 0;
+    private int returnValue = CANCEL_OPTION;
     public static boolean SpssSelected = false;
 
     public DialogSpecifyMetadata(java.awt.Frame parent, boolean modal) {
@@ -376,7 +381,6 @@ public class DialogSpecifyMetadata extends DialogBase {
     }//GEN-LAST:event_buttonOKActionPerformed
 
     private void buttonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCancelActionPerformed
-        returnValue = CANCEL_OPTION;
         setVisible(false);
         dispose(); // free memory of this dialog
     }//GEN-LAST:event_buttonCancelActionPerformed
@@ -548,11 +552,6 @@ public class DialogSpecifyMetadata extends DialogBase {
         }
     }
 
-    private Metadata oldMetadata;
-    private Metadata metadata;
-    private DefaultListModel<Variable> variableListModel; 
-    private Variable previousSelectedVariable;
-    private int returnValue = CANCEL_OPTION;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonCancel;

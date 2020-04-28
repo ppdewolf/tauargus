@@ -330,15 +330,17 @@ public class TauArgusUtils {
         String hs;
         hs = SystemUtils.getRegString("optimal", "cplexlicensefile", "access.ilm");
         //if needed add the application path
-        if (!hs.contains(":") && !hs.contains("/") && !hs.contains("//")){
+        // Assumed non-UNC paths!!!!!
+        // Added !hs.startsWith("\\") to exclude UNC paths for Windows in if-statement
+        if (!hs.contains(":") && !hs.contains("/") && !hs.contains("//") && !hs.startsWith("\\")){
             try{
-          hs = SystemUtils.getApplicationDirectory(Application.class).getCanonicalPath()+  "\\" + hs ; 
+                hs = SystemUtils.getApplicationDirectory(Application.class).getCanonicalPath()+  "\\" + hs ;
             }
-           catch (IOException ex){}
+           catch (Exception ex){
+               throw new ArgusException("Exception thrown: " + ex.getMessage());
+           }
         }
-       if (!TauArgusUtils.ExistFile(hs)){ throw new ArgusException("Cplex licence file: "+ hs + " could not be found");}
-       return hs;
-//     return SystemUtils.getRegString("optimal", "cplexlicensefile", "access.ilm"); 
-       
+        if (!TauArgusUtils.ExistFile(hs)){ throw new ArgusException("Cplex licence file: "+ hs + " could not be found");}
+        return hs;
     }   
 }

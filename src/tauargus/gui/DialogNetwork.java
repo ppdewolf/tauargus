@@ -259,7 +259,6 @@ public class DialogNetwork extends DialogBase {
     }//GEN-LAST:event_radiobuttonDykstraActionPerformed
 
     private void buttonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCancelActionPerformed
-        returnValue = CANCEL_OPTION;
         setVisible(false);
         dispose();
     }//GEN-LAST:event_buttonCancelActionPerformed
