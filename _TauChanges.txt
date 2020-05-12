@@ -369,5 +369,11 @@ summary    : Corrected return value in case of error in SetCellKeyValuesCont (in
 date	   : Apr 24, 2020
 summary    : Should now be able to deal correctly with UNC paths
 
+date	   : May 12, 2020
+summary    : Fixed issue#111: last line of safe table was not treated correctly in generate apriori
+
+date	   : May 12, 2020
+summary	   : Additional version information available in about-dialog
+
 above to be released in 4.2.0 build 5
 --------------------------------------------------------------
