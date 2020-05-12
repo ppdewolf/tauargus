@@ -25,6 +25,7 @@ import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -634,7 +635,7 @@ public class PanelTable extends javax.swing.JPanel {
         if (Application.isAnco()) {
                 radioButtonUwe.setVisible(TauArgusUtils.ExistFile(hs+"/EXP_ExternalUnpickerOnJJ.exe"));        
         }
-        
+
         radioButtonNetwork.setVisible(TauArgusUtils.ExistFile(hs+"/main1H2D.exe")||TauArgusUtils.ExistFile(hs+"/main1H2D")); 
         
         CKMpossible = tableSet.CellKeyAvailable && (!tableSet.respVar.CKMType.equals("N") || tableSet.respVar.type.equals(Type.FREQUENCY));
