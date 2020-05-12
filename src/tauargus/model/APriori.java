@@ -373,7 +373,7 @@ public class APriori {
     public void ReadSafeFile(String safeFileName, String sep) throws ArgusException
     {
         try {
-           File f = new File(safeFileName) ;
+            File f = new File(safeFileName) ;
             Scanner scan = new Scanner(f);
             
             String line = scan.nextLine();
@@ -381,24 +381,24 @@ public class APriori {
             // check if we start with a variable line: just identifier strings
             if( IsHeaderLine(line))
                 line = scan.nextLine();
-            
+           
             // at first real line, determine ceel values column = first numeric column
             int FirstNumericField = GetFirstNumericColumn(line);
             if( FirstNumericField<0)
-                throw new ArgusException("No numeric field found in save file '"+safeFileName+"'");
+                throw new ArgusException("No numeric field found in safe file '"+safeFileName+"'");
             
             Cells.clear();
-            while( scan.hasNext())
+            Cells.add(new APrioriCell(line, sep, FirstNumericField ,this)); // Add first encountered cell
+
+            while (scan.hasNextLine()) // Continue with rest
             {                
-                Cells.add(new APrioriCell(line, sep, FirstNumericField ,this));
                 line = scan.nextLine();
+                Cells.add(new APrioriCell(line, sep, FirstNumericField ,this));
             }
-            
         } 
         catch (FileNotFoundException ex) {
             Logger.getLogger(APriori.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
     }
     
     public int getDimension()

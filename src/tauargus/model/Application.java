@@ -67,7 +67,7 @@ public class Application {
 
     // for interfacing with C++ dll
     static {
-        System.loadLibrary("tauhitas");           
+        System.loadLibrary("TauHitas");           
         System.loadLibrary("TauRounder");
         System.loadLibrary("TauArgusJava");                
  }
@@ -104,6 +104,23 @@ public class Application {
     
     public static String getFullVersion() {
         return "" + MAJOR + "." + MINOR + "." + REVISION; // + "; build: " + BUILD; build is shown separately in lower left corner
+    }
+    
+    public static String getArgusLibVersion() {
+        return "" + argus.model.Application.MAJOR + "." + argus.model.Application.MINOR + "." + 
+                                    argus.model.Application.REVISION + " build " + argus.model.Application.BUILD;
+    }
+    
+    public static String getRounderVersion(){
+        return rounder.GetVersion();
+    }
+    
+    public static String getHitasVersion(){
+        return tauHitas.GetVersion();
+    }
+    
+    public static String getArgusJavaVersion(){
+        return tauArgus.GetVersion();
     }
     
     public static String getSolverName( int solver){
@@ -413,8 +430,13 @@ public class Application {
         getAnco();
         SystemUtils.setLogbook(SystemUtils.getRegString("general", "logbook", getTempFile("TauLogbook.txt")));
         SystemUtils.writeLogbook(" ");         
+        SystemUtils.writeLogbook("--------------------------");
         SystemUtils.writeLogbook("Start of TauArgus run");
-        SystemUtils.writeLogbook("Version "+Application.getFullVersion()+" build "+Application.BUILD);
+        SystemUtils.writeLogbook("TauArgus version " + Application.getFullVersion() + " build " + Application.BUILD);
+        SystemUtils.writeLogbook("ArgusLib.jar version " + getArgusLibVersion());
+        SystemUtils.writeLogbook("TauRounder.dll version " + rounder.GetVersion());
+        SystemUtils.writeLogbook("hauhitas.dll version " + tauHitas.GetVersion());
+        SystemUtils.writeLogbook("TauArgusJava.dll version " + tauArgus.GetVersion());
         SystemUtils.writeLogbook("--------------------------");
         solverSelected = SystemUtils.getRegInteger("optimal", "solverused", SOLVER_SOPLEX);
         generalMaxHitasTime = SystemUtils.getRegInteger("optimal", "maxhitastime", 1);

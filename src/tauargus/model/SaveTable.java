@@ -591,6 +591,8 @@ public class SaveTable {
     static void writeStaartHTML(BufferedWriter out ){
         try{
             out.write ("<br>&tau;-ARGUS version: " + Application.getFullVersion()+" (Build " + Application.BUILD + ")");  out.newLine();
+            out.write ("<br>ArgusLib version: " + argus.model.Application.MAJOR + "." + argus.model.Application.MINOR + "." +
+                                    argus.model.Application.REVISION + " (Build " + argus.model.Application.BUILD + ")"); out.newLine();
             out.write("</body>\n");
             out.write("</html\n");
         }
@@ -1077,9 +1079,7 @@ public class SaveTable {
                 }
             }
 
-            out.write ("<br>&tau;-ARGUS version: " + Application.getFullVersion()+" (Build " + Application.BUILD + ")");  out.newLine();
-            out.write("</body>\n");
-            out.write("</html\n");  
+            writeStaartHTML(out);
             out.close();
         }catch (Exception ex) { JOptionPane.showMessageDialog(null, ex.getMessage());}
     }

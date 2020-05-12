@@ -23,8 +23,10 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import tauargus.model.Application;
 
 public class DialogAbout extends DialogBase {
@@ -43,6 +45,7 @@ public class DialogAbout extends DialogBase {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 setVisible(false);
+                dispose();
             }
         };
         KeyStroke stroke;
@@ -70,6 +73,7 @@ public class DialogAbout extends DialogBase {
         labelApplicationIcon = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
+        buttonVersionDetails = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("About Argus");
@@ -126,6 +130,13 @@ public class DialogAbout extends DialogBase {
                 .addContainerGap())
         );
 
+        buttonVersionDetails.setText("Details");
+        buttonVersionDetails.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonVersionDetailsActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -138,12 +149,18 @@ public class DialogAbout extends DialogBase {
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(38, 38, 38)
                                 .addComponent(labelApplicationIcon)
-                                .addGap(52, 52, 52)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jLabel2))
-                                    .addComponent(labelVersion, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(52, 52, 52)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(jLabel2))
+                                            .addComponent(labelVersion, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGap(0, 0, Short.MAX_VALUE))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(buttonVersionDetails))))
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                 .addComponent(separator1, javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
@@ -166,8 +183,10 @@ public class DialogAbout extends DialogBase {
                         .addGap(7, 7, 7)
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(labelVersion)))
-                .addGap(18, 18, 18)
+                        .addComponent(labelVersion)
+                        .addGap(3, 3, 3)
+                        .addComponent(buttonVersionDetails)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(separator1, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -180,6 +199,11 @@ public class DialogAbout extends DialogBase {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void buttonVersionDetailsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonVersionDetailsActionPerformed
+        DialogVersionDetails dialog = new DialogVersionDetails((JFrame)SwingUtilities.getAncestorOfClass(JFrame.class, this),true);
+        dialog.setVisible(true);
+    }//GEN-LAST:event_buttonVersionDetailsActionPerformed
 
 //    /**
 //     * @param args the command line arguments
@@ -227,6 +251,7 @@ public class DialogAbout extends DialogBase {
 //        });
 //    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton buttonVersionDetails;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
