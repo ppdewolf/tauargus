@@ -808,10 +808,10 @@ public class batch {
             case "CKM":
                 // For frequency count tbales: TabNo ptablefile (optional)
                 //      e.g., CKM(1) "ptableFREQ"
-                // For magnitude tables: TabNo ptablefileCONT | ptablefileSEP (optional) | muC (optional)
+                // For magnitude tables: TabNo ptablefileCONT (optional) | ptablefileSEP (optional) | muC (optional)
                 //      e.g., CKM(1) "ptableCONT" | "ptableSEP" | 2.7 Everything specified
-                //            CKM(1) | "ptableSEP" | 2.7)  Only ptablefileSEP and muC specified
-                //            CKM(1) "ptableCONT" | | 2.7)  Only ptablefileCONT and muC specified
+                //            CKM(1) | "ptableSEP" | 2.7   Only ptablefileSEP and muC specified
+                //            CKM(1) "ptableCONT" | | 2.7  Only ptablefileCONT and muC specified
                 //            CKM(1) "ptableCONT"||  Only ptableCONT specified
                 //            CKM(1) ||2.7  Only muC specified
                 if (!tableset.CellKeyAvailable){
@@ -829,11 +829,11 @@ public class batch {
                 
                 try {
                     if (tableset.respVar.isResponse()){
-                        hs1 = TauArgusUtils.getFullFileName(tableset.cellkeyVar.PTableFileCont);
+                        hs1 = TauArgusUtils.getFullFileName(giveRightFile(tableset.cellkeyVar.PTableFileCont));
                         if (!TauArgusUtils.ExistFile(hs1)){
                             throw new ArgusException("\"ptable file (" + hs1 + ") does not exist\"");
                         }
-                        hs2 = TauArgusUtils.getFullFileName(tableset.cellkeyVar.PTableFileSep);
+                        hs2 = TauArgusUtils.getFullFileName(giveRightFile(tableset.cellkeyVar.PTableFileSep));
                         if (!TauArgusUtils.ExistFile(hs2) && !tableset.cellkeyVar.PTableFileSep.equals("")){
                             throw new ArgusException("\"ptable file (" + hs2 + ") does not exist\"");
                         }
@@ -842,10 +842,7 @@ public class batch {
                         }
                     }
                     else{
-                        hs1 = TauArgusUtils.getFullFileName(tableset.cellkeyVar.PTableFile);
-                        if (!TauArgusUtils.ExistFile(hs1)){
-                            throw new ArgusException("\"ptable file (" + hs1 + ") does not exist\"");
-                        }
+                        hs1 = TauArgusUtils.getFullFileName(giveRightFile(tableset.cellkeyVar.PTableFile));
                         if(OptiSuppress.RunCellKey(tableset, hs1)){
                             reportProgress("Using ptable file " + hs1);
                         }
@@ -892,14 +889,14 @@ public class batch {
             token = nextToken(tail); 
             if (!token.equals("")){  // first parameter should be ptableCONT
                 if (token.substring(0,2).equals("//")) return false; // Comment, so do nothing and return false
-                if (TauArgusUtils.ExistFile(TauArgusUtils.getFullFileName(StrUtils.unQuote(token)))) cellkeyVar.PTableFileCont = token;
+                cellkeyVar.PTableFileCont = giveRightFile(token);
             }
             token = nextChar(tail);
             if (token.equals("|")){
                 token = nextToken(tail);
                 if (!token.equals("")){  // second paramter should be ptableSEP
                     if (token.substring(0,2).equals("//")) return false; // Comment, so do nothing and return false
-                    if (TauArgusUtils.ExistFile(TauArgusUtils.getFullFileName(StrUtils.unQuote(token)))) cellkeyVar.PTableFileSep = token;
+                    cellkeyVar.PTableFileSep = giveRightFile(token);
                 }
                 token = nextChar(tail);
                 if (token.equals("|")){
@@ -918,8 +915,7 @@ public class batch {
                 hs = StrUtils.unQuote(tail[0].trim());
                 if (hs.substring(0,2).equals("//")) 
                     return false; // Comment, so do nothing and return false
-                if (TauArgusUtils.ExistFile(TauArgusUtils.getFullFileName(hs))) 
-                    cellkeyVar.PTableFile = hs;
+                cellkeyVar.PTableFile = giveRightFile(hs);
             }
         }
         return true;

@@ -274,7 +274,7 @@ public class TableService {
             TableSet table = TableService.getTable(i);
             boolean isFreq = table.isFrequencyTable();
             int ish = table.indexOfShadowVariable();
-            if (isFreq && ish < 0) {
+            if (isFreq && ish <= 0) { // ish == 0 in case of FreqVar without ShadowVar
                 ish = Application.numberOfVariables();
             }
             int[] expVar = table.indicesOfExplanatoryVariables();
