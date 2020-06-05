@@ -435,7 +435,7 @@ public class Application {
         SystemUtils.writeLogbook("TauArgus version " + Application.getFullVersion() + " build " + Application.BUILD);
         SystemUtils.writeLogbook("ArgusLib.jar version " + getArgusLibVersion());
         SystemUtils.writeLogbook("TauRounder.dll version " + rounder.GetVersion());
-        SystemUtils.writeLogbook("hauhitas.dll version " + tauHitas.GetVersion());
+        SystemUtils.writeLogbook("TauHitas.dll version " + tauHitas.GetVersion());
         SystemUtils.writeLogbook("TauArgusJava.dll version " + tauArgus.GetVersion());
         SystemUtils.writeLogbook("--------------------------");
         solverSelected = SystemUtils.getRegInteger("optimal", "solverused", SOLVER_SOPLEX);

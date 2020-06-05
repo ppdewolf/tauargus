@@ -2453,13 +2453,13 @@ public class TableSet {
         return ecdf;
     }
     
-    // returns the index of LAST occurrence of a value <= x in arr[0..n-1]
+    // returns the index of LAST occurrence of a value <= x in a SORTED arr[0..n-1]
     // between index low and index high
     private static int last(double arr[], int low, int high, double x, int n) 
     { 
-        if (high >= low) 
+        if ((high >= low) && (x >= arr[0]))
         { 
-            int mid = low + (high - low)/2; 
+            int mid = low + (high - low)/2;
             //if (( mid == n-1 || x < arr[mid+1]) && Math.abs(arr[mid] - x) <= EPSILON) 
             if (( mid == n-1 || x < arr[mid+1]) && arr[mid]<=x) 
                 return mid; 

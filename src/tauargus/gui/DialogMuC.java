@@ -66,7 +66,7 @@ public class DialogMuC extends DialogBase {
         setName("muCDialog"); // NOI18N
         setResizable(false);
 
-        jLabel1.setText("Additional noise for sensitive cells (0 means no additional noise): mu_C =");
+        jLabel1.setText("<html>Additional noise for sensitive cells (0 means no additional noise): &mu;<sub>C</sub> =</html>");
 
         muCValue.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         muCValue.setText("0");
@@ -91,7 +91,7 @@ public class DialogMuC extends DialogBase {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel1)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(muCValue, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))

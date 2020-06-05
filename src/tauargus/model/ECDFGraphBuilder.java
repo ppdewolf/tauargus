@@ -94,6 +94,11 @@ public class ECDFGraphBuilder {
         XYSeries series = new XYSeries("1");
         
         series.add(0.0,0.0);
+        if (start_i == -1){      // i.e., X[0] > 0 
+            series.add(X[0], 0);
+            start_i = 0;
+        }
+        
         for (int i=start_i;i<nX;i++){
             if (X[i]<X[i+1]){
                 series.add(X[i], (i + 1)*increment);
