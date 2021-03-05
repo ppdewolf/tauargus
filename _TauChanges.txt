@@ -377,3 +377,6 @@ summary	   : Additional version information available in about-dialog
 
 above to be released in 4.2.0 build 5
 --------------------------------------------------------------
+date	   : Jun 29, 2020
+summary	   : (temporary) Fix for rounding error in calculation of cellkey (TauArgusJava.dll) Issue #145
+

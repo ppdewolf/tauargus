@@ -36,6 +36,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
@@ -243,32 +244,32 @@ public class OptiSuppress {
         SaveTable.writeJJ(tableSet, Application.getTempFile("Anneke.JJ"), false, false, 0, false, false);
         //Write Rounding parameter file
         try {
-        BufferedWriter out = new BufferedWriter(new FileWriter(Application.getTempFile("Anneke.txt")));
-        out.write(Application.getTempFile("Anneke.JJ")); out.newLine();
-        out.write ("NoLongerNeeded"); out.newLine();
-        out.write (Application.getTempFile("Anneke.Out")); out.newLine();
-        out.write (Application.getTempFile("Anneke.txt")); out.newLine();
-        out.write ("primsec"); out.newLine();
-        out.write ("without"); out.newLine();
-        out.write ("2"); out.newLine();
-        out.write ("1"); out.newLine();
-        out.write ("0"); out.newLine();
-        out.write ("0"); out.newLine();
-        out.write ("50"); out.newLine();
-        out.write ("50"); out.newLine();
-        out.write ("0"); out.newLine();
-        out.write ("5"); out.newLine();
-        if  (Application.solverSelected == Application.SOLVER_NO) {out.write ("GLPK");}
-        if  (Application.solverSelected == Application.SOLVER_CPLEX) {out.write ("cplex");}
-        if  (Application.solverSelected == Application.SOLVER_XPRESS) {out.write ("xpress");}
-        if  (Application.solverSelected == Application.SOLVER_SOPLEX) {out.write ("GLPK");}
-        out.newLine();
+        BufferedWriter out2 = new BufferedWriter(new FileWriter(Application.getTempFile("Anneke.txt")));
+        out2.write(Application.getTempFile("Anneke.JJ")); out2.newLine();
+        out2.write ("NoLongerNeeded"); out2.newLine();
+        out2.write (Application.getTempFile("Anneke.Out")); out2.newLine();
+        out2.write (Application.getTempFile("Anneke.txt")); out2.newLine();
+        out2.write ("primsec"); out2.newLine();
+        out2.write ("without"); out2.newLine();
+        out2.write ("2"); out2.newLine();
+        out2.write ("1"); out2.newLine();
+        out2.write ("0"); out2.newLine();
+        out2.write ("0"); out2.newLine();
+        out2.write ("50"); out2.newLine();
+        out2.write ("50"); out2.newLine();
+        out2.write ("0"); out2.newLine();
+        out2.write ("5"); out2.newLine();
+        if  (Application.solverSelected == Application.SOLVER_NO) {out2.write ("GLPK");}
+        if  (Application.solverSelected == Application.SOLVER_CPLEX) {out2.write ("cplex");}
+        if  (Application.solverSelected == Application.SOLVER_XPRESS) {out2.write ("xpress");}
+        if  (Application.solverSelected == Application.SOLVER_SOPLEX) {out2.write ("GLPK");}
+        out2.newLine();
         
         if  (Application.solverSelected == Application.SOLVER_CPLEX) {
-            out.write (TauArgusUtils.GetCplexLicenceFile());}
-        else{out.write ("NoLicenceSpecified");}
-        out.newLine();
-        out.close();
+            out2.write (TauArgusUtils.GetCplexLicenceFile());}
+        else{out2.write ("NoLicenceSpecified");}
+        out2.newLine();
+        out2.close();
         }        
         catch (IOException ex){
           throw new ArgusException("A problem was encountered when writing the parameter file for audit");} 
@@ -279,30 +280,32 @@ public class OptiSuppress {
         try{
           hs = SystemUtils.getApplicationDirectory(OptiSuppress.class).getCanonicalPath();
           hs = hs + "/intervalle.exe";
-          if (!TauArgusUtils.ExistFile(hs)){ throw new ArgusException("The audit program could not be found");}
+          if (!TauArgusUtils.ExistFile(hs)){ throw new ArgusException("The audit program \""+ hs + "\" could not be found");}
           commandline.add(hs);
           commandline.add(Application.getTempFile("Anneke.txt"));
           commandline.add(Application.getTempFile("Audit.log"));
           TauArgusUtils.writeBatchFileForExec("RunAudit", commandline);
           } 
-        catch (Exception ex){}
+        catch (IOException | URISyntaxException | ArgusException ex){
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
         //Run the intervalle program
         result = ExecUtils.execCommand(commandline, Application.getTempDir(),false, "Run Audit program");
         
-        if (result !=0){ throw new ArgusException("The audit program was not completed successfully");}
+        if (result != 0){ throw new ArgusException("The audit program was not completed successfully");}
         if (!TauArgusUtils.ExistFile(Application.getTempFile("Anneke.Out"))){
             throw new ArgusException("The audit program was not completed successfully\nNo output file found");
         } 
         try{
             BufferedReader in = new BufferedReader(new FileReader(Application.getTempFile("Anneke.Out")));
             Tokenizer tokenizer = new Tokenizer(in);
-            BufferedWriter out = new BufferedWriter(new FileWriter(Application.getTempFile("audit_"+tabNo+ ".html")));
+            BufferedWriter out2 = new BufferedWriter(new FileWriter(Application.getTempFile("audit_"+tabNo+ ".html")));
             //KopHTML
             int lineNumber = 0;
             for (i=0;i<4;i++){hs = tokenizer.nextLine();}  //first 4 lines are skipped
-            SaveTable.writeKopHtml(tableSet, out, false);
-            out.write("<!--XXXXXXXXXXXXXX-->"); out.newLine();
-            out.write("<h2>Overview of not-properly protected cells</h2>"); out.newLine();
+            SaveTable.writeKopHtml(tableSet, out2, false);
+            out2.write("<!--XXXXXXXXXXXXXX-->"); out2.newLine();
+            out2.write("<h2>Overview of not-properly protected cells</h2>"); out2.newLine();
             while ((tokenizer.nextLine()) != null) {
                 hs = tokenizer.nextField(";");
                 cn = Integer.parseInt(hs);
@@ -314,16 +317,16 @@ public class OptiSuppress {
                 if (tokenizer.getLine().equals("u;1")){
                     lineNumber++;
                     if(lineNumber==1){
-                        out.write("<table>"); out.newLine();
-                        out.write("  <tr>"); out.newLine();
+                        out2.write("<table>"); out2.newLine();
+                        out2.write("  <tr>"); out2.newLine();
                         for (i=0;i<tableSet.expVar.size();i++) {
-                            out.write("    <td>"+tableSet.expVar.get(i).name  +"</td>"); out.newLine();
+                            out2.write("    <td>"+tableSet.expVar.get(i).name  +"</td>"); out2.newLine();
                         }
-                        out.write("    <td>Lower Prot.</td>");out.newLine();
-                        out.write("    <td>Cell value</td>");out.newLine();
-                        out.write("    <td>Upper Prot.</td> ");out.newLine();
-                        out.write("    <td>Exact</td>"); out.newLine();
-                        out.write("  </tr>"); out.newLine();
+                        out2.write("    <td>Lower Prot.</td>");out2.newLine();
+                        out2.write("    <td>Cell value</td>");out2.newLine();
+                        out2.write("    <td>Upper Prot.</td> ");out2.newLine();
+                        out2.write("    <td>Exact</td>"); out2.newLine();
+                        out2.write("  </tr>"); out2.newLine();
                     }
                     hs = TableService.IndexToCodesString(tableSet, cn);
                     hs = hs.replace(",", "</td><td align=\"Right\">");
@@ -335,13 +338,13 @@ public class OptiSuppress {
                     else {hs = hs +"&nbsp;";tableSet.auditPartialDisclosure++;}
                     
                     hs = hs + "</td></tr>";
-                    out.write(hs); out.newLine();
+                    out2.write(hs); out2.newLine();
                 }
             }
-            if(lineNumber>0){out.write("</table>"); out.newLine();}
-            out.write("<!--XXXXXXXXXXXXXX-->"); out.newLine();
-            SaveTable.writeStaartHTML(out);
-            out.close();
+            if(lineNumber>0){out2.write("</table>"); out2.newLine();}
+            out2.write("<!--XXXXXXXXXXXXXX-->"); out2.newLine();
+            SaveTable.writeStaartHTML(out2);
+            out2.close();
             tableSet.hasBeenAudited = true;   
             SystemUtils.writeLogbook("End of Audit procedure\n" + 
                                      tableSet.auditExactDisclosure + " cells could be exactly disclosed\n"+
@@ -370,7 +373,7 @@ public class OptiSuppress {
         
         try {
             command = SystemUtils.getApplicationDirectory(OptiSuppress.class).getCanonicalPath();
-        } catch (Exception ex) {}
+        } catch (IOException | URISyntaxException ex) {JOptionPane.showMessageDialog(null, ex.toString());}
 
         if (doExpert){ // clean possible output files
             for(i=0;i<solverNames.length;i++){TauArgusUtils.DeleteFile(Application.getTempFile("CTA_"+solverNames[i]+".sol"));}
@@ -416,10 +419,10 @@ public class OptiSuppress {
                 case Application.SOLVER_NO: throw new ArgusException("No solver has been selected so CTA cannot be applied");            
             }
         }
-        BufferedWriter out = new BufferedWriter(new FileWriter(Application.getTempFile("CTA.bat")));
-        out.write(command); out.newLine();
-        out.write ("pause"); out.newLine();
-        out.close();
+        BufferedWriter out2 = new BufferedWriter(new FileWriter(Application.getTempFile("CTA.bat")));
+        out2.write(command); out2.newLine();
+        out2.write ("pause"); out2.newLine();
+        out2.close();
         
         solFile = Application.getTempDir() + "/CTA_" + solver + ".sol";        
         oke = TauArgusUtils.DeleteFile(solFile);
@@ -451,27 +454,7 @@ public class OptiSuppress {
             tableSet.suppressINFO = "Standard CTA solution has been applied<br>" +
                                     "Solver used : " + solver + "<br>" + hs;
         }
-        if (doExpert){ // try to find a solutions file;  we take the first non-empty one
-            solFile = ""; long lastTime, lt;
-            lastTime = 0;
-            for(i=0;i<solverNames.length;i++){
-                hs = Application.getTempFile("CTA_"+solverNames[i]+".sol");  
-                if (TauArgusUtils.ExistFile(hs)){
-                    hs = Application.getTempFile("CTA_"+solverNames[i]+".sol"); 
-                    if (TauArgusUtils.FileLength(hs)>0) {
-                        lt = TauArgusUtils.FileLastModified(hs);
-                        if (lt > lastTime){
-                            lastTime = lt;  
-                            solFile = hs;   
-                            solver = solverNames[i];
-                        }
-                    }
-                }  
-            }
-            if (solFile.equals("")) {throw new ArgusException("No solution file of CTA-program found");}
-            tableSet.suppressINFO = "Expert CTA solution has been applied<br>" +
-                                    "Solver used : " + solver+ "<br>";
-        }
+        if (doExpert)
         if (TauArgusUtils.FileLength(solFile)==0){ throw new ArgusException("Solution file of CTA-program is empty");}
         
         //Read rthe results back
@@ -490,7 +473,8 @@ public class OptiSuppress {
             }
             tokenizer.close();
         }
-        finally {reader.close();}
+        catch(FileNotFoundException | NumberFormatException ex){JOptionPane.showMessageDialog(null, ex.toString());}
+        finally {if (reader != null) reader.close();}
          
         Date endDate = new Date();
         long diff = endDate.getTime()-startDate.getTime();
@@ -519,7 +503,7 @@ public class OptiSuppress {
         String hs, kop, zeroline = "0.0 z 0 0";
         int aant;
         try{
-            BufferedWriter out = new BufferedWriter(new FileWriter(Application.getTempFile("Hitastab.txt")));
+            BufferedWriter out2 = new BufferedWriter(new FileWriter(Application.getTempFile("Hitastab.txt")));
             BufferedReader in =  new BufferedReader(new FileReader(Application.getTempFile("Hitastab.kld")));
             //while (in.ready()){
             try {
@@ -530,9 +514,9 @@ public class OptiSuppress {
             aant = hs.substring(12).indexOf(' ') + 6;
             while (hs != null){
                 kop = hs.substring(0, 11);
-                out.write(kop.substring(0, 6) + "    0 " + hs.substring(12)); out.newLine();
-                out.write(kop.substring(0, 6) + "    1 " + hs.substring(12)); out.newLine();
-                out.write(kop.substring(0, 6) + "    2 " + zeroline.format("%" + aant + "s",zeroline)); out.newLine();
+                out2.write(kop.substring(0, 6) + "    0 " + hs.substring(12)); out2.newLine();
+                out2.write(kop.substring(0, 6) + "    1 " + hs.substring(12)); out2.newLine();
+                out2.write(kop.substring(0, 6) + "    2 " + zeroline.format("%" + aant + "s",zeroline)); out2.newLine();
                 try {
                     hs = in.readLine();
                 } catch (IOException ex){
@@ -540,19 +524,19 @@ public class OptiSuppress {
                 }
             }
             in.close();
-            out.close();
-            out = new BufferedWriter(new FileWriter(Application.getTempFile("hitasv2.txt")));
-            out.write("var_2"); out.newLine();
-            out.write(".0");out.newLine();
-            out.write(".1");out.newLine();
-            out.close();
-            out = new BufferedWriter(new FileWriter(Application.getTempFile("NFS.txt")));
-            out.write("2");out.newLine();
-            out.write (Application.getTempFile("hitasv1.txt")); out.newLine();
-            out.write (Application.getTempFile("hitasv2.txt")); out.newLine();
-            out.write (Application.getTempFile("Hitastab.txt")); out.newLine();
-            out.write (Application.getTempFile("hitassec.txt")); out.newLine();
-            out.close();
+            out2.close();
+            out2 = new BufferedWriter(new FileWriter(Application.getTempFile("hitasv2.txt")));
+            out2.write("var_2"); out2.newLine();
+            out2.write(".0");out2.newLine();
+            out2.write(".1");out2.newLine();
+            out2.close();
+            out2 = new BufferedWriter(new FileWriter(Application.getTempFile("NFS.txt")));
+            out2.write("2");out2.newLine();
+            out2.write (Application.getTempFile("hitasv1.txt")); out2.newLine();
+            out2.write (Application.getTempFile("hitasv2.txt")); out2.newLine();
+            out2.write (Application.getTempFile("Hitastab.txt")); out2.newLine();
+            out2.write (Application.getTempFile("hitassec.txt")); out2.newLine();
+            out2.close();
         }
         catch (Exception ex){}
     }
@@ -592,7 +576,7 @@ public class OptiSuppress {
         fileHitasVtxt.renameTo(new File(Application.getTempFile(hs+".kld")));  
 
         try{
-            BufferedWriter out = new BufferedWriter(new FileWriter(Application.getTempFile(hs+".txt")));
+            BufferedWriter out2 = new BufferedWriter(new FileWriter(Application.getTempFile(hs+".txt")));
             BufferedReader in =  new BufferedReader(new FileReader(Application.getTempFile(hs+".kld")));
             while (in.ready()){
                 hs = in.readLine();
@@ -602,10 +586,10 @@ public class OptiSuppress {
                 hs = hs.substring(i);
                 hs = hs.replace (".", "_");
                 hs = dots.substring(0, i) + hs;
-                out.write(hs);
-                out.newLine();
+                out2.write(hs);
+                out2.newLine();
             }
-            out.close();
+            out2.close();
             in.close();
             if (fileKlad.exists() && !Application.isAnco()) { fileKlad.delete();}
         }
@@ -729,15 +713,20 @@ public class OptiSuppress {
             ControleerHITAStabtxt(tableSet); 
             if (tableSet.expVar.size() == 1) {verdubbelHitasTxt();}
        
-            TauArgusUtils.DeleteFile(Application.getTempFile("bt.dat"));
-            TauArgusUtils.DeleteFile(Application.getTempFile("jjuit.dat"));
-            TauArgusUtils.DeleteFile(Application.getTempFile("infeas.dat"));
+            // Clean up possible left over temp-files previous run of modular/HiTaS
+            TauArgusUtils.DeleteFile(Application.getTempFile("BT.dat"));
+            TauArgusUtils.DeleteFile(Application.getTempFile("JJUit.dat"));
+            TauArgusUtils.DeleteFile(Application.getTempFile("InFeas.dat"));
             TauArgusUtils.DeleteFile(Application.getTempFile("hitassec.txt"));
-            TauArgusUtils.DeleteFile(Application.getTempFile("hitas.log")); //op verzoek van Helen
-            TauArgusUtils.DeleteFile(Application.getTempFile("csp.bra"));  //op verzoek van Helen
-            TauArgusUtils.DeleteFile(Application.getTempFile("CPWProb.log")); //op verzoek van Helen
-            TauArgusUtils.DeleteFile(Application.getTempFile("sdcnet.lp")); //op verzoek van Helen
-            TauArgusUtils.DeleteFile(Application.getTempFile("hierinfo.dat")); //op verzoek van Helen
+            TauArgusUtils.DeleteFile(Application.getTempFile("HiTaS.log")); 
+            TauArgusUtils.DeleteFile(Application.getTempFile("cspSCIP.bra"));
+            TauArgusUtils.DeleteFile(Application.getTempFile("cspSCIP.heu"));
+            TauArgusUtils.DeleteFile(Application.getTempFile("cspSCIP.sta"));
+            TauArgusUtils.DeleteFile(Application.getTempFile("CSPlogfile.txt"));
+            TauArgusUtils.DeleteFile(Application.getTempFile("sdcnet.lp"));
+            TauArgusUtils.DeleteFile(Application.getTempFile("sdc.lp"));
+            TauArgusUtils.DeleteFile(Application.getTempFile("problem.lp"));
+            TauArgusUtils.DeleteFile(Application.getTempFile("hierinfo.dat"));
 
         //Run Hitas
         hs = "";
@@ -833,7 +822,7 @@ public class OptiSuppress {
     
         epsilon = 1.0 / ( 10^(i+1));
         try{
-            BufferedWriter out = new BufferedWriter(new FileWriter(Application.getTempFile("Hitastab.txt")));
+            BufferedWriter out2 = new BufferedWriter(new FileWriter(Application.getTempFile("Hitastab.txt")));
   
             Tokenizer tokenizer;
             tokenizer = null;
@@ -893,11 +882,11 @@ public class OptiSuppress {
                     if ("-".equals(token.substring(0,1))) {token = token.substring(1);}
                     regelOut = regelOut + " " + token; //Cost
                 }
-                out.write (regelOut);
-                out.newLine();
+                out2.write (regelOut);
+                out2.newLine();
             }
             tokenizer.close();
-            out.close();
+            out2.close();
         }
         catch (Exception ex){}
     }
@@ -954,14 +943,14 @@ public class OptiSuppress {
         }
         //modify the output for reading the secondaries
         BufferedReader  in = new BufferedReader(new FileReader(Application.getTempFile("s.txt"))); 
-        BufferedWriter out = new BufferedWriter(new FileWriter(Application.getTempFile("s1.txt")));
-        out.write("fop"); out.newLine();
-        out.write("fop"); out.newLine();
+        BufferedWriter out2 = new BufferedWriter(new FileWriter(Application.getTempFile("s1.txt")));
+        out2.write("fop"); out2.newLine();
+        out2.write("fop"); out2.newLine();
         while ( (hs = in.readLine()) != null){
             hs = hs + " m";
-            out.write(hs); out.newLine();
+            out2.write(hs); out2.newLine();
         }
-        in.close(); out.close();
+        in.close(); out2.close();
       
         result = tauArgus.SetSecondaryJJFORMAT(tableSet.index, Application.getTempFile("s1.txt"), false, nSec);
 
@@ -1215,9 +1204,9 @@ public class OptiSuppress {
         TauArgusUtils.renameFile (fn, Application.getTempFile("klad"));
         try{
             BufferedReader in = new BufferedReader(new FileReader(Application.getTempFile("klad")));
-            BufferedWriter out = new BufferedWriter(new FileWriter(fn));
-            regel[0] = in.readLine(); out.write(regel[0]); out.newLine();
-            regel[0] = in.readLine(); out.write(regel[0]); out.newLine();
+            BufferedWriter out2 = new BufferedWriter(new FileWriter(fn));
+            regel[0] = in.readLine(); out2.write(regel[0]); out2.newLine();
+            regel[0] = in.readLine(); out2.write(regel[0]); out2.newLine();
             n = Integer.parseInt(regel[0]);
             for (i=0;i<n;i++){
                 regel[0] = in.readLine(); 
@@ -1243,7 +1232,7 @@ public class OptiSuppress {
                     } else{
                         regelUit = regelUit + " "+ regel[0];  
                     }
-                    out.write(regelUit); out.newLine();
+                    out2.write(regelUit); out2.newLine();
                 } else{
                     if (unitCost) {
                         regelUit = ""; // regel[0].substring(0,p+1);
@@ -1254,36 +1243,36 @@ public class OptiSuppress {
                         hs = TauArgusUtils.GetSimpleToken(regel);
                         if (unitCost) {hs ="1";}
                         regelUit = regelUit + hs + " ";
-                        out.write (regelUit + regel[0]);
+                        out2.write (regelUit + regel[0]);
                     }
-                    else {out.write(regel[0]);}
-                    out.newLine();
+                    else {out2.write(regel[0]);}
+                    out2.newLine();
                 }
             } //end loop over the cells
             if (noPartitions){
                 regel[0] = in.readLine();
                 if (regel[0].trim().equals("1")){  //somehow JJ does not like one restriction only
-                    out.write("2");  out.newLine(); 
+                    out2.write("2");  out2.newLine(); 
                     regel[0] = in.readLine();
-                    out.write(regel[0]); out.newLine();
-                    out.write(regel[0]); out.newLine();
+                    out2.write(regel[0]); out2.newLine();
+                    out2.write(regel[0]); out2.newLine();
                 }
-                out.write(regel[0]); out.newLine();
+                out2.write(regel[0]); out2.newLine();
                 regel[0] = in.readLine();
                 while (regel[0] != null){
-                    out.write(regel[0]); out.newLine();
+                    out2.write(regel[0]); out2.newLine();
                     regel[0] = in.readLine();            
                 }          
             }
             else{ //Partitions but what about the single restiction problem?? 
                 regel[0] = in.readLine();
                 while (regel[0] != null){
-                    out.write(regel[0]); out.newLine();
+                    out2.write(regel[0]); out2.newLine();
                     regel[0] = in.readLine();            
                 }    
             }
             in.close();
-            out.close();
+            out2.close();
             return true;
         }
         catch(Exception ex){ 
@@ -1558,13 +1547,13 @@ public class OptiSuppress {
         }
         try{ 
             BufferedReader  in  = new BufferedReader(new FileReader(Application.getTempFile("JJ.OUT")));    
-            BufferedWriter out = new BufferedWriter(new FileWriter(Application.getTempFile("JJ2.OUT")));
-            out.write ("fop"); out.newLine();
-            out.write ("fop"); out.newLine();
+            BufferedWriter out2 = new BufferedWriter(new FileWriter(Application.getTempFile("JJ2.OUT")));
+            out2.write ("fop"); out2.newLine();
+            out2.write ("fop"); out2.newLine();
             while((hs = in.readLine()) != null) { 
-                out.write(hs + " m"); out.newLine();
+                out2.write(hs + " m"); out2.newLine();
             } 
-            in.close(); out.close();
+            in.close(); out2.close();
         } 
         catch (IOException ex){
             throw new ArgusException("An error occured while processing the output of Optimal");
@@ -1633,15 +1622,15 @@ public class OptiSuppress {
      */
     public static int addSecondariesToJJFile (String JJInputFile, String JJOutputFile ){
         int i, n, nSec; String hs, regel; int curr;  
-        BufferedReader in,sec;  BufferedWriter out;
+        BufferedReader in,sec;  BufferedWriter out2;
         try{
             in = new BufferedReader(new FileReader(JJInputFile));
             sec = new BufferedReader(new FileReader(Application.getTempFile(Application.getTempFile("JJ.OUT"))));
-            out = new BufferedWriter(new FileWriter(JJOutputFile));
+            out2 = new BufferedWriter(new FileWriter(JJOutputFile));
             regel = in.readLine();
-            out.write(regel);out.newLine();
+            out2.write(regel);out2.newLine();
             regel = in.readLine();
-            out.write(regel);out.newLine();
+            out2.write(regel);out2.newLine();
             n = Integer.parseInt(regel);
             nSec = 0;
             if (sec.ready()){
@@ -1654,13 +1643,13 @@ public class OptiSuppress {
                     if (regel.contains("s")){regel= regel.replace("s", "m"); nSec++;}
                     if (sec.ready()){hs = sec.readLine().trim(); curr = Integer.parseInt(hs);} else{curr = 999999999;}
                 }
-                out.write(regel); out.newLine();
+                out2.write(regel); out2.newLine();
             }
             while (in.ready()){
                 regel = in.readLine();
-                out.write(regel); out.newLine();
+                out2.write(regel); out2.newLine();
             }
-            in.close(); sec.close(); out.close();
+            in.close(); sec.close(); out2.close();
             return nSec;
         }
         catch (FileNotFoundException ex){return -1;}

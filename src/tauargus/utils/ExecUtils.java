@@ -241,8 +241,8 @@ public class ExecUtils {
         } catch (InterruptedException ex) {
             //windowInfo.setVisible(false);
             System.out.println("Process is interrupted: " + commandString);
-        } catch (URISyntaxException ex) {
-            System.out.println("Exception is thrown: " + ex.getMessage());
+        } catch (URISyntaxException | NullPointerException | IndexOutOfBoundsException ex) {
+            System.out.println("Exception is thrown by " + ex.toString());
         }
         finally {
             if (!silent) {
