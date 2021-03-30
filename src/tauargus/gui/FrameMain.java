@@ -17,36 +17,38 @@
 
 package tauargus.gui;
 
+import argus.utils.StrUtils;
+import argus.utils.SystemUtils;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-//import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-//import java.util.logging.Level;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import static javax.swing.JViewport.SIMPLE_SCROLL_MODE;
+import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import tauargus.model.Application;
 import tauargus.model.ArgusException;
 import tauargus.model.DataFilePair;
 import tauargus.model.LinkedTables;
 import tauargus.model.Metadata;
+import tauargus.model.SpssUtilsTau;
 import tauargus.model.TableSet;
 import tauargus.model.batch;
 import tauargus.service.TableService;
-import argus.utils.StrUtils;
-//import tauargus.gui.PanelTable;
-//import tauargus.utils.ExecUtils;
-import argus.utils.SystemUtils;
-import tauargus.model.SpssUtilsTau;
 import tauargus.utils.TauArgusUtils;
 
 public class FrameMain extends javax.swing.JFrame {
@@ -58,6 +60,7 @@ public class FrameMain extends javax.swing.JFrame {
     private final Action openMicrodataAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
+            boolean MetadataError = false;
             DialogOpenMicrodata dialog = new DialogOpenMicrodata(FrameMain.this, true);
             if (dialog.showDialog() == DialogOpenMicrodata.APPROVE_OPTION) {
                 DataFilePair dataFilePair = dialog.getMicrodataFilePair();
@@ -75,36 +78,41 @@ public class FrameMain extends javax.swing.JFrame {
                 
                 //If the datafile is a SAV file, then we assume the file is a SPSS systemfile
                 //and so we will first read the SPSS metadata
-                
-                
+              
                 if (!metadata.metaFile.trim().equals(""))
                 {
                     try {
                         metadata.readMicroMetadata();
-// Anco 1.6                        
-//                    } catch (ArgusException | FileNotFoundException ex) {
-                    } catch (ArgusException  ex) {
-                        if (!ex.getMessage().isEmpty()){JOptionPane.showMessageDialog(FrameMain.this, ex.getMessage());}}
-                      catch ( FileNotFoundException ex) {
+                    }
+                    catch (ArgusException  ex) {
+                        if (!ex.getMessage().isEmpty()){
+                            JOptionPane.showMessageDialog(FrameMain.this, ex.getMessage());
+                            MetadataError = true;
+                        }
+                    }
+                    catch ( FileNotFoundException ex) {
                         JOptionPane.showMessageDialog(FrameMain.this, ex.getMessage());  
                     } 
  // If SPSS then check the validity of the metadata  
-                if (metadata.dataFileType == Metadata.DATA_FILE_TYPE_SPSS){
-                    try{
-                       SpssUtilsTau.checkSpssMeta (metadata); 
-                    }
-                    catch (ArgusException ex){
-                      JOptionPane.showMessageDialog(FrameMain.this, ex.getMessage()+ 
-                              "\nPlease correct first"); 
-                      Application.clearMetadatas();
-                      metadata = null;
-                    }
-                    
-                }    
-                    
+                    if (metadata.dataFileType == Metadata.DATA_FILE_TYPE_SPSS){
+                        try{
+                            SpssUtilsTau.checkSpssMeta (metadata); 
+                        }
+                        catch (ArgusException ex){
+                            JOptionPane.showMessageDialog(FrameMain.this, ex.getMessage()+ 
+                                                                  "\nPlease correct first"); 
+                            Application.clearMetadatas();
+                            metadata = null;
+                        }
+                    }    
                 }
                 
                 Application.addMetadata(metadata);
+                if (MetadataError){ // then show metadata window
+                    for (ActionListener a: menuItemSpecifyMetadata.getActionListeners()){
+                        a.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null) { });
+                    }
+                }
                 organise();
             }
         }
@@ -145,8 +153,8 @@ public class FrameMain extends javax.swing.JFrame {
     private final Action specifyMetadataAction = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            DialogSpecifyMetadata dialog = new DialogSpecifyMetadata(FrameMain.this, true);
             Metadata metadata = Application.getMetadata(0);
+            DialogSpecifyMetadata dialog = new DialogSpecifyMetadata(FrameMain.this, true);
             if (dialog.showDialog(metadata) == DialogSpecifyMetadata.APPROVE_OPTION) {
                 organise();
             }
@@ -192,6 +200,7 @@ public class FrameMain extends javax.swing.JFrame {
         try {
             if (LinkedTables.TestLinkedPossible()){
                 DialogLinkedTables dialog = new DialogLinkedTables(FrameMain.this, true);
+                dialog.setLocationRelativeTo(FrameMain.this);
                 dialog.setVisible(true);
         
                 panelTable.setTable(currentTable);
@@ -208,6 +217,7 @@ public class FrameMain extends javax.swing.JFrame {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             DialogAPriori dialog = new DialogAPriori(FrameMain.this, true);
+            dialog.setLocationRelativeTo(FrameMain.this);
             dialog.setVisible(true);
         }        
     };
@@ -238,6 +248,7 @@ public class FrameMain extends javax.swing.JFrame {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             DialogOptions dialog = new DialogOptions(FrameMain.this, true);
+            dialog.setLocationRelativeTo(FrameMain.this);
             dialog.setVisible(true);
             if (TableService.numberOfTables() != 0) {panelTable.enableHiddenFeatures(Application.isAnco());}
         }
@@ -272,25 +283,8 @@ public class FrameMain extends javax.swing.JFrame {
         initComponents();
         panelTable = new tauargus.gui.PanelTable();
         jScrollPane1.setViewportView(panelTable);
+        jScrollPane1.getViewport().setScrollMode(SIMPLE_SCROLL_MODE);
         fileChooser = new javax.swing.JFileChooser();
-        
-//        panelTable.setVisible(false);
-
-        // TODO Remove this after testing period.
-//        if (Application.numberOfMetadatas() == 0) {
-//            DataFilePair dataFilePair = new DataFilePair("C:\\Users\\Gebruiker\\Projects\\TauArgusVB\\Data\\tau_testW.asc", "C:\\Users\\Gebruiker\\Projects\\TauArgusVB\\Data\\tau_testW.rda");
-//            Metadata metadata = new Metadata(false);
-//            metadata.metaFile = dataFilePair.getMetaFileName();
-//            metadata.dataFile = dataFilePair.getDataFileName();
-//            Application.clearMetadatas();
-//            try {
-//                metadata.readMicroMetadata();
-//                Application.addMetadata(metadata);
-//            } 
-//            catch (Exception ex) {
-//                JOptionPane.showMessageDialog(this, ex.getMessage());
-//            }
-//        }
         
         if (TableService.numberOfTables() > 0) {
             currentTable = TableService.getTable(0);
@@ -301,13 +295,13 @@ public class FrameMain extends javax.swing.JFrame {
         organise();
     }
     
-    public void organise() {
+    private void organise() {
         specifyMetadataAction.setEnabled(Application.numberOfMetadatas() > 0);
-        specifyTablesAction.setEnabled(Application.numberOfMetadatas() > 0);
+        specifyTablesAction.setEnabled((Application.numberOfMetadatas() > 0) && (Application.getMetadatas().get(0).containsExplanatoryVariable()));
 
         selectTableAction.setEnabled(TableService.numberOfTables() > 1);     
-        menuItemLinkedTables.setEnabled(TableService.numberOfTables() != 0);
-        LinkedTablesAction.setEnabled(TableService.numberOfTables() != 0);
+        menuItemLinkedTables.setEnabled(TableService.numberOfTables() > 1);
+        LinkedTablesAction.setEnabled(TableService.numberOfTables() > 1);
         
         saveTableAction.setEnabled(TableService.numberOfTables() != 0);
         viewReportAction.setEnabled(TableService.numberOfTables() != 0);      
@@ -320,14 +314,16 @@ public class FrameMain extends javax.swing.JFrame {
         panelTable.setVisible(TableService.numberOfTables() != 0);
         if (TableService.numberOfTables() != 0) {panelTable.enableHiddenFeatures(Application.isAnco());}
     }
+    
+    public void organiseAnco(){
+        organise();
+    }
 
     @Override
     public List<Image> getIconImages() {
         URL url = FrameMain.class.getResource("/tauargus/resources/Tau32.png");
         Image image = Toolkit.getDefaultToolkit().getImage(url);
-// Anco 1.6
-//        ArrayList<Image> imageList = new ArrayList<>();
-        ArrayList<Image> imageList = new ArrayList<Image>();
+        ArrayList<Image> imageList = new ArrayList<>();
         imageList.add(image);
         return imageList;
     }
@@ -344,6 +340,8 @@ public class FrameMain extends javax.swing.JFrame {
         toolBar = new javax.swing.JToolBar();
         buttonOpenMicrodata = new javax.swing.JButton();
         buttonOpenTable = new javax.swing.JButton();
+        buttonOpenTableSet = new javax.swing.JButton();
+        buttonOpenBatchProcess = new javax.swing.JButton();
         separator4 = new javax.swing.JToolBar.Separator();
         buttonSpecifyMetadata = new javax.swing.JButton();
         buttonSpecifyTables = new javax.swing.JButton();
@@ -355,8 +353,9 @@ public class FrameMain extends javax.swing.JFrame {
         buttonViewReport = new javax.swing.JButton();
         buttonGenerateApriori = new javax.swing.JButton();
         separator7 = new javax.swing.JToolBar.Separator();
-        buttonOptions = new javax.swing.JButton();
         buttonHelp = new javax.swing.JButton();
+        buttonOptions = new javax.swing.JButton();
+        buttonAbout = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         menuBar = new javax.swing.JMenuBar();
         menuFile = new javax.swing.JMenu();
@@ -416,6 +415,30 @@ public class FrameMain extends javax.swing.JFrame {
         buttonOpenTable.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         buttonOpenTable.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         toolBar.add(buttonOpenTable);
+
+        buttonOpenTableSet.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/OpenTableSet.png"))); // NOI18N
+        buttonOpenTableSet.setToolTipText("Open TableSet...");
+        buttonOpenTableSet.setFocusable(false);
+        buttonOpenTableSet.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        buttonOpenTableSet.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        buttonOpenTableSet.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemOpenTableSetActionPerformed(evt);
+            }
+        });
+        toolBar.add(buttonOpenTableSet);
+
+        buttonOpenBatchProcess.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/OpenBatch.png"))); // NOI18N
+        buttonOpenBatchProcess.setToolTipText("Open Batch Process...");
+        buttonOpenBatchProcess.setFocusable(false);
+        buttonOpenBatchProcess.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        buttonOpenBatchProcess.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        buttonOpenBatchProcess.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemOpenBatchProcessActionPerformed(evt);
+            }
+        });
+        toolBar.add(buttonOpenBatchProcess);
         toolBar.add(separator4);
 
         buttonSpecifyMetadata.setAction(specifyMetadataAction);
@@ -478,14 +501,6 @@ public class FrameMain extends javax.swing.JFrame {
         toolBar.add(buttonGenerateApriori);
         toolBar.add(separator7);
 
-        buttonOptions.setAction(OptionsAction);
-        buttonOptions.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/options.png"))); // NOI18N
-        buttonOptions.setToolTipText("Options");
-        buttonOptions.setFocusable(false);
-        buttonOptions.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        buttonOptions.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        toolBar.add(buttonOptions);
-
         buttonHelp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/Help.png"))); // NOI18N
         buttonHelp.setToolTipText("Help");
         buttonHelp.setFocusable(false);
@@ -498,6 +513,26 @@ public class FrameMain extends javax.swing.JFrame {
         });
         toolBar.add(buttonHelp);
 
+        buttonOptions.setAction(OptionsAction);
+        buttonOptions.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/options.png"))); // NOI18N
+        buttonOptions.setToolTipText("Options");
+        buttonOptions.setFocusable(false);
+        buttonOptions.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        buttonOptions.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        toolBar.add(buttonOptions);
+
+        buttonAbout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/about.png"))); // NOI18N
+        buttonAbout.setToolTipText("About");
+        buttonAbout.setFocusable(false);
+        buttonAbout.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        buttonAbout.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        buttonAbout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemAboutActionPerformed(evt);
+            }
+        });
+        toolBar.add(buttonAbout);
+
         jScrollPane1.setMaximumSize(new java.awt.Dimension(0, 0));
 
         menuFile.setMnemonic('F');
@@ -508,11 +543,6 @@ public class FrameMain extends javax.swing.JFrame {
         menuItemOpenMicrodata.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/OpenMicrodata.png"))); // NOI18N
         menuItemOpenMicrodata.setMnemonic('M');
         menuItemOpenMicrodata.setText("Open Microdata...");
-        menuItemOpenMicrodata.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuItemOpenMicrodataActionPerformed(evt);
-            }
-        });
         menuFile.add(menuItemOpenMicrodata);
 
         menuItemOpenTable.setAction(openTableAction);
@@ -520,13 +550,9 @@ public class FrameMain extends javax.swing.JFrame {
         menuItemOpenTable.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/OpenTable.png"))); // NOI18N
         menuItemOpenTable.setMnemonic('T');
         menuItemOpenTable.setText("Open Table...");
-        menuItemOpenTable.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuItemOpenTableActionPerformed(evt);
-            }
-        });
         menuFile.add(menuItemOpenTable);
 
+        menuItemOpenTableSet.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/OpenTableSet.png"))); // NOI18N
         menuItemOpenTableSet.setMnemonic('S');
         menuItemOpenTableSet.setText("Open Table Set...");
         menuItemOpenTableSet.addActionListener(new java.awt.event.ActionListener() {
@@ -537,6 +563,7 @@ public class FrameMain extends javax.swing.JFrame {
         menuFile.add(menuItemOpenTableSet);
         menuFile.add(separator1);
 
+        menuItemOpenBatchProcess.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/OpenBatch.png"))); // NOI18N
         menuItemOpenBatchProcess.setMnemonic('B');
         menuItemOpenBatchProcess.setText("Open Batch Process...");
         menuItemOpenBatchProcess.addActionListener(new java.awt.event.ActionListener() {
@@ -583,11 +610,6 @@ public class FrameMain extends javax.swing.JFrame {
         menuItemSelectTable.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/SelectTable.png"))); // NOI18N
         menuItemSelectTable.setMnemonic('S');
         menuItemSelectTable.setText("Select Table...");
-        menuItemSelectTable.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuItemSelectTableActionPerformed(evt);
-            }
-        });
         menuModify.add(menuItemSelectTable);
 
         menuItemLinkedTables.setAction(LinkedTablesAction);
@@ -712,6 +734,7 @@ public class FrameMain extends javax.swing.JFrame {
         });
         menuHelp.add(menuItemSolverOptions);
 
+        menuItemAbout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tauargus/resources/about.png"))); // NOI18N
         menuItemAbout.setMnemonic('A');
         menuItemAbout.setText("About");
         menuItemAbout.setName(""); // NOI18N
@@ -796,7 +819,7 @@ public class FrameMain extends javax.swing.JFrame {
         String hs="";
         DialogHtmlViewer dialog = new DialogHtmlViewer(FrameMain.this, true);
         try{hs = SystemUtils.getApplicationDirectory(FrameMain.class).getCanonicalPath();}
-        catch (IOException ex){};
+        catch (Exception ex){}
         hs = hs +"/tauNews.html";
         if (TauArgusUtils.ExistFile(hs)){
         dialog.showDialog("News","file:////"+  hs);
@@ -808,7 +831,6 @@ public class FrameMain extends javax.swing.JFrame {
     private void menuItemAncoNewsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemAncoNewsActionPerformed
         DialogHtmlViewer dialog = new DialogHtmlViewer(FrameMain.this, true);
         JOptionPane.showMessageDialog(FrameMain.this, "The Anco news file tobe implemented"); 
-//        dialog.showDialog("Anco News", FrameMain.class.getResource("/tauargus/resources/NewsAnco.html"));
     }//GEN-LAST:event_menuItemAncoNewsActionPerformed
 
     private void menuItemSaveTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemSaveTableActionPerformed
@@ -816,48 +838,18 @@ public class FrameMain extends javax.swing.JFrame {
     }//GEN-LAST:event_menuItemSaveTableActionPerformed
 
     private void menuItemGenerateAprioryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemGenerateAprioryActionPerformed
-//        DialogAPriori dialog = new DialogAPriori(FrameMain.this, true);
-//        dialog.setVisible(true);
+        // TODO add your handling code here:
     }//GEN-LAST:event_menuItemGenerateAprioryActionPerformed
 
     private void menuItemOptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemOptionsActionPerformed
-//        DialogOptions dialog = new DialogOptions(FrameMain.this, true);
-//        dialog.setVisible(true);
-//        if (TableService.numberOfTables() != 0) {panelTable.enableHiddenFeatures(Application.isAnco());}
         // TODO add your handling code here:
     }//GEN-LAST:event_menuItemOptionsActionPerformed
 
     private void menuItemLinkedTablesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemLinkedTablesActionPerformed
-//       if (TableService.numberOfTables()<2){
-//           JOptionPane.showMessageDialog(FrameMain.this, "Unable to run the linked tables procedure;\n"+
-//                                                          "a minimum of 2 tables is needed");           
-//       }else{
-        
-/*        try {
-            if (LinkedTables.TestLinkedPossible()){
-                DialogLinkedTables dialog = new DialogLinkedTables(FrameMain.this, true);
-                dialog.setVisible(true);
-        
-                panelTable.setTable(currentTable);
-                organise();
-            }
-        }
-        catch (ArgusException ex){
-                 JOptionPane.showMessageDialog(FrameMain.this, ex.getMessage());}
-        // TODO add your handling code here:*/
+        // TODO add your handling code here:
     }//GEN-LAST:event_menuItemLinkedTablesActionPerformed
 
-    private void menuItemOpenMicrodataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemOpenMicrodataActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_menuItemOpenMicrodataActionPerformed
-
     private void menuItemOpenBatchProcessActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemOpenBatchProcessActionPerformed
-        // TODO add your handling code here:
-//        String hs = SystemUtils.getRegString("general", "datadir", "");
-//        if (!hs.equals("")){
-//            File file = new File(hs); 
-//            fileChooser.setCurrentDirectory(file);
-//        }
         TauArgusUtils.getDataDirFromRegistry(fileChooser);
         fileChooser.setDialogTitle("Open Batch file");
         fileChooser.setSelectedFile(new File(""));
@@ -869,77 +861,77 @@ public class FrameMain extends javax.swing.JFrame {
             String hs =fileChooser.getSelectedFile().toString();
             TauArgusUtils.putDataDirInRegistry(hs);
             Application.setBatch(Application.BATCH_FROMMENU);
-          
-//              String xs =fileChooser.getSelectedFile().toString();  
-//              batch.runBatchProcess(xs);
-// start a new thread to allow a window to show progress.               
-              new Thread(){
-                public void run(){
-                String xs =fileChooser.getSelectedFile().toString();  
-                batch.runBatchProcess(xs); 
-                if (TableService.numberOfTables() > 0) {
-                  currentTable = TableService.getTable(0);
-                  panelTable.setTable(currentTable);
+            // start a new thread to allow a window to show progress.               
+            final SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>(){
+                @Override
+                protected Void doInBackground()throws ArgusException, Exception{
+                    String xs =fileChooser.getSelectedFile().toString();  
+                    batch.runBatchProcess(xs); 
+                    return null;
                 }
-                organise();    
-               }
-             }.start();     
+                @Override
+                protected void done(){
+                    try{
+                        get();
+                        if (TableService.numberOfTables() > 0) {
+                            currentTable = TableService.getTable(0);
+                            panelTable.setTable(currentTable);
+                        }
+                        organise();    
+                    }
+                    catch (InterruptedException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    } catch (ExecutionException ex) {
+                        JOptionPane.showMessageDialog(null, ex.getCause().getMessage());
+                    }
+                }
+            };
+            worker.execute();    
         }           
     }//GEN-LAST:event_menuItemOpenBatchProcessActionPerformed
 
-    private void menuItemOpenTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemOpenTableActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_menuItemOpenTableActionPerformed
-
     private void menuItemSolverOptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemSolverOptionsActionPerformed
-        // TODO add your handling code here:
         DialogSolverOptions dialog = new DialogSolverOptions(FrameMain.this,true);
+        dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
     }//GEN-LAST:event_menuItemSolverOptionsActionPerformed
 
     private void menuItemWriteBatchFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemWriteBatchFileActionPerformed
-        // TODO add your handling code here:
         DialogWriteBatchFile dialog = new DialogWriteBatchFile(FrameMain.this,true);
+        dialog.setLocationRelativeTo(FrameMain.this);
         dialog.setVisible(true);
     }//GEN-LAST:event_menuItemWriteBatchFileActionPerformed
-
-    private void menuItemSelectTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemSelectTableActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_menuItemSelectTableActionPerformed
 
     private void menuItemViewReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemViewReportActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_menuItemViewReportActionPerformed
 
     private void menuItemProtectJJFormatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemProtectJJFormatActionPerformed
-        // TODO add your handling code here:
         DialogProtectJJFormat dialog = new DialogProtectJJFormat(FrameMain.this,true);
+        dialog.setLocationRelativeTo(FrameMain.this);
         dialog.setVisible(true);       
-        
     }//GEN-LAST:event_menuItemProtectJJFormatActionPerformed
 
-    private void buttonOpenMicrodataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonOpenMicrodataActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_buttonOpenMicrodataActionPerformed
-
     private void menuItemContentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemContentActionPerformed
-        // TODO add your handling code here:
-//        try{
-//        Application.showHelp("General");
-//        }
-//        catch (ArgusException ex){ JOptionPane.showMessageDialog(FrameMain.this, "The report file is not (yet) available ") ;}
         try{
             Application.showHelp("General");
             }
         catch (argus.model.ArgusException ex){JOptionPane.showMessageDialog(null, ex.getMessage());}
     }//GEN-LAST:event_menuItemContentActionPerformed
+
+    private void buttonOpenMicrodataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonOpenMicrodataActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_buttonOpenMicrodataActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton buttonAbout;
     private javax.swing.JButton buttonGenerateApriori;
     private javax.swing.JButton buttonHelp;
     private javax.swing.JButton buttonLinkedTables;
+    private javax.swing.JButton buttonOpenBatchProcess;
     private javax.swing.JButton buttonOpenMicrodata;
     private javax.swing.JButton buttonOpenTable;
+    private javax.swing.JButton buttonOpenTableSet;
     private javax.swing.JButton buttonOptions;
     private javax.swing.JButton buttonSaveTable;
     private javax.swing.JButton buttonSelectTable;

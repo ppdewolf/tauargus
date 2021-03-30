@@ -8,7 +8,41 @@
 <body>
 <h1>&tau;-ARGUS New developments </h1><p>
 <hr>
-<h2>Last modified: 10 July 2017</h2>
+<h2>Last modified: 7 February 2020</h2>
+<h2>&tau;-ARGUS version 4.2.0</h2>
+<hr><i>7 February 2020</i><br>
+Version 4.2.0 build 1<br>
+Introduced the Cell Key method (CKM) for frequency count tables and magnitude tables.<br>
+Possible to call CKM from batch file.<br>
+Added graph feedback on CKM for frequency count tables.<br>
+CKM for magnitude tables: parameters are defined in the .rda-file.<br>
+Adjusted the SpecifyMetadata dialog to be able to deal with CKM for magnitude tables.<br>
+No longer checks for CPLEX license file if CPLEX is not used.<br>
+Possible to save recode tree.<br>
+Request rule in batch now detects use of holdings.<br>
+Fixed bug that shadow variable and record key could not be first variable in microdata.<br>
+Fixed some error messages for controlled rounding (more informative).<br>
+<h2>&tau;-ARGUS version 4.1.7</h2>
+<hr><i>12 February 2017</i><br>
+Version 4.1.7 build 3<br>
+Small issue with reading back suppressions in specific linked tables set up fixed.
+<hr><i>19 December 2017</i><br>
+Version 4.1.7 build 2<br>
+Added checks on maximum number of dimensions for Modular, Optimal and Linked.<br>
+The generator of the batch-file has been improved. The weight and missing=safe parameters have been included and also the WRITETABLE command has been added.<br>
+Status M (secondary) will now be accepted when reading a (protected) table.<br>
+No more check for CPLEX Licence file while using other solvers in Rounder.<br>
+Negative "general total" no longer causes a crash.<br>
+Small fix in singleton protection for negative cells.<br>
+Small fix in saving tabular data.<br>
+Able to "walk" through table cells with arrow keys.<br>
+Cell stays selected after changing its state.<br>
+Fixed some issue with writing in intermediate format in batch (issue #36).<br>
+When generating a batch-file the writetable command now writes the correct table number.<br>
+Correct tab of rules-panel is chosen in DialogSelectTable.<br>
+Fixed bug of issue #79 (protected cells in combination with distance costs).<br>
+Linked Tables menu item now only enabled when at least 2 tables present.<br>
+Some minor GUI things.<br>
 <h2>&tau;-ARGUS version 4.1.6</h2>
 <hr><i>10 July 2017</i><br>
 Version 4.1.6 build 2<br>

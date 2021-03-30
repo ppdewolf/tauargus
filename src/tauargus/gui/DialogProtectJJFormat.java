@@ -27,7 +27,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
-//import tauargus.model.Application;
 import tauargus.model.OptiSuppress;
 import tauargus.utils.TauArgusUtils;
 
@@ -35,17 +34,16 @@ import tauargus.utils.TauArgusUtils;
  *
  * @author Hundepool
  */
-public class DialogProtectJJFormat extends javax.swing.JDialog {
+public class DialogProtectJJFormat extends DialogBase {
 
     /**
      * Creates new form DialogProtectJJFormat
      */
-    private javax.swing.JFileChooser fileChooser;
+    private final javax.swing.JFileChooser fileChooser;
     
     public DialogProtectJJFormat(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        setLocationRelativeTo(parent);
         fileChooser = new javax.swing.JFileChooser();
     }
 
@@ -213,23 +211,10 @@ public class DialogProtectJJFormat extends javax.swing.JDialog {
                     "Input file  " + jTextFieldJJInputFile.getText() + "\n"+
                     "Output file "+ jTextFieldJJInputFile.getText()+ "\n"+
                     nSec +" secondaries");              
-          }
-
-            
-  //  } catch (ArgusException ex){
-    //        JOptionPane.showMessageDialog(this, "No correct value for Max Time\n"+
-      //                                           ex.getMessage());
-
-        
+          }   
     }//GEN-LAST:event_jButtonProtectJJFileActionPerformed
 
     private void jButtonSearchJJInputFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSearchJJInputFileActionPerformed
-        // TODO add your handling code here:+
-//        String hs = SystemUtils.getRegString("general", "datadir", "");
-//        if (!hs.equals("")){
-//            File file = new File(hs); 
-//            fileChooser.setCurrentDirectory(file);
-//        }
         TauArgusUtils.getDataDirFromRegistry(fileChooser);
         fileChooser.setDialogTitle("Open JJ file");
         fileChooser.setSelectedFile(new File(""));
@@ -237,20 +222,13 @@ public class DialogProtectJJFormat extends javax.swing.JDialog {
         // filters are shown in order of declaration, setFileFilter sets the default filter
         fileChooser.setFileFilter(new FileNameExtensionFilter("JJ file (*.jj)", "jj"));
         if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
- //           textFieldMicrodata.setText(fileChooser.getSelectedFile().toString());
-          String hs = fileChooser.getSelectedFile().getPath();
-          jTextFieldJJInputFile.setText(hs);  
-          TauArgusUtils.putDataDirInRegistry(hs);
+            String hs = fileChooser.getSelectedFile().getPath();
+            jTextFieldJJInputFile.setText(hs);  
+            TauArgusUtils.putDataDirInRegistry(hs);
         }   
     }//GEN-LAST:event_jButtonSearchJJInputFileActionPerformed
 
     private void jButtonSearchJJOutputFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSearchJJOutputFileActionPerformed
-        // TODO add your handling code here:
-//        String hs = SystemUtils.getRegString("general", "datadir", "");
-//        if (!hs.equals("")){
-//            File file = new File(hs); 
-//            fileChooser.setCurrentDirectory(file);
-//        }
         TauArgusUtils.getDataDirFromRegistry(fileChooser);
         fileChooser.setDialogTitle("JJ output file");
         fileChooser.setSelectedFile(new File(""));
@@ -258,60 +236,59 @@ public class DialogProtectJJFormat extends javax.swing.JDialog {
         // filters are shown in order of declaration, setFileFilter sets the default filter
         fileChooser.setFileFilter(new FileNameExtensionFilter("JJ file (*.jj)", "jj"));
         if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
- //           textFieldMicrodata.setText(fileChooser.getSelectedFile().toString());
-          String hs = fileChooser.getSelectedFile().getPath();
-          jTextFieldJJOutputFile.setText(hs); 
-          TauArgusUtils.putDataDirInRegistry(hs); 
+            String hs = fileChooser.getSelectedFile().getPath();
+            jTextFieldJJOutputFile.setText(hs); 
+            TauArgusUtils.putDataDirInRegistry(hs); 
         }
     }//GEN-LAST:event_jButtonSearchJJOutputFileActionPerformed
 
     private void jButtonReadyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonReadyActionPerformed
-        // TODO add your handling code here:
           setVisible(false);
+          dispose();
     }//GEN-LAST:event_jButtonReadyActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(DialogProtectJJFormat.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(DialogProtectJJFormat.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(DialogProtectJJFormat.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(DialogProtectJJFormat.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                DialogProtectJJFormat dialog = new DialogProtectJJFormat(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
-
+//    /**
+//     * @param args the command line arguments
+//     */
+//    public static void main(String args[]) {
+//        /* Set the Nimbus look and feel */
+//        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+//        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+//         */
+//        try {
+//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//                if ("Nimbus".equals(info.getName())) {
+//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//                    break;
+//                }
+//            }
+//        } catch (ClassNotFoundException ex) {
+//            java.util.logging.Logger.getLogger(DialogProtectJJFormat.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (InstantiationException ex) {
+//            java.util.logging.Logger.getLogger(DialogProtectJJFormat.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (IllegalAccessException ex) {
+//            java.util.logging.Logger.getLogger(DialogProtectJJFormat.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+//            java.util.logging.Logger.getLogger(DialogProtectJJFormat.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        }
+//        //</editor-fold>
+//
+//        /* Create and display the dialog */
+//        java.awt.EventQueue.invokeLater(new Runnable() {
+//            public void run() {
+//                DialogProtectJJFormat dialog = new DialogProtectJJFormat(new javax.swing.JFrame(), true);
+//                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+//                    @Override
+//                    public void windowClosing(java.awt.event.WindowEvent e) {
+//                        System.exit(0);
+//                    }
+//                });
+//                dialog.setVisible(true);
+//            }
+//        });
+//    }
+//
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonProtectJJFile;
     private javax.swing.JButton jButtonReady;

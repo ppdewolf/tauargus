@@ -17,8 +17,12 @@
 
 package tauargus.gui;
 
+import argus.utils.SystemUtils;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -26,9 +30,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
+import javax.swing.JRootPane;
 import javax.swing.JTable;
 import javax.swing.JTree;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -50,16 +57,28 @@ import tauargus.model.RecodeInfo;
 import tauargus.model.TableSet;
 import tauargus.model.VarCodeProperties;
 import tauargus.model.Variable;
-import tauargus.utils.SingleListSelectionModel;
-//import tauargus.utils.ExecUtils;
-import argus.utils.SystemUtils;
 import tauargus.service.TableService;
-import tauargus.utils.TableColumnResizer;
+import tauargus.utils.SingleListSelectionModel;
 import tauargus.utils.TauArgusUtils;
 import tauargus.utils.TreeUtils;
 
 public class DialogGlobalRecode extends DialogBase {
 
+    @Override
+    protected JRootPane createRootPane() {
+        ActionListener actionListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                buttonCloseActionPerformed(actionEvent);
+            }
+        };    
+ 
+        KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+        JRootPane tmpRootPane = new JRootPane();
+        tmpRootPane.registerKeyboardAction(actionListener, stroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+        return tmpRootPane;
+    }    
+    
     private static class CodeInfo {
         private final int codeIndex;
         private final String label;
@@ -106,13 +125,13 @@ public class DialogGlobalRecode extends DialogBase {
             this.variables = variables;
             fireTableDataChanged();
         }
-
+        
         @Override
         public int getRowCount() {
             return variables.size();
         }
 
-        static String[] columnNames = { "R", "Variable", "Extended variable" };
+        static String[] columnNames = {"Recoded", "Variable"};//, "Extended variable" };
 
         @Override
         public int getColumnCount() {
@@ -173,9 +192,7 @@ public class DialogGlobalRecode extends DialogBase {
     private boolean fromTree;
     private MyDocumentListener documentListener;
 
-    /**
-     * Creates new form DialogGlobalRecode
-     */
+    // Creates new form DialogGlobalRecode
     public DialogGlobalRecode(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
@@ -186,23 +203,23 @@ public class DialogGlobalRecode extends DialogBase {
                 Variable variable = (Variable) value;
                 if (column == 0) {
                     if (variable.recoded)
-                        value = "R";
+                        value = " R";
                     else if (variable.truncLevels > 0)
-                        value = "T";
+                        value = " T";
                     else
                         value = "";
                 }
                 if (column == 1) {
                     value = variable.name; // VarName(i)
                 }
-                if (column == 2) {
+/*                if (column == 2) { // Why is this column here? Equals column 1?
                     value = variable.name; // metadata.Varlist(i).Name
-                }
+                }*/
                 Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                if ((variable.recoded || variable.truncLevels > 0) && !isSelected) {
-                    component.setForeground(Color.red);
+                if ((variable.recoded || variable.truncLevels > 0)){// && !isSelected) {
+                            component.setForeground(Color.red);
                 } else {
-                    component.setForeground(Color.black);
+                    component.setForeground(isSelected ? Color.white : Color.black);
                 }
                 return component;
             }
@@ -215,10 +232,11 @@ public class DialogGlobalRecode extends DialogBase {
         ListSelectionModel selectionModel = new SingleListSelectionModel();
         selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         selectionModel.addListSelectionListener(new ListSelectionListener() {
+            @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (documentListener.isChanged()) {
                     documentListener.setChanged(false);
-                    saveRecodeInfo();
+                    saveRecodeInfo(false);
                 }
                 int selectedRow = tableVariables.getSelectedRow();
                 if (selectedRow != -1) {
@@ -251,13 +269,8 @@ public class DialogGlobalRecode extends DialogBase {
                                     textFieldMissing2.setText(recodeInfo.getMissing2());
                                     textFieldCodelist.setText(recodeInfo.getCodeList());
                                 }
-// Anco 1.6
-                                //                            } catch (ArgusException | IOException ex) {
-                               } catch (ArgusException  ex) {
+                               } catch (ArgusException | IOException  ex) {
                                 JOptionPane.showMessageDialog(DialogGlobalRecode.this, ex.getMessage());}
-                                catch (IOException ex) {
-                                JOptionPane.showMessageDialog(DialogGlobalRecode.this, ex.getMessage());
-                            }
                         }
                         textAreaWarning.setText("");
                     }
@@ -291,32 +304,49 @@ public class DialogGlobalRecode extends DialogBase {
             }
         });
         
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                if (documentListener.isChanged()) {
-                    documentListener.setChanged(false);
-                    saveRecodeInfo();
-                }
-
-                tauArgus.ApplyRecode();
-            }
-        });
-
-        setLocationRelativeTo(parent);
+//        addWindowListener(new WindowAdapter() {
+//            @Override
+//            public void windowClosing(WindowEvent e) {
+//                if (documentListener.isChanged()) {
+//                    documentListener.setChanged(false);
+//                    saveRecodeInfo(false);
+//                }
+//
+//                tauArgus.ApplyRecode();
+//            }
+//        });
+//
+//        setLocationRelativeTo(parent);
     }
 
     public void showDialog(TableSet tableSet) {
         this.tableSet = tableSet;
 
         tableVariables.setModel(new VariableTableModel(tableSet.expVar));
-        TableColumnResizer.adjustColumnPreferredWidths(tableVariables, false);
+        //TableColumnResizer.adjustColumnPreferredWidths(tableVariables, false);
+        tableVariables.getColumnModel().getColumn(0).setPreferredWidth(60);
+        tableVariables.getColumnModel().getColumn(0).setMaxWidth(60);
         
-        if (tableSet.expVar.size() != 0) {
+        if (!tableSet.expVar.isEmpty()) {
             tableVariables.setRowSelectionInterval(0, 0);
         }
         
         labelRecodeData.setText("Edit box for global recode");
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                if (documentListener.isChanged()) {
+                    documentListener.setChanged(false);
+                    saveRecodeInfo(false);
+                }
+
+                tauArgus.ApplyRecode();
+            }
+        });
+
+        setLocationRelativeTo(this.getParent());
+        
         pack();
         setVisible(true);
     }
@@ -356,7 +386,7 @@ public class DialogGlobalRecode extends DialogBase {
         textAreaWarning = new javax.swing.JTextArea();
         panelTree = new javax.swing.JPanel();
         labelMaxLevel = new javax.swing.JLabel();
-        comboBoxMaxLevel = new javax.swing.JComboBox();
+        comboBoxMaxLevel = new javax.swing.JComboBox<>();
         scrollPaneCodeTree = new javax.swing.JScrollPane();
         treeCode = new javax.swing.JTree();
         labelTreeResult = new javax.swing.JLabel();
@@ -368,11 +398,11 @@ public class DialogGlobalRecode extends DialogBase {
 
             },
             new String [] {
-                "R", "Variable", "Extended variable"
+                "Recoded", "Variable"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false
+                false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -380,6 +410,8 @@ public class DialogGlobalRecode extends DialogBase {
             }
         });
         tableVariables.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        tableVariables.setShowHorizontalLines(false);
+        tableVariables.setShowVerticalLines(false);
         tableVariables.getTableHeader().setReorderingAllowed(false);
         scrollPaneVariables.setViewportView(tableVariables);
 
@@ -559,7 +591,7 @@ public class DialogGlobalRecode extends DialogBase {
         labelMaxLevel.setText("Maximum level:");
 
         comboBoxMaxLevel.setMaximumRowCount(9);
-        comboBoxMaxLevel.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }));
+        comboBoxMaxLevel.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }));
         comboBoxMaxLevel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comboBoxMaxLevelActionPerformed(evt);
@@ -641,6 +673,7 @@ public class DialogGlobalRecode extends DialogBase {
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttonUndoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonUndoActionPerformed
+        int rowIndex = tableVariables.getSelectedRow();
         if (!tauArgus.UndoRecode(variable.index)) {
             JOptionPane.showMessageDialog(this, "Unknown error when undoing recode");
         } else {
@@ -662,19 +695,20 @@ public class DialogGlobalRecode extends DialogBase {
             buttonRead.setEnabled(!fromTree);
             textAreaWarning.setText("");
         }
+        tableVariables.setRowSelectionInterval(rowIndex, rowIndex);
     }//GEN-LAST:event_buttonUndoActionPerformed
 
     private void buttonCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCloseActionPerformed
         setVisible(false);
         if (documentListener.isChanged()) {
             documentListener.setChanged(false);
-            saveRecodeInfo();
+            saveRecodeInfo(false);
         }
-
+        
         tauArgus.ApplyRecode();
         for (int i=0;i<TableService.numberOfTables();i++){
-            TableSet tableSet = TableService.getTable(i);
-            tableSet.clearHistory();
+            TableSet tmptableSet = TableService.getTable(i);
+            tmptableSet.clearHistory();
         }
         dispose();
     }//GEN-LAST:event_buttonCloseActionPerformed
@@ -687,6 +721,7 @@ public class DialogGlobalRecode extends DialogBase {
     }//GEN-LAST:event_comboBoxMaxLevelActionPerformed
 
     private void buttonApplyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonApplyActionPerformed
+        int rowIndex = tableVariables.getSelectedRow();
         if (fromTree) {
             tauArgus.UndoRecode(variable.index);
             for (int row = 0; row < treeCode.getRowCount(); row++) {
@@ -711,6 +746,13 @@ public class DialogGlobalRecode extends DialogBase {
                 logger.info("Var: " + variable.name + " has been recoded\n"); // VarName(CurrentVar) 
                 SystemUtils.writeLogbook("Var: " + variable.name + " has been recoded");
                 buildTree();
+                if (Application.isAnco()) {
+//                    int i= JOptionPane.showConfirmDialog(this, "Do you want to save the recoding of the tree", "", JOptionPane.YES_NO_OPTION);
+//                    if (i == JOptionPane.YES_OPTION){
+                       saveRecodeInfo(true);
+                       JOptionPane.showMessageDialog(this, "Reading back has not yet been implemented");
+//                    }
+                }
             } else {
                 JOptionPane.showMessageDialog(this, "This hierarchical recoding could not be applied");
                 labelTreeResult.setText("Tree recode could not be applied");
@@ -736,6 +778,7 @@ public class DialogGlobalRecode extends DialogBase {
                 JOptionPane.showMessageDialog(this, ex.getMessage());
             }
         }
+        tableVariables.setRowSelectionInterval(rowIndex, rowIndex);
     }//GEN-LAST:event_buttonApplyActionPerformed
 
     private void buttonCodelistActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCodelistActionPerformed
@@ -758,6 +801,7 @@ public class DialogGlobalRecode extends DialogBase {
 //            File file = new File(hs); 
 //            fileChooser.setCurrentDirectory(file);
 //        }
+        int rowIndex = tableVariables.getSelectedRow();
         TauArgusUtils.getDataDirFromRegistry(fileChooser);        
         fileChooser.setDialogTitle("Recode files");
         fileChooser.setSelectedFile(new File(""));
@@ -803,11 +847,15 @@ public class DialogGlobalRecode extends DialogBase {
                 } 
             }
         }
+        tableVariables.setRowSelectionInterval(rowIndex, rowIndex);
     }//GEN-LAST:event_buttonReadActionPerformed
 
-    private void saveRecodeInfo() {
+    private void saveRecodeInfo(Boolean forTreeRecode) {
         RecodeInfo recodeInfo = new RecodeInfo(textAreaRecodeData.getText(), textFieldMissing1.getText(), textFieldMissing2.getText(), textFieldCodelist.getText());
-        int i = JOptionPane.showConfirmDialog(this, "Recode information has been changed.\nSave recodefile?", "ARGUS-recodefiles", JOptionPane.YES_NO_OPTION);
+        String message;
+        message = "Recode information has been changed.\nSave recodefile?";
+        if (forTreeRecode){message = "Do you want to save the recoded tree information";}
+        int i = JOptionPane.showConfirmDialog(this, message, "ARGUS-recodefiles", JOptionPane.YES_NO_OPTION);
         if (i == JOptionPane.YES_OPTION) {
 //        String hs = SystemUtils.getRegString("general", "datadir", "");
 //        if (!hs.equals("")){
@@ -821,14 +869,27 @@ public class DialogGlobalRecode extends DialogBase {
             if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
                 variable.currentRecodeFile = fileChooser.getSelectedFile().toString();
                 TauArgusUtils.putDataDirInRegistry(variable.currentRecodeFile);
-                try {
-                    variable.writeRecodeFile(variable.currentRecodeFile, recodeInfo);
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(DialogGlobalRecode.this, ex.getMessage());
+                if (!forTreeRecode){
+                   try {
+                       variable.writeRecodeFile(variable.currentRecodeFile, recodeInfo);
+                   } catch (Exception ex) {
+                       JOptionPane.showMessageDialog(DialogGlobalRecode.this, ex.getMessage());
+                   }
+                   return;
                 }
-                return;
-            }
+                else // Save a real tree
+                {
+                    try {
+                       variable.writeRecodeTreeFile(variable.currentRecodeFile); 
+                    } catch (Exception ex) {
+                       JOptionPane.showMessageDialog(DialogGlobalRecode.this, ex.getMessage());
+                   }
+                   return;    
+                 }
+                }    
         }
+        if(forTreeRecode){return;}
+        // we do not need a temp recode file for a hierarchical recode
         String tempDir = Application.getTempDir();
         File f = new File(tempDir, "Argus" + variable.index + ".grc");
         variable.currentRecodeFile = f.getAbsolutePath();
@@ -867,7 +928,7 @@ public class DialogGlobalRecode extends DialogBase {
     }
     
     private void buildTree() {
-        int codeIndex = 0; int maxDepth = 0; int VarDepth = 0; int MaxLevelChoice = 0;
+        int codeIndex = 0; int maxDepth; int VarDepth; int MaxLevelChoice;
         VarCodeProperties properties = new VarCodeProperties(variable.index, codeIndex);
         CodeInfo codeInfo = new CodeInfo(codeIndex, properties.getCode(), properties.isMissing(), properties.isActive());
         DefaultMutableTreeNode topNode = new DefaultMutableTreeNode(codeInfo, properties.isParent());
@@ -918,47 +979,47 @@ public class DialogGlobalRecode extends DialogBase {
         return maxDepth;
     }
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(DialogGlobalRecode.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(DialogGlobalRecode.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(DialogGlobalRecode.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(DialogGlobalRecode.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                DialogGlobalRecode dialog = new DialogGlobalRecode(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
+//    /**
+//     * @param args the command line arguments
+//     */
+//    public static void main(String args[]) {
+//        /* Set the Nimbus look and feel */
+//        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+//        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+//         */
+//        try {
+//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//                if ("Nimbus".equals(info.getName())) {
+//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//                    break;
+//                }
+//            }
+//        } catch (ClassNotFoundException ex) {
+//            java.util.logging.Logger.getLogger(DialogGlobalRecode.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (InstantiationException ex) {
+//            java.util.logging.Logger.getLogger(DialogGlobalRecode.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (IllegalAccessException ex) {
+//            java.util.logging.Logger.getLogger(DialogGlobalRecode.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+//            java.util.logging.Logger.getLogger(DialogGlobalRecode.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        }
+//        //</editor-fold>
+//
+//        /* Create and display the dialog */
+//        java.awt.EventQueue.invokeLater(new Runnable() {
+//            public void run() {
+//                DialogGlobalRecode dialog = new DialogGlobalRecode(new javax.swing.JFrame(), true);
+//                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+//                    @Override
+//                    public void windowClosing(java.awt.event.WindowEvent e) {
+//                        System.exit(0);
+//                    }
+//                });
+//                dialog.setVisible(true);
+//            }
+//        });
+//    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonApply;
@@ -966,7 +1027,7 @@ public class DialogGlobalRecode extends DialogBase {
     private javax.swing.JButton buttonCodelist;
     private javax.swing.JButton buttonRead;
     private javax.swing.JButton buttonUndo;
-    private javax.swing.JComboBox comboBoxMaxLevel;
+    private javax.swing.JComboBox<String> comboBoxMaxLevel;
     private javax.swing.JFileChooser fileChooser;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel labelCodelist;

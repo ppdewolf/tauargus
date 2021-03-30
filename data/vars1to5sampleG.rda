@@ -1,0 +1,21 @@
+NACE 1  6  
+  <RECODEABLE>
+  <HIERARCHICAL>
+  <HIERLEVELS>  3 1 1 1 0 0
+Size 8  2  
+  <RECODEABLE>
+Region 11  1  
+  <RECODEABLE>
+  <HIERARCHICAL>
+  <HIERCODELIST> "Region.hrc"
+  <HIERLEADSTRING> "@"
+Var1 12  10  
+  <NUMERIC>
+Var2 22  10  
+  <NUMERIC>
+Var3 32  10  
+  <NUMERIC>
+Var4 42  10  
+  <NUMERIC>
+Var5 52  10  
+  <NUMERIC>

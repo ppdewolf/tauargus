@@ -17,15 +17,12 @@
 
 package tauargus.gui;
 
+import argus.utils.StrUtils;
 import javax.swing.JOptionPane;
 import tauargus.extern.dataengine.TauArgus;
 import tauargus.model.Application;
-//import tauargus.model.ArgusException;
-//import tauargus.model.Metadata;
 import tauargus.model.TableSet;
 import tauargus.model.Variable;
-//import tauargus.service.TableService;
-import argus.utils.StrUtils;
 import tauargus.utils.TauArgusUtils;
 
 public class DialogRoundingParameters extends DialogBase {
@@ -34,7 +31,7 @@ public class DialogRoundingParameters extends DialogBase {
     public static final int CANCEL_OPTION = 1;
     public static final int APPROVE_OPTION = 0;
     
-    private TauArgus tauArgus = Application.getTauArgusDll();
+    private final TauArgus tauArgus = Application.getTauArgusDll();
 
     private TableSet tableSet;
     private boolean partitionAllowed;
@@ -43,14 +40,11 @@ public class DialogRoundingParameters extends DialogBase {
     private int SubTableSize;
     private int returnValue = CANCEL_OPTION;
 
-    /**
-     * Creates new form DialogRoundingParameters
-     */
+    // Creates new form DialogRoundingParameters
     public DialogRoundingParameters(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         organizePartitionOptions();
-        setLocationRelativeTo(parent);
     }
 
     public int showDialog(TableSet table) {
@@ -72,8 +66,6 @@ public class DialogRoundingParameters extends DialogBase {
         textFieldNumberOfBlocks.setVisible(false);
         
         checkBoxPartition.setSelected(false);
-//        checkBoxPartition.click();
-        // checkBoxPartition.setEnabled(true) //(table.expVar.get(0).hierarchical == HIER_NONE)
         if (table.expVar.get(0).hierarchical != Variable.HIER_NONE) {
             checkBoxTotals.setEnabled(false);
             checkBoxNumberOfBlocks.setEnabled(false);
@@ -99,11 +91,9 @@ public class DialogRoundingParameters extends DialogBase {
         }
         labelPartNumber.setText(NPart + " subtables");
         labelPartTableSize.setText(SubTableSize + " cells per subtable");
-//        PrepareRoundVar;
-//        TestSize();
         comboBoxNumSteps.setSelectedIndex(0);
-//        chkOKButton;
         organizePartitionOptions();
+        setLocationRelativeTo(this.getParent());        
         setVisible(true);
 
         return returnValue;
@@ -121,8 +111,6 @@ public class DialogRoundingParameters extends DialogBase {
         labelPartNumber.setEnabled(b);
         labelPartTableSize.setEnabled(b);
         panelPartitions.setVisible(b);
-//        labelPartNumber.setVisible(b);
-//        labelPartTableSize.setVisible(b);
     }
 
     /**
@@ -434,10 +422,12 @@ public class DialogRoundingParameters extends DialogBase {
 
     private void buttonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCancelActionPerformed
         setVisible(false);
+        dispose();
     }//GEN-LAST:event_buttonCancelActionPerformed
 
     private void DialogClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_DialogClosing
         setVisible(false);
+        dispose();
     }//GEN-LAST:event_DialogClosing
 
     private boolean testRoundingBase(){
@@ -448,94 +438,94 @@ public class DialogRoundingParameters extends DialogBase {
             rb = StrUtils.toInteger(textFieldRoundingBase.getText());
           } 
           catch(Exception ex){}
-//          catch (ArgusException ex){}
         }
         return minRoundBase <= rb;
     }
     
     private void buttonOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonOkActionPerformed
         if (!testRoundingBase()){
-         JOptionPane.showMessageDialog(this, "Please fill in a correct rounding base");   
+            JOptionPane.showMessageDialog(this, "Please fill in a correct rounding base");   
         }
         else {
-        setVisible(false);
-        storeRoundingParameters();
-        returnValue = APPROVE_OPTION;
+            storeRoundingParameters();
+            returnValue = APPROVE_OPTION;
+            setVisible(false);
+            dispose();
         }
     }//GEN-LAST:event_buttonOkActionPerformed
 
     private void storeRoundingParameters(){
-       tableSet.roundBase = Integer.parseInt(textFieldRoundingBase.getText());
-       tableSet.roundMaxTime = Integer.parseInt(textMaxRoundTime.getText());
-       tableSet.roundMaxStep = comboBoxNumSteps.getSelectedIndex();
-       tableSet.roundUnitCost = checkBoxUnitCost.isSelected();
-       tableSet.roundPartitions = 0;
-       if (checkBoxPartition.isSelected()){tableSet.roundPartitions = 1;}
-       tableSet.roundAddIntermediateTotals = checkBoxTotals.isSelected();
-       tableSet.roundStoppingRule = 2;
-       if (radioButtonStopRapid.isSelected()){tableSet.roundStoppingRule = 0;}
-       if (radioButtonStopFeasible.isSelected()){tableSet.roundStoppingRule = 1;}
-       if (checkBoxTotals.isSelected()){tableSet.roundPartitions = 2;}
-       tableSet.roundNumberofBlocks = 0;
-       if (checkBoxNumberOfBlocks.isSelected()) 
+        tableSet.roundBase = Integer.parseInt(textFieldRoundingBase.getText());
+        tableSet.roundMaxTime = Integer.parseInt(textMaxRoundTime.getText());
+        tableSet.roundMaxStep = comboBoxNumSteps.getSelectedIndex();
+        tableSet.roundUnitCost = checkBoxUnitCost.isSelected();
+        tableSet.roundPartitions = 0;
+        if (checkBoxPartition.isSelected()){tableSet.roundPartitions = 1;}
+        tableSet.roundAddIntermediateTotals = checkBoxTotals.isSelected();
+        tableSet.roundStoppingRule = 2;
+        if (radioButtonStopRapid.isSelected()){tableSet.roundStoppingRule = 0;}
+        if (radioButtonStopFeasible.isSelected()){tableSet.roundStoppingRule = 1;}
+        if (checkBoxTotals.isSelected()){tableSet.roundPartitions = 2;}
+        tableSet.roundNumberofBlocks = 0;
+        if (checkBoxNumberOfBlocks.isSelected()) 
             {tableSet.roundNumberofBlocks = Integer.parseInt(textFieldNumberOfBlocks.getText());
              tableSet.roundPartitions = 3;}
 }
     
     public long computeMinRoundBase(TableSet table) {
-        long minRoundBase;
-//        TableSet table = TableService.getTable(tableIndex);
+        long minRB;
         if (table.respVar == Application.getFreqVar()) {
-            minRoundBase = table.minFreq[table.holding ? 1 : 0];
+            minRB = table.minFreq[table.holding ? 1 : 0];
         }
         else {
-            minRoundBase = (long)tauArgus.MaximumProtectionLevel(table.index);
+            minRB = (long)tauArgus.MaximumProtectionLevel(table.index);
         }
-        if (minRoundBase < 1) minRoundBase = 1;
-        return minRoundBase;
+        if (minRB < 1) minRB = 1;
+        return minRB;
     }
     
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(DialogRoundingParameters.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(DialogRoundingParameters.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(DialogRoundingParameters.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(DialogRoundingParameters.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                DialogRoundingParameters dialog = new DialogRoundingParameters(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
+//    /**
+//     * @param args the command line arguments
+//     */
+//    public static void main(String args[]) {
+//        /* Set the Nimbus look and feel */
+//        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+//        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+//         */
+//        try {
+//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//                if ("Nimbus".equals(info.getName())) {
+//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//                    break;
+//                }
+//            }
+//        } catch (ClassNotFoundException ex) {
+//            java.util.logging.Logger.getLogger(DialogRoundingParameters.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (InstantiationException ex) {
+//            java.util.logging.Logger.getLogger(DialogRoundingParameters.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (IllegalAccessException ex) {
+//            java.util.logging.Logger.getLogger(DialogRoundingParameters.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+//            java.util.logging.Logger.getLogger(DialogRoundingParameters.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        }
+//        //</editor-fold>
+//
+//        /* Create and display the dialog */
+//        java.awt.EventQueue.invokeLater(new Runnable() {
+//            public void run() {
+//                DialogRoundingParameters dialog = new DialogRoundingParameters(new javax.swing.JFrame(), true);
+//                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+//                    @Override
+//                    public void windowClosing(java.awt.event.WindowEvent e) {
+//                        System.exit(0);
+//                    }
+//                });
+//                dialog.setVisible(true);
+//            }
+//        });
+//    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonCancel;
     private javax.swing.ButtonGroup buttonGroupAudit;

@@ -17,37 +17,59 @@
 
 package tauargus.gui;
 
-import tauargus.utils.DoubleInputVerifier;
-import tauargus.utils.IntegerInputVerifier;
-import tauargus.utils.MouseJListDoubleClickedListener;
-import tauargus.utils.SingleListSelectionModel;
+import argus.utils.SystemUtils;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
+import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JRootPane;
+import javax.swing.KeyStroke;
 import javax.swing.SwingWorker;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
-import tauargus.extern.dataengine.TauArgus;
 import tauargus.model.Application;
 import tauargus.model.Metadata;
 import tauargus.model.ProgressSwingWorker;
 import tauargus.model.TableSet;
 import tauargus.model.Variable;
 import tauargus.service.TableService;
+import tauargus.utils.DoubleInputVerifier;
+import tauargus.utils.IntegerInputVerifier;
+import tauargus.utils.MouseJListDoubleClickedListener;
+import tauargus.utils.SingleListSelectionModel;
 import tauargus.utils.SwingUtils;
-//import tauargus.utils.ExecUtils;
-import argus.utils.SystemUtils;
-//import tauargus.utils.TauArgusUtils;
-
 
 public class DialogSpecifyTablesMicro extends DialogBase {
 
+    /*
+     * Makes it possible to use <ESC> to close the Dialog (cancel)
+     * Different from DialogBase: needs additinoal action in case of Cancel
+     */
+    @Override
+    protected JRootPane createRootPane() {
+        ActionListener actionListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                buttonCancelActionPerformed(actionEvent);
+            }
+        };    
+ 
+        KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+        JRootPane thisrootPane = new JRootPane();
+        thisrootPane.registerKeyboardAction(actionListener, stroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+        return thisrootPane;
+    }
+ 
+    
     // ***** Dialog Return Values *****
     public static final int CANCEL_OPTION = 1;
     public static final int APPROVE_OPTION = 0;
@@ -55,20 +77,17 @@ public class DialogSpecifyTablesMicro extends DialogBase {
 
     private static final Logger logger = Logger.getLogger(DialogSpecifyTablesMicro.class.getName());
     
-    /**
-     * Creates new form DialogSpecifyTablesMicro
+     /*
+     Creates new form DialogSpecifyTablesMicro
      */
     public DialogSpecifyTablesMicro(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         createComponentArrays();
-        loadDefaultsFromRegistry();
         
         labelMSC.setVisible(Application.isAnco());
         textFieldMSC.setVisible(Application.isAnco());
-// Anco 1.6        
-//        explanatoryVariableListModel = new DefaultListModel<>();
-        explanatoryVariableListModel = new DefaultListModel<Variable>();
+        explanatoryVariableListModel = new DefaultListModel<>();
         listExplanatoryVariables.setModel(explanatoryVariableListModel);
         listExplanatoryVariables.setCellRenderer(new VariableNameCellRenderer());
         listExplanatoryVariables.addMouseListener(new MouseJListDoubleClickedListener<Variable>(listExplanatoryVariables) {
@@ -81,9 +100,7 @@ public class DialogSpecifyTablesMicro extends DialogBase {
                 }
             }
         });
-// Anco 1.6
-//        selectedExplanatoryVariableListModel = new DefaultListModel<>();
-        selectedExplanatoryVariableListModel = new DefaultListModel<Variable>();
+        selectedExplanatoryVariableListModel = new DefaultListModel<>();
         listSelectedExplanatoryVariables.setModel(selectedExplanatoryVariableListModel);
         listSelectedExplanatoryVariables.setCellRenderer(new VariableNameCellRenderer());
         listSelectedExplanatoryVariables.addMouseListener(new MouseJListDoubleClickedListener<Variable>(listSelectedExplanatoryVariables) {
@@ -93,9 +110,7 @@ public class DialogSpecifyTablesMicro extends DialogBase {
                 organiseDistanceOption();
             }
         });
-// Anco 1.6
-//        responseVariableListModel = new DefaultListModel<>();
-        responseVariableListModel = new DefaultListModel<Variable>();
+        responseVariableListModel = new DefaultListModel<>();
         listResponseVariables.setModel(responseVariableListModel);
         listResponseVariables.setCellRenderer(new VariableNameCellRenderer());
         listResponseVariables.setSelectionModel(new SingleListSelectionModel());
@@ -146,21 +161,25 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         }
         textFieldlZeroUnsafeRange.setInputVerifier(doubleInputVerifier);
         textFieldManualSafetyRange.setInputVerifier(integerInputVerifier);
-        
-        setLocationRelativeTo(parent);
     }
 
     public int showDialog(Metadata metadata) {
         this.metadata = metadata;
         
         // Let table use it's original variables 
-        for (int i = 0; i < TableService.numberOfTables(); i++) {
+        //????????????????????????????????????????????????????????????
+        // PWOF 2017-12-08
+        // This is only needed in case of "Compute Tables"?
+        // In case of "Cancel" this resets the variables incorrectly?
+        // But why only in case of more than 1 table?
+        //????????????????????????????????????????????????????????????
+/*        for (int i = 0; i < TableService.numberOfTables(); i++) {
             TableSet table = TableService.getTable(i);
             for (int j = 0; j < table.expVar.size(); j++) {
                 table.expVar.set(j, table.expVar.get(j).originalVariable);
             }
         }
-        
+*/        
         if (!Application.isAnco()) {
             checkBoxPqRule.setText("P%-rule");
             tabbedPaneRules.setTitleAt(1, "P%-rule");
@@ -207,7 +226,7 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         checkBoxRequestRule.setEnabled(metadata.containsRequestVariable());
         checkBoxApplyWeights.setEnabled(metadata.containsWeightVariable());
         checkBoxUseHoldingsInfo.setEnabled(metadata.containsHoldingVariable());
-        
+                
         //load(new TableSet(metadata));
         if (TableService.numberOfTables()==0)
         {
@@ -220,6 +239,7 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         }
         organiseAllOptions();
 
+        setLocationRelativeTo(this.getParent());        
         setVisible(true);
         return returnValue;
     }
@@ -229,24 +249,29 @@ public class DialogSpecifyTablesMicro extends DialogBase {
      */
     private void load(TableSet tableSet) {
         selectedExplanatoryVariableListModel.clear();
-        for (Variable variable : tableSet.expVar) {
+        tableSet.expVar.forEach((variable) -> {
             selectedExplanatoryVariableListModel.addElement(variable);
-        }
+        });
 
         setResponseVariable(tableSet.respVar);
         setShadowVariable(tableSet.shadowVar);
         textFieldCostVariable.setText("");
-        if (tableSet.costFunc == TableSet.COST_DIST) {
-            radioButtonDistanceFunction.setSelected(true);
-        } else if (tableSet.costFunc == TableSet.COST_UNITY) {
-            radioButtonUnity.setSelected(true);
-        } else if (tableSet.costFunc == TableSet.COST_FREQ) {
-            radioButtonFrequency.setSelected(true);
-        } else {
-            radioButtonVariable.setSelected(true);
-            setCostVariable(tableSet.costVar);
-            textFieldLambda.setText(Double.toString(tableSet.lambda));
-            textFieldMSC.setText(Double.toString(tableSet.maxScaleCost));
+        switch (tableSet.costFunc) {
+            case TableSet.COST_DIST:
+                radioButtonDistanceFunction.setSelected(true);
+                break;
+            case TableSet.COST_UNITY:
+                radioButtonUnity.setSelected(true);
+                break;
+            case TableSet.COST_FREQ:
+                radioButtonFrequency.setSelected(true);
+                break;
+            default:
+                radioButtonVariable.setSelected(true);
+                setCostVariable(tableSet.costVar);
+                textFieldLambda.setText(Double.toString(tableSet.lambda));
+                textFieldMSC.setText(Double.toString(tableSet.maxScaleCost));
+                break;
         }
 
         checkBoxApplyWeights.setSelected(tableSet.weighted);
@@ -255,7 +280,6 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         checkBoxDominanceRule.setSelected(tableSet.domRule);
         checkBoxPqRule.setSelected(tableSet.pqRule);
         checkBoxRequestRule.setSelected(tableSet.piepRule[0] || tableSet.piepRule[1]);
-        //checkBoxMinimumFrequency.setSelected((tableSet.minFreq[0] != 0) || (tableSet.minFreq[1] != 0));
         checkBoxMinimumFrequency.setSelected(tableSet.frequencyRule);
         checkBoxZeroUnsafe.setSelected(tableSet.zeroUnsafe);
 
@@ -280,7 +304,6 @@ public class DialogSpecifyTablesMicro extends DialogBase {
             if (tableSet.frequencyRule) textFieldMinFreq[i].setText(Integer.toString(tableSet.minFreq[i]));
         }
 
-        //loadDefaultsFromRegistry();
         organiseAllOptions();
 
         for (int i = 0; i < tabbedPaneRules.getTabCount(); i++) {
@@ -334,6 +357,7 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         boolean b = checkBoxRequestRule.isSelected();
         tabbedPaneRules.setEnabledAt(2, b);
         labelReqSafetyRange.setEnabled(b);
+        labelReqSafetyRangeHolding.setEnabled(b && checkBoxUseHoldingsInfo.isSelected());
         for (int i=0; i<4; i++) {
             if (i==2) {
                 b = b && checkBoxUseHoldingsInfo.isSelected();
@@ -402,6 +426,23 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         organiseZeroUnsafeRuleOptions();
         organiseButtonAddTableOption();
         organiseDistanceOption();
+        SelectPanel();
+    }
+    
+    private void SelectPanel(){
+        if (checkBoxDominanceRule.isSelected()){
+            tabbedPaneRules.setSelectedComponent(panelDominanceRule);
+        }
+        else{
+            if (checkBoxPqRule.isSelected()){
+                tabbedPaneRules.setSelectedComponent(panelPqRule);
+            }
+            else{
+                if (checkBoxRequestRule.isSelected()){
+                    tabbedPaneRules.setSelectedComponent(panelRequestRule);
+                }
+            }
+        }        
     }
     
     private void organiseHoldingOptions() {
@@ -443,25 +484,14 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         tableSet.frequencyRule = checkBoxMinimumFrequency.isSelected();
         tableSet.zeroUnsafe = checkBoxZeroUnsafe.isSelected();
 
-        // Set dom rule, pq-rule and request rule parameters...
-        int j = 4;
-        if (!tableSet.holding) {
-            j = 2;
-        }
+        int j = (tableSet.holding && tableSet.metadata.containsHoldingVariable()) ? 4 : 2;
         for (int i=0; i<j; i++) {
-// if-tests are not needed: usage of rule is controlled by boolean when calling SetTableSafety-routine (from tauargus.extern.dataengine.TauArgus)
-            //if (tableSet.domRule) {
-                tableSet.domK[i] = Integer.parseInt(textFieldDomK[i].getText());
+               tableSet.domK[i] = Integer.parseInt(textFieldDomK[i].getText());
                 tableSet.domN[i] = Integer.parseInt(textFieldDomN[i].getText());
-            //}
-            //if (tableSet.pqRule) {
                 tableSet.pqP[i] = Integer.parseInt(textFieldPqP[i].getText());
                 tableSet.pqQ[i] = Integer.parseInt(textFieldPqQ[i].getText());
                 tableSet.pqN[i] = Integer.parseInt(textFieldPqN[i].getText());
-            //}
-            //if (checkBoxRequestRule.isSelected()) {
                 tableSet.piepPercentage[i] = Integer.parseInt(textFieldReq[i].getText());
-            //}
         }
         for (int i=0; i<2; i++) {
             tableSet.piepRule[i] = checkBoxRequestRule.isSelected() && 
@@ -469,7 +499,8 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         }
 
         // Set request rule (remaining) and frequency rule parameter...
-        for (int i=0; i<2; i++) {
+        j = (tableSet.holding && tableSet.metadata.containsHoldingVariable()) ? 2 : 1;
+        for (int i=0; i<j; i++) {
             tableSet.piepMarge[i] = Integer.parseInt(textFieldReqRange[i].getText());
             tableSet.piepMinFreq[i] = Integer.parseInt(textFieldReqFreq[i].getText());
 
@@ -493,6 +524,7 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         tableSet.suppressed = TableSet.SUP_NO;
         tableSet.solverUsed = Application.SOLVER_NO;                
         tableSet.singletonUsed = false;
+        tableSet.cellkeyVar = metadata.find(tauargus.model.Type.RECORD_KEY);
     }
 
     private void createComponentArrays() {
@@ -1258,7 +1290,10 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         labelReqIndFreq.setLabelFor(textFieldIndFreq);
         labelReqIndFreq.setText("MinFreq");
 
-        labelReqSafetyRange.setText("<html>Safety<br>range:</html>");
+        labelReqSafetyRange.setText("Range");
+        labelReqSafetyRange.setMaximumSize(new java.awt.Dimension(38, 14));
+        labelReqSafetyRange.setMinimumSize(new java.awt.Dimension(38, 14));
+        labelReqSafetyRange.setPreferredSize(new java.awt.Dimension(38, 14));
 
         labelReqIndPercentage.setText("%");
 
@@ -1273,92 +1308,78 @@ public class DialogSpecifyTablesMicro extends DialogBase {
 
         labelReqHoldPercentage.setText("%");
 
-        labelReqSafetyRangeHolding.setText("<html>Safety<br>range:</html>");
+        labelReqSafetyRangeHolding.setText("Range");
+        labelReqSafetyRangeHolding.setMaximumSize(new java.awt.Dimension(38, 14));
+        labelReqSafetyRangeHolding.setMinimumSize(new java.awt.Dimension(38, 14));
+        labelReqSafetyRangeHolding.setPreferredSize(new java.awt.Dimension(38, 14));
 
         javax.swing.GroupLayout panelRequestRuleLayout = new javax.swing.GroupLayout(panelRequestRule);
         panelRequestRule.setLayout(panelRequestRuleLayout);
         panelRequestRuleLayout.setHorizontalGroup(
             panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelRequestRuleLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panelRequestRuleLayout.createSequentialGroup()
-                        .addGroup(panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(separatorReq)
-                            .addGroup(panelRequestRuleLayout.createSequentialGroup()
-                                .addGroup(panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(labelReqInd1, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
-                                    .addComponent(labelReqInd2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(textFieldReqInd1, javax.swing.GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE)
-                                    .addComponent(textFieldReqInd2, javax.swing.GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE))
-                                .addGroup(panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(panelRequestRuleLayout.createSequentialGroup()
-                                        .addGap(18, 18, 18)
-                                        .addComponent(labelReqSafetyRange, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 6, Short.MAX_VALUE))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelRequestRuleLayout.createSequentialGroup()
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(labelReqIndFreq)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
-                                .addGroup(panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(textFieldReqIndFreq, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGroup(panelRequestRuleLayout.createSequentialGroup()
-                                        .addComponent(textFieldReqIndRange, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(labelReqIndPercentage, javax.swing.GroupLayout.PREFERRED_SIZE, 11, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addGap(6, 6, 6)))
-                        .addContainerGap())
-                    .addGroup(panelRequestRuleLayout.createSequentialGroup()
-                        .addGroup(panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(labelReqHold2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
-                            .addComponent(labelReqHold1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(textFieldReqHold1, javax.swing.GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE)
-                            .addComponent(textFieldReqHold2, javax.swing.GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelRequestRuleLayout.createSequentialGroup()
-                                .addComponent(labelReqSafetyRangeHolding, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(textFieldReqHoldRange, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(labelReqHoldPercentage)
-                                .addContainerGap())
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelRequestRuleLayout.createSequentialGroup()
-                                .addComponent(labelReqHoldFreq)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(textFieldReqHoldFreq, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(32, 32, 32))))))
-        );
-        panelRequestRuleLayout.setVerticalGroup(
-            panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelRequestRuleLayout.createSequentialGroup()
                 .addGroup(panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panelRequestRuleLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addGroup(panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(textFieldReqInd1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(labelReqInd1))
+                        .addGroup(panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(panelRequestRuleLayout.createSequentialGroup()
+                                .addGroup(panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(labelReqInd1)
+                                    .addComponent(labelReqInd2))
+                                .addGap(11, 11, 11)
+                                .addGroup(panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(textFieldReqInd2, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(textFieldReqInd1, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(panelRequestRuleLayout.createSequentialGroup()
+                                .addGroup(panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(labelReqHold2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(labelReqHold1))
+                                .addGap(6, 6, 6)
+                                .addGroup(panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(textFieldReqHold1, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(textFieldReqHold2, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(labelReqInd2)
-                            .addComponent(textFieldReqInd2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(11, 11, 11))
+                        .addGroup(panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                            .addComponent(labelReqHoldFreq)
+                            .addComponent(labelReqSafetyRangeHolding, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(labelReqSafetyRange, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(labelReqIndFreq))
+                        .addGap(6, 6, 6)
+                        .addGroup(panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                            .addComponent(textFieldReqHoldFreq, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(textFieldReqHoldRange, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(textFieldReqIndRange, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(textFieldReqIndFreq, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                            .addComponent(labelReqHoldPercentage)
+                            .addComponent(labelReqIndPercentage, javax.swing.GroupLayout.PREFERRED_SIZE, 11, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(panelRequestRuleLayout.createSequentialGroup()
+                        .addGap(10, 10, 10)
+                        .addComponent(separatorReq)))
+                .addContainerGap())
+        );
+        panelRequestRuleLayout.setVerticalGroup(
+            panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelRequestRuleLayout.createSequentialGroup()
+                .addGroup(panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelRequestRuleLayout.createSequentialGroup()
-                        .addGap(2, 2, 2)
+                        .addGap(60, 60, 60)
+                        .addComponent(labelReqIndPercentage))
+                    .addGroup(panelRequestRuleLayout.createSequentialGroup()
+                        .addGap(31, 31, 31)
                         .addGroup(panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(labelReqInd1)
+                            .addComponent(textFieldReqInd1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(labelReqIndFreq)
                             .addComponent(textFieldReqIndFreq, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(labelReqInd2)
+                            .addComponent(textFieldReqInd2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(labelReqSafetyRange, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(textFieldReqIndRange, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(labelReqIndPercentage)))
-                        .addGap(5, 5, 5)))
+                            .addComponent(textFieldReqIndRange, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(separatorReq, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -1367,14 +1388,13 @@ public class DialogSpecifyTablesMicro extends DialogBase {
                     .addComponent(textFieldReqHoldFreq, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(labelReqHoldFreq))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(labelReqHold2)
-                        .addComponent(textFieldReqHold2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(textFieldReqHoldRange, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(labelReqHoldPercentage))
-                    .addComponent(labelReqSafetyRangeHolding, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(20, 20, 20))
+                .addGroup(panelRequestRuleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(labelReqHold2)
+                    .addComponent(textFieldReqHoldRange, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(labelReqHoldPercentage)
+                    .addComponent(textFieldReqHold2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(labelReqSafetyRangeHolding, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(16, 16, 16))
         );
 
         tabbedPaneRules.addTab("Req. rule", panelRequestRule);
@@ -1526,7 +1546,7 @@ public class DialogSpecifyTablesMicro extends DialogBase {
                     .addComponent(checkBoxDominanceRule, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(tabbedPaneRules, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panelParametersLayout.createSequentialGroup()
                         .addComponent(panelZero, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1549,7 +1569,7 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         panelParametersLayout.setVerticalGroup(
             panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelParametersLayout.createSequentialGroup()
-                .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panelParametersLayout.createSequentialGroup()
                         .addGap(37, 37, 37)
                         .addComponent(checkBoxDominanceRule, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1560,26 +1580,26 @@ public class DialogSpecifyTablesMicro extends DialogBase {
                     .addGroup(panelParametersLayout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(panelMinimumFrequency, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(panelParametersLayout.createSequentialGroup()
-                                .addComponent(checkBoxApplyWeights)
+                                .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(panelMinimumFrequency, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(panelParametersLayout.createSequentialGroup()
+                                        .addComponent(checkBoxApplyWeights)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(checkBoxMissingSafe)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(checkBoxUseHoldingsInfo)))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(checkBoxMissingSafe)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(checkBoxUseHoldingsInfo)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(panelZero, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(panelParametersLayout.createSequentialGroup()
-                                .addComponent(labelManualSafetyRange, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(textFieldManualSafetyRange, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(labelManualSafetyRangePercentage)))))
-                    .addGroup(panelParametersLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(tabbedPaneRules)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(panelZero, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(panelParametersLayout.createSequentialGroup()
+                                        .addComponent(labelManualSafetyRange, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(panelParametersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                            .addComponent(textFieldManualSafetyRange, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(labelManualSafetyRangePercentage)))))
+                            .addComponent(tabbedPaneRules, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(21, Short.MAX_VALUE))
         );
 
         buttonDeleteTable.setText("\u2227");
@@ -1668,11 +1688,12 @@ public class DialogSpecifyTablesMicro extends DialogBase {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(panelParameters, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(scrollPaneTables, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE)
+                .addComponent(scrollPaneTables, javax.swing.GroupLayout.DEFAULT_SIZE, 102, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(buttonComputeTables)
-                    .addComponent(buttonCancel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(buttonComputeTables, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(buttonCancel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         panelExplanatoryVariables.getAccessibleContext().setAccessibleName("Explanatory variables");
@@ -1683,6 +1704,22 @@ public class DialogSpecifyTablesMicro extends DialogBase {
     private void buttonComputeTablesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonComputeTablesActionPerformed
         // The GUI thread (EDT) should not be used for long running tasks, 
         // so use a SwingWorker class
+        
+        // PWOF 2017-12-08
+        // Copied from showDialog() because only needed in case of " Compute Tables" ???
+        // Let table use it's original variables 
+        //????????????????????????????????????????????????????????????
+        // PWOF 2017-12-08
+        // This is only needed in case of "Compute Tables"?
+        // In case of "Cancel" this resets the variables incorrectly?
+        //????????????????????????????????????????????????????????????
+        for (int i = 0; i < TableService.numberOfTables(); i++) {
+            TableSet table = TableService.getTable(i);
+            for (int j = 0; j < table.expVar.size(); j++) {
+                table.expVar.set(j, table.expVar.get(j).originalVariable);
+            }
+        }
+
         saveDefaultsToRegistry();
         final SwingWorker<Void, Void> worker = new ProgressSwingWorker<Void, Void>(ProgressSwingWorker.SINGLE, "Computing tables") {
 
@@ -1707,15 +1744,18 @@ public class DialogSpecifyTablesMicro extends DialogBase {
                 } catch (ExecutionException ex) {
                     JOptionPane.showMessageDialog(null, ex.getCause().getMessage());
                 }
+                finally { // cleanup
+                    dispose(); 
+                }
             }
-        };        
+        };
         worker.execute();
-
     }//GEN-LAST:event_buttonComputeTablesActionPerformed
 
     private void buttonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCancelActionPerformed
-        setVisible(false);
         if (hasBeenModified)TableService.clearTables();
+        setVisible(false);
+        dispose();
     }//GEN-LAST:event_buttonCancelActionPerformed
 
     private void buttonResponseDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonResponseDeleteActionPerformed
@@ -1766,7 +1806,6 @@ public class DialogSpecifyTablesMicro extends DialogBase {
     private void buttonExplanatoryDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonExplanatoryDeleteActionPerformed
         // set the selection to an item that still exists after deletion
         // if not done before removal the remove button will loose focus
-//        int[] selectedIndices = listSelectedExplanatoryVariables.getSelectedIndices();
         List<Variable> selectedValues = listSelectedExplanatoryVariables.getSelectedValuesList();
         int selectedIndex = listSelectedExplanatoryVariables.getMaxSelectionIndex() + 1;
         while (selectedIndex >= 0
@@ -1774,19 +1813,19 @@ public class DialogSpecifyTablesMicro extends DialogBase {
             selectedIndex--;
         }
         listSelectedExplanatoryVariables.setSelectedIndex(selectedIndex);
-        for (Variable variable : selectedValues) {
+        selectedValues.forEach((variable) -> {
             selectedExplanatoryVariableListModel.removeElement(variable);
-        }
+        });
         organiseDistanceOption();
-//        for (int index : selectedIndices) {
-//            listSelectedExplanatoryVariables.remove(index);
-//        }
     }//GEN-LAST:event_buttonExplanatoryDeleteActionPerformed
 
     private void checkBoxRequestRuleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxRequestRuleActionPerformed
         organiseRequestRuleOptions();
         if (checkBoxRequestRule.isSelected()) {
             tabbedPaneRules.setSelectedComponent(panelRequestRule);
+        }
+        else{
+            SelectPanel();
         }
     }//GEN-LAST:event_checkBoxRequestRuleActionPerformed
 
@@ -1795,12 +1834,18 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         if (checkBoxDominanceRule.isSelected()) {
             tabbedPaneRules.setSelectedComponent(panelDominanceRule);
         }
+        else{
+         SelectPanel();   
+        }
     }//GEN-LAST:event_checkBoxDominanceRuleActionPerformed
 
     private void checkBoxPqRuleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxPqRuleActionPerformed
         organisePqRuleOptions();
         if (checkBoxPqRule.isSelected()) {
             tabbedPaneRules.setSelectedComponent(panelPqRule);
+        }
+        else{
+            SelectPanel();
         }
     }//GEN-LAST:event_checkBoxPqRuleActionPerformed
 
@@ -1880,8 +1925,9 @@ public class DialogSpecifyTablesMicro extends DialogBase {
     }//GEN-LAST:event_listResponseVariablesValueChanged
 
     private void dialogClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_dialogClosing
-        setVisible(false);
         if (hasBeenModified) TableService.clearTables();
+        setVisible(false);
+        dispose();
     }//GEN-LAST:event_dialogClosing
 
     private void setResponseVariable(Variable variable) {
@@ -1913,10 +1959,11 @@ public class DialogSpecifyTablesMicro extends DialogBase {
             return false;
         }
         
-        // Alleen de freq-regel bij freq-tabellen!!!!
+       
+        // Only freq-rule bij <freq>-tables!!!!
         if (checkBoxDominanceRule.isSelected() || checkBoxPqRule.isSelected() || checkBoxRequestRule.isSelected() || checkBoxZeroUnsafe.isSelected()) {
             if (responseVariable == freqVar) {
-                JOptionPane.showMessageDialog(this, "Only the frequency rule is allowed, when a freq-table is requested");
+                JOptionPane.showMessageDialog(this, "When using response variable <freq>, dominance rule and p%-rule are not allowed");
                 return false;
             }
         }
@@ -1945,7 +1992,7 @@ public class DialogSpecifyTablesMicro extends DialogBase {
                 textFieldDomN[0].requestFocusInWindow();
                 return false;
             }
-            if (checkBoxUseHoldingsInfo.isSelected()) {
+            if (metadata.containsHoldingVariable() && checkBoxUseHoldingsInfo.isSelected()) {
                 if (Integer.parseInt(textFieldDomN[2].getText()) == 0 && Integer.parseInt(textFieldDomN[3].getText()) > 0) {
                     JOptionPane.showMessageDialog(this, "illegal value for the first holding dominance rule");
                     tabbedPaneRules.setSelectedIndex(0);
@@ -1981,13 +2028,13 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         }
         if (checkBoxPqRule.isSelected()) {
             int j = 2;
-            if (Integer.parseInt(textFieldPqP[0].getText()) == 0 && Integer.parseInt(textFieldPqP[0].getText()) > 0) {
+            if (Integer.parseInt(textFieldPqP[0].getText()) == 0 && Integer.parseInt(textFieldPqP[1].getText()) > 0) {
                 JOptionPane.showMessageDialog(this, "The first P-rule should be specified too");
                 tabbedPaneRules.setSelectedIndex(1);
                 textFieldPqP[0].requestFocusInWindow();
                 return false;
             }
-            if (checkBoxUseHoldingsInfo.isSelected()) {
+            if (metadata.containsHoldingVariable() && checkBoxUseHoldingsInfo.isSelected()) {
                 if (Integer.parseInt(textFieldPqP[2].getText()) == 0 && Integer.parseInt(textFieldPqP[3].getText()) > 0) {
                     JOptionPane.showMessageDialog(this, "Illegal value for first P-Holding-rule");
                     tabbedPaneRules.setSelectedIndex(1);
@@ -2014,7 +2061,8 @@ public class DialogSpecifyTablesMicro extends DialogBase {
             }
         }
         if (checkBoxMinimumFrequency.isSelected()) {
-            for (int i=0; i<2; i++) {
+            int maxi = (metadata.containsHoldingVariable() && checkBoxUseHoldingsInfo.isSelected()) ? 2 : 1;
+            for (int i=0; i<maxi; i++) {
                 if (Integer.parseInt(textFieldMinFreq[i].getText()) < 0) {
                     JOptionPane.showMessageDialog(this, "Illegal value for min. frequency: " + textFieldMinFreq[i].getText() + "\nMust be positive");
                     textFieldMinFreq[i].requestFocusInWindow();
@@ -2036,7 +2084,6 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         }
 
         if (checkBoxZeroUnsafe.isSelected()) {
-            //if (Integer.parseInt(textFieldlZeroUnsafeRange.getText()) <= 0) {
             if (Double.parseDouble(textFieldlZeroUnsafeRange.getText()) <= 0) {
                 JOptionPane.showMessageDialog(this, "Illegal value for zero margin: " + textFieldlZeroUnsafeRange.getText() + "\nMust be positive");
                 textFieldlZeroUnsafeRange.requestFocusInWindow();
@@ -2053,7 +2100,6 @@ public class DialogSpecifyTablesMicro extends DialogBase {
         return true;
     }
 
-    private TauArgus tauArgus = Application.getTauArgusDll();
     private Metadata metadata;
          
     private javax.swing.JLabel[] labelDom;
@@ -2077,10 +2123,10 @@ public class DialogSpecifyTablesMicro extends DialogBase {
     private javax.swing.JTextField[] textFieldRange;
     private javax.swing.JLabel[] labelMinFreqPercentage;
          
-    private DefaultListModel<Variable> explanatoryVariableListModel;
+    private final DefaultListModel<Variable> explanatoryVariableListModel;
     private DefaultListModel<Variable> selectedExplanatoryVariableListModel;
-    private DefaultListModel<Variable> responseVariableListModel;
-    private Variable freqVar;
+    private final DefaultListModel<Variable> responseVariableListModel;
+    private final Variable freqVar;
     private Variable responseVariable;
     private Variable shadowVariable;
     private Variable costVariable;
@@ -2247,8 +2293,8 @@ public class DialogSpecifyTablesMicro extends DialogBase {
       textFieldDomHold2N.setText(SystemUtils.getRegString("sensitivityrules", "domn4", "0"));
       textFieldDomHold2K.setText(SystemUtils.getRegString("sensitivityrules", "dimk4", "0"));
       
-      //peep rule
-      checkBoxRequestRule.setSelected(SystemUtils.getRegBoolean("sensitivityrules", "peeprule", false));
+      //peep rule Only if requestvariable is present in data
+      checkBoxRequestRule.setSelected(this.metadata.containsRequestVariable() ? SystemUtils.getRegBoolean("sensitivityrules", "peeprule", false) : false);
       
       textFieldReqInd1.setText(SystemUtils.getRegString("sensitivityrules", "peepindk1", "0"));
       textFieldReqInd2.setText(SystemUtils.getRegString("sensitivityrules", "peepindk2", "0"));
@@ -2271,9 +2317,8 @@ public class DialogSpecifyTablesMicro extends DialogBase {
       textFieldlZeroUnsafeRange.setText(SystemUtils.getRegString("sensitivityrules", "zerorulerange", "10"));
 
       textFieldManualSafetyRange.setText(SystemUtils.getRegString("sensitivityrules", "manualrange", "10"));
-
-      
     }
+    
     private void saveDefaultsToRegistry(){    
      SystemUtils.putRegString("sensitivityrules", "pqp1",textFieldPqInd1P.getText());
      SystemUtils.putRegString("sensitivityrules", "pqq1",textFieldPqInd1Q.getText());
@@ -2337,10 +2382,6 @@ public class DialogSpecifyTablesMicro extends DialogBase {
       SystemUtils.putRegString("sensitivityrules", "zerorulerange", textFieldlZeroUnsafeRange.getText());
 
       SystemUtils.putRegString("sensitivityrules", "manualrange", textFieldManualSafetyRange.getText());
-
-
-     
-     
     }
 
     

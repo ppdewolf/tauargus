@@ -17,22 +17,19 @@
 
 package tauargus.gui;
 
+import argus.utils.SystemUtils;
 import java.awt.Container;
 import java.io.File;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.ButtonGroup;
-//import javax.swing.JFrame;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import tauargus.model.Application;
-//import tauargus.service.TableService;
-//import tauargus.utils.ExecUtils;
-import argus.utils.SystemUtils;
 import tauargus.utils.TauArgusUtils;
 
 /**
  *
  * @author Hundepool
  */
-public class DialogOptions extends javax.swing.JDialog {
+public class DialogOptions extends DialogBase {
     private javax.swing.JFileChooser fileChooser;
     
     private FrameMain getParentFrame() {
@@ -48,7 +45,6 @@ public class DialogOptions extends javax.swing.JDialog {
     public DialogOptions(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        setLocationRelativeTo(null); 
         fileChooser = new javax.swing.JFileChooser();
         jCheckBoxDebugHiTaS.setSelected(Application.SaveDebugHiTaS);
         if (Application.isAnco()) {jLabelAnco.setText("Anco");
@@ -69,7 +65,6 @@ public class DialogOptions extends javax.swing.JDialog {
         
         i = SystemUtils.getRegInteger("optimal", "solverused", Application.solverSelected);
         switch (i) {
-//            case Application.SOLVER_NO: {jRadioButtonNoSolver.setSelected(true); break;}
             case Application.SOLVER_XPRESS : {jRadioButtonXPress.setSelected(true); break;}
             case Application.SOLVER_CPLEX: {jRadioButtonCPlex.setSelected(true); break;}
             case Application.SOLVER_SOPLEX : {jRadioButtonSCIP.setSelected(true); break;}
@@ -290,7 +285,6 @@ public class DialogOptions extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jLabelAncoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabelAncoMouseClicked
-        // TODO add your handling code here:
         if (jLabelAnco.getText().equals("Anco")) { // Anco options off
             Application.setAnco(false);
             jLabelAnco.setText("      ");
@@ -306,7 +300,7 @@ public class DialogOptions extends javax.swing.JDialog {
         }
         
       FrameMain parent = getParentFrame(); // To have menu items updated when returning to FrameMain
-      parent.organise();
+      parent.organiseAnco();
     }//GEN-LAST:event_jLabelAncoMouseClicked
 
     private void jButtonLogFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonLogFileActionPerformed
@@ -322,8 +316,6 @@ public class DialogOptions extends javax.swing.JDialog {
             String hs = fileChooser.getSelectedFile().toString();
             TauArgusUtils.putDataDirInRegistry(hs);
         }
-        
-               // TODO add your handling code here:
     }//GEN-LAST:event_jButtonLogFileActionPerformed
 
     private void jButtonOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOKActionPerformed
@@ -345,12 +337,10 @@ public class DialogOptions extends javax.swing.JDialog {
         SystemUtils.putRegInteger("optimal", "solverused", i);
         Application.solverSelected = i;
         setVisible(false);
-       
-        // TODO add your handling code here:
+        dispose();
     }//GEN-LAST:event_jButtonOKActionPerformed
 
     private void jRadioButtonCPlexItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jRadioButtonCPlexItemStateChanged
-        // TODO add your handling code here:
         jLabelCplexLicenseFile.setVisible(jRadioButtonCPlex.isSelected());
         jTextCplexLicenseFile.setVisible(jRadioButtonCPlex.isSelected());
         jButtonCplexLicenseFile.setVisible(jRadioButtonCPlex.isSelected());
@@ -368,47 +358,47 @@ public class DialogOptions extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_jButtonCplexLicenseFileActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(DialogOptions.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(DialogOptions.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(DialogOptions.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(DialogOptions.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                DialogOptions dialog = new DialogOptions(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
+//    /**
+//     * @param args the command line arguments
+//     */
+//    public static void main(String args[]) {
+//        /* Set the Nimbus look and feel */
+//        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+//        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+//         */
+//        try {
+//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//                if ("Nimbus".equals(info.getName())) {
+//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//                    break;
+//                }
+//            }
+//        } catch (ClassNotFoundException ex) {
+//            java.util.logging.Logger.getLogger(DialogOptions.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (InstantiationException ex) {
+//            java.util.logging.Logger.getLogger(DialogOptions.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (IllegalAccessException ex) {
+//            java.util.logging.Logger.getLogger(DialogOptions.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+//            java.util.logging.Logger.getLogger(DialogOptions.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        }
+//        //</editor-fold>
+//
+//        /* Create and display the dialog */
+//        java.awt.EventQueue.invokeLater(new Runnable() {
+//            public void run() {
+//                DialogOptions dialog = new DialogOptions(new javax.swing.JFrame(), true);
+//                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+//                    @Override
+//                    public void windowClosing(java.awt.event.WindowEvent e) {
+//                        System.exit(0);
+//                    }
+//                });
+//                dialog.setVisible(true);
+//            }
+//        });
+//    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JButton jButtonCplexLicenseFile;

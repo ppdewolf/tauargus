@@ -17,12 +17,11 @@
 
 package tauargus.gui;
 
+import argus.utils.SystemUtils;
 import java.io.File;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.commons.io.FilenameUtils;
 import tauargus.model.DataFilePair;
-//import tauargus.utils.ExecUtils;
-import argus.utils.SystemUtils;
 import tauargus.utils.TauArgusUtils;
 
 /**
@@ -32,7 +31,7 @@ import tauargus.utils.TauArgusUtils;
 public class PanelSelectTableFiles extends javax.swing.JPanel {
     private boolean showInfo = true;
 
-    /**
+    /*
      * Creates new form PanelSelectTableFiles
      */
     public PanelSelectTableFiles(boolean isMetaDataOptional) {
@@ -192,7 +191,6 @@ public class PanelSelectTableFiles extends javax.swing.JPanel {
         if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
             textFieldTableData.setText(fileChooser.getSelectedFile().toString());
             hs = fileChooser.getSelectedFile().getPath();
-//            if (!hs.equals("")){SystemUtils.putRegString("general", "datadir", hs);}
             TauArgusUtils.putDataDirInRegistry(hs);
             setMetaDataFileNameIfPossible();
         }

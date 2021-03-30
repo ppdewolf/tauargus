@@ -17,32 +17,57 @@
 
 package tauargus.gui;
 
+import argus.utils.SystemUtils;
+import java.awt.Cursor;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
-import tauargus.model.SaveTable;
-import tauargus.model.TableSet;
+import static javax.swing.JOptionPane.YES_OPTION;
+import javax.swing.JRootPane;
+import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.commons.io.FilenameUtils;
 import tauargus.model.ArgusException;
-import argus.utils.StrUtils;
-//import tauargus.utils.ExecUtils;
-import argus.utils.SystemUtils;
-import java.awt.Cursor;
-import static javax.swing.JOptionPane.YES_OPTION;
+import tauargus.model.SaveTable;
+import tauargus.model.TableSet;
 import tauargus.utils.TauArgusUtils;
 
 public class DialogSaveTable extends DialogBase {
-
+    @Override
+    protected JRootPane createRootPane() {
+        ActionListener actionListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                buttonCancelActionPerformed(actionEvent);
+            }
+        };    
+ 
+        KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+        JRootPane rootPane = new JRootPane();
+        rootPane.registerKeyboardAction(actionListener, stroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+        return rootPane;
+    }
+    
+    
     private TableSet tableSet;
-    private String[] extensions = {"csv", "csv", "txt","sbs","tab","jj"};
+    private final String[] extensions = {"csv", "csv", "txt","sbs","tab","jj","tab"};
     public DialogSaveTable(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        setLocationRelativeTo(parent);
     }
 
     public void showDialog(TableSet tableSet){
         this.tableSet = tableSet;
+        this.jRadioCKMFormat.setEnabled(tableSet.ckmProtect);
+        if (tableSet.ckmProtect || tableSet.ctaProtect){
+            this.jRadioIntermediate.setEnabled(false);
+            this.jRadioSBSFormat.setEnabled(false);
+        }
+        if (tableSet.rounded) this.jRadioJJFormat.setEnabled(false);
+        setLocationRelativeTo(this.getParent());        
         setVisible(true);
     };
 
@@ -85,6 +110,11 @@ public class DialogSaveTable extends DialogBase {
         jSeparator7 = new javax.swing.JSeparator();
         textFieldSaveFileName = new javax.swing.JTextField();
         jButtonChooseSafeFile = new javax.swing.JButton();
+        jRadioCKMFormat = new javax.swing.JRadioButton();
+        jCheckBoxAddOrigVal = new javax.swing.JCheckBox();
+        jCheckBoxAddDiff = new javax.swing.JCheckBox();
+        jCheckBoxAddCellKey = new javax.swing.JCheckBox();
+        jSeparator8 = new javax.swing.JSeparator();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Save table");
@@ -190,55 +220,89 @@ public class DialogSaveTable extends DialogBase {
             }
         });
 
+        buttonGroupFormat.add(jRadioCKMFormat);
+        jRadioCKMFormat.setText("CKM format");
+        jRadioCKMFormat.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jRadioCKMFormatItemStateChanged(evt);
+            }
+        });
+
+        jCheckBoxAddOrigVal.setText("Add original value");
+        jCheckBoxAddOrigVal.setEnabled(false);
+
+        jCheckBoxAddDiff.setText("Add difference");
+        jCheckBoxAddDiff.setEnabled(false);
+
+        jCheckBoxAddCellKey.setText("Add cell-key");
+        jCheckBoxAddCellKey.setEnabled(false);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSeparator6, javax.swing.GroupLayout.Alignment.TRAILING)
-            .addComponent(jSeparator7)
-            .addComponent(jSeparator4, javax.swing.GroupLayout.Alignment.TRAILING)
-            .addComponent(jSeparator5)
-            .addComponent(jSeparator2)
-            .addComponent(jSeparator3)
             .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButtonWrite)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(buttonCancel)
-                .addContainerGap())
+            .addComponent(jSeparator3)
+            .addComponent(jSeparator2)
+            .addComponent(jSeparator4, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addComponent(jSeparator6, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addComponent(jSeparator5, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addComponent(jSeparator8)
+            .addComponent(jSeparator7)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jRadioCSVFormat)
-                            .addComponent(jRadioCSVPivot)
-                            .addComponent(jRadioCodeValue)
-                            .addComponent(jRadioSBSFormat)
-                            .addComponent(jRadioIntermediate)
-                            .addComponent(jRadioJJFormat))
-                        .addGap(40, 40, 40)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jCheckBoxAddHierarchicalLevels)
-                            .addComponent(checkBoxStatusOnly)
-                            .addComponent(checkBoxAddAuditResults)
-                            .addComponent(checkBoxUseHoldingInfo)
-                            .addComponent(jCheckBoxremoveTrivialLevels)
-                            .addComponent(jCheckBoxAddStatus)
-                            .addComponent(jCheckBoxSuppressEmptyCells)
-                            .addComponent(jCheckBoxVarNamesOnFirstRow)
-                            .addComponent(jCheckBoxEmbedSpanningVarQuotes)))
+                        .addGap(6, 6, 6)
+                        .addComponent(jRadioSBSFormat))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(10, 10, 10)
-                        .addComponent(jLabel1)))
+                        .addGap(6, 6, 6)
+                        .addComponent(jRadioIntermediate))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jRadioJJFormat, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jRadioCKMFormat, javax.swing.GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE))))
+                .addGap(40, 40, 40)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jCheckBoxEmbedSpanningVarQuotes)
+                    .addComponent(jCheckBoxVarNamesOnFirstRow)
+                    .addComponent(jCheckBoxSuppressEmptyCells)
+                    .addComponent(jCheckBoxAddStatus)
+                    .addComponent(jCheckBoxAddCellKey)
+                    .addComponent(jCheckBoxAddDiff, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jCheckBoxAddOrigVal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jCheckBoxremoveTrivialLevels, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(checkBoxUseHoldingInfo)
+                    .addComponent(checkBoxAddAuditResults)
+                    .addComponent(checkBoxStatusOnly)
+                    .addComponent(jCheckBoxAddHierarchicalLevels))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(textFieldSaveFileName, javax.swing.GroupLayout.PREFERRED_SIZE, 302, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButtonChooseSafeFile)
-                .addGap(0, 10, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(10, 10, 10)
+                        .addComponent(jLabel1))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addComponent(jRadioCodeValue))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addComponent(jRadioCSVPivot))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addComponent(jRadioCSVFormat))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(20, 20, 20)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jButtonWrite)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(buttonCancel))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(textFieldSaveFileName, javax.swing.GroupLayout.PREFERRED_SIZE, 302, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jButtonChooseSafeFile)))))
+                .addContainerGap(24, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -276,7 +340,17 @@ public class DialogSaveTable extends DialogBase {
                     .addComponent(jRadioJJFormat)
                     .addComponent(jCheckBoxremoveTrivialLevels))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jRadioCKMFormat)
+                    .addComponent(jCheckBoxAddOrigVal))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jCheckBoxAddDiff)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jCheckBoxAddCellKey)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSeparator8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
@@ -293,11 +367,11 @@ public class DialogSaveTable extends DialogBase {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(textFieldSaveFileName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButtonChooseSafeFile))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(buttonCancel)
                     .addComponent(jButtonWrite))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -307,14 +381,14 @@ public class DialogSaveTable extends DialogBase {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(24, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -370,6 +444,11 @@ public class DialogSaveTable extends DialogBase {
         SaveTable.writeIntermediateAddAudit = checkBoxAddAuditResults.isSelected();
         SaveTable.writeIntermediateUseHolding = checkBoxUseHoldingInfo.isSelected();
         SaveTable.writeJJRemoveBogus = jCheckBoxremoveTrivialLevels.isSelected();
+        
+        SaveTable.writeCKMOriginalValues = jCheckBoxAddOrigVal.isSelected();
+        SaveTable.writeCKMDifferences = jCheckBoxAddDiff.isSelected();
+        SaveTable.writeCKMCellKeys = jCheckBoxAddCellKey.isSelected();
+        
         try {
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             SaveTable.writeTable(tableSet, selectedFormat);
@@ -382,6 +461,7 @@ public class DialogSaveTable extends DialogBase {
         SaveTable.writeReport(tableSet);
 
         setVisible(false);
+        dispose();
     }//GEN-LAST:event_jButtonWriteActionPerformed
 
     private int whichFormat(){
@@ -392,30 +472,25 @@ public class DialogSaveTable extends DialogBase {
         if (jRadioSBSFormat.isSelected())   {i= TableSet.FILE_FORMAT_SBS;}
         if (jRadioIntermediate.isSelected()){i= TableSet.FILE_FORMAT_INTERMEDIATE;}
         if (jRadioJJFormat.isSelected())    {i= TableSet.FILE_FORMAT_JJ;}
+        if (jRadioCKMFormat.isSelected())   {i= TableSet.FILE_FORMAT_CKM;}
         return i;          
     }
+    
     private void buttonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCancelActionPerformed
         tableSet.safeFileName = "";
         setVisible(false);
+        dispose();
     }//GEN-LAST:event_buttonCancelActionPerformed
 
     private void jButtonChooseSafeFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonChooseSafeFileActionPerformed
-      int selectedFormat;  
-      selectedFormat = whichFormat();
-//        String hs = SystemUtils.getRegString("general", "datadir", "");
-//        if (!hs.equals("")){
-//            File file = new File(hs); 
-//            jFileChooser1.setCurrentDirectory(file);
-//        }
+        int selectedFormat;  
+        selectedFormat = whichFormat();
         TauArgusUtils.getDataDirFromRegistry(jFileChooser1);
-        // TODO add your handling code here:
         jFileChooser1.setDialogTitle("Safe file name");
         jFileChooser1.setSelectedFile(new File(""));
         jFileChooser1.resetChoosableFileFilters();
-//        jFileChooser1.setCurrentDirectory("");
-        // filters are shown in order of declaration, setFileFilter sets the default filter
         jFileChooser1.setFileFilter(new FileNameExtensionFilter("Safe file name (*."+ 
-                this.extensions[selectedFormat] +")", this.extensions[selectedFormat]));
+                                            this.extensions[selectedFormat] +")", this.extensions[selectedFormat]));
         if (jFileChooser1.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
             tableSet.safeFileName=jFileChooser1.getSelectedFile().toString();
             textFieldSaveFileName.setText(tableSet.safeFileName);
@@ -424,33 +499,28 @@ public class DialogSaveTable extends DialogBase {
     }//GEN-LAST:event_jButtonChooseSafeFileActionPerformed
 
     private void jRadioCSVPivotItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jRadioCSVPivotItemStateChanged
-        // TODO add your handling code here:
         jCheckBoxVarNamesOnFirstRow.setSelected(jRadioCSVPivot.isSelected());
         jCheckBoxEmbedSpanningVarQuotes.setSelected(jRadioCSVPivot.isSelected());
         enableGeneralOptions();
     }//GEN-LAST:event_jRadioCSVPivotItemStateChanged
 
     private void jRadioCodeValueItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jRadioCodeValueItemStateChanged
-        // TODO add your handling code here:
         jCheckBoxEmbedSpanningVarQuotes.setSelected(jRadioCodeValue.isSelected());
         enableGeneralOptions();
     }//GEN-LAST:event_jRadioCodeValueItemStateChanged
 
     private void jRadioCSVFormatItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jRadioCSVFormatItemStateChanged
-        // TODO add your handling code here:
         jCheckBoxEmbedSpanningVarQuotes.setSelected(jRadioCSVFormat.isSelected());
         enableGeneralOptions();
     }//GEN-LAST:event_jRadioCSVFormatItemStateChanged
 
     private void jRadioSBSFormatItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jRadioSBSFormatItemStateChanged
-        // TODO add your handling code here:
         jCheckBoxAddHierarchicalLevels.setEnabled(jRadioSBSFormat.isSelected());
         jCheckBoxEmbedSpanningVarQuotes.setSelected(jRadioSBSFormat.isSelected());
         enableGeneralOptions();
     }//GEN-LAST:event_jRadioSBSFormatItemStateChanged
 
     private void jRadioIntermediateItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jRadioIntermediateItemStateChanged
-        // TODO add your handling code here:
         checkBoxStatusOnly.setEnabled(jRadioIntermediate.isSelected());
         checkBoxAddAuditResults.setEnabled(jRadioIntermediate.isSelected());
         checkBoxUseHoldingInfo.setEnabled(jRadioIntermediate.isSelected());
@@ -459,72 +529,75 @@ public class DialogSaveTable extends DialogBase {
     }//GEN-LAST:event_jRadioIntermediateItemStateChanged
 
     private void jRadioJJFormatItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jRadioJJFormatItemStateChanged
-        // TODO add your handling code here:
         jCheckBoxremoveTrivialLevels.setEnabled(jRadioJJFormat.isSelected());
         jCheckBoxEmbedSpanningVarQuotes.setSelected(false);
         enableGeneralOptions();
     }//GEN-LAST:event_jRadioJJFormatItemStateChanged
+
+    private void jRadioCKMFormatItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jRadioCKMFormatItemStateChanged
+        jCheckBoxAddOrigVal.setEnabled(jRadioCKMFormat.isSelected());
+        jCheckBoxAddDiff.setEnabled(jRadioCKMFormat.isSelected());
+        jCheckBoxAddCellKey.setEnabled(jRadioCKMFormat.isSelected());
+        enableGeneralOptions();
+    }//GEN-LAST:event_jRadioCKMFormatItemStateChanged
     
     private  void enableGeneralOptions(){
         jCheckBoxAddStatus.setEnabled(jRadioCSVPivot.isSelected() ||
-                                      jRadioCodeValue.isSelected()  );
+                                      jRadioCodeValue.isSelected() );
         jCheckBoxEmbedSpanningVarQuotes.setEnabled(jRadioCSVPivot.isSelected() ||
                                                    jRadioCodeValue.isSelected()||
                                                    jRadioIntermediate.isSelected() ||
                                                    jRadioSBSFormat.isSelected() ||
-                                                   jRadioCSVFormat.isSelected());
+                                                   jRadioCSVFormat.isSelected() ||
+                                                   jRadioCKMFormat.isSelected() );
         jCheckBoxSuppressEmptyCells.setEnabled(jRadioCSVPivot.isSelected() ||
                                                 jRadioCodeValue.isSelected()||
                                                 jRadioIntermediate.isSelected() ||
-                                                jRadioSBSFormat.isSelected() );
-        jCheckBoxVarNamesOnFirstRow.setEnabled(//jRadioCSVPivot.isSelected() ||
-                                                jRadioCodeValue.isSelected() //||
-                                                //jRadioIntermediate.isSelected() ||
-                                                //jRadioSBSFormat.isSelected()
-                                                );
-//jCheckBoxVarNamesOnFirstRow.setSelected(jRadioCSVPivot.isSelected());
+                                                jRadioSBSFormat.isSelected() ||
+                                                jRadioCKMFormat.isSelected() );
+        jCheckBoxVarNamesOnFirstRow.setEnabled(jRadioCodeValue.isSelected() );
     }
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(DialogSaveTable.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(DialogSaveTable.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(DialogSaveTable.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(DialogSaveTable.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                DialogSaveTable dialog = new DialogSaveTable(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
+//    /**
+//     * @param args the command line arguments
+//     */
+//    public static void main(String args[]) {
+//        /* Set the Nimbus look and feel */
+//        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+//        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
+//         */
+//        try {
+//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//                if ("Nimbus".equals(info.getName())) {
+//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//                    break;
+//                }
+//            }
+//        } catch (ClassNotFoundException ex) {
+//            java.util.logging.Logger.getLogger(DialogSaveTable.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (InstantiationException ex) {
+//            java.util.logging.Logger.getLogger(DialogSaveTable.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (IllegalAccessException ex) {
+//            java.util.logging.Logger.getLogger(DialogSaveTable.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+//            java.util.logging.Logger.getLogger(DialogSaveTable.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        }
+//        //</editor-fold>
+//
+//        /* Create and display the dialog */
+//        java.awt.EventQueue.invokeLater(new Runnable() {
+//            public void run() {
+//                DialogSaveTable dialog = new DialogSaveTable(new javax.swing.JFrame(), true);
+//                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+//                    @Override
+//                    public void windowClosing(java.awt.event.WindowEvent e) {
+//                        System.exit(0);
+//                    }
+//                });
+//                dialog.setVisible(true);
+//            }
+//        });
+//    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonCancel;
     private javax.swing.ButtonGroup buttonGroupFormat;
@@ -533,7 +606,10 @@ public class DialogSaveTable extends DialogBase {
     private javax.swing.JCheckBox checkBoxUseHoldingInfo;
     private javax.swing.JButton jButtonChooseSafeFile;
     private javax.swing.JButton jButtonWrite;
+    private javax.swing.JCheckBox jCheckBoxAddCellKey;
+    private javax.swing.JCheckBox jCheckBoxAddDiff;
     private javax.swing.JCheckBox jCheckBoxAddHierarchicalLevels;
+    private javax.swing.JCheckBox jCheckBoxAddOrigVal;
     private javax.swing.JCheckBox jCheckBoxAddStatus;
     private javax.swing.JCheckBox jCheckBoxEmbedSpanningVarQuotes;
     private javax.swing.JCheckBox jCheckBoxSuppressEmptyCells;
@@ -542,6 +618,7 @@ public class DialogSaveTable extends DialogBase {
     private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JRadioButton jRadioCKMFormat;
     private javax.swing.JRadioButton jRadioCSVFormat;
     private javax.swing.JRadioButton jRadioCSVPivot;
     private javax.swing.JRadioButton jRadioCodeValue;
@@ -555,6 +632,7 @@ public class DialogSaveTable extends DialogBase {
     private javax.swing.JSeparator jSeparator5;
     private javax.swing.JSeparator jSeparator6;
     private javax.swing.JSeparator jSeparator7;
+    private javax.swing.JSeparator jSeparator8;
     private javax.swing.JTextField textFieldSaveFileName;
     // End of variables declaration//GEN-END:variables
 }

@@ -19,17 +19,38 @@ package tauargus.gui;
 
 //import tauargus.utils.ExecUtils;
 import argus.utils.SystemUtils;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import javax.swing.JComponent;
+import javax.swing.JRootPane;
+import javax.swing.KeyStroke;
 
 /**
  *
  * @author Peter-Paul
  */
-public class DialogSolverOptions extends javax.swing.JDialog {
-
-    /**
+public class DialogSolverOptions extends DialogBase {
+    @Override
+    protected JRootPane createRootPane() {
+        ActionListener actionListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                jButtonOKActionPerformed(actionEvent);
+            }
+        };    
+ 
+        KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+        JRootPane rootPane = new JRootPane();
+        rootPane.registerKeyboardAction(actionListener, stroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+        return rootPane;
+    }
+    
+    
+    /*
      * Creates new form DialogSolverOptions
      * Mode ideally the defaults are set once (e.g. in OptiSuppress)
-     */
+    */ 
     public DialogSolverOptions(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
@@ -57,8 +78,6 @@ public class DialogSolverOptions extends javax.swing.JDialog {
         jTextFieldRounderInfinity.setText(SystemUtils.getRegString("optimal", "jjRoundInf",  "21400000000000"));
         jTextFieldRounderMinViola.setText(SystemUtils.getRegString("optimal", "jjRoundMinViola", "0.0001"));
         jTextFieldRounderMaxSlack.setText(SystemUtils.getRegString("optimal", "jjRoundMaxSlack", "0.01"));
-        
-        setLocationRelativeTo(parent);
     }
 
     /**
@@ -463,7 +482,6 @@ public class DialogSolverOptions extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOKActionPerformed
-        // TODO add your handling code here:
         SystemUtils.putRegString("solveroptions", "zero", jTextFieldZero.getText());
         SystemUtils.putRegString("solveroptions", "zero1", jTextFieldZero1.getText());
         SystemUtils.putRegString("solveroptions", "zero2", jTextFieldZero2.getText());
@@ -484,15 +502,12 @@ public class DialogSolverOptions extends javax.swing.JDialog {
         SystemUtils.putRegString("optimal", "jjRoundInf", jTextFieldRounderInfinity.getText());
         SystemUtils.putRegString("optimal", "jjRoundMinViola", jTextFieldRounderMinViola.getText());
         SystemUtils.putRegString("optimal", "jjRoundMaxSlack", jTextFieldRounderMaxSlack.getText());
-           
-        
-//        ExecUtils.putRegBoolean("solveroptions", "applyscaling", jCheckBoxApplyScaling.isSelected());
-        
+
         setVisible(false);
+        dispose();
     }//GEN-LAST:event_jButtonOKActionPerformed
 
     private void jButtonDefaultsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDefaultsActionPerformed
-        // TODO add your handling code here:
         jTextFieldZero.setText("0.0000001");
         jTextFieldZero1.setText("0.0000001");
         jTextFieldZero2.setText("0.0000000001");
@@ -508,9 +523,6 @@ public class DialogSolverOptions extends javax.swing.JDialog {
         jTextFieldMaxCutsIter.setText("50");
         
         jTextFieldCTATolerance.setText("0.00001");
-        
-//        jCheckBoxApplyScaling.setSelected(false);
-
     }//GEN-LAST:event_jButtonDefaultsActionPerformed
 
     private void jTextFieldRounderMinViolaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldRounderMinViolaActionPerformed
@@ -520,45 +532,45 @@ public class DialogSolverOptions extends javax.swing.JDialog {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(DialogSolverOptions.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(DialogSolverOptions.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(DialogSolverOptions.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(DialogSolverOptions.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                DialogSolverOptions dialog = new DialogSolverOptions(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-                
-            }
-        });
-    }
+//    public static void main(String args[]) {
+//        /* Set the Nimbus look and feel */
+//        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+//        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+//         */
+//        try {
+//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//                if ("Nimbus".equals(info.getName())) {
+//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//                    break;
+//                }
+//            }
+//        } catch (ClassNotFoundException ex) {
+//            java.util.logging.Logger.getLogger(DialogSolverOptions.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (InstantiationException ex) {
+//            java.util.logging.Logger.getLogger(DialogSolverOptions.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (IllegalAccessException ex) {
+//            java.util.logging.Logger.getLogger(DialogSolverOptions.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+//            java.util.logging.Logger.getLogger(DialogSolverOptions.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        }
+//        //</editor-fold>
+//
+//        /* Create and display the dialog */
+//        java.awt.EventQueue.invokeLater(new Runnable() {
+//            public void run() {
+//                DialogSolverOptions dialog = new DialogSolverOptions(new javax.swing.JFrame(), true);
+//                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+//                    @Override
+//                    public void windowClosing(java.awt.event.WindowEvent e) {
+//                        System.exit(0);
+//                    }
+//                });
+//                dialog.setVisible(true);
+//                
+//            }
+//        });
+//    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonDefaults;

@@ -25,8 +25,11 @@ public enum SuppressionMethod {
     NETWORK ("Network"),
     MARGINAL("marginal suppression"),
     UWE("UWE optimisation"),
-    CTA("CTA_solution");
+    CTA("CTA_solution"),
+    CELLKEY("Cell Key Method");
 
+    private final String description;
+    
     SuppressionMethod(String description) {
         this.description = description;
     }
@@ -47,6 +50,10 @@ public enum SuppressionMethod {
         return this != ROUNDING;
     }
     
+    public boolean isCellKey(){
+        return this == CELLKEY;
+    }
+    
     public boolean isCosmetic() {
         return this == ROUNDING;
     }
@@ -56,5 +63,4 @@ public enum SuppressionMethod {
         return this == HITAS || this == OPTIMAL || this == GHMITER;
     }
 
-    private final String description;
 }

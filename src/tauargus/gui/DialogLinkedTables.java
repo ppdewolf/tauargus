@@ -20,20 +20,25 @@ package tauargus.gui;
 import argus.utils.StrUtils;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import javax.swing.DefaultListModel;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JRootPane;
+import javax.swing.KeyStroke;
 import tauargus.model.Application;
 import tauargus.model.ArgusException;
-//import tauargus.model.GHMiter;
+import tauargus.model.LinkedTables;
 import tauargus.model.TableSet;
 import tauargus.model.Variable;
 import tauargus.service.TableService;
-import tauargus.model.LinkedTables;
 
 /**
  * Controls the linked tables procedure, both the modular version as well as the hypercube version.
@@ -42,8 +47,23 @@ import tauargus.model.LinkedTables;
  * @author ahnl
  */
 public class DialogLinkedTables extends DialogBase {
+    @Override
+    protected JRootPane createRootPane() {
+        ActionListener actionListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                buttonReadyActionPerformed(actionEvent);
+            }
+        };    
+ 
+        KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+        JRootPane rootPane = new JRootPane();
+        rootPane.registerKeyboardAction(actionListener, stroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+        return rootPane;
+    }    
+    
     TableSet tableSet;
-        private JFrame getParentFrame() {
+    private JFrame getParentFrame() {
         Container container = this;
         while (!(container instanceof JFrame)) {
             container = container.getParent();
@@ -51,21 +71,17 @@ public class DialogLinkedTables extends DialogBase {
         return (JFrame)container;
     }
 
-    /**
-     * Creates new form DialogLinkedTables
-     */
+    // Creates new form DialogLinkedTables
     public DialogLinkedTables(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         initLists();
-        setLocationRelativeTo(parent);
     }
 
     private void initLists(){
         int i, n; Variable variable;
-        TableSet tableSet;
-//        DefaultListModel hulpModel1;
-//                , hulpModel2, hulpModel3, hulpModel4, hulpModel5, hulpModel6, hulpModel7;
+        TableSet tmptableSet;
+
         n = TableService.numberOfTables();
         labelTable1.setVisible(n>=1);
         labelTable2.setVisible(n>=2);
@@ -82,91 +98,72 @@ public class DialogLinkedTables extends DialogBase {
         listTable6.setVisible(n>=6);
         listTable7.setVisible(n>=7);
 
-        if (n>=1){tableSet=TableService.getTable(0);
-        DefaultListModel hulpModel1 = new DefaultListModel();
+        if (n>=1){tmptableSet=TableService.getTable(0);
+        DefaultListModel<String> hulpModel1 = new DefaultListModel<>();
         hulpModel1.clear();          
-        for (i=0;i<tableSet.expVar.size();i++){
-           variable = tableSet.expVar.get(i);
+        for (i=0;i<tmptableSet.expVar.size();i++){
+           variable = tmptableSet.expVar.get(i);
            hulpModel1.addElement(variable.name); 
           }
           listTable1.setModel(hulpModel1);}
 
-        if (n>=2){tableSet=TableService.getTable(1);
-        DefaultListModel hulpModel2 = new DefaultListModel();
+        if (n>=2){tmptableSet=TableService.getTable(1);
+        DefaultListModel<String> hulpModel2 = new DefaultListModel<>();
         hulpModel2.clear();          
-        for (i=0;i<tableSet.expVar.size();i++){
-           variable = tableSet.expVar.get(i);
+        for (i=0;i<tmptableSet.expVar.size();i++){
+           variable = tmptableSet.expVar.get(i);
            hulpModel2.addElement(variable.name); 
           }
           listTable2.setModel(hulpModel2);}
         
-        if (n>=3){tableSet=TableService.getTable(2);
-        DefaultListModel hulpModel3 = new DefaultListModel();
+        if (n>=3){tmptableSet=TableService.getTable(2);
+        DefaultListModel<String> hulpModel3 = new DefaultListModel<>();
         hulpModel3.clear();          
-        for (i=0;i<tableSet.expVar.size();i++){
-           variable = tableSet.expVar.get(i);
+        for (i=0;i<tmptableSet.expVar.size();i++){
+           variable = tmptableSet.expVar.get(i);
            hulpModel3.addElement(variable.name); 
           }
           listTable3.setModel(hulpModel3);}
 
-        if (n>=4){tableSet=TableService.getTable(3);
-        DefaultListModel hulpModel4 = new DefaultListModel();
+        if (n>=4){tmptableSet=TableService.getTable(3);
+        DefaultListModel<String> hulpModel4 = new DefaultListModel<>();
         hulpModel4.clear();          
-        for (i=0;i<tableSet.expVar.size();i++){
-           variable = tableSet.expVar.get(i);
+        for (i=0;i<tmptableSet.expVar.size();i++){
+           variable = tmptableSet.expVar.get(i);
            hulpModel4.addElement(variable.name); 
           }
           listTable4.setModel(hulpModel4);}
 
-       if (n>=5){tableSet=TableService.getTable(4);
-        DefaultListModel hulpModel5 = new DefaultListModel();
+       if (n>=5){tmptableSet=TableService.getTable(4);
+        DefaultListModel<String> hulpModel5 = new DefaultListModel<>();
         hulpModel5.clear();          
-        for (i=0;i<tableSet.expVar.size();i++){
-           variable = tableSet.expVar.get(i);
+        for (i=0;i<tmptableSet.expVar.size();i++){
+           variable = tmptableSet.expVar.get(i);
            hulpModel5.addElement(variable.name); 
           }
           listTable5.setModel(hulpModel5);}
 
-       if (n>=6){tableSet=TableService.getTable(5);
-        DefaultListModel hulpModel6 = new DefaultListModel();
+       if (n>=6){tmptableSet=TableService.getTable(5);
+        DefaultListModel<String> hulpModel6 = new DefaultListModel<>();
         hulpModel6.clear();          
-        for (i=0;i<tableSet.expVar.size();i++){
-           variable = tableSet.expVar.get(i);
+        for (i=0;i<tmptableSet.expVar.size();i++){
+           variable = tmptableSet.expVar.get(i);
            hulpModel6.addElement(variable.name); 
           }
           listTable6.setModel(hulpModel6);}
 
-        if (n>=7){tableSet=TableService.getTable(6);
-        DefaultListModel hulpModel7 = new DefaultListModel();
+        if (n>=7){tmptableSet=TableService.getTable(6);
+        DefaultListModel<String> hulpModel7 = new DefaultListModel<>();
         hulpModel7.clear();          
-        for (i=0;i<tableSet.expVar.size();i++){
-           variable = tableSet.expVar.get(i);
+        for (i=0;i<tmptableSet.expVar.size();i++){
+           variable = tmptableSet.expVar.get(i);
            hulpModel7.addElement(variable.name); 
           }
           listTable7.setModel(hulpModel7);}
 
-        
-//        if (n>=4){fillModel(3,hulpModel); 
-//           listTable4.setModel(hulpModel[3]);}
-//        if (n>=5){fillModel(4,hulpModel); 
-//           listTable5.setModel(hulpModel[4]);}
-//        if (n>=6){fillModel(5,hulpModel); 
-//           listTable6.setModel(hulpModel[5]);}
-//        if (n>=7){fillModel(6,hulpModel); 
-//           listTable7.setModel(hulpModel[6]);}
         LinkedTables.buildCoverTable();       
     }
     
-//    private void fillModel(int t, DefaultListModel[] hulpModel){
-//        int i; Variable variable;
-  
-//        tableSet=TableService.getTable(t); 
-//        hulpModel[t].clear();          
-//        for (i=0;i<tableSet.expVar.size();i++){
-//           variable = tableSet.expVar.get(i);
-//           hulpModel[t].addElement(variable.name); 
-             
-//    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -177,7 +174,7 @@ public class DialogLinkedTables extends DialogBase {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        listTable1 = new javax.swing.JList();
+        listTable1 = new javax.swing.JList<>();
         labelTable1 = new javax.swing.JLabel();
         buttonSuppressHypercube = new javax.swing.JButton();
         buttonSuppressModular = new javax.swing.JButton();
@@ -189,26 +186,26 @@ public class DialogLinkedTables extends DialogBase {
         labelTable6 = new javax.swing.JLabel();
         labelTable7 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        listTable2 = new javax.swing.JList();
+        listTable2 = new javax.swing.JList<>();
         jScrollPane3 = new javax.swing.JScrollPane();
-        listTable7 = new javax.swing.JList();
+        listTable7 = new javax.swing.JList<>();
         jScrollPane4 = new javax.swing.JScrollPane();
-        listTable3 = new javax.swing.JList();
+        listTable3 = new javax.swing.JList<>();
         jScrollPane5 = new javax.swing.JScrollPane();
-        listTable4 = new javax.swing.JList();
+        listTable4 = new javax.swing.JList<>();
         jScrollPane6 = new javax.swing.JScrollPane();
-        listTable5 = new javax.swing.JList();
+        listTable5 = new javax.swing.JList<>();
         jScrollPane7 = new javax.swing.JScrollPane();
-        listTable6 = new javax.swing.JList();
+        listTable6 = new javax.swing.JList<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Linked tables");
         setModal(true);
 
-        listTable1.setModel(new javax.swing.AbstractListModel() {
+        listTable1.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Var1", "Var2" };
             public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
+            public String getElementAt(int i) { return strings[i]; }
         });
         listTable1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         listTable1.setToolTipText("");
@@ -250,45 +247,45 @@ public class DialogLinkedTables extends DialogBase {
 
         labelTable7.setText("Table 7");
 
-        listTable2.setModel(new javax.swing.AbstractListModel() {
+        listTable2.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Var1", "Var2" };
             public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
+            public String getElementAt(int i) { return strings[i]; }
         });
         jScrollPane2.setViewportView(listTable2);
 
-        listTable7.setModel(new javax.swing.AbstractListModel() {
+        listTable7.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Var1", "Var2" };
             public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
+            public String getElementAt(int i) { return strings[i]; }
         });
         jScrollPane3.setViewportView(listTable7);
 
-        listTable3.setModel(new javax.swing.AbstractListModel() {
+        listTable3.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Var1", "Var2" };
             public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
+            public String getElementAt(int i) { return strings[i]; }
         });
         jScrollPane4.setViewportView(listTable3);
 
-        listTable4.setModel(new javax.swing.AbstractListModel() {
+        listTable4.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Var1", "Var2" };
             public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
+            public String getElementAt(int i) { return strings[i]; }
         });
         jScrollPane5.setViewportView(listTable4);
 
-        listTable5.setModel(new javax.swing.AbstractListModel() {
+        listTable5.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Var1", "Var2" };
             public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
+            public String getElementAt(int i) { return strings[i]; }
         });
         jScrollPane6.setViewportView(listTable5);
 
-        listTable6.setModel(new javax.swing.AbstractListModel() {
+        listTable6.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Var1", "Var2" };
             public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
+            public String getElementAt(int i) { return strings[i]; }
         });
         jScrollPane7.setViewportView(listTable6);
 
@@ -341,9 +338,9 @@ public class DialogLinkedTables extends DialogBase {
                         .addComponent(labelTable1))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(164, 164, 164)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(buttonSuppressHypercube, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                             .addComponent(buttonSuppressModular, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(buttonSuppressHypercube, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(buttonReady))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -385,8 +382,8 @@ public class DialogLinkedTables extends DialogBase {
      * @param evt 
      */
     private void buttonSuppressModularActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSuppressModularActionPerformed
-        // TODO add your handling code here:
-      String hs = "", hs1 = "";  Boolean oke = true;
+      String hs = "", hs1;  
+      Boolean oke;
       JFrame parentFrame = getParentFrame();
       tableSet = TableService.getTable(0);
       DialogModularParameters paramsG = new DialogModularParameters(parentFrame, tableSet, false, true);
@@ -422,7 +419,7 @@ public class DialogLinkedTables extends DialogBase {
                Info.addLabel("Overview of the inconsistency errors");
                try{
                   Info.addTextFile(Application.getTempFile("inconsistent.txt"));}
-               catch (ArgusException ex1){};
+               catch (ArgusException ex1){}
                Info.setVisible(true);  
                hs = hs + "\nSolve the inconsistencies first";
              }
@@ -438,6 +435,7 @@ public class DialogLinkedTables extends DialogBase {
       setVisible(false);
       listTable1.setLayout(null);
       listTable1.setSize(new Dimension(300,300));
+      dispose();
     }//GEN-LAST:event_buttonReadyActionPerformed
 /**
  * The hypercube has build in facilitities for linked tables.
@@ -467,7 +465,7 @@ public class DialogLinkedTables extends DialogBase {
              Info.addLabel("Overview of the frozen cells");
              try{
                Info.addTextFile(Application.getTempFile("frozen.txt"));}
-             catch (ArgusException ex1){};
+             catch (ArgusException ex1){}
                     Info.setVisible(true);
               }
           }
@@ -481,48 +479,48 @@ public class DialogLinkedTables extends DialogBase {
 
 
     
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(DialogLinkedTables.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(DialogLinkedTables.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(DialogLinkedTables.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(DialogLinkedTables.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                DialogLinkedTables dialog = new DialogLinkedTables(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-
-            }
-        });
-    }
+//    /**
+//     * @param args the command line arguments
+//     */
+//    public static void main(String args[]) {
+//        /* Set the Nimbus look and feel */
+//        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+//        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+//         */
+//        try {
+//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//                if ("Nimbus".equals(info.getName())) {
+//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//                    break;
+//                }
+//            }
+//        } catch (ClassNotFoundException ex) {
+//            java.util.logging.Logger.getLogger(DialogLinkedTables.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (InstantiationException ex) {
+//            java.util.logging.Logger.getLogger(DialogLinkedTables.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (IllegalAccessException ex) {
+//            java.util.logging.Logger.getLogger(DialogLinkedTables.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+//            java.util.logging.Logger.getLogger(DialogLinkedTables.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        }
+//        //</editor-fold>
+//
+//        /* Create and display the dialog */
+//        java.awt.EventQueue.invokeLater(new Runnable() {
+//            public void run() {
+//                DialogLinkedTables dialog = new DialogLinkedTables(new javax.swing.JFrame(), true);
+//                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+//                    @Override
+//                    public void windowClosing(java.awt.event.WindowEvent e) {
+//                        System.exit(0);
+//                    }
+//                });
+//                dialog.setVisible(true);
+//
+//            }
+//        });
+//    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonReady;
     private javax.swing.JButton buttonSuppressHypercube;
@@ -541,12 +539,12 @@ public class DialogLinkedTables extends DialogBase {
     private javax.swing.JLabel labelTable5;
     private javax.swing.JLabel labelTable6;
     private javax.swing.JLabel labelTable7;
-    private javax.swing.JList listTable1;
-    private javax.swing.JList listTable2;
-    private javax.swing.JList listTable3;
-    private javax.swing.JList listTable4;
-    private javax.swing.JList listTable5;
-    private javax.swing.JList listTable6;
-    private javax.swing.JList listTable7;
+    private javax.swing.JList<String> listTable1;
+    private javax.swing.JList<String> listTable2;
+    private javax.swing.JList<String> listTable3;
+    private javax.swing.JList<String> listTable4;
+    private javax.swing.JList<String> listTable5;
+    private javax.swing.JList<String> listTable6;
+    private javax.swing.JList<String> listTable7;
     // End of variables declaration//GEN-END:variables
 }

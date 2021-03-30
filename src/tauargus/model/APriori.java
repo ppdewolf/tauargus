@@ -17,43 +17,27 @@
 
 package tauargus.model;
 
+import argus.utils.StrUtils;
+import argus.utils.SystemUtils;
 import java.io.*;
-//import java.text.DecimalFormat;
-//import java.text.DecimalFormatSymbols;
-//import java.text.ParseException;
 import java.util.ArrayList;
-//import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
-import java.util.regex.*;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.*;
 import tauargus.extern.dataengine.TauArgus;
-
-//import tauargus.utils.WinRegistry;
-import argus.utils.SystemUtils; 
 import tauargus.service.TableService;
-//import tauargus.model.CodeList;
 import tauargus.utils.TauArgusUtils;
-//import tauargus.model.VarCode;
-//import tauargus.model.VarCodeProperties;
-import argus.utils.StrUtils;
 import tauargus.utils.Tokenizer;
-
-
-
-
-
 
 /**
  *
  * @author whcg
  */
 public class APriori {
-
-    
     /*!
         The class contains N coderanges \f$ C_1, ..., C_N \f$
         This class iterates over the cartesian product of their values
@@ -72,7 +56,6 @@ public class APriori {
             codeRange = cr;
             codeCntr = new int[cr.size()];
         }
-        
         /*!
             Start at the first combination of values
         */
@@ -83,7 +66,6 @@ public class APriori {
             for(int i=0; i<codeCntr.length; i++)
                 codeCntr[i] = 0;
         }
-        
         /*!
             Have all values been iterated?
         */
@@ -98,13 +80,9 @@ public class APriori {
             
             return false;
         }
-        
-        
         //  coderange:
         //     0: 13, 14
         //     1: 2,3,4
-        //
-        
         /*!
             Print the the current code values inside the iterator
         */        
@@ -116,10 +94,6 @@ public class APriori {
             
             return s;
         }
-        
-        
-        
-        
         /*!
             Goto the next value.
             A bit like counting in a N-ary system
@@ -140,7 +114,6 @@ public class APriori {
                 while(currCntr < codeCntr.length && 
                         codeCntr[currCntr]>=codeRange.get(currCntr).length-1)
                     currCntr++;
-                
                 // going a bit like from 99 --> 100 
                 // reset alle lower counters, e.g.  9 --> 0
                 // increase the next digit: 0 --> 1
@@ -154,11 +127,9 @@ public class APriori {
                     currCntr=0;
                 }
             }
-            
             //
             // fill return value
             //
-            
             return Current();
         }
         
@@ -178,13 +149,8 @@ public class APriori {
             return res;
         }
     }
-
-
     
-    
-    
-    
-    List<APrioriCell> Cells = new ArrayList<APrioriCell>();
+    List<APrioriCell> Cells = new ArrayList<>();
     
     /*!
            The mapping of the columns from the input safe file
@@ -193,7 +159,7 @@ public class APriori {
            (1,0)                       --> column 1 will be another variable
            (2,1)                       --> column 2 uses A 
      */
-    public Map<Integer,Integer> ColumnMap = new HashMap<Integer, Integer>();
+    public Map<Integer,Integer> ColumnMap = new HashMap<>();
     
     public int SelectedColumnsCount = 0;
     
@@ -201,14 +167,13 @@ public class APriori {
         The new status values
     */
     public enum ChangeStatus { 
-            Omit    (0, 'o'), 
-            Safe    (1, 's'), 
-            Unsafe  (2, 'u'), 
-            Protect (3, 'p');
+        Omit    (0, 'o'), 
+        Safe    (1, 's'), 
+        Unsafe  (2, 'u'), 
+        Protect (3, 'p');
             
-            private final int _idx;
-            private final char _symbol;
-
+        private final int _idx;
+        private final char _symbol;
             
         private ChangeStatus(int idx, char s) {
             _idx=idx;
@@ -232,7 +197,6 @@ public class APriori {
                 if( cs._idx==value)
                     return cs;
             }
-            
             return null;
         }
         
@@ -243,7 +207,6 @@ public class APriori {
                 if( cs._symbol==value)
                     return cs;
             }
-            
             return null;
         }
     }
@@ -251,11 +214,8 @@ public class APriori {
     /*!
         \brief Mapping per Cell Status
         This mapping corresponds with the mapping as defined in DialogAPriori
-        
      */
     public class Mapping {
-
-        
         public CellStatus oldstat;      //< The status as defined by TauArgus
         public ChangeStatus newstat;    //< The new ChangeStatus for that oldstat 
         public boolean useCost;         //< if Cost was checked in DialogApriori 
@@ -268,8 +228,6 @@ public class APriori {
             useCost = false;
             costValue = 1.0;
         }
-        
-        
                 
         public void WriteToRegistry(String root)
         {
@@ -295,7 +253,7 @@ public class APriori {
         }
     }
     
-    public  ArrayList<Mapping> Mappings = new ArrayList<Mapping>();
+    public  ArrayList<Mapping> Mappings = new ArrayList<>();
     
     
     public ChangeStatus GetChangeStatus(CellStatus status)
@@ -340,7 +298,6 @@ public class APriori {
         return -1;
     }
     
-    
     public String FileName;     //< The filename of the APriori file
     
     public APriori()
@@ -366,7 +323,6 @@ public class APriori {
         2. status value *may* be present
         3. the first line may contain the variable names (if 1  = true, these are all quoted)
     */
-    
     private boolean IsHeaderLine(String line)
     {
         Pattern reIdentifier = Pattern.compile("[a-zA-Z_][a-zA-Z_0-9]+");
@@ -384,7 +340,6 @@ public class APriori {
         
         return AllVars;
     }
-    
 
     private int GetFirstNumericColumn(String line)
     {
@@ -404,8 +359,6 @@ public class APriori {
         return -1;  // no numeric field found....
     }
     
-    
-    
     public boolean AllCellsHaveAStatus()
     {
         for(APrioriCell c: Cells)
@@ -416,12 +369,11 @@ public class APriori {
         
         return true;
     }
-
     
     public void ReadSafeFile(String safeFileName, String sep) throws ArgusException
     {
         try {
-           File f = new File(safeFileName) ;
+            File f = new File(safeFileName) ;
             Scanner scan = new Scanner(f);
             
             String line = scan.nextLine();
@@ -429,27 +381,25 @@ public class APriori {
             // check if we start with a variable line: just identifier strings
             if( IsHeaderLine(line))
                 line = scan.nextLine();
-            
+           
             // at first real line, determine ceel values column = first numeric column
             int FirstNumericField = GetFirstNumericColumn(line);
             if( FirstNumericField<0)
-                throw new ArgusException("No numeric field found in save file '"+safeFileName+"'");
+                throw new ArgusException("No numeric field found in safe file '"+safeFileName+"'");
             
             Cells.clear();
-            while( scan.hasNext())
+            Cells.add(new APrioriCell(line, sep, FirstNumericField ,this)); // Add first encountered cell
+
+            while (scan.hasNextLine()) // Continue with rest
             {                
-                Cells.add(new APrioriCell(line, sep, FirstNumericField ,this));
                 line = scan.nextLine();
+                Cells.add(new APrioriCell(line, sep, FirstNumericField ,this));
             }
-            
         } 
         catch (FileNotFoundException ex) {
             Logger.getLogger(APriori.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
     }
-    
-    
     
     public int getDimension()
     {
@@ -458,7 +408,6 @@ public class APriori {
         
         return 0;
     }
-    
 
     /*!
       Writes the APriori file to disk
@@ -466,13 +415,9 @@ public class APriori {
       \param aprioriFileName   the file name
       \param sep               the separator to be used when writing the file
      */
-    
     public void WriteAprioriFile(String aprioriFileName, String sep, int outDim)
     { 
         try {
-            
-//            File f = new File(aprioriFileName);
-//            FileWriter w = new FileWriter(f);
             BufferedWriter w = new BufferedWriter(new FileWriter(aprioriFileName));
             for(APrioriCell c : Cells)
             {
@@ -489,24 +434,16 @@ public class APriori {
         }
         
     }
-
-
     
     //! Just passing through ...
     public int ProcessAprioriFile(int tableNumber, String separator, 
-                                     boolean ignoreError, boolean expandBogus, boolean report, int[][] aPrioryStatus)
-            throws ArgusException
+                                  boolean ignoreError, boolean expandBogus, boolean report, int[][] aPrioryStatus) throws ArgusException
     {
-        //    TableSet.processAprioryFile(Application.getTempFile("temp0.hst"),0 , ";", true, true, true);
         int result = processAprioryFile(FileName, tableNumber, separator, 
                                             ignoreError, expandBogus, report, aPrioryStatus);
         
         return result;
     }
-    
-    
-    
-
     
     /*!
         The apriorifile may contain
@@ -534,62 +471,50 @@ public class APriori {
         
         return NoOfFields;
     }
-    
-
-    
-     BufferedWriter outCodes, outStatus, outCost, outBound;
-     BufferedWriter outWim = null;
-     TauArgus tauArgus = Application.getTauArgusDll();
-
+   
+    BufferedWriter outCodes, outStatus, outCost, outBound;
+    TauArgus tauArgus = Application.getTauArgusDll();
      
-     int AP_SAFE_MANUAL = CellStatus.SAFE_MANUAL.getValue();
-     int AP_PROTECT_MANUAL =  CellStatus.PROTECT_MANUAL.getValue();
-     int AP_UNSAFE_MANUAL = CellStatus.UNSAFE_MANUAL.getValue();
-     int AP_SECONDARY_UNSAFE_MANUAL = CellStatus.SECONDARY_UNSAFE_MANUAL.getValue();
-     int AP_SECONDARY_UNSAFE = CellStatus.SECONDARY_UNSAFE.getValue();
-     int AP_ADJUST_COST = -1;
-     int AP_ADJUST_PROT_LEVEL = -2;
-     int AP_ADJUST_APRIORI_BOUND = -3;
-
+    int AP_SAFE_MANUAL = CellStatus.SAFE_MANUAL.getValue();
+    int AP_PROTECT_MANUAL =  CellStatus.PROTECT_MANUAL.getValue();
+    int AP_UNSAFE_MANUAL = CellStatus.UNSAFE_MANUAL.getValue();
+    int AP_SECONDARY_UNSAFE_MANUAL = CellStatus.SECONDARY_UNSAFE_MANUAL.getValue();
+    int AP_SECONDARY_UNSAFE = CellStatus.SECONDARY_UNSAFE.getValue();
+    int AP_ADJUST_COST = -1;
+    int AP_ADJUST_PROT_LEVEL = -2;
+    int AP_ADJUST_APRIORI_BOUND = -3;
 
     // AP_STATUS: [1..4][1..2]
-     // 2e index: 1 = goed, 2 = fout
-     int AP_STATUS_LINE_READ        = 0;            
-     int AP_STATUS_CHANGE_STATUS    = 1;  
-     int AP_STATUS_CHANGE_COSTS     = 2;  
-     int AP_STATUS_CHANGE_BOUNDS    = 3;  
-     int AP_STATUS_CHANGE_PROTLEVEL = 4;
+    // 2e index: 1 = goed, 2 = fout
+    int AP_STATUS_LINE_READ        = 0;            
+    int AP_STATUS_CHANGE_STATUS    = 1;  
+    int AP_STATUS_CHANGE_COSTS     = 2;  
+    int AP_STATUS_CHANGE_BOUNDS    = 3;  
+    int AP_STATUS_CHANGE_PROTLEVEL = 4;
      
-     int AP_STATUS_OKAY     = 0;
-     int AP_STATUS_ERROR    = 1;
+    int AP_STATUS_OKAY     = 0;
+    int AP_STATUS_ERROR    = 1;
 
-     
-     
-     public static String getStatus(int i)
-     {
-         switch(i)
-         {
-             case 0: 
-                 return "Lines read"; 
-             case 1: 
-                 return "Status"; 
-             case 2: 
-                 return "Cost"; 
-             case 3: 
-                 return "APriori Bound"; 
-             case 4: 
-                 return "Prot. level"; 
-         }
+    public static String getStatus(int i)
+    {
+        switch(i)
+        {
+            case 0: 
+                return "Lines read"; 
+            case 1: 
+                return "Status"; 
+            case 2: 
+                return "Cost"; 
+            case 3: 
+                return "APriori Bound"; 
+            case 4: 
+                return "Prot. level"; 
+        }
          
-         return "";
-     }
+        return "";
+    }
     
-     
-     
-     
-     
-     
-     /*!
+    /*!
         Process one cell from the input table using the apriori file
         ------------------------------------------------------------
      
@@ -626,36 +551,20 @@ public class APriori {
         \param fileName     The apriori filename (CHECK if not class member !!!)
         \param tokenizer    Just included to get the linenumer correct for error messages
      
-     */
-     private void ProcessOneVarCode(TableSet tableSet, String apType, double x1, double x2, int newStatus, String Kop, int[] dimIndex, String codesString,
-                                    boolean report, boolean ignoreError, int[][] aPrioryStatus, String fileName, Tokenizer tokenizer)
-             throws ArgusException, IOException
-     {
-            int oldStatus = tableSet.getCellStatus(tableSet, dimIndex);
+    */
+    private void ProcessOneVarCode(TableSet tableSet, String apType, double x1, double x2, int newStatus, 
+                                    String Kop, int[] dimIndex, String codesString, boolean report, boolean ignoreError, 
+                                    int[][] aPrioryStatus, String fileName, Tokenizer tokenizer) throws ArgusException, IOException
+    {
+        int oldStatus = TableSet.getCellStatus(tableSet, dimIndex);
              
-            if( CellStatus.findByValue(oldStatus) == CellStatus.EMPTY ) // do nothing 
-            {
-                if( outWim!=null)
-                {
-                    String celldim = "(";
-                    for(int cw: dimIndex)
-                        celldim+=cw+",";
-                    celldim=celldim.substring(0, celldim.length()-1)+")";
-                    
-                    outWim.write("\n\r =========== Skipping "+celldim+" oldstatus = "+oldStatus+" ("+CellStatus.findByValue(oldStatus).getDescription()+")");
-                }
-                return;
-            }
+        if( CellStatus.findByValue(oldStatus) == CellStatus.EMPTY ) return; // do nothing 
             
-            String ErrorPosition = "\nLine"+tokenizer.getLine()+"\nCell "+codesString;
+        String ErrorPosition = "\nLine"+tokenizer.getLine()+"\nCell "+codesString;
 
-            if( outWim!=null)
-                outWim.write("\r\n Line="+tokenizer.getLine()+", Cell="+codesString+", OLD status = "+ CellStatus.findByValue(oldStatus).name() + ": aptype=" +apType+", x1="+x1+", x2="+x2);
-            
-            // met status is EMPTY mag niks gebeuren
-            // igv Ignore gewoon doorgaan met de volgende waarde in de lus
-            try
-            {
+        // met status is EMPTY mag niks gebeuren
+        // igv Ignore gewoon doorgaan met de volgende waarde in de lus
+        try{
             switch (apType)
             {
                 case "C": 
@@ -684,13 +593,10 @@ public class APriori {
                         
                         aPrioryStatus[AP_STATUS_CHANGE_COSTS][AP_STATUS_OKAY]++;
                     }
-                    
                     break;
-
                 case "AB": throw new ArgusException ("Change apriory bounds is not yet possible; was neither in the old TAU-Argus");
                             // whcg: ik zie geen code nog in de VB code
                            //break;
-
                 case "PL": 
                    //KAN alleen bij primair onveilige cellen.
                     boolean errorOccurred = false;
@@ -707,7 +613,7 @@ public class APriori {
                         errorOccurred = true;
                     }
 
-                    oldStatus = tableSet.getCellStatus(tableSet, dimIndex);
+                    oldStatus = TableSet.getCellStatus(tableSet, dimIndex);
                     if ( (oldStatus < CellStatus.UNSAFE_RULE.getValue())||(oldStatus > CellStatus.UNSAFE_MANUAL.getValue()) )
                     {
                         if (!ignoreError)
@@ -728,16 +634,13 @@ public class APriori {
                     
                     //AP_SECONDARY_UNSAFE_MANUAL
                     break;
-
                 case "S": 
                 case "U": 
                 case "P": 
                 case "M": 
                 case "ML":  //Status change
-
-                    // de overgang PROTECTED --> UNSAFE is verboden
-
-                    oldStatus = tableSet.getCellStatus(tableSet, dimIndex);
+                    // changing PROTECTED --> UNSAFE is not allowed
+                    oldStatus = TableSet.getCellStatus(tableSet, dimIndex);
 
                     // code van Robert, aangepast aan de mapping M, ML --> AP_...
                     if ((newStatus == AP_SECONDARY_UNSAFE) && (oldStatus == CellStatus.SAFE_MANUAL.getValue()))
@@ -749,9 +652,6 @@ public class APriori {
                     {
                         outStatus.write(Kop + "<td>"+CellStatus.findByValue(oldStatus).getDescription()+"</td><td>" +
                                                         CellStatus.findByValue(newStatus).getDescription()+"</td></tr>");
-                        
-                        if( oldStatus!=newStatus && outWim!=null)
-                            outWim.write("\n\r  ======= status changing:  "+CellStatus.findByValue(oldStatus).getDescription()+" --> "+CellStatus.findByValue(newStatus).getDescription());
                     }
 
                     if (!tauArgus.SetTableCellStatus(tableSet.index, dimIndex, newStatus))
@@ -771,373 +671,292 @@ public class APriori {
                         
                         aPrioryStatus[AP_STATUS_CHANGE_STATUS][AP_STATUS_OKAY]++;                                 
                     }
-
                     break;
-
-             }//end switch     
-            }
-            catch(IOException e)
-            {
-                 throw new ArgusException("An unexpected errro occurred when writing the report files for " + 
-                                           "the apriory file ("+ fileName + ").");
-            }
-     }
-    
-     
-     
-        private String VerlengString(String s , int length) 
-        {
-            if( s.length()<length )
-            {
-                for(int i=0; i<length-s.length(); i++)
-                    s = " "+s;
-            }
-            return s;
+            }//end switch     
         }
+        catch(IOException e){
+            throw new ArgusException("An unexpected errro occurred when writing the report files for " + 
+                                       "the apriory file ("+ fileName + ").");
+        }
+    }
      
-     
+    private String VerlengString(String s , int length) 
+    {
+        if( s.length()<length ){
+            for(int i=0; i<length-s.length(); i++)
+                s = " "+s;
+        }
+        return s;
+    }
     
-       public  int processAprioryFile(String fileName, int tableNumber, String separator, 
-                                     boolean ignoreError, boolean expandBogus, boolean report, int[][] aPrioryStatus) throws ArgusException
-       {
-            //int[][] aPrioryStatus = new int[5][2];
-            String regel, apType; 
-            int n, nMax, oldStatus, newStatus, varNo;
-            double x1,x2; 
-            boolean oke;
-            TableSet tableSet = TableService.getTable(tableNumber);
-            String[] codes = new String[tableSet.expVar.size()]; 
-            String codesString;
-            int[] dimIndex = new int[tableSet.expVar.size()];
-            BufferedReader in; 
+    public  int processAprioryFile(String fileName, int tableNumber, String separator, 
+                                   boolean ignoreError, boolean expandBogus, boolean report, int[][] aPrioryStatus) throws ArgusException
+    {
+        String regel, apType; 
+        int n, nMax, newStatus, varNo;
+        double x1,x2; 
+        boolean oke;
+        TableSet tableSet = TableService.getTable(tableNumber);
+        String[] codes = new String[tableSet.expVar.size()]; 
+        String codesString;
+        int[] dimIndex = new int[tableSet.expVar.size()];
+        BufferedReader in; 
 
-            nMax = 0;
+        nMax = 0;
 
-            for (int i=0;i<5;i++)
-            {
-              for (int j=0;j<1;j++)
-              {
+        for (int i=0;i<5;i++){
+            for (int j=0;j<1;j++){
                 aPrioryStatus[i][j] = 0;  
-              }  
-            }
+            }  
+        }
 
-            for (int i=0;i<tableSet.expVar.size();i++)
-            {
-               n = TauArgusUtils.getNumberOfActiveCodes(tableSet.expVar.get(i).index);
-               if (n>nMax)
-               {
-                   nMax = n;
-               }         
-            }
+        for (int i=0;i<tableSet.expVar.size();i++){
+            n = TauArgusUtils.getNumberOfActiveCodes(tableSet.expVar.get(i).index);
+            if (n>nMax) nMax = n;
+        }
 
-            String[][] codeList = new String[tableSet.expVar.size()][nMax];
-            for (int i=0;i<tableSet.expVar.size();i++)
-            { 
-               varNo = tableSet.expVar.get(i).index; 
+        String[][] codeList = new String[tableSet.expVar.size()][nMax];
+        for (int i=0;i<tableSet.expVar.size();i++){ 
+            varNo = tableSet.expVar.get(i).index; 
 
-               for (int j=0;j<TauArgusUtils.getNumberOfActiveCodes(varNo);j++)
-                   codeList[i][j] = TauArgusUtils.getCode(varNo, j).trim();
-            }
+            for (int j=0;j<TauArgusUtils.getNumberOfActiveCodes(varNo);j++)
+                codeList[i][j] = TauArgusUtils.getCode(varNo, j).trim();
+        }
 
-
-            try 
-            {
-                in = new BufferedReader(new FileReader(fileName));
+        try{
+            in = new BufferedReader(new FileReader(fileName));
                 
-                Tokenizer tokenizer = new Tokenizer(in);
+            Tokenizer tokenizer = new Tokenizer(in);
 
-                // if report = false then no reporting is done as the procedure is used for setting secondaries in linked modular
-                // The number of real secondaries is returned via aPrioryStatus[1][0];
+            // if report = false then no reporting is done as the procedure is used for setting secondaries in linked modular
+            // The number of real secondaries is returned via aPrioryStatus[1][0];
 
-                  outCodes  = new BufferedWriter(new FileWriter(Application.getTempFile("HistCodes" + tableNumber + ".htm"), false));
-                  outStatus = new BufferedWriter(new FileWriter(Application.getTempFile("HistStat" + tableNumber + ".htm"), false));
-                  outCost   = new BufferedWriter(new FileWriter(Application.getTempFile("HistCost" + tableNumber + ".htm"), false));     
-                  outBound  = new BufferedWriter(new FileWriter(Application.getTempFile("HistPL" + tableNumber + ".htm"), false)); 
+            outCodes  = new BufferedWriter(new FileWriter(Application.getTempFile("HistCodes" + tableNumber + ".htm"), false));
+            outStatus = new BufferedWriter(new FileWriter(Application.getTempFile("HistStat" + tableNumber + ".htm"), false));
+            outCost   = new BufferedWriter(new FileWriter(Application.getTempFile("HistCost" + tableNumber + ".htm"), false));     
+            outBound  = new BufferedWriter(new FileWriter(Application.getTempFile("HistPL" + tableNumber + ".htm"), false)); 
 
-                  outWim  = new BufferedWriter(new FileWriter("d:\\argus\\wim.txt", false));
+            if (report){  
+                outCodes.write("<FILE>" + fileName); outCodes.newLine();
+                outStatus.write("<FILE>" + fileName); outStatus.newLine();
+                outCost.write("<FILE>" + fileName); outCost.newLine();
+                outBound.write("<FILE>" + fileName); outBound.newLine();
+                outStatus.write("<h3>Overview of status changes</h3>");
+                outStatus.write("<table>" + "\r\n" + "<tr>");
+                outCost.write("<h3>Overview of cost function changes</h3>");
+                outCost.write("<table>" + "\r\n" + "<tr>");
+                outBound.write("<h3>Overview of apriory bound/protection level changes</h3>");
+                outBound.write("<table>" + "\r\n" + "<tr>");
 
-                  String ww = Application.getTempFile("HistCodes" + tableNumber + ".htm");
-                  
-                if (report)
-                {  
-                   outCodes.write("<FILE>" + fileName); outCodes.newLine();
-                   outStatus.write("<FILE>" + fileName); outStatus.newLine();
-                   outCost.write("<FILE>" + fileName); outCost.newLine();
-                   outBound.write("<FILE>" + fileName); outBound.newLine();
-                   
-                   
-                   
-                   outStatus.write("<h3>Overview of status changes</h3>");
-                   outStatus.write("<table>" + "\r\n" + "<tr>");
-                   outCost.write("<h3>Overview of cost function changes</h3>");
-                   outCost.write("<table>" + "\r\n" + "<tr>");
-                   outBound.write("<h3>Overview of apriory bound/protection level changes</h3>");
-                   outBound.write("<table>" + "\r\n" + "<tr>");
-
-                   int k = (int)Math.floor(50 / (double)tableSet.expVar.size());
-                   for (int i=0;i<tableSet.expVar.size();i++)
-                   {
-                        Variable v = tableSet.expVar.get(i);
+                int k = (int)Math.floor(50 / (double)tableSet.expVar.size());
+                for (int i=0;i<tableSet.expVar.size();i++){
+                    Variable v = tableSet.expVar.get(i);
                       
-                        outStatus.write("<td width=\""+ k+ "%\" >" + v.name + "</td>");
-                        outCost.write("<td width=\""+ k+ "%\" >" + v.name + "</td>");
-                        outBound.write("<td width=\""+ k+ "%\" >" + v.name + "</td>");
-                   }
-                    outStatus.write("<td>Old status</td><td>New status</td></tr>");
-                    outCost.write("<td>Old Cost</td><td>New cost</td></tr>");
-                    outBound.write("<td>Lower bound</td><td>Upper bound</td></tr>");
+                    outStatus.write("<td width=\""+ k+ "%\" >" + v.name + "</td>");
+                    outCost.write("<td width=\""+ k+ "%\" >" + v.name + "</td>");
+                    outBound.write("<td width=\""+ k+ "%\" >" + v.name + "</td>");
+                }
+                outStatus.write("<td>Old status</td><td>New status</td></tr>");
+                outCost.write("<td>Old Cost</td><td>New cost</td></tr>");
+                outBound.write("<td>Lower bound</td><td>Upper bound</td></tr>");
+            }
+
+            boolean firstLine = true;
+            while ((tokenizer.nextLine()) != null){
+                if (firstLine){ //test for a correct separator
+                    regel = tokenizer.getLine();  
+                    if (!regel.contains(separator)){
+                        throw new ArgusException("separator ("+separator+") not found in file "+fileName);
+                    } 
+
+                    if( NumberOfVarsInAprioryFile(regel, separator)!=tableSet.expVar.size())
+                        throw new ArgusException("APriory file contains "+NumberOfVarsInAprioryFile(regel, separator)+" fields, but current table has "+tableSet.expVar.size());
+                } 
+
+                firstLine = false;
+                   
+                //
+                // First part of the line: read the codes
+                //
+                // result: dimIndex[var index] = code index, i.e. this array indicates a cell in the (mutidimensional) table tableSet
+                //         or an error/exception is written/thrown if a code (from the input) does not exist
+                //
+                oke = true; codesString = ""; 
+                for (int i=0;i<tableSet.expVar.size();i++){
+                    codes[i] = tokenizer.nextField(separator).trim();
+                       
+                    int CodeLen = tableSet.expVar.get(i).varLen;                       
+                    if (codes[i].trim().equals(tableSet.expVar.get(i).totCode)){
+                        codes[i] = "";
+                    }
+                    else{
+                        if (!(tableSet.expVar.get(i).hierarchical == Variable.HIER_LEVELS || 
+                                tableSet.expVar.get(i).hierarchical == Variable.HIER_FILE)  ){
+                                codes[i] = VerlengString(codes[i], CodeLen);
+                        }
+                    }
+                       
+                    codesString = codesString + codes[i]+";";
+                       
+                    if( codes[i].equals(""))
+                        dimIndex[i] = 0;
+                    else{
+                        dimIndex[i] = -1;
+                        varNo = tableSet.expVar.get(i).index;
+                        for (int j=0;j<TauArgusUtils.getNumberOfActiveCodes(varNo);j++){
+                            if (codes[i].equals(codeList[i][j])){
+                                dimIndex[i] = j; 
+                                break;
+                            }
+                        }
+                    }
+                       
+                    if (dimIndex[i] == -1 ){ 
+                        aPrioryStatus[AP_STATUS_LINE_READ][AP_STATUS_ERROR]++;
+                        if (!ignoreError){
+                            throw new ArgusException("Code number "+(i+1) + " code: '"+codes[i]+ "' could not be found\n"+ 
+                                                     "Apriori file: '"+ fileName + "'\n"+
+                                                     "Line number: "+tokenizer.getLineNumber());
+                        }
+                        else{ 
+                            oke = false; codesString = codesString+"(incorrect)";
+                        }
+                    }
                 }
 
-                boolean firstLine = true;
-                while ((tokenizer.nextLine()) != null) 
-                {
-                   if (firstLine) 
-                   { //test for a correct separator
-                       regel = tokenizer.getLine();  
-                       if (!regel.contains(separator))
-                       {
-                           throw new ArgusException("separator ("+separator+") not found in file "+fileName);
-                       } 
-
-                      if( NumberOfVarsInAprioryFile(regel, separator)!=tableSet.expVar.size())
-                           throw new ArgusException("APriory file contains "+NumberOfVarsInAprioryFile(regel, separator)+" fields, but current table has "+tableSet.expVar.size());} 
-
-                       firstLine = false;
+                if(oke) aPrioryStatus[AP_STATUS_LINE_READ][AP_STATUS_OKAY]++;
                    
+                codesString = codesString.substring(0,codesString.length()-1);
 
-                   //
-                   // First part of the line: read the codes
-                   //
-                   // result: dimIndex[var index] = code index, i.e. this array indicates a cell in the (mutidimensional) table tableSet
-                   //         or an error/exception is written/thrown if a code (from the input) does not exist
-                   //
-                   oke = true; codesString = ""; 
-                   for (int i=0;i<tableSet.expVar.size();i++)
-                   {
-                        codes[i] = tokenizer.nextField(separator).trim();
-                       
-                        int CodeLen = tableSet.expVar.get(i).varLen;                       
-                        if (codes[i].trim().equals(tableSet.expVar.get(i).totCode))
-                        {
-                            codes[i] = "";
-                        }
-                        else
-                        {
-                            if (!(tableSet.expVar.get(i).hierarchical == Variable.HIER_LEVELS || 
-                                  tableSet.expVar.get(i).hierarchical == Variable.HIER_FILE)     )
-                            {
-                                codes[i] = VerlengString(codes[i], CodeLen);
-                            }
-                        }
-                       
-                       codesString = codesString + codes[i]+";";
+                if (!oke && report) outCodes.write(codesString); 
 
-                       
-                       if( codes[i].equals(""))
-                           dimIndex[i] = 0;
-                       else
-                       {
-                            dimIndex[i] = -1;
-                            varNo = tableSet.expVar.get(i).index;
-                            for (int j=0;j<TauArgusUtils.getNumberOfActiveCodes(varNo);j++)
-                            {
-                              if (codes[i].equals(codeList[i][j])) 
-                              {
-                                  dimIndex[i] = j; 
-                                  break;
-                              }
-                            }
-                       }
-                       
-                       if (dimIndex[i] == -1 )
-                       { 
-                           aPrioryStatus[AP_STATUS_LINE_READ][AP_STATUS_ERROR]++;
-                           if (!ignoreError){
-                               throw new ArgusException("Code number "+(i+1) + " code: '"+codes[i]+ "' could not be found\n"+ 
-                                                       "Apriori file: '"+ fileName + "'\n"+
-                                                       "Line number: "+tokenizer.getLineNumber());}
-                           else 
-                           { 
-                               oke = false; codesString = codesString+"(incorrect)";
-                           }
-                       }
-                       
-                   }
-
-                   if( oke)
-                    aPrioryStatus[AP_STATUS_LINE_READ][AP_STATUS_OKAY]++;
-                   
-                   codesString = codesString.substring(0,codesString.length()-1);
-
-                   if (!oke && report)
-                   {
-                       outCodes.write(codesString); 
-                   }
-
+                //
+                // Second part of the line: apriory setting
+                //
+                apType = ""; newStatus = 0;
+                x1=0; x2=0;
+                if (oke){ 
                     //
-                    // Second part of the line: apriory setting
-                    //
-
-                    apType = ""; newStatus = 0;
-                    x1=0; x2=0;
-                    if (oke)
-                    { 
-                        //
-                        // find the correct apriory transition
-                        // 
-                        apType = tokenizer.nextField(separator).toUpperCase();
-                        try{
+                    // find the correct apriory transition
+                    // 
+                    apType = tokenizer.nextField(separator).toUpperCase();
+                    try{
                         switch(apType) 
                         {
-                            case "S": newStatus = AP_SAFE_MANUAL; break;
-                            case "U": newStatus = AP_UNSAFE_MANUAL; break;
-                            case "P": newStatus = AP_PROTECT_MANUAL; break;
-                            case "M": newStatus = AP_SECONDARY_UNSAFE_MANUAL;  break;
-                            case "ML": newStatus = AP_SECONDARY_UNSAFE; break;
+                            case "S": newStatus = AP_SAFE_MANUAL; 
+                                      break;
+                            case "U": newStatus = AP_UNSAFE_MANUAL; 
+                                      break;
+                            case "P": newStatus = AP_PROTECT_MANUAL; 
+                                      break;
+                            case "M": newStatus = AP_SECONDARY_UNSAFE_MANUAL;  
+                                      break;
+                            case "ML": newStatus = AP_SECONDARY_UNSAFE; 
+                                       break;
                             case "C": 
                             case "W": newStatus = AP_ADJUST_COST; 
                                       x1 = StrUtils.toDouble(tokenizer.nextField(separator)); 
                                       break;
                             case "AB": newStatus = AP_ADJUST_APRIORI_BOUND; 
                                        x1 = StrUtils.toDouble(tokenizer.nextField(separator));
-                                       x2 = StrUtils.toDouble(tokenizer.nextField(separator)); break;
+                                       x2 = StrUtils.toDouble(tokenizer.nextField(separator)); 
+                                       break;
                             case "PL": newStatus = AP_ADJUST_PROT_LEVEL; 
                                        x1 = StrUtils.toDouble(tokenizer.nextField(separator));
-                                       x2 = StrUtils.toDouble(tokenizer.nextField(separator)); break;
+                                       x2 = StrUtils.toDouble(tokenizer.nextField(separator)); 
+                                       break;
                             default: 
                                 aPrioryStatus[AP_STATUS_LINE_READ][AP_STATUS_ERROR]++;
                                 throw new ArgusException ("Illegal apriory command in line " +tokenizer.getLineNumber() +
                                                                "\nApriory file: " + fileName);
-                                     //Always stop here             
+                                //Always stop here             
                         } //switch
-                        } 
-                        catch(Exception ex){}
+                    } 
+                    catch(Exception ex){}
 
+                    // When ignore=false in manual mode it should be possible to choose continue after error
+                    // so no exceptions, or distinguise between Application.IsBatch=true and manual(false)
 
+                    //
+                    // For each exp var i of the current table cell (determined by the values of the .hst file just read)
+                    // For each (bogus) code (if expandbogus), otherwise just the one value
+                    //
+                    //      Apply change as defined above in the previous switch
+                    //
 
-                        // igv ignore is false wil je iun de handmatige mode kunnen kiezen of he dorgaat na een fout
-                        // dus geen exceptions , of onderscheid tussen Application.IsBatch=true en handmatig(false)
-
-                        //
-                        // For each exp var i of the current table cell (determined by the values of the .hst file just read)
-                        // For each (bogus) code (if expandbogus), otherwise just the one value
-                        //
-                        //      Apply change as defined above in the previous switch
-                        //
-
-                        List<int[]> codeRange = new ArrayList<int[]>();
+                    List<int[]> codeRange = new ArrayList<>();
                         
-                        for (int var_i = 0; var_i < tableSet.expVar.size(); var_i++)
-                        {
-                            Variable v = tableSet.expVar.get(var_i);
-                            CodeList tempCodeList = new CodeList(v.index, v.hierarchical != Variable.HIER_NONE);
-                            int[] bogusCodes;
+                    for (int var_i = 0; var_i < tableSet.expVar.size(); var_i++){
+                        Variable v = tableSet.expVar.get(var_i);
+                        CodeList tempCodeList = new CodeList(v.index, v.hierarchical != Variable.HIER_NONE);
+                        int[] bogusCodes;
                             
-                            if( !expandBogus)
-                            {
-                                bogusCodes = new int[1];
-                                bogusCodes[0] = dimIndex[var_i];                               
-                            }
-                            else
-                            {
-                                bogusCodes = tempCodeList.bogusRange(dimIndex[var_i]);
-                            }
-                            
-                            if( outWim!=null && bogusCodes.length>1 ) // i.e. there are "bogus"cells
-                            {
-                                String BogusValues = dimIndex[var_i]+" --> "; 
-                                for(int bc : bogusCodes)
-                                {
-                                    BogusValues+=", " + bc;
-                                }
-                                
-                                outWim.write("\n\r =================  Var "+v.name+" "+BogusValues);
-                            }
-                            
-                            codeRange.add(bogusCodes);
+                        if(!expandBogus){
+                            bogusCodes = new int[1];
+                            bogusCodes[0] = dimIndex[var_i];                               
                         }
-                        
-                        
-                        boolean Istherarange = false;
-                        for(int i=0; i<codeRange.size(); i++)
-                        {
-                            if( codeRange.get(i).length>2)
-                                Istherarange = true;
+                        else{
+                            bogusCodes = tempCodeList.bogusRange(dimIndex[var_i]);
                         }
-                        if( Istherarange)
-                        {
-                            int x = 2;
+                            
+                        codeRange.add(bogusCodes);
+                    }
+                        
+/* Not Used ?????                        
+                    boolean Istherarange = false;
+                    for(int i=0; i<codeRange.size(); i++){
+                        if( codeRange.get(i).length>2)
+                            Istherarange = true;
+                    }
+                    if(Istherarange){
+                        int x = 2;
+                    }
+*/                         
+                        
+                    CartesianProductIterator It = new CartesianProductIterator(codeRange);
+                    It.Reset();
+                        
+                    while(!It.EOR()){
+                        // Status EMPTY should not be changed
+                        // When Ignore=true continue with next case in loop
+                        dimIndex = It.Current();
+
+                        String Kop = "<tr>";                                
+                        for (int i = 0; i < tableSet.expVar.size(); i++){
+                            //String t1 = codes[i]; Not used????
+                            String t2 = codeList[i][dimIndex[i]];
+
+                            Kop = Kop + "<td>" + t2 + "</td>";                                    
                         }
-                        
-                        
-                        CartesianProductIterator It = new CartesianProductIterator(codeRange);
-                        It.Reset();
-                        
-                        while( !It.EOR())
-                        {
-                            // met status is EMPTY mag niks gebeuren
-                            // igv Ignore gewoon doorgaan met de volgende waarde in de lus
 
-                            //dimIndex[var_i] = kode;
-                            dimIndex = It.Current();
-
-                            String Kop = "<tr>";                                
-                            for (int i = 0; i < tableSet.expVar.size(); i++)
-                            {
-                                String t1 = codes[i];
-                                String t2 = codeList[i][dimIndex[i]];
-
-                                Kop = Kop + "<td>" + t2 + "</td>";                                    
-                            }
-                            
-                            
-                            ProcessOneVarCode(tableSet, apType, x1, x2, newStatus, Kop, dimIndex, codesString, 
+                        ProcessOneVarCode(tableSet, apType, x1, x2, newStatus, Kop, dimIndex, codesString, 
                                                  report, ignoreError, aPrioryStatus, fileName, tokenizer);
-                        
-                            It.Next();
-                            
-                            String tt = It.Currpos();
-                            int qq = 2;
-                            
-                        }// for iterator   
-                    }//if oke
 
-                }
+                        It.Next();
+                            
+                        //String tt = It.Currpos(); Not used????
+                        //int qq = 2; Not used????
+                            
+                    }// for iterator   
+                }//if oke
+            }
                 
-                if (report)
-                {  
-                    outCodes.close();
+            if (report){  
+                outCodes.close();
                     
-                    outStatus.write("</table>");
-                    outStatus.close();
-                    outBound.write("</table>");
-                    outBound.close();
-                    outCost.write("</table>");
-                    outCost.close();
-                 }  
-                
-                 if( outWim!=null)
-                    outWim.close();
-            }
-            catch (IOException ex)
-            { 
-                throw new ArgusException("An unexpected errro occurred when writing the report files for " + 
-                                              "the apriory file ("+ fileName + ").");
-            }
+                outStatus.write("</table>");
+                outStatus.close();
+                outBound.write("</table>");
+                outBound.close();
+                outCost.write("</table>");
+                outCost.close();
+            }  
+        }
+        catch (IOException ex){ 
+            throw new ArgusException("An unexpected errro occurred when writing the report files for " + 
+                                     "the apriory file ("+ fileName + ").");
+        }
      
-            return 0;
-          }// reading lines loop
-       
-//        if (report)
-//        {  
-//            outCodes.close();
-//            outStatus.close();
-//            outBound.close();
-//            outCost.close();
-//         }  
-//     
-//         return 0;
-//    }
-    
-    
+        return 0;
+    }// reading lines loop       
 }

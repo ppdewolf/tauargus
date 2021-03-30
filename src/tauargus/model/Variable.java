@@ -36,7 +36,7 @@ public class Variable implements Cloneable {
     
     private static final Logger logger = Logger.getLogger(Variable.class.getName());
     
-    private TauArgus tauArgus = Application.getTauArgusDll();
+    private final TauArgus tauArgus = Application.getTauArgusDll();
 
     // Determines lengths of fixed sized arrays being used
     public static final int MAX_NUMBER_OF_MISSINGS = 2;
@@ -72,6 +72,26 @@ public class Variable implements Cloneable {
     public String hierFileName = "";
     public String leadingString = ".";
 
+    // Only used by variable of type 'RecordKey'
+    public String PTableFile = "";      // For CKM on count tables
+    public String PTableFileCont = "";  // For CKM on magnitude tables
+    public String PTableFileSep = "";   // For CKM on magnitude tables
+    
+    // Used for CKM
+    public boolean zerosincellkey = false; // default: false
+    public boolean CKMapply_even_odd = false; // default: false
+    public String CKMType = "N";           // default: not allowed to apply CKM
+    public int CKMTopK = 1;                // default: only largest observation used, topK = T = 1
+    public boolean CKMseparation = false;  // default: small values not treated differently
+    public double CKMm1squared = 0;        // default: no variance for small values
+    public String CKMscaling = "";         // default: there is no default. Needs to specificied when using CKM with magnitude table
+    public double CKMsigma0 = -1;          // default "unknown" for parameters sigma0, sigma1, xstar, q
+    public double CKMsigma1 = -1;          // default "unknown" for parameters sigma0, sigma1, xstar, q
+    public double CKMxstar = -1;           // default "unknown" for parameters sigma0, sigma1, xstar, q
+    public double CKMq = -1;               // default "unknown" for parameters sigma0, sigma1, xstar, q
+    public double[] CKMepsilon;            // for parameters epsilon2, epsilon3, ..., epsilonT
+    public double muC = 0;                 // default: no additional perturbation for sensitivecells
+            
     // Only used by variables of type 'Request'
     public String[] requestCode;
 
@@ -106,6 +126,10 @@ public class Variable implements Cloneable {
     public boolean isResponse() {
         return type.isResponse();
     }
+    
+    public boolean isRecordKey() {
+        return type.isRecordKey();
+    }   
     
     public boolean isTotalCode(String code) {
         return code.equalsIgnoreCase(totCode);
@@ -167,11 +191,9 @@ public class Variable implements Cloneable {
         String missing1 = "";
         String missing2 = "";
         String codeList = "";
-// Anco 1.6 try with recources        
-//        try (BufferedReader reader = new BufferedReader(new FileReader(fileName));) {
-        BufferedReader reader = null;
-        try {reader = new BufferedReader(new FileReader(fileName));
-              Tokenizer tokenizer = new Tokenizer(reader);
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {              
+            Tokenizer tokenizer = new Tokenizer(reader);
             while ((tokenizer.nextLine()) != null) {
                 String hs;
                 hs = tokenizer.getLine();
@@ -190,19 +212,14 @@ public class Variable implements Cloneable {
                     codeList = tokenizer.nextToken();
                 } else if (!token.equals("")) {
                     recodeData = recodeData + hs + "\n";
-//                    recodeData = recodeData + token + "\n";
                 }
             }
             return new RecodeInfo(recodeData, missing1, missing2, codeList);
         }
-        finally {reader.close();}
     }
 
     public void writeRecodeFile(String fileName, RecodeInfo recodeInfo) throws IOException {
-// anco 1.6 try with resources        
-//        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));) {
-       BufferedWriter writer = null; 
-       try {writer = new BufferedWriter(new FileWriter(fileName));  
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {            
             if (!recodeInfo.getMissing1().equals("") || !recodeInfo.getMissing2().equals("")) {
                 writer.write("<MISSING> " + recodeInfo.getMissing1() + " " + recodeInfo.getMissing2() + "\n");
             }
@@ -211,7 +228,33 @@ public class Variable implements Cloneable {
             }
             writer.write(recodeInfo.getRecodeData() + "\n");
         }
-       finally {writer.close();}
+    }
+
+        public void writeRecodeTreeFile(String fileName) throws IOException {
+         int[] isParent = new int[1];
+         int[] isActive = new int[1];
+         int[] isMissing = new int[1];
+         int[] level = new int[1];
+         int[] nChild = new int[1];
+         String[] code = new String[1];
+         String currentCode;
+       int[] nc = new int[1]; int[]nac = new int[1]; 
+       int i, j;
+       try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+           writer.write("<TREERECODE>\n");
+// write here the recoded tree   
+            tauArgus.GetVarNumberOfCodes(index, nc, nac);
+            for (i=0; i<nc[0]-1;i++){
+               tauArgus.GetVarCodeProperties(index, i, isParent, isActive, isMissing, level, nChild, code); 
+               if ( isActive[0] == 1 && nChild[0] > 0) { //is a node
+                  currentCode = code[0]; 
+                  tauArgus.GetVarCodeProperties(index, i+1, isParent, isActive, isMissing, level, nChild, code); 
+                  if (isActive[0] == 0){
+                     writer.write(currentCode + "\n"); 
+                  }
+               }   
+            }
+       }
     }
 
     public void recode(RecodeInfo recodeInfo) throws ArgusException {
@@ -247,8 +290,9 @@ public class Variable implements Cloneable {
 //Anco 1.6 try with resources     
 //overigens wordt de reader niet gesloten ???????        
 //        try (BufferedReader reader = new BufferedReader(new FileReader(new File(fileName)));) {        
-      BufferedReader reader = null;  
-      try {reader = new BufferedReader(new FileReader(new File(fileName)));                
+      //BufferedReader reader = null;  
+      try (BufferedReader reader = new BufferedReader(new FileReader(new File(fileName)))){
+      //{reader = new BufferedReader(new FileReader(new File(fileName)));                
             tauArgus.UndoRecode(index);
             String regel = reader.readLine();
             if (!StringUtils.equals(regel, "<TREERECODE>")) {
@@ -266,7 +310,6 @@ public class Variable implements Cloneable {
             tauArgus.DoActiveRecode(index);
         }
         catch (Exception ex) {
-            
             tauArgus.UndoRecode(index);
             throw new ArgusException("Error in reading tree status in recode file " + fileName + ": " + ex.getMessage());
         }
@@ -296,9 +339,11 @@ public class Variable implements Cloneable {
 
         boolean equal = name.equals(variable.name)
                 && type == variable.type
-                && bPos == variable.bPos
                 && varLen == variable.varLen;
-//                && truncatable == variable.truncatable // only needed fot MuArgus
+        
+        if (variable.metadata.dataFileType != Metadata.DATA_FILE_TYPE_FREE){
+            equal = equal && bPos == variable.bPos;
+        }
 
         if (variable.isCategorical()) {
             equal = equal
@@ -319,6 +364,29 @@ public class Variable implements Cloneable {
 
         if (variable.type == Type.REQUEST) {
             equal = equal && Arrays.equals(requestCode, variable.requestCode);
+        }
+        
+        if (variable.type == Type.RECORD_KEY){
+            equal = equal && PTableFile.equals(variable.PTableFile)
+                    && PTableFileCont.equals(variable.PTableFileCont)
+                    && PTableFileSep.equals(variable.PTableFileSep);
+        }
+        
+        if (variable.type == Type.RESPONSE){
+            equal = equal 
+                    && Arrays.equals(CKMepsilon, variable.CKMepsilon)
+                    && CKMType.equals(variable.CKMType)
+                    && CKMTopK == variable.CKMTopK
+                    && CKMseparation == variable.CKMseparation
+                    && zerosincellkey == variable.zerosincellkey
+                    && CKMapply_even_odd == variable.CKMapply_even_odd
+                    && CKMm1squared == variable.CKMm1squared
+                    && CKMscaling.equals(variable.CKMscaling)
+                    && CKMsigma0 == variable.CKMsigma0
+                    && CKMsigma1 == variable.CKMsigma1
+                    && CKMxstar == variable.CKMxstar
+                    && CKMq == variable.CKMq
+                    && muC == variable.muC;
         }
         
         return equal;
@@ -343,6 +411,16 @@ public class Variable implements Cloneable {
         hash = 89 * hash + Objects.hashCode(this.leadingString);
         hash = 89 * hash + Arrays.deepHashCode(this.missing);
         hash = 89 * hash + Objects.hashCode(this.totCode);
+        hash = 89 * hash + Objects.hashCode(this.PTableFile);
+        hash = 89 * hash + Objects.hashCode(this.PTableFileCont);
+        hash = 89 * hash + Objects.hashCode(this.PTableFileSep);
+        hash = 89 * hash + (this.zerosincellkey ? 1 : 0);
+        hash = 89 * hash + (this.CKMapply_even_odd ? 1 : 0);
+        hash = 89 * hash + Objects.hashCode(this.CKMType);
+        hash = 89 * hash + this.CKMTopK;
+        hash = 89 * hash + (this.CKMseparation ? 1 : 0);
+        hash = 89 * hash + Objects.hashCode(this.CKMscaling);
+
         return hash;
     }
 
@@ -351,16 +429,24 @@ public class Variable implements Cloneable {
         Variable variable = (Variable)super.clone(); 
         
         if (requestCode != null) {
-            variable.requestCode = (String[])requestCode.clone();
+            //variable.requestCode = (String[])requestCode.clone();
+            variable.requestCode = requestCode.clone();
         }
         if (distanceFunction != null) {
-            variable.distanceFunction = (int[])distanceFunction.clone();
+            //variable.distanceFunction = (int[])distanceFunction.clone();
+            variable.distanceFunction = distanceFunction.clone();
         }
         if (hierLevels != null) {
-            variable.hierLevels = (int[])hierLevels.clone();
+            //variable.hierLevels = (int[])hierLevels.clone();
+            variable.hierLevels = hierLevels.clone();
         }
         if (missing != null) {
-            variable.missing = (String[])missing.clone();
+            //variable.missing = (String[])missing.clone();
+            variable.missing = missing.clone();
+        }
+        if (CKMepsilon != null){
+            //variable.CKMepsilon = (double[])CKMepsilon.clone();
+            variable.CKMepsilon = CKMepsilon.clone();
         }
         variable.originalVariable = this;
         return variable;

@@ -173,3 +173,210 @@ summary    : Issue #47 on filepath of cdl-file with intermediate format solved
 
 above is RELEASED IN 4.1.6
 --------------------------------------------------------------
+date       : August 13, 2017
+summary    : Optimal also checks for four dimensions max
+
+date       : August 14, 2017
+summary    : Also the linked procedure checks (when Modular is chosen) that the individual tables have a max. dim 4 and the cover table has a max. dim 10 
+
+date       : August 18, 2017
+summary    : The generator of the batch-file has been improved. The weight and missing=safe parameters have been included and also the WRITETABLE command has been added
+
+
+date       : October 3, 2017
+summary    : For Luigi: Status M will now be accepted when reading a (protected) table.
+
+date       : October 9, 2017
+summary    : No more check for CPLEX Licence file while using other solvers in Rounder.
+
+date       : October 31, 2017
+summary    : The maxTabVal and the minTabVal are now also correct if the table max is negative. These values are always interpreted as the upper and lower bound of the table.
+				If the max > 0 and the min > 0 these bounds are 1.5 x  max and 0
+				If the max > 0 and the min < 0 these bounds are 1.5 x  max and 1.5 x min
+				If the max < 0 and the min < 0 the bounds are 0 and 1.5 x min.
+
+date	   : November 7, 2017
+summary    : Small fix in "dirty tricks" for negative cells (in tauhitas.dll)
+
+date       : Nov 16, 2017
+summary    : Small fix in saving tabular data (totcode was not passed by call from java) (in tauhitas.dll and java-call)
+
+date       : Nov 16, 2017
+summary    : Able to "walk" through table cells with arrow keys
+             Cell stays selected after changing its state
+
+date       : Nov 23, 2017
+summary    : Writing intermediate in Batch no longer invokes the SwingWorker. This should solve issue 36
+
+date       : Nov 23, 2017
+summary    : When generating a batch-file the writetable command now writes the correct table number.
+
+date       : Nov 27, 2017
+summary    : Correct tab of rules-panel is chosen in DialogSelectTable
+
+date       : Nov 28, 2017
+summary    : Fixed bug of issue 79 (protected cells in combination with distance costs) in tauhitas.dll
+
+date       : Dec 01, 2017
+summary    : Linked Tables menu item now only enabled when at least 2 tables present
+
+date       : Dec 11, 2017
+summary    : Attempt to solve bug with Cancel in Specify Tables
+
+date       : Dec 12, 2017
+summary    : Some minor GUI things
+
+date	   : Jan 16, 2018
+summary	   : Fixed some compile-time warnings
+
+date	   : Jan 18, 2018
+summary	   : Added some icons
+
+date	   : Fab 2, 2018
+summary	   : Results from linked table protection were not handled correctly in GUI. Fixed this.
+
+date       : Feb 12, 2018
+summary    : Solved bug reading back secondary suppressions when using linked-tables in special set-up
+
+date       : Feb 14, 2018
+summary    : Fixed use of <FREQ> in batch with microdata input (issue 86)
+
+above is RELEASED IN 4.1.7
+--------------------------------------------------------------
+date       : Mar 6, 2018
+summary    : No longer check for Cplex licence file in Optimal when not using Cplex
+
+date       : Mar 21, 2018
+summary    : Saving the recode tree has been implemented. Reading back still to come.
+
+date       : June 11, 2018
+summary    : Cell Key method implemented (frequency tables)
+
+date       : July 2, 2018
+summary    : Info screen (table summary) adjusted to display CKM info
+
+date       : July 9, 2018
+summary    : CKM for weighted frequency tables implemented
+
+date       : July 20, 2018
+summary    : Saving CKM protected as csv or codevalue did not work correctly
+
+date       : Oct 1, 2018
+summary    : Added percentage of perturbed files in CKM reporting
+
+date	   : Dec 19, 2018
+summary    : Bug with not initialised MaxCost in tauhitas.dll fixed
+	
+date       : Apr 16, 2019
+summary    : Linked tables with set of tables as input: fixed bug in case name of table-file contains name of spanning variable
+
+date       : May 8, 2019
+summary    : Basic Info Loss for CKM added, in dialog and in report. 
+
+date	   : May 22, 2019
+summary	   : Now possible to call CKM from batch file
+
+date       : May 27, 2019
+summary    : Now possible to change ptable in GUI suppress-view
+
+above released up to version 4.1.14_BETA
+--------------------------------------------------------------
+date       : June 14, 2019
+summary    : Information loss measures added for CKM protected tables
+
+above released up to version 4.1.15_BETA
+--------------------------------------------------------------
+date       : June 19, 2019
+summary    : Fixed bug that using request rule in batch mode did not detect use of holdings
+
+date	   : July 4, 2019
+summary    : Some refactoring
+
+date       : July 15, 2019
+summary	   : Fixed bug that shadow variabel and record key could not be first variable in microdata
+	     Added Information Loss over non-empty cells to report file
+	     Added Graphics of ECDF to report file
+
+above released up to version 4.1.16_BETA
+--------------------------------------------------------------
+date       : Aug 21, 2019
+summary    : Fixed small bug in ECDF graphs
+
+date       : Sep 25, 2019
+summary    : Added CKM for magnitude tables
+
+date       : Nov 5, 2019
+summary    : First version of GUI for specifying CKM for magnitude tables
+
+date       : Dec 5, 2019
+summary    : Fixed inconsistent behaviour of CKM (in TauArgusJava.dll)
+
+date       : Jan 15, 2020
+summary    : Fixed error messages for controlled rounding (in CRP.dll)
+
+date       : Jan 23, 2020
+summary    : Fixed several GUI aspects (mainly related to CKM for magnitude tables)
+
+date       : Jan 24, 2020
+summary    : Added parameters info to report file in case of CKM for magnitude tables
+
+date       : Jan 28, 2020
+summary    : Possible to call CKM for magnitude tables from batch-file
+
+date       : Jan 31, 2020
+summary    : Possible to save CKM for magnitude tables call to batch-file (write batch)
+
+date       : Feb 3, 2020
+summary    : Empty ptable file now raises error (no crash anymore)
+
+above released in 4.2.0 build 1 (test version first)
+--------------------------------------------------------------
+date	   : Feb 28, 2020
+summary    : Small bug fix concerning request rule being selected even when disabled because of absence of request variable
+
+above released in 4.2.0 build 2 
+--------------------------------------------------------------
+date	   : Mar 4, 2020
+summary    : Small bug fix concerning SummaryDialog in case of CKM on magnitude table
+
+date	   : Mar 11, 2020
+summary    : Small bug fixes for holding settings in Specify Table (microdata)
+
+date	   : Mar 25, 2020
+summary    : Bug fix starting with empty rda-file was not possible + slightly adjusted the way of constructing new metadata with the GUI
+
+date	   : Mar 27, 2020
+summary    : Some refactoring, adding a lot of "dispose()", removing "main()" from many dialog classes
+
+daTE	   : Mar 30, 2020
+summary    : Replaced some "Thread()"s by "SwingWorker()"s, removing some display errors due to thread unsafe procedures 
+
+date	   : Apr 1, 2020
+summary    : Bugs fixed in CKM for magnitude tables using no flexfunction (in TauArgusJava.dll)
+
+date	   : Apr 2, 2020
+summary    : Bugs fixed in saving some metadata to the rda-file
+
+date	   : Apr 8, 2020
+summary    : Some refactoring
+
+date	   : Apr 17, 2020
+summary    : Now possible to use <ESC> to close Dialogs
+
+date	   : Apr 17, 2020
+summary    : Corrected return value in case of error in SetCellKeyValuesCont (in TauArgusJava.dll) + better handling those errors in Java
+
+date	   : Apr 24, 2020
+summary    : Should now be able to deal correctly with UNC paths
+
+date	   : May 12, 2020
+summary    : Fixed issue#111: last line of safe table was not treated correctly in generate apriori
+
+date	   : May 12, 2020
+summary	   : Additional version information available in about-dialog
+
+above to be released in 4.2.0 build 5
+--------------------------------------------------------------
+date	   : Jun 29, 2020
+summary	   : (temporary) Fix for rounding error in calculation of cellkey (TauArgusJava.dll) Issue #145
+

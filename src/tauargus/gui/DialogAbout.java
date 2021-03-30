@@ -22,17 +22,18 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.logging.Logger;
-//import javax.swing.JComponent;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import tauargus.model.Application;
 
-public class DialogAbout extends javax.swing.JDialog {
+public class DialogAbout extends DialogBase {
 
     private static final Logger logger = Logger.getLogger(DialogAbout.class.getName());
 
-    /**
-     * Creates new form DialogAbout
-     */
+    // Creates new form DialogAbout
     public DialogAbout(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
@@ -44,14 +45,12 @@ public class DialogAbout extends javax.swing.JDialog {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 setVisible(false);
+                dispose();
             }
         };
         KeyStroke stroke;
         stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
-        //buttonClose.registerKeyboardAction(actionListener, stroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
         stroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK);
-        //buttonClose.registerKeyboardAction(actionListener, stroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
-//        getRootPane().
 
         setLocationRelativeTo(parent);
     }
@@ -74,6 +73,7 @@ public class DialogAbout extends javax.swing.JDialog {
         labelApplicationIcon = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
+        buttonVersionDetails = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("About Argus");
@@ -130,6 +130,13 @@ public class DialogAbout extends javax.swing.JDialog {
                 .addContainerGap())
         );
 
+        buttonVersionDetails.setText("Details");
+        buttonVersionDetails.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonVersionDetailsActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -142,12 +149,18 @@ public class DialogAbout extends javax.swing.JDialog {
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(38, 38, 38)
                                 .addComponent(labelApplicationIcon)
-                                .addGap(52, 52, 52)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jLabel2))
-                                    .addComponent(labelVersion, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(52, 52, 52)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(jLabel2))
+                                            .addComponent(labelVersion, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGap(0, 0, Short.MAX_VALUE))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(buttonVersionDetails))))
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                 .addComponent(separator1, javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
@@ -170,8 +183,10 @@ public class DialogAbout extends javax.swing.JDialog {
                         .addGap(7, 7, 7)
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(labelVersion)))
-                .addGap(18, 18, 18)
+                        .addComponent(labelVersion)
+                        .addGap(3, 3, 3)
+                        .addComponent(buttonVersionDetails)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(separator1, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -185,52 +200,58 @@ public class DialogAbout extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-// Anco 1.6            
-//        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
-        } catch (ClassNotFoundException  ex) { 
-            logger.log(java.util.logging.Level.SEVERE, null, ex);}
-          catch (InstantiationException ex) { 
-            logger.log(java.util.logging.Level.SEVERE, null, ex);}
-          catch (IllegalAccessException  ex) { 
-            logger.log(java.util.logging.Level.SEVERE, null, ex);}
-          catch ( javax.swing.UnsupportedLookAndFeelException ex) { 
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
-            
-        }
-        //</editor-fold>
+    private void buttonVersionDetailsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonVersionDetailsActionPerformed
+        DialogVersionDetails dialog = new DialogVersionDetails((JFrame)SwingUtilities.getAncestorOfClass(JFrame.class, this),true);
+        dialog.setVisible(true);
+    }//GEN-LAST:event_buttonVersionDetailsActionPerformed
 
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                DialogAbout dialog = new DialogAbout(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
+//    /**
+//     * @param args the command line arguments
+//     */
+//    public static void main(String args[]) {
+//        /* Set the Nimbus look and feel */
+//        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+//        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+//         */
+//        try {
+//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//                if ("Nimbus".equals(info.getName())) {
+//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//                    break;
+//                }
+//            }
+//// Anco 1.6            
+////        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
+//        } catch (ClassNotFoundException  ex) { 
+//            logger.log(java.util.logging.Level.SEVERE, null, ex);}
+//          catch (InstantiationException ex) { 
+//            logger.log(java.util.logging.Level.SEVERE, null, ex);}
+//          catch (IllegalAccessException  ex) { 
+//            logger.log(java.util.logging.Level.SEVERE, null, ex);}
+//          catch ( javax.swing.UnsupportedLookAndFeelException ex) { 
+//            logger.log(java.util.logging.Level.SEVERE, null, ex);
+//            
+//        }
+//        //</editor-fold>
+//
+//        /* Create and display the dialog */
+//        java.awt.EventQueue.invokeLater(new Runnable() {
+//            @Override
+//            public void run() {
+//                DialogAbout dialog = new DialogAbout(new javax.swing.JFrame(), true);
+//                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+//                    @Override
+//                    public void windowClosing(java.awt.event.WindowEvent e) {
+//                        System.exit(0);
+//                    }
+//                });
+//                dialog.setVisible(true);
+//            }
+//        });
+//    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton buttonVersionDetails;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;

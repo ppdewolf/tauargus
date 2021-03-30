@@ -31,7 +31,8 @@ public enum Type {
     TOP_N                  ("top N",       false, true,  true  ),
     LOWER_PROTECTION_LEVEL ("lower PL",    false, true,  true  ),
     UPPER_PROTECTION_LEVEL ("upper PL",    false, true,  true  ),
-    STATUS                 ("status",      false, true,  false );
+    STATUS                 ("status",      false, true,  false ),
+    RECORD_KEY             ("record key",  true,  false, true  );
     
     private final String description;
     private final boolean availableForMicrodata;
@@ -71,5 +72,9 @@ public enum Type {
     
     public boolean isResponse() {
         return this == RESPONSE || this == CAT_RESP;
+    }
+    
+    public boolean isRecordKey() {
+        return this == RECORD_KEY;
     }
 }

@@ -22,14 +22,14 @@ import tauargus.extern.dataengine.TauArgus;
 
 public final class VarCodeProperties {
     
-    private TauArgus tauArgus = Application.getTauArgusDll();
+    private final TauArgus tauArgus = Application.getTauArgusDll();
     
-    private int[] parent = new int[1];
-    private int[] active = new int[1];
-    private int[] missing = new int[1];
-    private int[] level = new int[1];
-    private int[] nChildren = new int[1];
-    private String[] code = new String[1];
+    private final int[] parent = new int[1];
+    private final int[] active = new int[1];
+    private final int[] missing = new int[1];
+    private final int[] level = new int[1];
+    private final int[] nChildren = new int[1];
+    private final String[] code = new String[1];
     
     public VarCodeProperties() {
     }

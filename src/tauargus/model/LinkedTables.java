@@ -17,19 +17,18 @@
 
 package tauargus.model;
 
+import argus.utils.SystemUtils;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.util.ArrayList;
 import java.util.Date;
-//import javax.swing.JOptionPane;
-import tauargus.service.TableService;
-import tauargus.utils.TauArgusUtils;
 import tauargus.extern.dataengine.TauArgus;
 import tauargus.gui.DialogLinkedTables;
+import tauargus.service.TableService;
 import tauargus.utils.ExecUtils;
-import argus.utils.SystemUtils;
-import java.util.ArrayList;
+import tauargus.utils.TauArgusUtils;
 
 /**
  *
@@ -44,7 +43,7 @@ public class LinkedTables {
     public static int coverDim;
     static String[][] coverCodelist; static int maxCoverCodeList;
     private static int[][] volgNoCL;
-    private static String nullen = "00000000";
+    private static final String nullen = "00000000";
     private static final TauArgus tauArgus = Application.getTauArgusDll();
     
     public static boolean TestLinkedPossible()throws ArgusException{
@@ -61,8 +60,11 @@ public class LinkedTables {
     }
     
     public static boolean runLinkedModular(DialogLinkedTables Moeder) throws ArgusException{
-        String hs = ""; int i; TableSet tableSet0, tableSet;
+        String hs = ""; int i,j; TableSet tableSet0, tableSet;
         Date startDate = new Date();
+        if (coverDim > 10){
+            throw new ArgusException ("The total number of explanatory variables for the Modular approach is 10+");
+        }
         for (i=0;i<TableService.numberOfTables();i++){
             hs = hs + "\n"+ (i+1) + ": "+ TableService.getTableDescription(TableService.getTable(i));        } 
         SystemUtils.writeLogbook("Start of modular linked tables procedure\n"+
@@ -71,6 +73,10 @@ public class LinkedTables {
         TauArgusUtils.DeleteFile(Application.getTempFile("tempTot.txt"));
         for (i=0;i<TableService.numberOfTables();i++){
           tableSet = TableService.getTable(i);
+          j = tableSet.expVar.size();
+          if (j > 4) {
+              throw new ArgusException ("The max. dimension of the individual tables must not exceed 4");
+          }
           TableService.undoSuppress(i);
           tableSet.singletonSingletonCheck = tableSet0.singletonSingletonCheck; 
           tableSet.singletonMultipleCheck = tableSet0.singletonMultipleCheck; 
@@ -116,8 +122,8 @@ public class LinkedTables {
       for (int i=0;i<TableService.numberOfTables();i++){
         tableSet = TableService.getTable(i);
         try{ 
-//          for (j=0;j<coverDim;j++){codeIndex[j] = -1; totCodes[j] = "\"" + coverCodelist[j][0] +"\"" ;}
-          for (j=0;j<coverDim;j++){codeIndex[j] = -1; totCodes[j] = "\"Total\"" ;}
+          for (j=0;j<coverDim;j++){codeIndex[j] = -1; totCodes[j] = "\"" + coverCodelist[j][0] +"\"" ;}
+          //for (j=0;j<coverDim;j++){codeIndex[j] = -1; totCodes[j] = "\"Total\"" ;}
           for (j=0;j<tableSet.expVar.size();j++) {codeIndex[toCoverIndex[i][j]]=toCoverIndex[i][j];}
           
           BufferedWriter out = new BufferedWriter(new FileWriter(Application.getTempFile("temp"+i+".hst")));
@@ -153,7 +159,7 @@ public class LinkedTables {
       for (int i=0;i<TableService.numberOfTables();i++){
         tableSet = TableService.getTable(i); 
         tableSet.suppressINFO = OptiSuppress.ReadHitasINFO("hitas.log");
-        tableSet.solverUsed = Application.solverSelected;;
+        tableSet.solverUsed = Application.solverSelected;
         int[][] aPrioryStatus = new int[5][2];
         if (TableSet.processAprioryFile(Application.getTempFile("temp"+i+".hst"), i, ";", true, false, false, aPrioryStatus)!=0){
              TableService.undoSuppress(i);
@@ -167,13 +173,13 @@ public class LinkedTables {
     }
     
     static void runCoverTable()throws ArgusException{
-     String hs, appDir;
+     String appDir;
      ArrayList<String> commandline = new ArrayList<>();
      //java -jar "D:\TauJava\tauargus\dist\TauArgus.jar"  "C:\Users\ahnl\AppData\Local\Temp\tempTot.arb"
-     hs = "java -jar \"";
+     //hs = "java -jar \"";
      try{  appDir = SystemUtils.getApplicationDirectory(LinkedTables.class).toString(); }
-     catch (Exception ex){ throw new ArgusException(ex.getMessage()+"\nerror running the cover table");}
-     hs = hs + appDir + "/TauArgus.jar\" \"" + Application.getTempFile("tempTot.arb") + "\"";
+     catch (Exception ex){ throw new ArgusException(ex.getMessage()+"\nError running the cover table:\nCan't find TauArgus.jar");}
+     //hs = hs + appDir + "/TauArgus.jar\" \"" + Application.getTempFile("tempTot.arb") + "\"";
      commandline.add("java");
      commandline.add("-jar");
      commandline.add(appDir+"/TauArgus.jar");
@@ -184,7 +190,7 @@ public class LinkedTables {
      TauArgusUtils.writeBatchFileForExec( "TempTot", commandline);
      SystemUtils.writeLogbook("Start of the Tau-Argus procedure for the modular linked tables procedure");
      int result = ExecUtils.execCommand(commandline, null, false, "Run cover table");
-     if (result != 0) { throw new ArgusException("Error running the cover table");}
+     if (result != 0) { throw new ArgusException("Error running the cover table\nReturned value: "+result);}
     }
     
     static void exportTables()throws ArgusException{
@@ -193,7 +199,7 @@ public class LinkedTables {
         // Then write the corresponding metadata file
         int i, j; TableSet tableSet; String regelOut;
         String[] codes = new String[coverDim];String [] regel = new String[1];
-      for (i=0;i<TableService.numberOfTables();i++){
+        for (i=0;i<TableService.numberOfTables();i++){
             tableSet = TableService.getTable(i);
             try{
             tableSet.write(Application.getTempFile("temp"+i+".tab"),
@@ -229,6 +235,7 @@ public class LinkedTables {
            j=coverSourceTab[i];  
            BufferedReader in = new BufferedReader(new FileReader(Application.getTempFile("temp"+j+".rda")));
             regelOut = in.readLine();
+            // This assumes that the name of a variable does not appear in any text before the definition of the variable
             while (regelOut.indexOf(coverVariablesName[i],0) == -1) {regelOut = in.readLine();}
             rda.write(regelOut); rda.newLine();
             regelOut = in.readLine();
@@ -384,7 +391,7 @@ public class LinkedTables {
          out.write(""+j); out.newLine();
          for (k=0;k<coverDim;k++){Oke = false;
            for (j=0;j<tableSet.expVar.size();j++){ 
-             if (coverVariablesName[k] == tableSet.expVar.get(j).name) {Oke = true;}
+             if (coverVariablesName[k].equals(tableSet.expVar.get(j).name)) {Oke = true;}
            }
            if (!Oke){
              out.write("'"+coverVariablesName[k]+"'"); out.newLine();
@@ -497,145 +504,6 @@ public class LinkedTables {
       return hs;
     }
 
-//For i = 1 To NSpecTableData
-// Oke = FileExist(TempDir + "\AUSGABE" + Trim(Str(i)))
-// If Not Oke Then
-//  SDCMsgBox "Unable to apply the hypercube method" + vbCrLf + _
-//    "File AUSGABE" + Trim(Str(i)) + " not found", vbCritical
-//  GoTo FOUT
-// End If
-// k = frmMain.ArgOCX.SetSecondaryGHMITER(TempDir + "\AUSGABE" + Trim(Str(i)), i, j, False)
-// If k = 1 Then
-//  With TableSetStruct(i)
-//   .Suppressed = SUP_GHMITER
-//   .NSecond = j
-//  End With
-// Else
-// 'set secondary wrong
-//  If k = 4007 Then
-//   SDCMsgBox "The hypercube method could not suppress this table successfully;" + vbCrLf + _
-//          "some frozen/protected cells need to be suppressed", vbCritical
-//   frmViewTable.SchrijfFrozenCells False, TableSetStruct(i).NExpVar, i
-//  Else
-//   SDCMsgBox "Unable to apply the hypercube method" + vbCrLf + _
-//         ErrorResourceString(k), vbCritical
-//   If Not (Dir(TempDir + "\proto002") = "") Then
-//    frmInfo.Pad = TempDir
-//    frmInfo.Filename = "\proto002"
-//    frmInfo.Label1.Caption = "Content of error message file proto002"
-//    frmInfo.lblHint.Caption = ""
-//    frmInfo.Show vbModal
-//   End If
-//  End If
-// End If
-//Next i
-//
-//frmViewTable.TestProto003 (1)
-//'and duplicate the information over the other tables
-//For i = 2 To NSpecTableData
-// For j = 1 To 11
-//  TableSetStruct(i).GhMiterRatio(j) = TableSetStruct(1).GhMiterRatio(j)
-// Next j
-//Next i
-//
-//lblProgress.Caption = "Hypercube completed successfully"
-//lblProgress.Refresh
-//ProtectLinkedHypercube = True
-//Exit Function
-//FOUT:
-//lblProgress.Caption = "Hypercube completed failed"
-//lblProgress.Refresh
-//For i = 1 To NSpecTableData
-// With TableSetStruct(i)
-//  .Suppressed = SUP_NO
-//  .NSecond = 0
-//  .VerwerkTijd = 0
-// End With
-//Next i
-//ProtectLinkedHypercube = False
-//End Function        
-
-   
-    
-//Function AdjustEingabe(n As Long) As Boolean
-//Dim Regel As String, ResultRegel As String, NV As Long, i As Long, c As Long, i1 As Long
-//Dim VolgNo(1 To MaxDimLinked) As String, Codes(1 To MaxDimLinked) As String, j As Long
-//Dim Hs As String
-//lblprogress.Caption = "processing file Eingabe" + Str(n)
-//lblprogress.Refresh
-//KopieerFile TempDir + "\EINGABE" + Trim(Str(n)), TempDir + "\EINGABE.tmp"
-//
-//Open TempDir + "\EINGABE.tmp" For Input As #1
-//Open TempDir + "\EINGABE" + Trim(Str(n)) For Output As #2
-//NV = TableSetStruct(n).NExpVar
-//ReDim VolgNoCL(0 To MaxLenCL, 1 To NV) As Long
-//While Not EOF(1)
-// Line Input #1, Regel
-// ResultRegel = ""
-// For i = 1 To 7
-//  ResultRegel = ResultRegel + " " + GetTokenSEP(Regel, " ")
-// Next i
-// For i = 1 To NV
-//  VolgNo(i) = GetTokenSEP(Regel, " ")
-//  VolgNo(i) = Mid(VolgNo(i), 2, Len(VolgNo(i)) - 2)
-// Next i
-// For i = 1 To NV
-//  j = InStr(2, Regel, "'")
-//  Codes(i) = Left(Regel, j)
-//  Codes(i) = Trim(Mid(Codes(i), 2, Len(Codes(i)) - 2))
-//  Regel = Trim(Mid(Regel, j + 1))
-// Next i
-// For i = 1 To NV
-//  c = -1
-//  If Codes(i) = "" Then
-//   c = -1
-//  End If
-//  i1 = TableOrder(n, i)
-//  For j = 0 To CoverVar(i1, 2)
-//   If Codes(i) = "" Then
-//   c = 0
-//   GoTo NEXTJ
-//   ElseIf Trim(CoverCodeList(i1, j)) = Codes(i) Then
-//    c = j
-//    GoTo NEXTJ
-//   End If
-//  Next j
-//  'loop must be terminated via a hit (and NEXTJ)
-//  Hs = ListViewtab(n - 1).ListItems(i).Text
-//  SDCMsgBox "Error adjusting EINGABE" + vbCrLf + _
-//    "Code: " + Codes(i) + " for variable: " + Hs + " in subtable" + Str(n) + " not found", vbCritical
-//  GoTo FOUT
-//NEXTJ:
-//  j = Val(VolgNo(i))
-//  VolgNoCL(j, i) = c
-// ResultRegel = ResultRegel + " '" + PlusNul(c) + "'"
-// Next i
-// For i = 1 To NV
-//  ResultRegel = ResultRegel + " '" + Codes(i) + "'"
-// Next i
-// Print #2, ResultRegel
-//Wend
-//Close #1
-//Close #2
-//lblprogress.Caption = ""
-//lblprogress.Refresh
-//AdjustEingabe = True
-//Exit Function
-//FOUT:
-//AdjustEingabe = False
-//lblprogress.Caption = ""
-//lblprogress.Refresh
-//Close #1
-//Close #2
-//End Function
-//
-//Function PlusNul(n) As String
-//Dim Hs As String
-//Hs = Trim(Str(n))
-//Hs = Left(Nul, 8 - Len(Hs)) + Hs
-//PlusNul = Hs
-//End Function
-//
     static void checkCodeList()throws ArgusException{
         int i, j, k, vi, nt; TableSet tableSet;
         String hs, xs; Boolean found;

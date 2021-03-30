@@ -16,9 +16,10 @@
 */
 
 package tauargus.gui;
+import javax.swing.JTextField;
 import tauargus.model.TableSet;
 
-public class DialogModularParameters extends javax.swing.JDialog {
+public class DialogModularParameters extends DialogBase {
 
 
     // ***** Dialog Return Values *****
@@ -27,27 +28,27 @@ public class DialogModularParameters extends javax.swing.JDialog {
     
     private int returnValue = CANCEL_OPTION;
     private static TableSet tableSet;
+    private boolean forOptimal;
 
-    /**
-     * Creates new form DialogModularParameters
-     */
+    // Creates new form DialogModularParameters
     public DialogModularParameters(java.awt.Frame parent, TableSet tableSet, boolean forOptimal, boolean modal) {
         super(parent, modal);
-        this.tableSet = tableSet;
+        DialogModularParameters.tableSet = tableSet;
         initComponents();
-        if (forOptimal)
-        {
-            labelModularParameters.setText("Options for the optimal suppression:");
-            setTitle("Optimal options");
-        }
+        this.forOptimal = forOptimal;
         jLabelmaxTimeOptimal.setVisible(forOptimal);
-        jTextmaxTimeOptimal.setHorizontalAlignment(jTextmaxTimeOptimal.RIGHT);
+        jTextmaxTimeOptimal.setHorizontalAlignment(JTextField.RIGHT);
         jTextmaxTimeOptimal.setVisible(forOptimal);
         jLabelMaxminutes.setVisible(forOptimal);
-        setLocationRelativeTo(parent);
+        
     }
 
     public int showDialog() {
+        if (forOptimal) {
+            setTitle("Optimal options");
+            labelModularParameters.setText("Options for the optimal suppression:");
+        }
+        setLocationRelativeTo(this.getParent());
         setVisible(true);
         return returnValue;
     }
@@ -179,8 +180,8 @@ public class DialogModularParameters extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCancelActionPerformed
-        returnValue = CANCEL_OPTION;
         setVisible(false);
+        dispose();
     }//GEN-LAST:event_buttonCancelActionPerformed
 
     private void buttonOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonOkActionPerformed
@@ -188,55 +189,57 @@ public class DialogModularParameters extends javax.swing.JDialog {
         tableSet.singletonMultipleCheck = checkBoxSingletonMultiple.isSelected();
         tableSet.minFreqCheck = checkBoxMinFreq.isSelected();
        {tableSet.maxTimeOptimal = Integer.parseInt(jTextmaxTimeOptimal.getText());}
-        setVisible(false);
         returnValue = APPROVE_OPTION;
+        setVisible(false);
+        dispose();
     }//GEN-LAST:event_buttonOkActionPerformed
 
     private void DialogClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_DialogClosing
         setVisible(false);
+        dispose();
     }//GEN-LAST:event_DialogClosing
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(DialogModularParameters.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(DialogModularParameters.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(DialogModularParameters.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(DialogModularParameters.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                DialogModularParameters dialog = new DialogModularParameters(new javax.swing.JFrame(), tableSet, false, true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
+//    /**
+//     * @param args the command line arguments
+//     */
+//    public static void main(String args[]) {
+//        /* Set the Nimbus look and feel */
+//        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+//        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+//         */
+//        try {
+//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//                if ("Nimbus".equals(info.getName())) {
+//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//                    break;
+//                }
+//            }
+//        } catch (ClassNotFoundException ex) {
+//            java.util.logging.Logger.getLogger(DialogModularParameters.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (InstantiationException ex) {
+//            java.util.logging.Logger.getLogger(DialogModularParameters.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (IllegalAccessException ex) {
+//            java.util.logging.Logger.getLogger(DialogModularParameters.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+//            java.util.logging.Logger.getLogger(DialogModularParameters.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        }
+//        //</editor-fold>
+//
+//        /* Create and display the dialog */
+//        java.awt.EventQueue.invokeLater(new Runnable() {
+//            public void run() {
+//                DialogModularParameters dialog = new DialogModularParameters(new javax.swing.JFrame(), tableSet, false, true);
+//                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+//                    @Override
+//                    public void windowClosing(java.awt.event.WindowEvent e) {
+//                        System.exit(0);
+//                    }
+//                });
+//                dialog.setVisible(true);
+//            }
+//        });
+//    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonCancel;
     private javax.swing.JButton buttonOk;

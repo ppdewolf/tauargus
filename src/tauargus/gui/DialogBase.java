@@ -17,30 +17,48 @@
 
 package tauargus.gui;
 
-import tauargus.resources.ContextHelp;
 import argus.model.ArgusException;
 import argus.utils.SystemUtils;
 import java.awt.event.ActionEvent;
-import java.io.File;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileNameExtensionFilter;
-//import muargus.MuARGUS;
 import tauargus.model.Application;
+import tauargus.resources.ContextHelp;
 import tauargus.utils.TauArgusUtils;
-//import muargus.model.MetadataMu;
 
 /**
  *
  * @author Statistics Netherlands
- * @param <T>
+ *
  */
 public class DialogBase extends javax.swing.JDialog {
 
+    /*
+     * Makes it possible to use <ESC> to close the Dialog (cancel)
+     */
+    @Override
+    protected JRootPane createRootPane() {
+        ActionListener actionListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                setVisible(false);
+                dispose();
+            }
+        };    
+ 
+        KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+        JRootPane rootPane = new JRootPane();
+        rootPane.registerKeyboardAction(actionListener, stroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+        return rootPane;
+    }
     
     /**
      * Creates new form DialogBase
@@ -50,34 +68,9 @@ public class DialogBase extends javax.swing.JDialog {
      */
     public DialogBase(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
-//        this.controller = controller;
         initComponents();
         setHelpAction();
     }
-    
-    /**
-     * 
-     * @param metadata 
-     */
-//    public void setMetadata(MetadataMu metadata) {
-//        this.metadata = metadata;
-//      initializeData();
-//    }
-
-    /**
-     * 
-     * @return 
-     */
-//    protected MetadataMu getMetadata() {
-//        return this.metadata;
-//    }
-    
-    /**
-     * 
-     */
-//    protected void initializeData() {
-        //Base class implementation is empty
- //   }
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -106,31 +99,6 @@ public class DialogBase extends javax.swing.JDialog {
     
     /**
      * 
-     * @param ex 
-     */
- //   public void showErrorMessage(ArgusException ex) {
- //      JOptionPane.showMessageDialog(null, ex.getMessage(), MuARGUS.getMessageTitle(), JOptionPane.ERROR_MESSAGE);
- //   }
-    
-    /**
-     * 
-     * @param message
-     * @return 
-     */
- //   public boolean showConfirmDialog(String message) {
- //       return (JOptionPane.showConfirmDialog(null, message, MuARGUS.getMessageTitle(), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION);
- //   }
-    
-    /**
-     * 
-     * @param message 
-     */
- //   public void showMessage(String message) {
- //       JOptionPane.showMessageDialog(null, message, MuARGUS.getMessageTitle(), JOptionPane.INFORMATION_MESSAGE);
- //   }
-    
-    /**
-     * 
      * @param title
      * @param forSaving
      * @param filter
@@ -138,11 +106,6 @@ public class DialogBase extends javax.swing.JDialog {
      */
     public String showFileDialog(String title, boolean forSaving, String[] filter) {
         JFileChooser fileChooser = new JFileChooser();
-//        String hs = SystemUtils.getRegString("general", "datadir", "");
-//        if (!hs.equals("")){
-//            File file = new File(hs); 
-//            fileChooser.setCurrentDirectory(file);
-//        }
         TauArgusUtils.getDataDirFromRegistry(fileChooser);
         fileChooser.setDialogTitle(title);
         fileChooser.resetChoosableFileFilters();
@@ -212,13 +175,6 @@ public class DialogBase extends javax.swing.JDialog {
         //Base class implementation is empty
     }
 
-    /**
-     * 
-     * @return 
-     */
- //   protected T getController() {
-  //      return this.controller;
-  //  }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
 }

@@ -20,38 +20,14 @@ package tauargus.utils;
 import argus.utils.SystemUtils;
 import static argus.utils.SystemUtils.getApplicationDirectory;
 import java.io.BufferedReader;
-//import java.io.BufferedWriter;
 import java.io.File;
-//import java.io.FileFilter;
-//import java.io.FileNotFoundException;
-//import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-//import java.lang.reflect.InvocationTargetException;
-//import java.net.URI;
-//import java.net.URISyntaxException;
-//import java.net.URL;
-//import java.text.DecimalFormat;
-//import java.text.DecimalFormatSymbols;
-//import java.text.SimpleDateFormat;
-//import java.util.Calendar;
+import java.net.URISyntaxException;
 import java.util.List;
-//import java.util.logging.Level;
-//import java.util.logging.Logger;
-//import java.util.prefs.Preferences;
-//import org.apache.commons.io.FilenameUtils;
-//import org.apache.commons.io.filefilter.WildcardFileFilter;
-//import tauargus.gui.DialogOpenMicrodata;
 import tauargus.gui.FrameInfo;
-//import tauargus.gui.FrameMain;
-//import tauargus.gui.PanelTable;
 import tauargus.model.Application;
-//import java.awt.*;
-//import java.awt.event.*;
-//import javax.swing.*;
-//import tauargus.gui.DialogInfo;
-
 // Only the exec routines are left
 // The rest is to the Argus lib SystemUtils
 
@@ -159,27 +135,20 @@ public class ExecUtils {
     public static int execCommand(String commandString, String workingDir, Boolean silent, String header) {
 
         if (!silent){
-          windowInfo = new FrameInfo();    
-//        windowInfo = new DialogInfo(FrameMain, false);
-          windowInfo.setVisible(true);
-//        windowInfo.requestFocusInWindow();
-//        windowInfo.setAlwaysOnTop(true);
-          windowInfo.addLabel (header); 
-          
+            windowInfo = new FrameInfo();    
+            windowInfo.setVisible(true);
+            windowInfo.setLocationRelativeTo(null);
+            windowInfo.addLabel (header); 
         }
-//        frameInfo.repaint();
-//        frameInfo.validate();
 
         try {
             Process process;
             ProcessBuilder pb;
             if (workingDir == null) {
-                //process = Runtime.getRuntime().exec(commandString);
                 pb = new ProcessBuilder(commandString);
                 pb.environment().put("LD_LIBRARY_PATH", getApplicationDirectory(Application.class).getCanonicalPath());
                 process = pb.start();
             } else {
-                //process = Runtime.getRuntime().exec(commandString, null, new File(workingDir));
                 pb = new ProcessBuilder(commandString);
                 pb.environment().put("LD_LIBRARY_PATH", getApplicationDirectory(Application.class).getCanonicalPath());
                 pb.directory(new File(workingDir));
@@ -188,7 +157,6 @@ public class ExecUtils {
             eatStream(process.getInputStream(),silent);
             eatStream(process.getErrorStream(),silent);
             int exitCode = process.waitFor();
-            //windowInfo.setVisible(false);
             if (exitCode != 0) {
                 System.out.println("Process terminated with exit code " + exitCode);
             } else {
@@ -196,13 +164,17 @@ public class ExecUtils {
             }
             return exitCode;
         } catch (IOException ex) {
-            //windowInfo.setVisible(false);
             System.out.println("Unable to start: " + commandString);
         } catch (InterruptedException ex) {
-            //windowInfo.setVisible(false);
             System.out.println("Process is interrupted: " + commandString);
-        } finally {
-            if (!silent) windowInfo.setVisible(false);
+        } catch (URISyntaxException ex) {
+            System.out.println("Exception is thrown: " + ex.getMessage());
+        }
+        finally {
+            if (!silent) {
+                windowInfo.setVisible(false);
+                windowInfo.dispose();
+            }
         }
         return -99;
     }
@@ -226,13 +198,10 @@ public class ExecUtils {
     public static int execCommand(List<String> commandString, String workingDir, Boolean silent, String header) {
         String hs;
         if (!silent){
-          windowInfo = new FrameInfo();    
-//        windowInfo = new DialogInfo(FrameMain, false);
-          windowInfo.setVisible(true);
-//        windowInfo.requestFocusInWindow();
-//        windowInfo.setAlwaysOnTop(true);
-          windowInfo.addLabel (header); 
-          
+            windowInfo = new FrameInfo();    
+            windowInfo.setLocationRelativeTo(null);
+            windowInfo.setVisible(true);
+            windowInfo.addLabel (header); 
         }
 // remove the .exe extension if not windows        
         if (!SystemUtils.isWindows()){
@@ -240,8 +209,6 @@ public class ExecUtils {
           if (hs.toUpperCase().endsWith(".EXE")){hs = hs.substring(0,hs.length()-4);}
           commandString.set(0,hs);
         }
-//        frameInfo.repaint();
-//        frameInfo.validate();
 
         try {
             Process process;
@@ -274,8 +241,14 @@ public class ExecUtils {
         } catch (InterruptedException ex) {
             //windowInfo.setVisible(false);
             System.out.println("Process is interrupted: " + commandString);
-        } finally {
-            if (!silent) windowInfo.setVisible(false);
+        } catch (URISyntaxException | NullPointerException | IndexOutOfBoundsException ex) {
+            System.out.println("Exception is thrown by " + ex.toString());
+        }
+        finally {
+            if (!silent) {
+                windowInfo.setVisible(false);
+                windowInfo.dispose();
+            }
         }
         return -99;
     }
@@ -365,7 +338,7 @@ public class ExecUtils {
         return decimalFormat;
     }
 */    
-    public static void main(String[] args) {
+//    public static void main(String[] args) {
 //        try {
             // execCommand("c:\\Program Files\\Microsoft Office\\Office14\\WINWORD.EXE c:\\Users\\Gebruiker\\Projects\\TauArgus\\doc\\Install.docx", "c:\\Users\\Gebruiker\\Google Drive\\TauJava");
 //            System.out.println(getApplicationDirectory().getCanonicalPath());
@@ -374,7 +347,7 @@ public class ExecUtils {
 //        } catch (IOException ex) {
 //            Logger.getLogger(ExecUtils.class.getName()).log(Level.SEVERE, null, ex);
 //        }
-    }
+//    }
 /*    
     public static void putRegBoolean(String subRoot, String name, Boolean boolKey){
         Preferences p = Preferences.userRoot().node("tauargus/"+subRoot);

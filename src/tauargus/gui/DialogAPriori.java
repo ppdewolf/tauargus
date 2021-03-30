@@ -17,37 +17,32 @@
 
 package tauargus.gui;
 
+import argus.utils.SystemUtils;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
-//import java.awt.font.GlyphMetrics;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.AbstractCellEditor;
 import javax.swing.JComboBox;
-import javax.swing.JRadioButton;
-import javax.swing.JTable;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-//import javax.swing.event.TableModelEvent;
-//import javax.swing.event.TableModelListener;
+import javax.swing.JRadioButton;
+import javax.swing.JTable;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import tauargus.model.APriori;
+import tauargus.model.APriori.Mapping;
+import tauargus.model.ArgusException;
 import tauargus.model.CellStatus;
 import tauargus.utils.TableColumnResizer;
-
-import tauargus.model.APriori.Mapping;
-import tauargus.model.APriori;
-//import tauargus.model.APrioriCell;
-import tauargus.model.ArgusException;
-import argus.utils.SystemUtils;
 import tauargus.utils.TauArgusUtils;
-import java.awt.Cursor;
 
 
 /*!
@@ -62,29 +57,14 @@ public class DialogAPriori extends DialogBase {
     
     private APriori apriori = new APriori();
     
-//    private class MyObject {
-//        int newstat;
-//        boolean weight;
-//        Integer costValue;
-//    }
-//    
-//    private ArrayList<MyObject> myList = new ArrayList<>();
-//    
-//    {
-//        for (CellStatus cellStatus : CellStatus.values()) {
-//            if (cellStatus != CellStatus.UNKNOWN) {
-//                myList.add(new MyObject());
-//            }
-//        }
-//    }
-    
     private static class HeaderRenderer implements TableCellRenderer {
         TableCellRenderer renderer;
         int horAlignment;
         public HeaderRenderer(JTable table, int horizontalAlignment) {
             horAlignment = horizontalAlignment;
-            renderer = (TableCellRenderer)table.getTableHeader().getDefaultRenderer();
+            renderer = table.getTableHeader().getDefaultRenderer();
         }
+        @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
             Component c = renderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
             JLabel label = (JLabel)c;
@@ -94,7 +74,7 @@ public class DialogAPriori extends DialogBase {
     }
     
     private class RadioButtonCellEditorRenderer extends AbstractCellEditor implements TableCellEditor, TableCellRenderer, ActionListener {
-        private JRadioButton radioButton = new JRadioButton();
+        private final JRadioButton radioButton = new JRadioButton();
         {
             radioButton.addActionListener(this);
             radioButton.setOpaque(false);
@@ -124,10 +104,10 @@ public class DialogAPriori extends DialogBase {
         }
     }
     
-    private static String[] columnNames = new String[]{ "Status", "Omit", "Safe", "Unsafe", "Protect", "Cost", "Cost value" };
+    private static final String[] columnNames = new String[]{ "Status", "Omit", "Safe", "Unsafe", "Protect", "Cost", "Cost value" };
     
     
-    /**
+    /*
      * Creates new form DialogAPriori
      */
     public DialogAPriori(java.awt.Frame parent, boolean modal) {
@@ -153,13 +133,14 @@ public class DialogAPriori extends DialogBase {
 
             @Override
             public Class<?> getColumnClass(int columnIndex) {
-                if (columnIndex == 5) {
-                    // JTable uses checkboxes for editing if class is Boolean 
-                    return Boolean.class;
-                } else if (columnIndex == 6) {
-                    return Double.class;
-                } else {
-                    return super.getColumnClass(columnIndex);
+                switch (columnIndex) {
+                    case 5:
+                        // JTable uses checkboxes for editing if class is Boolean
+                        return Boolean.class;
+                    case 6:
+                        return Double.class;
+                    default:
+                        return super.getColumnClass(columnIndex);
                 }
             }
 
@@ -225,8 +206,7 @@ public class DialogAPriori extends DialogBase {
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);        
         TableColumnResizer.adjustColumnPreferredWidths(table, false);
         panelTable.add(table.getTableHeader(), java.awt.BorderLayout.PAGE_START);
-        pack();
-        setLocationRelativeTo(parent);
+        //pack();
      
         ChangeOkButtonState();
         apriori.InitColumnMap(4);
@@ -246,22 +226,19 @@ public class DialogAPriori extends DialogBase {
         
         if( textFieldAprioryFile.getText().trim().equals(""))
             enabled = false;
-
         
-        List<Integer> selectedvars = new ArrayList<Integer>();
+        List<Integer> selectedvars = new ArrayList<>();
         
-       if( comboBoxOutVar1.isVisible() ) selectedvars.add(comboBoxOutVar1.getSelectedIndex());
-       if( comboBoxOutVar2.isVisible() ) selectedvars.add(comboBoxOutVar2.getSelectedIndex());
-       if( comboBoxOutVar3.isVisible() ) selectedvars.add(comboBoxOutVar3.getSelectedIndex());
-       if( comboBoxOutVar4.isVisible() ) selectedvars.add(comboBoxOutVar4.getSelectedIndex());
+        if( comboBoxOutVar1.isVisible() ) selectedvars.add(comboBoxOutVar1.getSelectedIndex());
+        if( comboBoxOutVar2.isVisible() ) selectedvars.add(comboBoxOutVar2.getSelectedIndex());
+        if( comboBoxOutVar3.isVisible() ) selectedvars.add(comboBoxOutVar3.getSelectedIndex());
+        if( comboBoxOutVar4.isVisible() ) selectedvars.add(comboBoxOutVar4.getSelectedIndex());
        
         int SelectedVarCount =0;
         boolean Doubles = false;
         
-       for(int i=0; i<selectedvars.size(); i++)
-       {
-            if(selectedvars.get(i) > 0) 
-            {
+        for(int i=0; i<selectedvars.size(); i++){
+            if(selectedvars.get(i) > 0){
                 SelectedVarCount++;
             
                 if( i<selectedvars.size()-1 )
@@ -269,18 +246,18 @@ public class DialogAPriori extends DialogBase {
                         if( selectedvars.get(i).equals(selectedvars.get(j)))
                               Doubles = true;
             }
-       }    
+        }    
 
-       if( selectedvars.size()==1 && selectedvars.get(0)==0 )
+        if( selectedvars.size()==1 && selectedvars.get(0)==0 )
             enabled = false;
-       
-       if( Doubles)
+
+        if( Doubles)
            JOptionPane.showMessageDialog(null, "All selected variables must be distinct or Other");
        
-       if( SelectedVarCount==0 || Doubles)
+        if( SelectedVarCount==0 || Doubles)
             enabled = false;
        
-       buttonOk.setEnabled(enabled);       
+        buttonOk.setEnabled(enabled);       
     }
     
     
@@ -305,15 +282,15 @@ public class DialogAPriori extends DialogBase {
         buttonCancel = new javax.swing.JButton();
         buttonOk = new javax.swing.JButton();
         labelOutputDimension = new javax.swing.JLabel();
-        comboBoxOutputDimension = new javax.swing.JComboBox();
-        comboBoxOutVar1 = new javax.swing.JComboBox();
+        comboBoxOutputDimension = new javax.swing.JComboBox<>();
+        comboBoxOutVar1 = new javax.swing.JComboBox<>();
         labelOutVar1 = new javax.swing.JLabel();
         labelOutVar2 = new javax.swing.JLabel();
-        comboBoxOutVar2 = new javax.swing.JComboBox();
+        comboBoxOutVar2 = new javax.swing.JComboBox<>();
         labelOutVar3 = new javax.swing.JLabel();
-        comboBoxOutVar3 = new javax.swing.JComboBox();
+        comboBoxOutVar3 = new javax.swing.JComboBox<>();
         labelOutVar4 = new javax.swing.JLabel();
-        comboBoxOutVar4 = new javax.swing.JComboBox();
+        comboBoxOutVar4 = new javax.swing.JComboBox<>();
         labelSeparator = new javax.swing.JLabel();
         textFieldSeparator = new javax.swing.JTextField();
         panelTable = new javax.swing.JPanel();
@@ -363,14 +340,14 @@ public class DialogAPriori extends DialogBase {
 
         labelOutputDimension.setText("Output dimension:");
 
-        comboBoxOutputDimension.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "2", "3", "4" }));
+        comboBoxOutputDimension.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4" }));
         comboBoxOutputDimension.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 comboBoxOutputDimensionItemStateChanged(evt);
             }
         });
 
-        comboBoxOutVar1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item1", "Item 2", "Item 3", "Item 4" }));
+        comboBoxOutVar1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item1", "Item 2", "Item 3", "Item 4" }));
         comboBoxOutVar1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comboBoxOutVar1ActionPerformed(evt);
@@ -381,7 +358,7 @@ public class DialogAPriori extends DialogBase {
 
         labelOutVar2.setText("2");
 
-        comboBoxOutVar2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboBoxOutVar2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         comboBoxOutVar2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comboBoxOutVar2ActionPerformed(evt);
@@ -390,7 +367,7 @@ public class DialogAPriori extends DialogBase {
 
         labelOutVar3.setText("3");
 
-        comboBoxOutVar3.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboBoxOutVar3.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         comboBoxOutVar3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comboBoxOutVar3ActionPerformed(evt);
@@ -399,7 +376,7 @@ public class DialogAPriori extends DialogBase {
 
         labelOutVar4.setText("4");
 
-        comboBoxOutVar4.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboBoxOutVar4.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         comboBoxOutVar4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comboBoxOutVar4ActionPerformed(evt);
@@ -567,34 +544,27 @@ public class DialogAPriori extends DialogBase {
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttonOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonOkActionPerformed
-//        for (CellStatus cellStatus : CellStatus.values()) 
-//        {
-//            if (cellStatus != CellStatus.UNKNOWN) 
-//            {
-//                cellStatus.getValue();
-//                Mapping m = apriori.Mappings.get(cellStatus.getValue() - 1);
-//                System.out.println(cellStatus.getDescription() + " " + m.newstat + " " + m.useCost + " " + m.costValue);
-//            }
-//            
-//        }
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         apriori.WriteMappingsToRegistry();
         apriori.WriteAprioriFile(textFieldAprioryFile.getText(), textFieldSeparator.getText(), comboBoxOutputDimension.getSelectedIndex()+1);
         setCursor(Cursor.getDefaultCursor());
         setVisible(false);
+        dispose();
     }//GEN-LAST:event_buttonOkActionPerformed
 
     private void buttonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCancelActionPerformed
         setVisible(false);
+        dispose();
     }//GEN-LAST:event_buttonCancelActionPerformed
 
     private void dialogClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_dialogClosing
         setVisible(false);
+        dispose();
     }//GEN-LAST:event_dialogClosing
 
     
     
-    private void ShowDimension(JLabel label, JComboBox comboBox, boolean visible, int MaxNumber)
+    private void ShowDimension(JLabel label, JComboBox<String> comboBox, boolean visible, int MaxNumber)
     {
         label.setVisible((visible));
         comboBox.setVisible((visible));
@@ -604,54 +574,42 @@ public class DialogAPriori extends DialogBase {
             comboBox.removeAllItems();
             comboBox.addItem("Other");
             for(Integer i=0; i<MaxNumber; i++)
-                comboBox.addItem("ExpVar"+ new Integer(i+1).toString());
+                comboBox.addItem("ExpVar"+ Integer.toString(i+1));
             
             comboBox.setSelectedIndex(0);
         }
     }
     
-    
-    
-    
     private void ShowDimensionSelection(int MaxNumber, int SelectedNumber)
-    {      //This should not be here, but at a general level
-            comboBoxOutputDimension.removeAllItems();
+    {   //This should not be here, but at a general level
+        comboBoxOutputDimension.removeAllItems();
         
-            int outDim = comboBoxOutputDimension.getSelectedIndex()+1;
-            ShowDimension(labelOutVar1, comboBoxOutVar1, false, outDim);//MaxNumber);
-            ShowDimension(labelOutVar2, comboBoxOutVar2, false, outDim);//MaxNumber);
-            ShowDimension(labelOutVar3, comboBoxOutVar3, false, outDim);//MaxNumber);
-            ShowDimension(labelOutVar4, comboBoxOutVar4, false, outDim);//MaxNumber);
+        int outDim = comboBoxOutputDimension.getSelectedIndex()+1;
+        ShowDimension(labelOutVar1, comboBoxOutVar1, false, outDim);//MaxNumber);
+        ShowDimension(labelOutVar2, comboBoxOutVar2, false, outDim);//MaxNumber);
+        ShowDimension(labelOutVar3, comboBoxOutVar3, false, outDim);//MaxNumber);
+        ShowDimension(labelOutVar4, comboBoxOutVar4, false, outDim);//MaxNumber);
             
-            if( MaxNumber>0)
-            {                
-                programmatically = true;  // to shield of the state changed listener
-                for (int i=0;i<maxOutDim;i++){comboBoxOutputDimension.addItem(i+1);}
+        if( MaxNumber>0){                
+            programmatically = true;  // to shield of the state changed listener
+            for (int i=0;i<maxOutDim;i++){comboBoxOutputDimension.addItem(Integer.toString(i+1));}
                 
-                
-                for(int i=0; i<maxOutDim; i++)
-                {
-//                    comboBoxOutputDimension.addItem(i+1);
-                    switch(i)
-                    {
-//                        case 0: ShowDimension(labelOutVar1, comboBoxOutVar1, i<=SelectedNumber, MaxNumber); break;
-                        case 0: ShowDimension(labelOutVar1, comboBoxOutVar1, i<=SelectedNumber, MaxNumber); break;
-                        case 1: ShowDimension(labelOutVar2, comboBoxOutVar2, i<=SelectedNumber, MaxNumber); break;
-                        case 2: ShowDimension(labelOutVar3, comboBoxOutVar3, i<=SelectedNumber, MaxNumber); break;
-                        case 3: ShowDimension(labelOutVar4, comboBoxOutVar4, i<=SelectedNumber, MaxNumber); break;
-                    }
+            for(int i=0; i<maxOutDim; i++){
+                switch(i){
+                    //case 0: ShowDimension(labelOutVar1, comboBoxOutVar1, i<=SelectedNumber, MaxNumber); break;
+                    case 0: ShowDimension(labelOutVar1, comboBoxOutVar1, i<=SelectedNumber, MaxNumber); break;
+                    case 1: ShowDimension(labelOutVar2, comboBoxOutVar2, i<=SelectedNumber, MaxNumber); break;
+                    case 2: ShowDimension(labelOutVar3, comboBoxOutVar3, i<=SelectedNumber, MaxNumber); break;
+                    case 3: ShowDimension(labelOutVar4, comboBoxOutVar4, i<=SelectedNumber, MaxNumber); break;
                 }
-                
-                comboBoxOutputDimension.setSelectedIndex(SelectedNumber);
-                programmatically = false;
             }
+                
+            comboBoxOutputDimension.setSelectedIndex(SelectedNumber);
+            programmatically = false;
+        }
     }
     
-
-    
-    
-    private void InputFileSpecsChanged()
-    {
+    private void InputFileSpecsChanged() {
         if( !textFieldSafeFile.getText().trim().equals("") && 
             !textFieldSeparator.getText().trim().equals("")     )
         {
@@ -671,15 +629,7 @@ public class DialogAPriori extends DialogBase {
         }
     }
     
-    
-    
     private void buttonSafeFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSafeFileActionPerformed
-                
-        String hs = SystemUtils.getRegString("general", "datadir", "");
-//        if (!hs.equals("")){
-//            File file = new File(hs); 
-//            fileChooser.setCurrentDirectory(file);
- //       }
         TauArgusUtils.getDataDirFromRegistry(fileChooser);
         fileChooser.setDialogTitle("Select Safe file");
         fileChooser.setSelectedFile(new File(""));
@@ -688,33 +638,17 @@ public class DialogAPriori extends DialogBase {
         if (fileChooser.showOpenDialog(this) == javax.swing.JFileChooser.APPROVE_OPTION) {
             setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             String safeFile = fileChooser.getSelectedFile().toString();
-            if( safeFile.indexOf(".")<0)
-                safeFile+=".txt";
+            if(!safeFile.contains(".")) safeFile+=".txt";
              
             textFieldSafeFile.setText(safeFile);
-
             
             InputFileSpecsChanged();
-            
-            
-//            hs = fileChooser.getSelectedFile().getPath();
-//            if (!hs.equals("")){SystemUtils.putRegString("general", "datadir", hs);}
             TauArgusUtils.putDataDirInRegistry(safeFile);
-
             setCursor(Cursor.getDefaultCursor());
         }
     }//GEN-LAST:event_buttonSafeFileActionPerformed
 
-    
-    
-    
     private void buttonAprioryFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonAprioryFileActionPerformed
-
-        String hs = SystemUtils.getRegString("general", "datadir", "");
-//        if (!hs.equals("")){
-//            File file = new File(hs); 
-//            fileChooser.setCurrentDirectory(file);
-//        }
         TauArgusUtils.getDataDirFromRegistry(fileChooser);
         fileChooser.setDialogTitle("Select APriory file");
         fileChooser.setSelectedFile(new File(""));
@@ -726,16 +660,11 @@ public class DialogAPriori extends DialogBase {
             
             if( aprioriFile.indexOf(".")<0)
                 aprioriFile+=".hst";
-            
-//            textFieldCodelist.setText(codeListFile);
-//            variable.currentRecodeCodeListFile = codeListFile;
+
             textFieldAprioryFile.setText(aprioriFile);
             ChangeOkButtonState();
-            
-//            hs = fileChooser.getSelectedFile().getPath();
-//            if (!hs.equals("")){SystemUtils.putRegString("general", "datadir", hs);}
-//            setCursor(Cursor.getDefaultCursor());
-             TauArgusUtils.putDataDirInRegistry(aprioriFile);
+            setCursor(Cursor.getDefaultCursor());
+            TauArgusUtils.putDataDirInRegistry(aprioriFile);
         }
     }//GEN-LAST:event_buttonAprioryFileActionPerformed
 
@@ -748,9 +677,6 @@ public class DialogAPriori extends DialogBase {
                 ShowDimensionSelection(apriori.getDimension(), comboBoxOutputDimension.getSelectedIndex());
             }
     }//GEN-LAST:event_comboBoxOutputDimensionItemStateChanged
-
-    
-    
     
     private void comboBoxOutVar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxOutVar1ActionPerformed
         if( !programmatically)
@@ -792,52 +718,52 @@ public class DialogAPriori extends DialogBase {
            InputFileSpecsChanged(); 
     }//GEN-LAST:event_textFieldSeparatorKeyReleased
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(DialogAPriori.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(DialogAPriori.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(DialogAPriori.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(DialogAPriori.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                DialogAPriori dialog = new DialogAPriori(new javax.swing.JFrame(), true);
-                dialog.setVisible(true);
-                System.exit(0);
-            }
-        });
-    }
+//    /**
+//     * @param args the command line arguments
+//     */
+//    public static void main(String args[]) {
+//        /* Set the Nimbus look and feel */
+//        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+//        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+//         */
+//        try {
+//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//                if ("Nimbus".equals(info.getName())) {
+//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//                    break;
+//                }
+//            }
+//        } catch (ClassNotFoundException ex) {
+//            java.util.logging.Logger.getLogger(DialogAPriori.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (InstantiationException ex) {
+//            java.util.logging.Logger.getLogger(DialogAPriori.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (IllegalAccessException ex) {
+//            java.util.logging.Logger.getLogger(DialogAPriori.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+//            java.util.logging.Logger.getLogger(DialogAPriori.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        }
+//        //</editor-fold>
+//
+//        /* Create and display the dialog */
+//        java.awt.EventQueue.invokeLater(new Runnable() {
+//            public void run() {
+//                DialogAPriori dialog = new DialogAPriori(new javax.swing.JFrame(), true);
+//                dialog.setVisible(true);
+//                System.exit(0);
+//            }
+//        });
+//    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonAprioryFile;
     private javax.swing.JButton buttonCancel;
     private javax.swing.JButton buttonOk;
     private javax.swing.JButton buttonSafeFile;
-    private javax.swing.JComboBox comboBoxOutVar1;
-    private javax.swing.JComboBox comboBoxOutVar2;
-    private javax.swing.JComboBox comboBoxOutVar3;
-    private javax.swing.JComboBox comboBoxOutVar4;
-    private javax.swing.JComboBox comboBoxOutputDimension;
+    private javax.swing.JComboBox<String> comboBoxOutVar1;
+    private javax.swing.JComboBox<String> comboBoxOutVar2;
+    private javax.swing.JComboBox<String> comboBoxOutVar3;
+    private javax.swing.JComboBox<String> comboBoxOutVar4;
+    private javax.swing.JComboBox<String> comboBoxOutputDimension;
     private javax.swing.JFileChooser fileChooser;
     private javax.swing.JLabel labelAprioryFile;
     private javax.swing.JLabel labelMapping;

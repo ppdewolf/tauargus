@@ -20,7 +20,6 @@ package tauargus.service;
 import argus.utils.SystemUtils;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-//import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -93,7 +92,8 @@ public class TableService {
         tableSet.linkSuppressed = false;
         tableSet.nSecond = 0;
         tableSet.rounded = false;
-        tableSet.ctaProtect =false;
+        tableSet.ctaProtect = false;
+        tableSet.ckmProtect = false;
         tableSet.roundTime = 0;
         tableSet.processingTime = 0;
         tableSet.hasBeenAudited = false;
@@ -207,6 +207,7 @@ public class TableService {
             TableSet tableSet = TableService.getTable(i);
             tableSet.hasRealFreq = true;
             tableSet.suppressed = TableSet.SUP_NO;
+            tableSet.ckmProtect = false;
             tableSet.undoAudit();
             tableSet.nSecond = 0;
             tableSet.processingTime = 0;
@@ -217,7 +218,12 @@ public class TableService {
                 variable.inTable = true;
             }
         }
-        tauArgus.CleanAll();
+        try{
+            tauArgus.CleanAll();
+        }
+        catch(Exception ex){
+            throw new ArgusException("Something wrong:\n"+ex.getMessage());
+        }
         IProgressListener progressListener = new IProgressListener() {
             @Override
             public void UpdateProgress(final int percentage) {
@@ -268,12 +274,14 @@ public class TableService {
             TableSet table = TableService.getTable(i);
             boolean isFreq = table.isFrequencyTable();
             int ish = table.indexOfShadowVariable();
-            if (isFreq && ish < 0) {
+            if (isFreq && ish <= 0) { // ish == 0 in case of FreqVar without ShadowVar
                 ish = Application.numberOfVariables();
             }
             int[] expVar = table.indicesOfExplanatoryVariables();
             int requestVariableIndex = metadata.indexOf(Type.REQUEST);
-            if (!tauArgus.SetTable(i, expVar.length, expVar, isFreq, table.indexOfResponseVariable(), ish, table.indexOfCostVariable(), table.lambda, table.maxScaleCost, requestVariableIndex, table.missingIsSafe)) {
+            if (!tauArgus.SetTable(i, expVar.length, expVar, isFreq, table.indexOfResponseVariable(), ish, table.indexOfCostVariable(), 
+                                        table.indexOfCellKeyVariable(), table.respVar.CKMType, table.respVar.CKMTopK,
+                                        table.lambda, table.maxScaleCost, requestVariableIndex, table.missingIsSafe)) {
                 throw new ArgusException("SetTable went wrong for table" + (i + 1));
             }
             boolean isPiep = table.piepRule[0] || table.piepRule[1];
@@ -289,7 +297,10 @@ public class TableService {
             if (frequencyMarge[0] < frequencyMarge[1] && table.holding && table.minFreq[1] > 0) {
                 frequencyMarge[0] = frequencyMarge[1];
             }
-            if (!tauArgus.SetTableSafety(i, table.domRule, table.domN, table.domK, table.pqRule, table.pqP, table.pqQ, table.pqN, minFreq, table.piepPercentage, table.piepMarge, table.piepMinFreq, isPiep, table.weighted, table.weighted, table.holding, table.zeroUnsafe, false, 10, table.zeroRange, table.manualMarge, frequencyMarge)) {
+            if (!tauArgus.SetTableSafety(i, table.domRule, table.domN, table.domK, table.pqRule, table.pqP, table.pqQ, table.pqN, 
+                                         minFreq, table.piepPercentage, table.piepMarge, table.piepMinFreq, isPiep, table.weighted, 
+                                         table.weighted, table.holding, table.zeroUnsafe, false, 10, table.zeroRange, table.manualMarge, 
+                                         frequencyMarge)) {
                 throw new ArgusException("SetTableSafety went wrong for table" + (i + 1));
             }
         }
@@ -301,16 +312,18 @@ public class TableService {
         batch.reportProgress("Start computing tables");
         int[] tableIndex = new int[]{0};
         for (int i = 0; i < TableService.numberOfTables(); i++) {
-          tableIndex[0] = i;
-         if (!tauArgus.ComputeTables(errorCode, tableIndex)) {
-            throw new ArgusException("Error occurred when computing table" + (tableIndex[0] + 1) + tauArgus.GetErrorString(errorCode[0]));
-          }
+            tableIndex[0] = i;
+            if (!tauArgus.ComputeTables(errorCode, tableIndex)) {
+                throw new ArgusException("Error occurred when computing table" + (tableIndex[0] + 1) + tauArgus.GetErrorString(errorCode[0]));
+            }
         } 
         for (int i = 0; i < TableService.numberOfTables(); i++) {
             double[] xMaxTemp = new double[]{0.0};
             double xMin = tauArgus.GetMinimumCellValue(i, xMaxTemp);
             double xMax = xMaxTemp[0];
-            xMax = 1.5 * xMax;
+            if (xMax > 0){
+              xMax = 1.5 * xMax;}
+            else {xMax = 0;}
             if (xMin > 0) {
                 xMin = 0;
             }
